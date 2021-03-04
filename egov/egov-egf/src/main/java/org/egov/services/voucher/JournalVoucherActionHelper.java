@@ -168,9 +168,15 @@ public class JournalVoucherActionHelper {
    public void saveDocuments(CVoucherHeader voucherHeader)
    {
 	   List<DocumentUploads> files = voucherHeader.getDocumentDetail() == null ? null : voucherHeader.getDocumentDetail();
-       final List<DocumentUploads> documentDetails;
-       documentDetails = docUtils.getDocumentDetails(files, voucherHeader,
-               CommonConstants.JOURNAL_VOUCHER_OBJECT);
+       List<DocumentUploads> documentDetails = null;
+       try
+       {
+    	   documentDetails = docUtils.getDocumentDetails(files, voucherHeader,
+                   CommonConstants.JOURNAL_VOUCHER_OBJECT);
+       }catch (Exception e) {
+    	   e.printStackTrace();
+	}
+       
        if (!documentDetails.isEmpty()) {
        	voucherHeader.setDocumentDetail(documentDetails);
        	voucherService.persistDocuments(documentDetails);
