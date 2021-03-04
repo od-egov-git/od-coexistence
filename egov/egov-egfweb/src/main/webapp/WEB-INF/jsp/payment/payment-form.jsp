@@ -731,17 +731,8 @@
 			{
 				secondsignatory=dom.get('secondsignatory').value;
 			}
-			var backlogEntry='';
-			if(dom.get('backlogEntry') == null || dom.get('backlogEntry').value == '-1')
-			{
-				bootbox.alert("Please select whether it is a back dated entry");
-				undoLoadingMask();
-				return false;
-			}
-			else
-			{
-				backlogEntry=dom.get('backlogEntry').value;
-			}
+			var backlogEntry='N';
+			
 			if(dom.get('description') == null || dom.get('description').value == '')
 				{
 					bootbox.alert("<s:text name='msg.please.select.voucher.narration'/>");

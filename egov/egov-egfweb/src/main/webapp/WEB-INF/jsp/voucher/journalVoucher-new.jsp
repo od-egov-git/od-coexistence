@@ -253,7 +253,7 @@
 			}
 	function onSubmit()
 	{
-		var backlog=document.getElementById('backlogEntry');
+		var backlog=N;
 		if(validateJV()){
 			console.log("backlog  ::: "+backlog.value);
 			document.jvcreateform.action='/services/EGF/voucher/journalVoucher-create.action?backlogEntry='+backlog.value;
@@ -309,7 +309,7 @@
 		var vhDate=document.getElementById('voucherDate').value;
 		var vhType=document.getElementById('vType').value;
 		var narration=document.getElementById('narration');
-		var backlog=document.getElementById('backlogEntry');
+		var backlog='N'
 		console.log(vhType);
 		
 		if(vhType =='-1' )	{
@@ -328,12 +328,6 @@
 			document.getElementById('narration').focus();
 			return false;
 			}
-		if(backlog == null || backlog.value == '-1')
-		{
-		document.getElementById('lblError').innerHTML = "Please select whether it is a backlog entry";
-		document.getElementById('voucherDate').focus();
-		return false;
-		}
 		if(document.getElementById('vouchermis.function') == null || document.getElementById('vouchermis.function').value == '-1')
 		{
 		document.getElementById('lblError').innerHTML = 'Please select Function';
