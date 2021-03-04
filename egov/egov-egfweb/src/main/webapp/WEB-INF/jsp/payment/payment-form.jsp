@@ -343,8 +343,12 @@
 																		class="mandatory1">*</span></td>
 																	<td class="bluebox"><a href="#" onclick="openBudgetDetails()"> Click</a>
 																	</td>
-																	<td class="bluebox" width="15%">&nbsp;</td>
-																	<td class="bluebox" colspan="4">&nbsp;</td>
+																	<td class="bluebox" width="15%"><s:text name="backdated.entry" /><span
+																		class="mandatory1">*</span></td>
+																	<td class="bluebox" colspan="4"><s:select name="backlogEntry"
+																	headerKey="-1" headerValue="Select" value="%{backlogEntry}"
+																	list="#{'Y':'Yes' ,'N':'No'}"
+																			id="backlogEntry" /></td>
 																</tr>
 																
 															<tr>
@@ -731,8 +735,17 @@
 			{
 				secondsignatory=dom.get('secondsignatory').value;
 			}
-			var backlogEntry='N';
-			
+			var backlogEntry='';
+			if(dom.get('backlogEntry') == null || dom.get('backlogEntry').value == '-1')
+			{
+				bootbox.alert("Please select whether it is a back dated entry");
+				undoLoadingMask();
+				return false;
+			}
+			else
+			{
+				backlogEntry=dom.get('backlogEntry').value;
+			}
 			if(dom.get('description') == null || dom.get('description').value == '')
 				{
 					bootbox.alert("<s:text name='msg.please.select.voucher.narration'/>");

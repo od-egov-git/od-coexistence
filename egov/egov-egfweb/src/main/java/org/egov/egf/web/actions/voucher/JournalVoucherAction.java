@@ -254,8 +254,7 @@ public class JournalVoucherAction extends BaseVoucherAction
                     documentDetail.add(upload);
                 }
                 }
-                	
-               voucherHeader.setBackdateentry("N");
+               voucherHeader.setBackdateentry(backlogEntry);
                 voucherHeader = journalVoucherActionHelper.createVcouher(billDetailslist, subLedgerlist, voucherHeader,
                         voucherTypeBean, workflowBean);
                 voucherHeader.setDocumentDetail(documentDetail);               

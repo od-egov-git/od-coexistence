@@ -1070,7 +1070,7 @@ public class PaymentAction extends BasePaymentAction {
                 billregister.getEgBillregistermis()
                         .setFunction(functionService.findOne(Long.valueOf(parameters.get("function")[0].toString())));
             String backLogArr[]=new String[1];
-            backLogArr[0]="N";
+            backLogArr[0]=backlogEntry;
             parameters.put("backlogEntry", backLogArr);
             paymentheader = paymentService.createPayment(parameters, billList, billregister, workflowBean,firstsignatory,secondsignatory);
             miscBillList = paymentActionHelper.getPaymentBills(paymentheader);
