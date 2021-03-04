@@ -50,6 +50,10 @@
 <script>
 	function validateWorkFlowApprover(name,errorDivId) {
 		document.getElementById("workFlowAction").value=name;
+		if(name == 'Save As Draft')
+			{
+				return onSubmit();
+			}
 	    var approverPosId = document.getElementById("approverPositionId");
 	    if(approverPosId) {
 			var approver = approverPosId.options[approverPosId.selectedIndex].text; 
@@ -60,6 +64,10 @@
 
 	function validateWorkFlowApprover(name) {
 	    document.getElementById("workFlowAction").value=name;
+	    if(name == "Save As Draft")
+	    	{
+	    		return  onSubmit();
+	    	}
 	    var approverPosId = document.getElementById("approverPositionId");
 	    if(approverPosId && approverPosId.value != -1 && approverPosId.value != "") {
 			var approver = approverPosId.options[approverPosId.selectedIndex].text; 

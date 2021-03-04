@@ -47,10 +47,19 @@
  */
 package org.egov.services.voucher;
 
-import com.exilant.exility.common.TaskFailedException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
 import org.egov.billsaccounting.services.CreateVoucher;
+import org.egov.common.contstants.CommonConstants;
 import org.egov.commons.CVoucherHeader;
-import org.egov.eis.service.PositionMasterService;
+import org.egov.commons.DocumentUploads;
+import org.egov.commons.dao.EgwStatusHibernateDAO;
+import org.egov.commons.utils.DocumentUtils;
+import org.egov.egf.expensebill.service.ExpenseBillService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.exception.ApplicationRuntimeException;
 import org.egov.infra.microservice.models.EmployeeInfo;
@@ -60,18 +69,18 @@ import org.egov.infra.utils.StringUtils;
 import org.egov.infra.validation.exception.ValidationError;
 import org.egov.infra.validation.exception.ValidationException;
 import org.egov.infra.workflow.entity.State;
+import org.egov.infstr.services.PersistenceService;
+import org.egov.model.bills.EgBillregister;
+import org.egov.model.bills.Miscbilldetail;
 import org.egov.model.voucher.WorkflowBean;
-import org.egov.pims.commons.Position;
+import org.egov.services.payment.MiscbilldetailService;
 import org.egov.utils.FinancialConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import com.exilant.exility.common.TaskFailedException;
 
 @Transactional(readOnly = true)
 @Service
@@ -94,6 +103,22 @@ public class PreApprovedActionHelper {
     
     @Autowired
     SecurityUtils securityUtils;
+    
+    @Autowired
+    @Qualifier("miscbilldetailService")
+    private MiscbilldetailService miscbilldetailService;
+    
+    @Autowired
+    private ExpenseBillService expenseBillService;
+    @Autowired
+    private EgwStatusHibernateDAO egwStatusDAO;
+    @Autowired
+    @Qualifier("persistenceService")
+    private PersistenceService persistenceService;
+	@Autowired
+    private DocumentUtils docUtils;
+    
+    
     @Transactional
     public CVoucherHeader createVoucherFromBill(CVoucherHeader voucherHeader, WorkflowBean workflowBean, Long billId,
             String voucherNumber, Date voucherDate) throws ApplicationRuntimeException, SQLException, TaskFailedException {
@@ -120,6 +145,7 @@ public class PreApprovedActionHelper {
     @Transactional
     public CVoucherHeader sendForApproval(CVoucherHeader voucherHeader, WorkflowBean workflowBean)
     {
+    	EgBillregister expenseBill = null;
         try {
 
             if (FinancialConstants.CREATEANDAPPROVE.equalsIgnoreCase(workflowBean.getWorkFlowAction())
@@ -132,7 +158,37 @@ public class PreApprovedActionHelper {
                 voucherHeader = journalVoucherActionHelper.transitionWorkFlow(voucherHeader, workflowBean);
                 voucherService.applyAuditing(voucherHeader.getState());
             }
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.HOUR_OF_DAY, 0);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND, 0);
+            calendar.set(Calendar.MILLISECOND, 0);
+            Date currentDate = calendar.getTime(); 
+            if(workflowBean.getWorkFlowAction().equals("Approve"))
+            {
+            	if(voucherHeader != null && voucherHeader.getBackdateentry() != null && voucherHeader.getBackdateentry().equalsIgnoreCase("N"))
+            	{
+            		voucherHeader.setVoucherDate(currentDate);
+            	}
+            }
             voucherService.persist(voucherHeader);
+            if(workflowBean.getWorkFlowAction().equals("Approve"))
+            {
+            	List<Miscbilldetail> miscBillList = miscbilldetailService.findAllBy(
+                        " from Miscbilldetail where billVoucherHeader.id = ? ",
+                        voucherHeader.getId());
+            	
+            	if(miscBillList !=null && !miscBillList.isEmpty())
+            	{
+            		for(Miscbilldetail row : miscBillList)
+            		{
+            			 expenseBill = expenseBillService.getByBillnumber(row.getBillnumber());
+            			 expenseBill.setStatus(egwStatusDAO.getStatusByModuleAndCode("EXPENSEBILL", "Voucher Approved"));
+                		 expenseBillService.create(expenseBill);
+                		 persistenceService.getSession().flush();
+            		}
+            	}
+            }
 
         } catch (final ValidationException e) {
 
@@ -147,7 +203,18 @@ public class PreApprovedActionHelper {
         }
         return voucherHeader;
     }
-
+    @Transactional
+    public void saveDocuments(CVoucherHeader voucherHeader)
+    {
+ 	   List<DocumentUploads> files = voucherHeader.getDocumentDetail() == null ? null : voucherHeader.getDocumentDetail();
+        final List<DocumentUploads> documentDetails;
+        documentDetails = docUtils.getDocumentDetails(files, voucherHeader,
+                CommonConstants.JOURNAL_VOUCHER_OBJECT);
+        if (!documentDetails.isEmpty()) {
+        	voucherHeader.setDocumentDetail(documentDetails);
+        	voucherService.persistDocuments(documentDetails);
+        }
+    }
     private Boolean validateOwner(State state) {
 //        List<Position> positionsForUser = positionMasterService.getPositionsForEmployee(securityUtils.getCurrentUser().getId());
 //        return positionsForUser.contains(state.getOwnerPosition());

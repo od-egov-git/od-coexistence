@@ -55,40 +55,43 @@
 <style>
     .position_alert {
         position: fixed;
-        z-index: 9999;
-        top: 85px;
-        right: 20px;
-        background: #F2DEDE;
-        padding: 10px 20px;
-        border-radius: 5px;
+	    z-index: 9999;
+	    top: 5px;
+	    right: 20px;
+	    background: #265988;
+	    padding: 10px 20px;
+	    border-radius: 5px;
+		color: white;
     }
 
-    .position_alert1 {
+    .position_alert1 {      
         position: fixed;
-        z-index: 9999;
-        top: 85px;
-        right: 520px;
-        background: #F2DEDE;
-        padding: 10px 20px;
-        border-radius: 5px;
+	    z-index: 9999;
+	    top: 5px;
+	    right: 520px;
+	    background: #265988;
+	    padding: 10px 20px;
+	    border-radius: 5px;
+		color: white;
     }
 
     .position_alert2 {
         position: fixed;
-        z-index: 9999;
-        top: 85px;
-        right: 270px;
-        background: #F2DEDE;
-        padding: 10px 20px;
-        border-radius: 5px;
+	    z-index: 9999;
+	    top: 5px;
+	    right: 270px;
+	    background: #265988;
+	    padding: 10px 20px;
+	    border-radius: 5px;
+		color: white;
     }
 </style>
 <form:form name="expenseBillForm" role="form" action="" modelAttribute="egBillregister" id="egBillregister"
            class="form-horizontal form-groups-bordered" enctype="multipart/form-data">
-    <div class="position_alert">
+   <!--  <div class="position_alert">
         <spring:message code="lbl.netpayable.amount" text="Net Payable Amount"/> : &#8377 <span id="expenseNetPayableAmount"><c:out
             value="${expenseNetPayableAmount}" default="0.0"></c:out></span>
-    </div>
+    </div> -->
     <div class="position_alert1">
         <spring:message code="lbl.total.debit.amount" text="Total Debit Amount"/> : &#8377 <span id="expenseBillTotalDebitAmount"> <c:out
             value="${expenseBillTotalDebitAmount}" default="0.0"></c:out></span>
@@ -114,27 +117,33 @@
     <div class="panel-title text-center" style="color: green;">
         <c:out value="${message}"/><br/>
     </div>
-    <ul class="nav nav-tabs" id="settingstab">
+    <!--<ul class="nav nav-tabs" id="settingstab">
         <li class="active"><a data-toggle="tab" href="#expensebillheader"
                               data-tabidx=0><spring:message code="lbl.header" text="Header"/></a></li>
         <li><a data-toggle="tab" href="#checklist" data-tabidx=1><spring:message
                 code="lbl.checklist" text="CheckList"/> </a></li>
-    </ul>
+                      <!-- <li><a data-toggle="tab" href="#supportingDocuments" data-tabidx=1><spring:message
+                code="lbl.sdocuments"/> </a></li>
+              
+    </ul>-->
 
     <div class="tab-content">
         <div class="tab-pane fade in active" id="expensebillheader">
             <jsp:include page="expensebill-view-header.jsp"/>
-            <jsp:include page="expensebill-view-subledgerdetails.jsp"/>
+         <!--  <jsp:include page="expensebill-view-subledgerdetails.jsp"/> -->
             <jsp:include page="expensebill-view-accountdetails.jsp"/>
             <jsp:include page="expensebill-view-subledgeraccountdetails.jsp"/>
             <c:if test="${egBillregister.documentDetail != null &&  !egBillregister.documentDetail.isEmpty()}">
                 <jsp:include page="billdocument-upload.jsp"/>
             </c:if>
-            <%-- <jsp:include page="expensebill-budgetdetails.jsp"/> --%>
+           <!-- <jsp:include page="expensebill-budgetdetails.jsp"/> -->
         </div>
         <div class="tab-pane fade" id="checklist">
             <jsp:include page="expensebill-view-checklist.jsp"/>
         </div>
+         <!-- <div class="tab-pane fade" id="supportingDocuments">
+            <jsp:include page="expensebill-view-supporingDocs.jsp"/>
+        </div>-->
         <c:if test="${!workflowHistory.isEmpty() && mode != 'readOnly'}">
             <jsp:include page="../common/commonworkflowhistory-view.jsp"></jsp:include>
         </c:if>

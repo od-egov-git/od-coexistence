@@ -16,13 +16,12 @@ public class InstrumentSearchContract {
     private Date transactionDate;
     private String bankAccountNumber;
     private TransactionType transactionType;
-    private String bankId;
     public InstrumentSearchContract() {
         // TODO Auto-generated constructor stub
     }
     public InstrumentSearchContract(String ids, String sortBy, Integer pageSize, Integer offset, String instrumentTypes,
             String receiptIds, String financialStatuses, Date transactionFromDate, Date transactionToDate,
-            String transactionNumber, Date transactionDate, String bankAccountNumber, String bankId) {
+            String transactionNumber, Date transactionDate, String bankAccountNumber) {
         this.ids = ids;
         this.sortBy = sortBy;
         this.pageSize = pageSize;
@@ -35,7 +34,6 @@ public class InstrumentSearchContract {
         this.transactionNumber = transactionNumber;
         this.transactionDate = transactionDate;
         this.bankAccountNumber = bankAccountNumber;
-        this.setBankId(bankId);
     }
     public String getIds() {
         return ids;
@@ -114,12 +112,6 @@ public class InstrumentSearchContract {
     }
     public void setTransactionType(TransactionType transactionType) {
         this.transactionType = transactionType;
-    }
-    public String getBankId() {
-        return bankId;
-    }
-    public void setBankId(String bankId) {
-        this.bankId = bankId;
     }
     
 }

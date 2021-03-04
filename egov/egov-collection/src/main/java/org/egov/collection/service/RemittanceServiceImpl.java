@@ -160,13 +160,13 @@ public class RemittanceServiceImpl extends RemittanceService {
     @Override
     public List<Receipt> createCashBankRemittance(List<ReceiptBean> receiptList, final String accountNumberId,
             final Date remittanceDate) {
-
+    	LOGGER.info(" Start createCashBankRemittance ;;");
         final Set<Receipt> bankRemittanceList = new HashSet<>();
         final SimpleDateFormat dateFomatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         Set<String> paymentIdSet = null;
         InstrumentAccountCode accountCode = microserviceUtils
                 .getInstrumentAccountGlCodeByType(CollectionConstants.INSTRUMENTTYPE_NAME_CASH);
-
+        LOGGER.info("accountCode.getGlcode() :::"+accountCode.getGlcode());
         final String cashInHandQueryString = "SELECT COA.GLCODE FROM CHARTOFACCOUNTS COA WHERE COA.GLCODE = '"
                 + accountCode.getGlcode()
                 + "'";
@@ -178,9 +178,10 @@ public class RemittanceServiceImpl extends RemittanceService {
             cashInHandGLCode = cashInHand.list().get(0).toString();
 
         String createVoucher = "N";
-
+        LOGGER.info("cashInHandGLCode :::"+cashInHandGLCode);
         String functionCode = collectionsUtil.getAppConfigValue(CollectionConstants.MODULE_NAME_COLLECTIONS_CONFIG,
                 CollectionConstants.APPCONFIG_VALUE_COLLECTION_BANKREMITTANCE_FUNCTIONCODE);
+        LOGGER.info("functionCode ::"+functionCode);
      // TODO : need to make this call to mdms
 //        FinancialStatus instrumentStatusNew = microserviceUtils
 //                .getInstrumentStatusByCode(CollectionConstants.INSTRUMENT_NEW_STATUS);
@@ -198,13 +199,16 @@ public class RemittanceServiceImpl extends RemittanceService {
 
         final Bankaccount depositedBankAccount = (Bankaccount) persistenceService.find("from Bankaccount where accountnumber=?",
                 accountNumberId);
+        LOGGER.info("depositedBankAccount ;;;");
         final String serviceGlCode = depositedBankAccount.getChartofaccounts().getGlcode();
+        LOGGER.info("serviceGlCode :::"+serviceGlCode);
         List<Receipt> receipts;
         Set<Instrument> instruments;
         Map<String, Receipt> receiptMap = new HashMap<>();
         Map<String, Set<Instrument>> receiptInstrumentMap = new HashMap<>();
         final HashSet<String> receiptIds = new HashSet<>(0);
         List<BusinessService> businessServiceList = microserviceUtils.getBusinessService(null);
+        LOGGER.info("Fetched business service all");
         Map<String, BusinessService> businessDetailsMap = new HashMap<>();
         for (BusinessService bd : businessServiceList) {
             businessDetailsMap.put(bd.getCode(), bd);
@@ -212,6 +216,7 @@ public class RemittanceServiceImpl extends RemittanceService {
         BusinessService businessDetails;
         InstrumentResponse instrumentResponse;
         List<Instrument> instrumentsList;
+        LOGGER.info("Start receipt list");
         for (ReceiptBean receipt : receiptList) {
             if (receipt.getSelected() != null && receipt.getSelected()) {
                 if (receipt.getFund() != null && !receipt.getFund().isEmpty())
@@ -224,6 +229,7 @@ public class RemittanceServiceImpl extends RemittanceService {
                     } catch (final ParseException e) {
                         LOGGER.error("Error Parsing Date", e);
                     }
+                LOGGER.info("voucherDate :: "+voucherDate);
                 if (receipt.getService() != null && receipt.getService().length() > 0) {
                     businessDetails = businessDetailsMap.get(receipt.getService());
                     // If Cash Amount is present
@@ -234,7 +240,7 @@ public class RemittanceServiceImpl extends RemittanceService {
                             receipts = microserviceUtils.getReceipts(PaymentStatusEnum.NEW.name(),
                                     receipt.getService(),
                                     receipt.getFund(), receipt.getDepartment(), receipt.getReceiptDate());
-                            if (receipts != null && !receipts.isEmpty()) {
+                            if (receipts != null) {
                                 paymentIdSet = new HashSet<>();
                                 for (Receipt r : receipts) {
                                     receiptMap.put(r.getPaymentId(), r);
@@ -247,7 +253,7 @@ public class RemittanceServiceImpl extends RemittanceService {
                             receipts = microserviceUtils.getReceipts(CollectionConstants.RECEIPT_STATUS_APPROVED,
                                     receipt.getService(),
                                     receipt.getFund(), receipt.getDepartment(), receipt.getReceiptDate());
-                            if (receipts != null && !receipts.isEmpty()) {
+                            if (receipts != null) {
                                 for (Receipt r : receipts) {
                                     receiptMap.put(r.getBill().get(0).getBillDetails().get(0).getReceiptNumber(), r);
                                     receiptIds.add(r.getBill().get(0).getBillDetails().get(0).getId());
@@ -255,61 +261,81 @@ public class RemittanceServiceImpl extends RemittanceService {
                             }
                             break;
                         }
-                        if (receipts != null && !receipts.isEmpty()) {
+                        LOGGER.info("AFter payments:::");
                         instrumentsList = microserviceUtils.getInstrumentsByReceiptIds(
                                 CollectionConstants.INSTRUMENTTYPE_NAME_CASH, CollectionConstants.INSTRUMENT_NEW_STATUS,
                                 StringUtils.join(receiptIds, ","));
-
+                        LOGGER.info("instrumentsList ::: "+instrumentsList);
                         totalCashAmt = totalCashAmt.add(receipt.getInstrumentAmount());
                         if (businessDetails.isVoucherCreationEnabled()) {
+                        	LOGGER.info("YYYY");
                             createVoucher = "Y";
                             totalCashVoucherAmt = totalCashVoucherAmt.add(receipt.getInstrumentAmount());
+                            LOGGER.info("totalCashVoucherAmt ::: :"+totalCashVoucherAmt);
                         } else {
+                        	LOGGER.info("NNNN");
                             instrumentResponse = microserviceUtils.reconcileInstruments(instrumentsList,
-                                    accountNumberId, depositedBankAccount.getBankbranch().getBank().getId().toString());
+                                    accountNumberId);
+                            LOGGER.info("instrumentResponse ::::");
                         }
                         for (Instrument i : instrumentsList) {
+                        	LOGGER.info("i :::");
                             for (InstrumentVoucher iv : i.getInstrumentVouchers()) {
+                            	LOGGER.info("iv :::");
                                 if(iv.getVoucherHeaderId() != null){
+                                	LOGGER.info("iv.getVoucherHeaderId() :::"+iv.getVoucherHeaderId());
                                     if (receiptInstrumentMap.get(iv.getReceiptHeaderId()) != null) {
+                                    	LOGGER.info("receiptInstrumentMap.get(iv.getReceiptHeaderId()) ::: "+receiptInstrumentMap.get(iv.getReceiptHeaderId()));
                                         instruments = new HashSet(receiptInstrumentMap.get(iv.getReceiptHeaderId()));
                                         instruments.add(i);
                                         receiptInstrumentMap.put(iv.getReceiptHeaderId(), instruments);
+                                        LOGGER.info("receiptInstrumentMap :::");
                                     } else {
+                                    	LOGGER.info("else receiptInstrumentMap :::");
                                         receiptInstrumentMap.put(iv.getReceiptHeaderId(), Collections.singleton(i));
                                     }
                                     if(paymentIdSet  != null){
+                                    	LOGGER.info("paymentIdSet :::");
                                         paymentIdSet.add(iv.getReceiptHeaderId());
                                     }
                                     bankRemittanceList.add(receiptMap.get(iv.getReceiptHeaderId()));
+                                    LOGGER.info("iv.getVoucherHeaderId() :::"+iv.getVoucherHeaderId());
                                     List<CVoucherHeader> voucher = this.getVoucher(iv.getVoucherHeaderId());
+                                    LOGGER.info("Voucher created");
                                     if(!voucher.isEmpty()){
+                                    	LOGGER.info("voucher not empty");
                                         fundCode = voucher.get(0).getFundId().getCode();
                                         functionCode = voucher.get(0).getVouchermis().getFunction().getCode();
+                                        LOGGER.info("fundCode ::: "+fundCode);
+                                        LOGGER.info("functionCode ::: "+functionCode);
                                     }else{
+                                    	LOGGER.info("voucher  empty");
                                         String validationMessage = "Voucher is not exist for receipt: "+receipt.getReceiptNumber()+", contact tosystem administrator.";
+                                        LOGGER.info("validationMessage ::: "+validationMessage);
                                         throw new ValidationException(Arrays.asList(new ValidationError(validationMessage, validationMessage)));
                                     }
                                 }
                             }
                         }
+                        LOGGER.info("After voucher ");
 
                     }
                 }
             }
         }
-     }
         
         if (totalCashVoucherAmt.compareTo(totalCashAmt) != 0) {
             String validationMessage = "There is a difference of amount " + totalCashAmt.subtract(totalCashVoucherAmt)
                     + " between bank challan and the remittance voucher , please contact system administrator ";
+            LOGGER.info("validationMessage :: "+validationMessage);
             throw new ValidationException(Arrays.asList(new ValidationError(validationMessage, validationMessage)));
         }
+        LOGGER.info("Before populateAndPersistRemittance");
         final Remittance remittance = populateAndPersistRemittance(totalCashAmt, BigDecimal.ZERO, fundCode,
                 cashInHandGLCode, null, serviceGlCode, functionCode, bankRemittanceList, createVoucher,
                 voucherDate, depositedBankAccount, totalCashVoucherAmt, BigDecimal.ZERO, Collections.EMPTY_LIST,
                 receiptInstrumentMap);
-
+        LOGGER.info("End populateAndPersistRemittance");
         switch (ApplicationThreadLocals.getCollectionVersion().toUpperCase()) {
         case "V2":
         case "VERSION2":
@@ -328,11 +354,12 @@ public class RemittanceServiceImpl extends RemittanceService {
             ReceiptResponse response = microserviceUtils.updateReceipts(new ArrayList<>(bankRemittanceList));
             break;
         }
-        
+        LOGGER.info("after ReceiptResponse :::");
         List<Instrument> instrumentList = receiptInstrumentMap.values().stream().flatMap(Set::stream).collect(Collectors.toList());
         if(!instrumentList.isEmpty()){
-            microserviceUtils.reconcileInstrumentsWithPayinSlipId(instrumentList, accountNumberId,remittance.getVoucherHeader().getId(), depositedBankAccount.getBankbranch().getBank().getId().toString());
+            microserviceUtils.reconcileInstrumentsWithPayinSlipId(instrumentList, accountNumberId,remittance.getVoucherHeader().getVoucherNumber());            
         }
+        LOGGER.info("after reconcileInstrumentsWithPayinSlipId :::");
         receiptList.stream().forEach(receipt -> {
             receipt.setRemittanceReferenceNumber(remittance.getReferenceNumber());
         });
@@ -388,6 +415,7 @@ public class RemittanceServiceImpl extends RemittanceService {
             final String createVoucher, final Date voucherDate, final Bankaccount depositedBankAccount,
             final BigDecimal totalCashVoucherAmt, final BigDecimal totalChequeVoucherAmt, List<String> instrumentId,
             Map<String, Set<Instrument>> receiptInstrumentMap) {
+    	LOGGER.info("start of method populateAndPersistRemittance ");
         CVoucherHeader voucherHeader;
         final CFinancialYear financialYear = collectionsUtil.getFinancialYearforDate(new Date());
         BigDecimal totalAmount = BigDecimal.ZERO;
@@ -398,6 +426,7 @@ public class RemittanceServiceImpl extends RemittanceService {
         final EgwStatus receiptStatusApproved = collectionsUtil.getStatusForModuleAndCode(
                 CollectionConstants.MODULE_NAME_REMITTANCE, CollectionConstants.REMITTANCE_STATUS_CODE_APPROVED);
         remittance.setStatus(receiptStatusApproved);
+        LOGGER.info("After status::");
         remittance.setReferenceNumber(collectionsNumberGenerator.generateRemittanceNumber(financialYear));
         remittance.setFund(fundHibernateDAO.fundByCode(fundCode));
         remittance.setFunction(functionHibernateDAO.getFunctionByCode(functionCode));
@@ -408,6 +437,7 @@ public class RemittanceServiceImpl extends RemittanceService {
                     .addAll(getRemittanceDetailsList(totalCashAmount, BigDecimal.ZERO, cashInHandGLCode, remittance));
             totalAmount = totalAmount.add(totalCashAmount);
         }
+        LOGGER.info("After totalAmount::");
         if (totalChequeAmount != null && totalChequeAmount.compareTo(BigDecimal.ZERO) > 0
                 && chequeInHandGLcode != null) {
             remittanceDetailsList.addAll(
@@ -415,6 +445,7 @@ public class RemittanceServiceImpl extends RemittanceService {
             totalAmount = totalAmount.add(totalChequeAmount);
             isChequeAmount = Boolean.TRUE;
         }
+        LOGGER.info("After remittanceDetailsList::");
         remittanceDetailsList.addAll(getRemittanceDetailsList(BigDecimal.ZERO, totalAmount, serviceGLCode, remittance));
         remittance.setRemittanceDetails(new HashSet<RemittanceDetail>(remittanceDetailsList));
         HashSet<RemittanceInstrument> remittanceInstrumentSet = new HashSet<RemittanceInstrument>();
@@ -424,6 +455,7 @@ public class RemittanceServiceImpl extends RemittanceService {
             voucherHeader = createVoucherForRemittance(cashInHandGLCode, chequeInHandGLcode, serviceGLCode,
                     functionCode, totalCashVoucherAmt, totalChequeVoucherAmt, voucherDate, fundCode);
             remittance.setVoucherHeader(voucherHeader);
+            LOGGER.info("After voucherHeader::");
             for (Receipt receiptHeader : receiptHeadList) {
                 Set<Instrument> instSet = Collections.EMPTY_SET;
                 switch (ApplicationThreadLocals.getCollectionVersion().toUpperCase()) {
@@ -436,6 +468,7 @@ public class RemittanceServiceImpl extends RemittanceService {
                     instSet  = receiptInstrumentMap.get(receiptHeader.getBill().get(0).getBillDetails().get(0).getReceiptNumber());
                     break;
                 }
+                LOGGER.info("after instset");
                 for (Instrument instHead : instSet) {
                     if (!isChequeAmount || (isChequeAmount && instrumentId.contains(instHead.getId().toString()))) {
                         RemittanceInstrument ri = prepareRemittanceInstrument(remittance, instHead);
@@ -450,6 +483,7 @@ public class RemittanceServiceImpl extends RemittanceService {
             remittance.setRemittanceInstruments(remittanceInstrumentSet);
             RemittanceResponse response = create(remittance, receiptHeadList);
         }
+        LOGGER.info("end of remittance");
         return remittance;
     }
 
@@ -488,7 +522,7 @@ public class RemittanceServiceImpl extends RemittanceService {
         RemittanceReceipt rr;
         for (Receipt receipt : receiptHeadList) {
             rr = new RemittanceReceipt();
-            rr.setReceipt(receipt.getPaymentId());
+            rr.setReceipt(receipt.getBill().get(0).getBillDetails().get(0).getId());
             rr.setTenantId(microserviceUtils.getTenentId());
             r.getRemittanceReceipts().add(rr);
         }
@@ -554,11 +588,10 @@ public class RemittanceServiceImpl extends RemittanceService {
      */
     @Override
     public List<ReceiptBean> findCashRemittanceDetailsForServiceAndFund(final String boundaryIdList,
-            final String serviceCodes, final String fundCodes, final Date startDate, final Date endDate, String instrumentStatus) {
-     // TODO : need to make this call to mdms
-//        FinancialStatus status = microserviceUtils.getInstrumentStatusByCode(CollectionConstants.INSTRUMENT_NEW_STATUS);
+            final String serviceCodes, final String fundCodes, final Date startDate, final Date endDate) {
+        LOGGER.info("inside  findCashRemittanceDetailsForServiceAndFund method");
         List<Instrument> instruments = microserviceUtils.getInstruments(CollectionConstants.INSTRUMENTTYPE_NAME_CASH, TransactionType.Debit,
-                instrumentStatus,startDate,endDate);
+                CollectionConstants.INSTRUMENT_NEW_STATUS);
         List<String> receiptIds = new ArrayList<>();
         for (Instrument i : instruments) {
             if (i.getInstrumentVouchers() != null)
@@ -566,6 +599,7 @@ public class RemittanceServiceImpl extends RemittanceService {
                     receiptIds.add(iv.getReceiptHeaderId());
                 }
         }
+        LOGGER.info("after  instrument details ");
         List<ReceiptBean> resultList = new ArrayList<>();
         if(!receiptIds.isEmpty()){
         List<Receipt> receipts = Collections.EMPTY_LIST;
@@ -579,48 +613,54 @@ public class RemittanceServiceImpl extends RemittanceService {
             receipts = microserviceUtils.getReceipts(StringUtils.join(receiptIds, ","), CollectionConstants.RECEIPT_STATUS_APPROVED, serviceCodes,startDate, endDate);
             break;
         }
+        LOGGER.info("after request response");
         Map<String, List<Receipt>> receiptDateWiseMap = new HashMap<>();
         Map<String, List<Receipt>> serviceWiseMap = new HashMap<>();
         Map<String, List<Receipt>> instrumentWiseMap = new HashMap<>();
         Map<String, List<Receipt>> fundWiseMap = new HashMap<>();
         Map<String, List<Receipt>> departmentWiseMap = new HashMap<>();
-
+        LOGGER.info("after request response processing");
         groupByReceiptDate(receiptDateWiseMap, receipts);
-
+        LOGGER.info("after group by receipt");
         for (String key : receiptDateWiseMap.keySet()) {
             List<Receipt> tempList = receiptDateWiseMap.get(key);
             groupByService(key, serviceWiseMap, tempList);
         }
-
+        LOGGER.info("after group by service");
         for (String key : serviceWiseMap.keySet()) {
             List<Receipt> tempList = serviceWiseMap.get(key);
             groupByInstrument(key, instrumentWiseMap, tempList);
         }
-
+        LOGGER.info("after group by instrument");
         for (String key : instrumentWiseMap.keySet()) {
             List<Receipt> tempList = instrumentWiseMap.get(key);
             groupByFund(key, fundWiseMap, tempList);
         }
-
+        LOGGER.info("after group by fund");
         for (String key : fundWiseMap.keySet()) {
             List<Receipt> tempList = fundWiseMap.get(key);
             groupByDepartment(key, departmentWiseMap, tempList);
         }
-
+        LOGGER.info("after group by dept");
         for (String key : departmentWiseMap.keySet()) {
             List<Receipt> tempList = departmentWiseMap.get(key);
             populateResultList(key, resultList, tempList);
         }
-
+        LOGGER.info("after group by resultlist");
         populateNames(resultList);
+        LOGGER.info("after group by populateNames");
         }
         return resultList;
     }
 
     private void populateNames(List<ReceiptBean> resultList) {
+    	LOGGER.info("start populate method");
         List<Fund> fundList = fundHibernateDAO.findAllActiveFunds();
+        LOGGER.info("after funds");
         List<Department> departmentList = microserviceUtils.getDepartments();
+        LOGGER.info("after depts");
         List<BusinessService> businessServiceList = microserviceUtils.getBusinessService(null);
+        LOGGER.info("after business service");
         Map<String, String> fundCodeNameMap = new HashMap<>();
         Map<String, String> deptCodeNameMap = new HashMap<>();
         Map<String, String> businessDetailsCodeNameMap = new HashMap<>();
@@ -647,24 +687,35 @@ public class RemittanceServiceImpl extends RemittanceService {
         criteria.setCode(StringUtils.join(bsCodes,','));
         criteria.setVoucherCreationEnabled(true);
         List<BusinessServiceMapping> businessServiceMappingList = microserviceUtils.getBusinessServiceMappingBySearchCriteria(criteria );
+        LOGGER.info("after businesss");
         Map<String,BusinessServiceMapping> bsServiceMapping = new HashMap<>();
         businessServiceMappingList.stream().forEach(bsm -> {
             bsServiceMapping.put(bsm.getCode(), bsm);
         });
 
-        for (ReceiptBean rb : resultList) {
-            String serviceCode = rb.getService();
-            if (serviceCode != null && !serviceCode.isEmpty()){
-                rb.setServiceName(businessDetailsCodeNameMap.get(serviceCode));
-                BusinessServiceMapping serviceMapping = bsServiceMapping.get(serviceCode);
-                if(StringUtils.isNumeric(serviceMapping.getFund())){
-                    rb.setFundName(fundCodeNameMap.get(serviceMapping.getFund()));
-                }
-                if(StringUtils.isNoneBlank(serviceMapping.getDepartment())){
-                    rb.setDepartmentName(deptCodeNameMap.get(serviceMapping.getDepartment()));
+        try
+        {
+        	for (ReceiptBean rb : resultList) {
+                String serviceCode = rb.getService();
+                LOGGER.info("serviceCode :: "+serviceCode);
+                if (serviceCode != null && !serviceCode.isEmpty()){
+                    rb.setServiceName(businessDetailsCodeNameMap.get(serviceCode));
+                    LOGGER.info("rb.setServiceName :: "+rb.getServiceName());
+                    BusinessServiceMapping serviceMapping = bsServiceMapping.get(serviceCode);
+                    LOGGER.info("serviceMapping.getFund() :: "+serviceMapping.getFund());
+                    if(StringUtils.isNumeric(serviceMapping.getFund())){
+                        rb.setFundName(fundCodeNameMap.get(serviceMapping.getFund()));
+                    }
+                    LOGGER.info("serviceMapping.getDepartment() :: "+serviceMapping.getDepartment());
+                    if(StringUtils.isNoneBlank(serviceMapping.getDepartment())){
+                        rb.setDepartmentName(deptCodeNameMap.get(serviceMapping.getDepartment()));
+                    }
                 }
             }
-        }
+        }catch (Exception e) {
+			e.printStackTrace();
+		}
+        
     }
 
     private void populateResultList(String key, List<ReceiptBean> result, List<Receipt> tempList) {
@@ -796,7 +847,7 @@ public class RemittanceServiceImpl extends RemittanceService {
         String instrumentTypes = CollectionConstants.INSTRUMENTTYPE_NAME_CHEQUE + ","
                 + CollectionConstants.INSTRUMENTTYPE_NAME_DD;
         List<Instrument> instruments = microserviceUtils.getInstruments(instrumentTypes, TransactionType.Debit,
-                CollectionConstants.INSTRUMENT_NEW_STATUS,startDate,endDate);
+                CollectionConstants.INSTRUMENT_NEW_STATUS);
         Map<String, Instrument> receiptInstrumentMap = new HashMap<>();
         List<String> receiptIds = new ArrayList<>();
         for (Instrument i : instruments) {
@@ -1019,7 +1070,7 @@ public class RemittanceServiceImpl extends RemittanceService {
                         createVoucher = "Y";
                         totalChequeVoucherAmt = totalChequeVoucherAmt.add(receipt.getInstrumentAmount());
                     } else {
-                        microserviceUtils.depositeInstruments(instruments, depositedBankAccount.getAccountnumber(), depositedBankAccount.getBankbranch().getBank().getId().toString());
+                        microserviceUtils.depositeInstruments(instruments, depositedBankAccount.getAccountnumber());
                     }
                 }
 
@@ -1079,6 +1130,5 @@ public class RemittanceServiceImpl extends RemittanceService {
         query.setParameter("voucherNumber", voucherHeaderId);
         return query.list();
     }
-
 
 }

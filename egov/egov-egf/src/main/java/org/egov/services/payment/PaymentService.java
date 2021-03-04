@@ -79,7 +79,6 @@ import org.egov.commons.EgwStatus;
 import org.egov.commons.dao.ChartOfAccountsHibernateDAO;
 import org.egov.commons.dao.EgwStatusHibernateDAO;
 import org.egov.commons.dao.FinancialYearDAO;
-import org.egov.commons.service.ChartOfAccountDetailService;
 import org.egov.commons.service.ObjectTypeService;
 import org.egov.commons.utils.EntityType;
 import org.egov.egf.commons.EgovCommon;
@@ -214,9 +213,6 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
     @Autowired
     @Qualifier("workflowService")
     private SimpleWorkflowService<Paymentheader> paymentHeaderWorkflowService;
-    
-    @Autowired
-	private ChartOfAccountDetailService chartOfAccountDetailService;
 
     public PaymentService(Class<Paymentheader> type) {
         super(type);
@@ -224,13 +220,11 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
 
     public BigDecimal getAccountBalance(final String accountId, final String voucherDate, final BigDecimal amount,
             final Long paymentId, final Long accGlcodeID) throws ParseException {
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Starting getAccountBalance...");
+            LOGGER.info("Starting getAccountBalance...");
         egovCommon.setPersistenceService(persistenceService);
         egovCommon.setFundFlowService(fundFlowService);
         egovCommon.setAppConfigValuesService(appConfigValuesService);
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Completed getAccountBalance.");
+            LOGGER.info("Completed getAccountBalance.");
         return egovCommon.getAccountBalance(formatter.parse(voucherDate), Long.valueOf(accountId), amount, paymentId,
                 accGlcodeID);
     }
@@ -282,15 +276,17 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
 
     @Transactional
     public Paymentheader createPayment(final Map<String, String[]> parameters, final List<PaymentBean> billList,
-            final EgBillregister billregister, WorkflowBean workflowBean)
+            final EgBillregister billregister, WorkflowBean workflowBean, String firstsignatory, String secondsignatory)
             throws ApplicationRuntimeException, ValidationException {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Starting createPayment...");
         Paymentheader paymentheader = null;
+        String backlogEntry=null;
         try {
             accountcodedetails = new ArrayList<HashMap<String, Object>>();
             subledgerdetails = new ArrayList<HashMap<String, Object>>();
             conBillIdlength = 0;
+             backlogEntry=parameters.get("backlogEntry")[0];
             getGlcodeIds();
 
             final HashMap<String, Object> headerdetails = new HashMap<String, Object>();
@@ -306,7 +302,13 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
             headerdetails.put(VoucherConstant.VOUCHERTYPE, "Payment");
             if (parameters.get(VoucherConstant.DESCRIPTION) != null)
                 headerdetails.put(VoucherConstant.DESCRIPTION, parameters.get(VoucherConstant.DESCRIPTION)[0]);
-
+            if (firstsignatory != null)
+                headerdetails.put("firstsignatory", firstsignatory);
+            if (secondsignatory != null)
+                headerdetails.put("secondsignatory", secondsignatory);
+            if (backlogEntry != null)
+                headerdetails.put("backdateentry", backlogEntry);
+            
             if (parameters.get(VoucherConstant.VOUCHERDATE) != null
                     && !parameters.get(VoucherConstant.VOUCHERDATE)[0].equals(EMPTY_STRING))
                 headerdetails.put(VoucherConstant.VOUCHERDATE,
@@ -440,7 +442,7 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
             paymentheader.transition().progressWithStateCopy().withSenderName(user.getName())
                     .withComments(workflowBean.getApproverComments())
                     .withStateValue(stateValue).withDateInfo(currentDate.toDate())
-                    .withOwner(paymentheader.getState().getInitiatorPosition())
+                    .withOwner(paymentheader.getState().getInitiatorPosition()).withOwnerName((paymentheader.getState().getInitiatorPosition() != null && paymentheader.getState().getInitiatorPosition() > 0L) ? getEmployeeName(paymentheader.getState().getInitiatorPosition()):"")
                     .withNextAction(FinancialConstants.WF_STATE_EOA_Approval_Pending);
         } else if (FinancialConstants.BUTTONAPPROVE.equalsIgnoreCase(workflowBean.getWorkFlowAction())) {
 
@@ -469,10 +471,9 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
                         null, null, null, workflowBean.getCurrentState(), null);
                 paymentheader.transition().start().withSenderName(user.getName())
                         .withComments(workflowBean.getApproverComments()).withStateValue(wfmatrix.getNextState())
-                        .withDateInfo(currentDate.toDate()).withOwner(workflowBean.getApproverPositionId())
+                        .withDateInfo(currentDate.toDate()).withOwner(workflowBean.getApproverPositionId()).withOwnerName((workflowBean.getApproverPositionId() != null && workflowBean.getApproverPositionId() > 0L) ? getEmployeeName(workflowBean.getApproverPositionId()):"")
                         .withNextAction(wfmatrix.getNextAction())
-                        .withInitiator((info != null && info.getAssignments() != null && !info.getAssignments().isEmpty())
-                                ? info.getAssignments().get(0).getPosition() : null);
+                        .withInitiator(user.getId());
 
             } else if (paymentheader.getCurrentState().getNextAction().equalsIgnoreCase("END"))
                 paymentheader.transition().progressWithStateCopy().end().withSenderName(user.getName())
@@ -485,7 +486,7 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
                         null, null, null, paymentheader.getCurrentState().getValue(), null);
                 paymentheader.transition().progressWithStateCopy().withSenderName(user.getName())
                         .withComments(workflowBean.getApproverComments()).withStateValue(wfmatrix.getNextState())
-                        .withDateInfo(currentDate.toDate()).withOwner(workflowBean.getApproverPositionId())
+                        .withDateInfo(currentDate.toDate()).withOwner(workflowBean.getApproverPositionId()).withOwnerName((workflowBean.getApproverPositionId() != null && workflowBean.getApproverPositionId() > 0L) ? getEmployeeName(workflowBean.getApproverPositionId()):"")
                         .withNextAction(wfmatrix.getNextAction());
             }
         }
@@ -632,12 +633,7 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
             }
             sublegDetailMap.put(VoucherConstant.DEBITAMOUNT, tmpsublegDetailMap.get(key));
             sublegDetailMap.put(VoucherConstant.CREDITAMOUNT, BigDecimal.valueOf(0));
-            
-			if (chartOfAccountDetailService.getByGlcodeAndDetailTypeId(
-					sublegDetailMap.get(VoucherConstant.GLCODE).toString(),
-					Integer.valueOf(sublegDetailMap.get(VoucherConstant.DETAILTYPEID).toString())) != null) {
-				subledgerdetails.add(sublegDetailMap);
-			}
+            subledgerdetails.add(sublegDetailMap);
         }
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Completed prepareVoucherdetails.");
@@ -818,6 +814,39 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
             LOGGER.debug("Completed updateVoucherHeader.");
     }
 
+    private void updateVoucherHeaderForPayment(final Map<String, String[]> parameters, final CVoucherHeader existingVH,
+            final CVoucherHeader voucherHeader) throws Exception {
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Starting updateVoucherHeader...");
+
+        voucherHeader.setFundId(existingVH.getFundId());
+
+        voucherService.getUpdatedVNumCGVN(existingVH, voucherHeader, existingVH.getType());
+
+        /*
+         * String voucherNumber = VoucherHelper.getGeneratedVoucherNumber(existingVH .getFundId().getId(), autoVoucherType,
+         * voucherHeader.getVoucherDate(), vNumGenMode, manualVoucherNumber);
+         */
+        // existingVH.setVoucherNumber(voucherNumber);
+        /*
+         * if ("Auto".equalsIgnoreCase(vNumGenMode)) { if(LOGGER.isDebugEnabled()) LOGGER.debug(
+         * "Voucher number generation mode is : "+ vNumGenMode); existingVH
+         * .setVoucherNumber(cmImpl.getTxnNumber(existingVH.getFundId() .getId().toString(),autoVoucherType,vDate,con)); }else {
+         * existingVH.setVoucherNumber (parameters.get("voucherNumberPrefix")[0]+parameters .get("voucherNumberSuffix")[0]); }
+         */
+      
+        existingVH.setDescription(voucherHeader.getDescription());
+        existingVH.setVoucherDate(voucherHeader.getVoucherDate());
+        //existingVH.setCgvn(vType + eg_voucher);
+        existingVH.setLastModifiedDate(new Date());
+        existingVH.setLastModifiedBy(user);
+        // persistenceService.setType(CVoucherHeader.class);
+        persistenceService.update(existingVH);
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Completed updateVoucherHeader.");
+    }
+
+
     private void prepareVoucherDetailsForModify(final List<PaymentBean> paymentBillList,
             final Map<String, String[]> parameters, final Bankaccount ba) {
         if (LOGGER.isDebugEnabled())
@@ -978,6 +1007,14 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
             List<AppConfigValues> appList;
 
             worksBillGlcodeList = populateGlCodeIds(Constants.WORKS_BILL_PURPOSE_IDS);
+            if(worksBillGlcodeList != null && !worksBillGlcodeList.isEmpty())
+            {
+            	for(CChartOfAccounts coa :worksBillGlcodeList)
+            	{
+            		LOGGER.info("coa ::::"+coa.toString());
+            	}
+            	
+            }
             purchaseBillGlcodeList = populateGlCodeIds(Constants.PURCHASE_BILL_PURPOSE_IDS);
             salaryBillGlcodeList = populateGlCodeIds("salaryBillPurposeIds");
             pensionBillGlcodeList = populateGlCodeIds(Constants.PENSION_BILL_PURPOSE_IDS);
@@ -1053,11 +1090,9 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
             LOGGER.info(
                     "Calling getDeductionAmt..................................$$$$$$$$$$$$$$$$$$$$$$ " + list.size());
         for (final CChartOfAccounts coa : list)
-            if (LOGGER.isDebugEnabled())
-                LOGGER.debug("#################################" + coa.getGlcode() + ":::::" + coa.getPurposeId());
+                LOGGER.info("#################################" + coa.getGlcode() + ":::::" + coa.getPurposeId());
         populateDeductionData(billList, deductionAmtMap, type, glCodeList.get(type));
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Completed getDeductionAmt.");
+            LOGGER.info("Completed getDeductionAmt.");
         return deductionAmtMap;
     }
 
@@ -1085,8 +1120,7 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
 
     @SuppressWarnings("unchecked")
     private List<Object[]> getDeductionList(final String expendituretype, final List<CChartOfAccounts> glcodeList) {
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Starting getDeductionList...");
+            LOGGER.info("Starting getDeductionList...");
         List<Object[]> dedList;
         final String mainquery = "select bill.id as id, sum (gl.creditAmount) from eg_Billregister bill,eg_billregistermis billmis left join "
                 + "voucherheader vh on vh.id=billmis.voucherheaderid left join (select sum(paidamount) as paidamount,billvhid as billvhid from miscbilldetail misc,voucherheader vh1 where  misc.payvhid=vh1.id and vh1.status not in (1,2,4) group by "
@@ -1095,14 +1129,12 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
                 + "' and gl.voucherHeaderId=billmis.voucherHeaderid and gl.glcodeId not in(:glCodeList) and "
                 + "gl.creditAmount>0 and (misc.billvhid is null or (bill.passedamount > misc.paidamount)) group by bill.id";
         dedList = getSession().createSQLQuery(mainquery).setParameterList("glCodeList", glcodeList).list();
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Completed getDeductionList.");
+            LOGGER.info("Completed getDeductionList.");
         return dedList;
     }
 
     private List<Object[]> getEarlierPaymentAmtList(final String expendituretype) {
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Starting getEarlierPaymentAmtList...");
+            LOGGER.info("Starting getEarlierPaymentAmtList...");
         List<Object[]> dedList;
         final String mainquery = "select bill.id as id,misc.paidamount from eg_Billregister bill,eg_billregistermis billmis left join "
                 + "voucherheader vh on vh.id=billmis.voucherheaderid left join (select sum(paidamount) as paidamount,billvhid as billvhid from miscbilldetail  misc,voucherheader vh where  misc.payvhid=vh.id and vh.status not in (1,2,4)    group by "
@@ -1110,8 +1142,7 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
                 + "vh.status=0 and bill.expendituretype='" + expendituretype
                 + "' and (bill.passedamount > misc.paidamount)";
         dedList = getSession().createSQLQuery(mainquery).list();
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Completed getEarlierPaymentAmtList.");
+            LOGGER.info("Completed getEarlierPaymentAmtList.");
         return dedList;
     }
 
@@ -1336,23 +1367,22 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
                     }
                     entity = getEntity(Integer.valueOf(obj[0].toString()), (Serializable) obj[1]);
 
-                    if (type.equals("Supplier") && (StringUtils.isBlank(entity.getTinno())
-                            || StringUtils.isBlank(entity.getBankname()) || StringUtils.isBlank(entity.getBankaccount())
+                    if (type.equals("Supplier") && (StringUtils.isBlank(entity.getBankname()) || StringUtils.isBlank(entity.getBankaccount())
                             || StringUtils.isBlank(entity.getIfsccode()))) {
                         LOGGER.error("BankAccount,IFSC Code, Tin number is mandatory for RTGS Payment for "
                                 + entity.getName());
                         errors.add(new ValidationError("paymentMode",
-                                "BankName, BankAccount,IFSC Code, Tin number is mandatory for RTGS Assignment for "
+                                "BankName, BankAccount,IFSC Code are mandatory for payment instrument Assignment for "
                                         + bean.getVoucherNumber() + "\\n Party Name " + entity.getName()));
                         throw new ValidationException(errors);
-                    } else if (StringUtils.isBlank(entity.getPanno()) || StringUtils.isBlank(entity.getBankname())
+                    } else if (StringUtils.isBlank(entity.getBankname())
                             || StringUtils.isBlank(entity.getBankaccount())
                             || StringUtils.isBlank(entity.getIfsccode())) {
-                        LOGGER.error("Mandatory details for RTGS Assignment for " + bean.getVoucherNumber()
-                                + " for Party Name " + entity.getName() + " is missing missing");
+                        LOGGER.error("BankName, BankAccount,IFSC Code are mandatory for payment instrument Assignment for " + bean.getVoucherNumber()
+                        + " for Party Name " + entity.getName());
                         errors.add(new ValidationError("paymentMode",
-                                "Mandatory details for RTGS Assignment for " + bean.getVoucherNumber()
-                                        + " for Party Name " + entity.getName() + " is missing missing"));
+                                "BankName, BankAccount,IFSC Code are mandatory for payment instrument Assignment for " + bean.getVoucherNumber()
+                                        + " for Party Name " + entity.getName()));
                         throw new ValidationException(errors);
                     }
                 }
@@ -1534,6 +1564,39 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
         }
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Completed getMiscBillList.");
+        return paymentBeanList;
+    }
+ public List<PaymentBean> getMiscBillListForPaymentHeader(final Paymentheader header) {
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Starting getMiscBillListForPaymentHeader...");
+        List<PaymentBean> paymentBeanList = null;
+        final Query query = getSession()
+                .createSQLQuery(
+                        "select mb.billvhid as billVoucherId ,  br.id as billId,mb.billnumber as billNumber,mb.billdate as billDate,mb.paidto as payTo,mb.amount as netAmt,  "
+                                + " mb.passedamount as passedAmt,mb.paidamount as paymentAmt,br.expendituretype as expType from miscbilldetail mb, eg_billregister br , eg_billregistermis mis "
+                                + " where mb.payvhid=" + header.getVoucherheader().getId()
+                                + " and br.id= mis.billid and mis.voucherheaderid=billvhid order by mb.paidto,mb.BILLDATE")
+                .addScalar("billVoucherId",LongType.INSTANCE).addScalar("billId", BigDecimalType.INSTANCE).addScalar("billNumber").addScalar("billDate")
+                .addScalar("payTo").addScalar("netAmt", BigDecimalType.INSTANCE)
+                .addScalar("passedAmt", BigDecimalType.INSTANCE).addScalar("paymentAmt", BigDecimalType.INSTANCE)
+                .addScalar("expType").setResultTransformer(Transformers.aliasToBean(PaymentBean.class));
+        paymentBeanList = query.list();
+        BigDecimal earlierAmt;
+        for (final PaymentBean bean : paymentBeanList) {
+            bean.setIsSelected(true);
+            earlierAmt = (BigDecimal) persistenceService.find(
+                    " select sum(paidamount) from Miscbilldetail where billVoucherHeader.id=?"
+                            + " and payVoucherHeader.status not in(?,?)",
+                    //bean.getCsBillId(), FinancialConstants.CANCELLEDVOUCHERSTATUS,
+                            bean.getBillVoucherId(), FinancialConstants.CANCELLEDVOUCHERSTATUS,
+                    FinancialConstants.REVERSEDVOUCHERSTATUS);
+            if (earlierAmt == null)
+                earlierAmt = BigDecimal.ZERO;
+            bean.setEarlierPaymentAmt(earlierAmt.subtract(bean.getPaymentAmt()));
+            bean.setPayableAmt(bean.getNetAmt().subtract(bean.getEarlierPaymentAmt()));
+        }
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Completed getMiscBillListForPaymentHeader.");
         return paymentBeanList;
     }
 
@@ -1848,7 +1911,7 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
             sql.append(" and vh.fundId=" + voucherHeader.getFundId().getId());
         if (voucherHeader.getVouchermis().getFundsource() != null)
             sql.append(" and vmis.fundsourceId=" + voucherHeader.getVouchermis().getFundsource().getId());
-        if (voucherHeader.getVouchermis().getDepartmentcode() != null)
+        if (voucherHeader.getVouchermis().getDepartmentcode() != null && !voucherHeader.getVouchermis().getDepartmentcode().equals("-1"))
             sql.append(" and vmis.departmentcode='" + voucherHeader.getVouchermis().getDepartmentcode() + "'");
         if (voucherHeader.getVouchermis().getSchemeid() != null)
             sql.append(" and vmis.schemeid=" + voucherHeader.getVouchermis().getSchemeid().getId());
@@ -1935,6 +1998,109 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
         return chequeAssignmentList;
     }
 
+    public List<ChequeAssignment> getBankToBankTransVoucherForRTGSInstrument(final Map<String, String[]> parameters,
+            final CVoucherHeader voucherHeader) throws ApplicationException, ParseException {
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Starting getBankToBankTransVoucherForRTGSInstrument...");
+        final List<ChequeAssignment> chequeAssignmentList = new ArrayList<ChequeAssignment>();
+
+        final StringBuffer sql = new StringBuffer();
+        if (!"".equals(parameters.get("fromDate")[0]))
+            sql.append(" and vh.voucherDate>='" + sdf.format(formatter.parse(parameters.get("fromDate")[0])) + "' ");
+        if (!"".equals(parameters.get("toDate")[0]))
+            sql.append(" and vh.voucherDate<='" + sdf.format(formatter.parse(parameters.get("toDate")[0])) + "'");
+        if (!StringUtils.isEmpty(voucherHeader.getVoucherNumber()))
+            sql.append(" and vh.voucherNumber like '%" + voucherHeader.getVoucherNumber() + "%'");
+        if (voucherHeader.getFundId() != null)
+            sql.append(" and vh.fundId=" + voucherHeader.getFundId().getId());
+        if (voucherHeader.getVouchermis().getFundsource() != null)
+            sql.append(" and vmis.fundsourceId=" + voucherHeader.getVouchermis().getFundsource().getId());
+        if (voucherHeader.getVouchermis().getDepartmentcode() != null && !voucherHeader.getVouchermis().getDepartmentcode().equals("-1"))
+            sql.append(" and vmis.departmentcode='" + voucherHeader.getVouchermis().getDepartmentcode() + "'");
+        if (voucherHeader.getVouchermis().getSchemeid() != null)
+            sql.append(" and vmis.schemeid=" + voucherHeader.getVouchermis().getSchemeid().getId());
+        if (voucherHeader.getVouchermis().getSubschemeid() != null)
+            sql.append(" and vmis.subschemeid=" + voucherHeader.getVouchermis().getSubschemeid().getId());
+        if (voucherHeader.getVouchermis().getFunctionary() != null)
+            sql.append(" and vmis.functionaryid=" + voucherHeader.getVouchermis().getFunctionary().getId());
+        if (voucherHeader.getVouchermis().getDivisionid() != null)
+            sql.append(" and vmis.divisionid=" + voucherHeader.getVouchermis().getDivisionid().getId());
+        if (parameters.get("bankaccount") != null && !parameters.get("bankaccount")[0].equals("-1")) {
+            sql.append(" and ph.bankaccountnumberid=" + parameters.get("bankaccount")[0]);
+            sql.append(" and lower(ph.type)=lower('" + parameters.get("paymentMode")[0] + "')");
+            sql.append(" and ph.bankaccountnumberid=ba.id");
+        } else
+            sql.append(" and ph.bankaccountnumberid=ba.id")
+                    .append(" and lower(ph.type)=lower('" + parameters.get("paymentMode")[0] + "')");
+//        sql.append(" and vmis.departmentid     =dept.id  ");
+        final List<AppConfigValues> appList = appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+                "APPROVEDVOUCHERSTATUS");
+        final String approvedstatus = appList.get(0).getValue();
+        final List<String> descriptionList = new ArrayList<String>();
+        descriptionList.add("New");
+        descriptionList.add("Reconciled");
+        final List<EgwStatus> egwStatusList = egwStatusDAO.getStatusListByModuleAndCodeList("Instrument",
+                descriptionList);
+        String statusId = "";
+        for (final EgwStatus egwStatus : egwStatusList)
+            statusId = statusId + egwStatus.getId() + ",";
+        statusId = statusId.substring(0, statusId.length() - 1);
+
+        persistenceService.find(" from Bankaccount where id=?", Long.valueOf(parameters.get("bankaccount")[0]));
+        Query query = null;
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("statusId -- > " + statusId);
+
+        chequeList = new ArrayList<ChequeAssignment>();
+
+        if (voucherHeader.getName() == null
+                || !voucherHeader.getName().equalsIgnoreCase(FinancialConstants.PAYMENTVOUCHER_NAME_REMITTANCE)) { // /
+                                                                                                                   // Only
+                                                                                                                   // for
+                                                                                                                   // bill
+                                                                                                                   // payment
+                                                                                                                   // screen
+            query = getSession()
+                    .createSQLQuery(
+                            " SELECT vh.id   AS voucherid , vh.voucherNumber        AS voucherNumber ,dept.code          AS departmentName,"
+                                    + "  vh.voucherDate  AS voucherDate , misbill.paidto  AS paidTo, SUM(misbill.paidamount) AS paidAmount,current_date AS chequeDate,"
+                                    + "   ba.accountnumber  AS bankAccNumber, ba.id  AS bankAccountId ,vh.name     AS expenditureType    FROM Paymentheader ph,"
+                                    + "  voucherheader vh,  vouchermis vmis,  Miscbilldetail misbill,  eg_department dept,  bankaccount ba,  egf_instrumentvoucher iv RIGHT OUTER JOIN voucherheader pvh"
+                                    + " ON (pvh.id    =iv.VOUCHERHEADERID) WHERE ph.voucherheaderid  =misbill.billvhid AND ph.voucherheaderid    =vh.id AND vh.name  ='"
+                                    + FinancialConstants.CONTRAVOUCHER_NAME_BTOB + "'"
+                                    + " AND vmis.voucherheaderid  = vh.id  AND vh.status   =" + approvedstatus + sql
+                                    + " AND pvh.id      =vh.id AND iv.id     IS NULL"
+//                                    + " AND dept.id  = vmis.departmentid AND ph.bankaccountnumberid= ba.id GROUP BY vh.id,   vh.voucherNumber,  dept.name , "
+                                    +" AND dept.code  = vmis.departmentcode AND ph.bankaccountnumberid= ba.id GROUP BY vh.id,   vh.voucherNumber,  dept.code , "
+                                    + " vh.voucherDate,  misbill.paidto,ba.accountnumber,  ba.id,vh.name"
+                                    + " UNION SELECT vh.id  AS voucherid ,vh.voucherNumber AS voucherNumber ,dept.code AS departmentName,vh.voucherDate          AS voucherDate ,"
+                                    + "  misbill.paidto          AS paidTo, SUM(misbill.paidamount) AS paidAmount, current_date   AS chequeDate,ba.accountnumber  AS bankAccNumber,"
+                                    + " ba.id   AS bankAccountId, vh.name  AS expenditureType FROM Paymentheader ph,voucherheader vh,vouchermis vmis,eg_department dept,bankaccount ba,"
+                                    + " Miscbilldetail misbill, egf_instrumentvoucher iv RIGHT OUTER JOIN voucherheader pvh ON (pvh.id=iv.VOUCHERHEADERID) LEFT OUTER JOIN egf_instrumentheader ih"
+                                    + " ON (ih.ID   =iv.INSTRUMENTHEADERID) WHERE ph.voucherheaderid  =misbill.billvhid AND ph.voucherheaderid    =vh.id AND vh.name ='"
+                                    + FinancialConstants.CONTRAVOUCHER_NAME_BTOB + "'"
+                                    + " AND vmis.voucherheaderid  = vh.id AND vh.status  =" + approvedstatus + sql
+//                                    + " AND pvh.id   =vh.id AND dept.id          = vmis.departmentid"
+                                    + " AND pvh.id   =vh.id AND dept.code = vmis.departmentcode"
+                                    + " AND ph.bankaccountnumberid= ba.id AND ih.id IN  (SELECT MAX(ih.id)  FROM egf_instrumentvoucher iv  RIGHT OUTER JOIN voucherheader pvh"
+                                    + " ON (pvh.id=iv.VOUCHERHEADERID) LEFT OUTER JOIN egf_instrumentheader ih   ON (ih.ID    =iv.INSTRUMENTHEADERID)  WHERE pvh.id =vh.id   "
+                                    + "  " + " ) and ih.id_status not in (" + statusId
+                                    + ") GROUP BY vh.id,  vh.voucherNumber,  dept.code ,  vh.voucherDate,  misbill.paidto,  ba.accountnumber,  ba.id,  vh.name                                           "
+                                    + " order by bankAccountId, departmentName,  voucherNumber ")
+                    .addScalar("voucherid", LongType.INSTANCE).addScalar("voucherNumber").addScalar("departmentName")
+                    .addScalar("voucherDate").addScalar("paidTo").addScalar("paidAmount", BigDecimalType.INSTANCE)
+                    .addScalar("chequeDate").addScalar("bankAccNumber").addScalar("bankAccountId", LongType.INSTANCE)
+                    .addScalar("expenditureType")
+                    .setResultTransformer(Transformers.aliasToBean(ChequeAssignment.class));
+
+            chequeAssignmentList.addAll(query.list());
+
+        }
+
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Completed getPaymentVoucherNotInInstrument.");
+        return chequeAssignmentList;
+    }
     // this will be used for all paymentVouchers
     private List<ChequeAssignment> chequeList = null;
 
@@ -2191,6 +2357,7 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
                 chequeAssignmentList.addAll(query.list());
 
             } else {
+            	System.out.println("Test");
                 StringBuilder tempquery1 = new StringBuilder();
 
                 tempquery1.append(
@@ -2278,8 +2445,7 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
     public List<InstrumentHeader> createInstrument(final List<ChequeAssignment> chequeAssignmentList,
             final String paymentMode, final Integer bankaccount, final Map<String, String[]> parameters,
             final String dept) throws ApplicationRuntimeException, Exception {
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Starting createInstrument...");
+            LOGGER.info("Starting creation of Instrument...");
         List<InstrumentHeader> instHeaderList = new ArrayList<InstrumentHeader>();
         final List<Long> selectedPaymentVHList = new ArrayList<Long>();
         final Map<String, BigDecimal> payeeMap = new HashMap<String, BigDecimal>();
@@ -2287,6 +2453,9 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
 
         for (final ChequeAssignment assignment : chequeAssignmentList)
             if (assignment.getIsSelected()) {
+            	LOGGER.info("assignment.getVoucherid()  ::: "+assignment.getVoucherid());
+            	LOGGER.info("assignment.getVoucherHeaderId()  ::: "+assignment.getVoucherHeaderId());
+            	LOGGER.info("assignment.getVoucherNumber()  ::: "+assignment.getVoucherNumber());
                 selectedPaymentVHList.add(assignment.getVoucherid());
                 if (payeeMap.containsKey(assignment.getPaidTo() + DELIMETER + assignment.getDetailtypeid() + DELIMETER
                         + assignment.getDetailkeyid())) // concatenate the
@@ -2302,8 +2471,7 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
                             + assignment.getDetailkeyid(), assignment.getPaidAmount());
                 totalPaidAmt = totalPaidAmt.add(assignment.getPaidAmount());
             }
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("selectedPaymentList===" + selectedPaymentVHList);
+            LOGGER.info("selectedPaymentList===" + selectedPaymentVHList);
         final Bankaccount account = (Bankaccount) persistenceService.find(" from Bankaccount where  id=?",
                 bankaccount.longValue());
         // get voucherList
@@ -2390,6 +2558,13 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
             if (paymentMode.equals(FinancialConstants.MODEOFPAYMENT_RTGS))
                 instrumentHeaderList.add(prepareInstrumentHeaderForRtgs(account, parameters.get("rtgsRefNo")[0],
                         totalPaidAmt, formatter.parse(parameters.get("rtgsDate")[0]), ""));
+            else if(paymentMode.equals(FinancialConstants.MODEOFPAYMENT_PEX))
+            {
+            	Map<String, Object> instrumentHeaderMap = prepareInstrumentHeaderForPex(
+                        account, parameters.get("pexRefNo")[0], totalPaidAmt,
+                        formatter.parse(parameters.get("pexDate")[0]), "");
+            	instrumentHeaderList.add(instrumentHeaderMap);
+            }
             else if (isChequeNoGenerationAuto()) // if cheque number generation
                                                  // is auto
             {
@@ -2673,8 +2848,7 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
 
     public List<PaymentBean> getCSList(final List<EgBillregister> billList, final Map<Long, BigDecimal> deductionAmtMap,
             final Map<Long, BigDecimal> paidAmtMap) {
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Starting getCSList...");
+            LOGGER.info("Starting getCSList...");
         final List<PaymentBean> contractorList = new ArrayList<PaymentBean>();
         PaymentBean paymentBean = null;
         if (billList != null && !billList.isEmpty())
@@ -2891,7 +3065,7 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
                 || !voucherHeader.getName().equalsIgnoreCase(FinancialConstants.PAYMENTVOUCHER_NAME_REMITTANCE))
             // / Only for bill payment screen
             if (nonSubledger) {
-            query = getSession().createSQLQuery(" select  vh.id as voucherid ,vh.voucherNumber as voucherNumber ," + " dept.name   AS departmentName, vh.voucherDate as voucherDate," + "  recovery.remitted as paidTo,sum(misbill.paidamount) as paidAmount,current_date as chequeDate" + " , ba.accountnumber   AS bankAccNumber, ba.id  AS bankAccountId ," + " gl.glcodeid as glcodeId," + " CONCAT(CONCAT(DO.name,'/'),do.tan) AS drawingOfficerNameTAN " + " from Paymentheader ph, eg_department dept," + " bankaccount ba, voucherheader vh   LEFT JOIN " + " EGF_INSTRUMENTVOUCHER IV ON VH.ID=IV.VOUCHERHEADERID LEFT JOIN EGF_INSTRUMENTHEADER IH ON IV.INSTRUMENTHEADERID=IH.ID," + " vouchermis vmis, Miscbilldetail misbill ,generalledger gl,eg_drawingofficer do,tds recovery" + " where recovery.type = '" + parameters.get("recoveryCode")[0] + "' and ph.voucherheaderid=misbill.payvhid and ph.voucherheaderid=vh.id and vmis.voucherheaderid= vh.id " + " and vh.id= gl.voucherheaderid and ph.drawingofficer_id= do.id " + " and vh.status =" + approvedstatus + " " + sql + " " + " and  IV.VOUCHERHEADERID IS NULL  and vh.type='" + FinancialConstants.STANDARD_VOUCHER_TYPE_PAYMENT + "' " + " and vh.name = '" + FinancialConstants.PAYMENTVOUCHER_NAME_REMITTANCE + "' " + " group by vh.id,  vh.voucherNumber,  dept.name ,  vh.voucherDate,misbill.paidto, " + " ba.accountnumber, ba.id ," + " gl.glcodeid,DO.name,do.tan,recovery.remitted " + " order by ba.id,dept.name,vh.voucherNumber ").addScalar("voucherid", LongType.INSTANCE).addScalar("voucherNumber").addScalar("departmentName").addScalar("voucherDate").addScalar("paidTo").addScalar("paidAmount", BigDecimalType.INSTANCE).addScalar("chequeDate").addScalar("bankAccNumber").addScalar("bankAccountId", LongType.INSTANCE).addScalar("glcodeId", LongType.INSTANCE).addScalar("drawingOfficerNameTAN").setResultTransformer(Transformers.aliasToBean(ChequeAssignment.class));
+            query = getSession().createSQLQuery(" select  vh.id as voucherid ,vh.voucherNumber as voucherNumber ," + " dept.name   AS departmentName, vh.voucherDate as voucherDate," + "  recovery.remitted as paidTo,sum(misbill.paidamount) as paidAmount,current_date as chequeDate" + " , ba.accountnumber   AS bankAccNumber, ba.id  AS bankAccountId ," + " gl.glcodeid as glcodeId," + " CONCAT(CONCAT(dr.name,'/'),dr.tan) AS drawingOfficerNameTAN " + " from Paymentheader ph, eg_department dept," + " bankaccount ba, voucherheader vh   LEFT JOIN " + " EGF_INSTRUMENTVOUCHER IV ON VH.ID=IV.VOUCHERHEADERID LEFT JOIN EGF_INSTRUMENTHEADER IH ON IV.INSTRUMENTHEADERID=IH.ID," + " vouchermis vmis, Miscbilldetail misbill ,generalledger gl,eg_drawingofficer dr,tds recovery" + " where recovery.type = '" + parameters.get("recoveryCode")[0] + "' and ph.voucherheaderid=misbill.payvhid and ph.voucherheaderid=vh.id and vmis.voucherheaderid= vh.id " + " and vh.id= gl.voucherheaderid and ph.drawingofficer_id= dr.id " + " and vh.status =" + approvedstatus + " " + sql + " " + " and  IV.VOUCHERHEADERID IS NULL  and vh.type='" + FinancialConstants.STANDARD_VOUCHER_TYPE_PAYMENT + "' " + " and vh.name = '" + FinancialConstants.PAYMENTVOUCHER_NAME_REMITTANCE + "' " + " group by vh.id,  vh.voucherNumber,  dept.name ,  vh.voucherDate,misbill.paidto, " + " ba.accountnumber, ba.id ," + " gl.glcodeid,dr.name,dr.tan,recovery.remitted " + " order by ba.id,dept.name,vh.voucherNumber ").addScalar("voucherid", LongType.INSTANCE).addScalar("voucherNumber").addScalar("departmentName").addScalar("voucherDate").addScalar("paidTo").addScalar("paidAmount", BigDecimalType.INSTANCE).addScalar("chequeDate").addScalar("bankAccNumber").addScalar("bankAccountId", LongType.INSTANCE).addScalar("glcodeId", LongType.INSTANCE).addScalar("drawingOfficerNameTAN").setResultTransformer(Transformers.aliasToBean(ChequeAssignment.class));
             // TODO Changet the debug statement to appropriate sentence
             if (LOGGER.isDebugEnabled())
             LOGGER.debug(" for non salary and remittance" + query);
@@ -2900,13 +3074,13 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
             // assign-->surrendar-->assign-->surrendar-->.......
             if (LOGGER.isDebugEnabled())
             LOGGER.debug("checking  cheque assigned and surrendard");
-            query = getSession().createSQLQuery("select vh.id as voucherid ,vh.voucherNumber as voucherNumber ," + " dept.name   AS departmentName, vh.voucherDate as voucherDate, recovery.remitted as paidTo" + " ,sum(misbill.paidamount) as paidAmount,current_date as chequeDate , ba.accountnumber AS bankAccNumber " + " , ba.id  AS bankAccountId , " + " gl.glcodeid as glcodeId," + " CONCAT(CONCAT(DO.name,'/'),do.tan) AS drawingOfficerNameTAN " + " from Paymentheader ph,eg_department dept, bankaccount ba," + " generalledger gl,eg_drawingofficer do, voucherheader vh   LEFT " + " JOIN EGF_INSTRUMENTVOUCHER IV ON VH.ID=IV.VOUCHERHEADERID LEFT JOIN EGF_INSTRUMENTHEADER IH " + " ON IV.INSTRUMENTHEADERID=IH.ID,vouchermis vmis, Miscbilldetail misbill,tds recovery" + ",(select max(iv1.instrumentheaderid) as maxihid,iv1.voucherheaderid as iv1vhid from egf_instrumentvoucher iv1 group by iv1.voucherheaderid) as table1 " + " where recovery.type = '" + parameters.get("recoveryCode")[0] + "' and  ph.voucherheaderid=misbill.payvhid and ph.voucherheaderid=vh.id and vmis.voucherheaderid= vh.id " + " and vh.status =" + approvedstatus + " " + sql + " " + " and  IV.VOUCHERHEADERID IS NOT  NULL and iv.instrumentheaderid=table1.maxihid " + " and  table1.iv1vhid=vh.id and ih.id_status not in (" + statusId + ") " + " and vh.type='" + FinancialConstants.STANDARD_VOUCHER_TYPE_PAYMENT + "' and vh.name = '" + FinancialConstants.PAYMENTVOUCHER_NAME_REMITTANCE + "'" + " and vh.id= gl.voucherheaderid " + " and ph.drawingofficer_id= do.id " + " group by   vh.id,  vh.voucherNumber,  dept.name ,  vh.voucherDate,misbill.paidto,ba.accountnumber," + " ba.id ," + " gl.glcodeid,DO.name,do.tan,recovery.remitted  order by ba.id,dept.name,vh.voucherNumber ").addScalar("voucherid", LongType.INSTANCE).addScalar("voucherNumber").addScalar("departmentName").addScalar("voucherDate").addScalar("paidTo").addScalar("paidAmount", BigDecimalType.INSTANCE).addScalar("chequeDate").addScalar("bankAccNumber").addScalar("bankAccountId", LongType.INSTANCE).addScalar("glcodeId", LongType.INSTANCE).addScalar("drawingOfficerNameTAN").setResultTransformer(Transformers.aliasToBean(ChequeAssignment.class));
+            query = getSession().createSQLQuery("select vh.id as voucherid ,vh.voucherNumber as voucherNumber ," + " dept.name   AS departmentName, vh.voucherDate as voucherDate, recovery.remitted as paidTo" + " ,sum(misbill.paidamount) as paidAmount,current_date as chequeDate , ba.accountnumber AS bankAccNumber " + " , ba.id  AS bankAccountId , " + " gl.glcodeid as glcodeId," + " CONCAT(CONCAT(dr.name,'/'),dr.tan) AS drawingOfficerNameTAN " + " from Paymentheader ph,eg_department dept, bankaccount ba," + " generalledger gl,eg_drawingofficer dr, voucherheader vh   LEFT " + " JOIN EGF_INSTRUMENTVOUCHER IV ON VH.ID=IV.VOUCHERHEADERID LEFT JOIN EGF_INSTRUMENTHEADER IH " + " ON IV.INSTRUMENTHEADERID=IH.ID,vouchermis vmis, Miscbilldetail misbill,tds recovery" + ",(select max(iv1.instrumentheaderid) as maxihid,iv1.voucherheaderid as iv1vhid from egf_instrumentvoucher iv1 group by iv1.voucherheaderid) as table1 " + " where recovery.type = '" + parameters.get("recoveryCode")[0] + "' and  ph.voucherheaderid=misbill.payvhid and ph.voucherheaderid=vh.id and vmis.voucherheaderid= vh.id " + " and vh.status =" + approvedstatus + " " + sql + " " + " and  IV.VOUCHERHEADERID IS NOT  NULL and iv.instrumentheaderid=table1.maxihid " + " and  table1.iv1vhid=vh.id and ih.id_status not in (" + statusId + ") " + " and vh.type='" + FinancialConstants.STANDARD_VOUCHER_TYPE_PAYMENT + "' and vh.name = '" + FinancialConstants.PAYMENTVOUCHER_NAME_REMITTANCE + "'" + " and vh.id= gl.voucherheaderid " + " and ph.drawingofficer_id= dr.id " + " group by   vh.id,  vh.voucherNumber,  dept.name ,  vh.voucherDate,misbill.paidto,ba.accountnumber," + " ba.id ," + " gl.glcodeid,dr.name,dr.tan,recovery.remitted  order by ba.id,dept.name,vh.voucherNumber ").addScalar("voucherid", LongType.INSTANCE).addScalar("voucherNumber").addScalar("departmentName").addScalar("voucherDate").addScalar("paidTo").addScalar("paidAmount", BigDecimalType.INSTANCE).addScalar("chequeDate").addScalar("bankAccNumber").addScalar("bankAccountId", LongType.INSTANCE).addScalar("glcodeId", LongType.INSTANCE).addScalar("drawingOfficerNameTAN").setResultTransformer(Transformers.aliasToBean(ChequeAssignment.class));
             if (LOGGER.isDebugEnabled())
             LOGGER.debug(" Surrendered rtgs nos" + query);
             chequeAssignmentList.addAll(query.list());
 
             } else {
-            query = getSession().createSQLQuery(" select  vh.id as voucherid ,vh.voucherNumber as voucherNumber ," + " dept.name   AS departmentName, vh.voucherDate as voucherDate," + " misbill.paidto as paidTo,sum(misbill.paidamount) as paidAmount,current_date as chequeDate" + " , ba.accountnumber   AS bankAccNumber, ba.id  AS bankAccountId ," + " gl.glcodeid as glcodeId," + " CONCAT(CONCAT(DO.name,'/'),do.tan) AS drawingOfficerNameTAN " + " from Paymentheader ph, eg_department dept," + " bankaccount ba, voucherheader vh   LEFT JOIN " + " EGF_INSTRUMENTVOUCHER IV ON VH.ID=IV.VOUCHERHEADERID LEFT JOIN EGF_INSTRUMENTHEADER IH ON IV.INSTRUMENTHEADERID=IH.ID," + " vouchermis vmis, Miscbilldetail misbill ,  generalledgerdetail gld,generalledger gl,eg_drawingofficer do" + " where ph.voucherheaderid=misbill.payvhid and ph.voucherheaderid=vh.id and vmis.voucherheaderid= vh.id " + " and vh.id= gl.voucherheaderid and gl.id=gld.generalledgerid and ph.drawingofficer_id= do.id " + " and vh.status =" + approvedstatus + " " + sql + " " + " and  IV.VOUCHERHEADERID IS NULL  and vh.type='" + FinancialConstants.STANDARD_VOUCHER_TYPE_PAYMENT + "' " + " and vh.name = '" + FinancialConstants.PAYMENTVOUCHER_NAME_REMITTANCE + "' " + " group by vh.id,  vh.voucherNumber,  dept.name ,  vh.voucherDate,misbill.paidto, " + " ba.accountnumber, ba.id ," + " gl.glcodeid,DO.name,do.tan " + " order by ba.id,dept.name,vh.voucherNumber ").addScalar("voucherid", LongType.INSTANCE).addScalar("voucherNumber").addScalar("departmentName").addScalar("voucherDate").addScalar("paidTo").addScalar("paidAmount", BigDecimalType.INSTANCE).addScalar("chequeDate").addScalar("bankAccNumber").addScalar("bankAccountId", LongType.INSTANCE).addScalar("glcodeId", LongType.INSTANCE).addScalar("drawingOfficerNameTAN").setResultTransformer(Transformers.aliasToBean(ChequeAssignment.class));
+            query = getSession().createSQLQuery(" select  vh.id as voucherid ,vh.voucherNumber as voucherNumber ," + " dept.name   AS departmentName, vh.voucherDate as voucherDate," + " misbill.paidto as paidTo,sum(misbill.paidamount) as paidAmount,current_date as chequeDate" + " , ba.accountnumber   AS bankAccNumber, ba.id  AS bankAccountId ," + " gl.glcodeid as glcodeId," + " CONCAT(CONCAT(dr.name,'/'),dr.tan) AS drawingOfficerNameTAN " + " from Paymentheader ph, eg_department dept," + " bankaccount ba, voucherheader vh   LEFT JOIN " + " EGF_INSTRUMENTVOUCHER IV ON VH.ID=IV.VOUCHERHEADERID LEFT JOIN EGF_INSTRUMENTHEADER IH ON IV.INSTRUMENTHEADERID=IH.ID," + " vouchermis vmis, Miscbilldetail misbill ,  generalledgerdetail gld,generalledger gl,eg_drawingofficer dr" + " where ph.voucherheaderid=misbill.payvhid and ph.voucherheaderid=vh.id and vmis.voucherheaderid= vh.id " + " and vh.id= gl.voucherheaderid and gl.id=gld.generalledgerid and ph.drawingofficer_id= dr.id " + " and vh.status =" + approvedstatus + " " + sql + " " + " and  IV.VOUCHERHEADERID IS NULL  and vh.type='" + FinancialConstants.STANDARD_VOUCHER_TYPE_PAYMENT + "' " + " and vh.name = '" + FinancialConstants.PAYMENTVOUCHER_NAME_REMITTANCE + "' " + " group by vh.id,  vh.voucherNumber,  dept.name ,  vh.voucherDate,misbill.paidto, " + " ba.accountnumber, ba.id ," + " gl.glcodeid,dr.name,dr.tan " + " order by ba.id,dept.name,vh.voucherNumber ").addScalar("voucherid", LongType.INSTANCE).addScalar("voucherNumber").addScalar("departmentName").addScalar("voucherDate").addScalar("paidTo").addScalar("paidAmount", BigDecimalType.INSTANCE).addScalar("chequeDate").addScalar("bankAccNumber").addScalar("bankAccountId", LongType.INSTANCE).addScalar("glcodeId", LongType.INSTANCE).addScalar("drawingOfficerNameTAN").setResultTransformer(Transformers.aliasToBean(ChequeAssignment.class));
             // TODO Changet the debug statement to appropriate sentence
             if (LOGGER.isDebugEnabled())
             LOGGER.debug(" for non salary and remittance" + query);
@@ -2915,7 +3089,7 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
             // assign-->surrendar-->assign-->surrendar-->.......
             if (LOGGER.isDebugEnabled())
             LOGGER.debug("checking  cheque assigned and surrendard");
-            query = getSession().createSQLQuery("select vh.id as voucherid ,vh.voucherNumber as voucherNumber ," + " dept.name   AS departmentName, vh.voucherDate as voucherDate, misbill.paidto as         paidTo" + " ,sum(misbill.paidamount) as paidAmount,current_date as chequeDate , ba.accountnumber AS bankAccNumber " + " , ba.id  AS bankAccountId , " + " gl.glcodeid as glcodeId," + " CONCAT(CONCAT(DO.name,'/'),do.tan) AS drawingOfficerNameTAN " + " from Paymentheader ph,eg_department dept, bankaccount ba," + " generalledgerdetail gld,generalledger gl,eg_drawingofficer do, voucherheader vh   LEFT " + " JOIN EGF_INSTRUMENTVOUCHER IV ON VH.ID=IV.VOUCHERHEADERID LEFT JOIN EGF_INSTRUMENTHEADER IH " + " ON IV.INSTRUMENTHEADERID=IH.ID,vouchermis vmis, Miscbilldetail misbill " + ",(select max(iv1.instrumentheaderid) as maxihid,iv1.voucherheaderid as iv1vhid from egf_instrumentvoucher iv1 group by iv1.voucherheaderid) as table1" + " where ph.voucherheaderid=misbill.payvhid and ph.voucherheaderid=vh.id and vmis.voucherheaderid= vh.id " + " and vh.status =" + approvedstatus + " " + sql + " " + " and  IV.VOUCHERHEADERID IS NOT  NULL and iv.instrumentheaderid=table1.maxihid " + " and  table1.iv1vhid=vh.id and ih.id_status not in (" + statusId + ") " + " and vh.type='" + FinancialConstants.STANDARD_VOUCHER_TYPE_PAYMENT + "' and vh.name = '" + FinancialConstants.PAYMENTVOUCHER_NAME_REMITTANCE + "'" + " and vh.id= gl.voucherheaderid and gl.id=gld.generalledgerid  and gl.glcodeid in (select distinct glcodeid from tds where remittance_mode='A')" + " and ph.drawingofficer_id= do.id " + " group by   vh.id,  vh.voucherNumber,  dept.name ,  vh.voucherDate,misbill.paidto,ba.accountnumber," + " ba.id ," + " gl.glcodeid,DO.name,do.tan  order by ba.id,dept.name,vh.voucherNumber ").addScalar("voucherid", LongType.INSTANCE).addScalar("voucherNumber").addScalar("departmentName").addScalar("voucherDate").addScalar("paidTo").addScalar("paidAmount", BigDecimalType.INSTANCE).addScalar("chequeDate").addScalar("bankAccNumber").addScalar("bankAccountId", LongType.INSTANCE).addScalar("glcodeId", LongType.INSTANCE).addScalar("drawingOfficerNameTAN").setResultTransformer(Transformers.aliasToBean(ChequeAssignment.class));
+            query = getSession().createSQLQuery("select vh.id as voucherid ,vh.voucherNumber as voucherNumber ," + " dept.name   AS departmentName, vh.voucherDate as voucherDate, misbill.paidto as         paidTo" + " ,sum(misbill.paidamount) as paidAmount,current_date as chequeDate , ba.accountnumber AS bankAccNumber " + " , ba.id  AS bankAccountId , " + " gl.glcodeid as glcodeId," + " CONCAT(CONCAT(dr.name,'/'),dr.tan) AS drawingOfficerNameTAN " + " from Paymentheader ph,eg_department dept, bankaccount ba," + " generalledgerdetail gld,generalledger gl,eg_drawingofficer dr, voucherheader vh   LEFT " + " JOIN EGF_INSTRUMENTVOUCHER IV ON VH.ID=IV.VOUCHERHEADERID LEFT JOIN EGF_INSTRUMENTHEADER IH " + " ON IV.INSTRUMENTHEADERID=IH.ID,vouchermis vmis, Miscbilldetail misbill " + ",(select max(iv1.instrumentheaderid) as maxihid,iv1.voucherheaderid as iv1vhid from egf_instrumentvoucher iv1 group by iv1.voucherheaderid) as table1" + " where ph.voucherheaderid=misbill.payvhid and ph.voucherheaderid=vh.id and vmis.voucherheaderid= vh.id " + " and vh.status =" + approvedstatus + " " + sql + " " + " and  IV.VOUCHERHEADERID IS NOT  NULL and iv.instrumentheaderid=table1.maxihid " + " and  table1.iv1vhid=vh.id and ih.id_status not in (" + statusId + ") " + " and vh.type='" + FinancialConstants.STANDARD_VOUCHER_TYPE_PAYMENT + "' and vh.name = '" + FinancialConstants.PAYMENTVOUCHER_NAME_REMITTANCE + "'" + " and vh.id= gl.voucherheaderid and gl.id=gld.generalledgerid  and gl.glcodeid in (select distinct glcodeid from tds where remittance_mode='A')" + " and ph.drawingofficer_id= dr.id " + " group by   vh.id,  vh.voucherNumber,  dept.name ,  vh.voucherDate,misbill.paidto,ba.accountnumber," + " ba.id ," + " gl.glcodeid,dr.name,dr.tan  order by ba.id,dept.name,vh.voucherNumber ").addScalar("voucherid", LongType.INSTANCE).addScalar("voucherNumber").addScalar("departmentName").addScalar("voucherDate").addScalar("paidTo").addScalar("paidAmount", BigDecimalType.INSTANCE).addScalar("chequeDate").addScalar("bankAccNumber").addScalar("bankAccountId", LongType.INSTANCE).addScalar("glcodeId", LongType.INSTANCE).addScalar("drawingOfficerNameTAN").setResultTransformer(Transformers.aliasToBean(ChequeAssignment.class));
             if (LOGGER.isDebugEnabled())
             LOGGER.debug(" Surrendered rtgs nos" + query);
             chequeAssignmentList.addAll(query.list());
@@ -3066,4 +3240,104 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
     public void setCreateVoucher(final CreateVoucher createVoucher) {
         this.createVoucher = createVoucher;
     }
+    
+    public boolean isPexNoGenerationAuto() {
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Starting isRtgsNoGenerationAuto...");
+        final List<AppConfigValues> appList = appConfigValuesService
+                .getConfigValuesByModuleAndKey(Constants.EGF,
+                        "PEXNO_GENERATION_AUTO");
+        final String chequeNoGeneration = appList.get(0).getValue();
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Completed isRtgsNoGenerationAuto.");
+        if (chequeNoGeneration.equalsIgnoreCase("Y"))
+            return true;
+        else
+            return false;
+    }
+    
+    protected Map<String, Object> prepareInstrumentHeaderForPex(
+            final Bankaccount account, final String txnNo,
+            final BigDecimal amount, final Date date, final String key) {
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Starting prepareInstrumentHeaderForRtgs...");
+        final Map<String, Object> instrumentHeaderMap = new HashMap<String, Object>();
+        instrumentHeaderMap.put(VoucherConstant.IS_PAYCHECK, "1");
+        instrumentHeaderMap.put(VoucherConstant.INSTRUMENT_TYPE,
+                FinancialConstants.INSTRUMENT_TYPE_PEX);
+        instrumentHeaderMap.put(VoucherConstant.INSTRUMENT_AMOUNT, amount);
+        instrumentHeaderMap.put(VoucherConstant.TRANSACTION_NUMBER, txnNo);
+        instrumentHeaderMap.put(VoucherConstant.TRANSACTION_DATE, date);
+        instrumentHeaderMap.put(VoucherConstant.BANK_CODE, account
+                .getBankbranch().getBank().getCode());
+        // / instrumentHeaderMap.put(VoucherConstant.PAY_TO, partyName);
+        instrumentHeaderMap.put(VoucherConstant.BANKACCOUNTID, account.getId());
+        if (!key.equals("")) {
+            if (key.split(DELIMETER)[1] != null
+                    && !key.split(DELIMETER)[1].equals("")
+                    && !key.split(DELIMETER)[1].equals("null"))
+                instrumentHeaderMap.put(VoucherConstant.DETAIL_TYPE_ID,
+                        Integer.valueOf(key.split(DELIMETER)[1]));
+            if (key.split(DELIMETER)[2] != null
+                    && !key.split(DELIMETER)[2].equals("")
+                    && !key.split(DELIMETER)[2].equals("null"))
+                instrumentHeaderMap.put(VoucherConstant.DETAIL_KEY_ID,
+                        Long.valueOf(key.split(DELIMETER)[2]));
+        }
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Completed prepareInstrumentHeaderForPex.");
+        return instrumentHeaderMap;
+    }
+    public Paymentheader updatePaymentHeader(final Map<String, String[]> parameters, final List<PaymentBean> billList,
+            final Paymentheader paymentheader,Bankaccount ba) throws ApplicationRuntimeException, ValidationException {
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Starting updatePaymentHeader...");
+        try {
+            miscBillList = new ArrayList<Miscbilldetail>();
+            user = ApplicationThreadLocals.getUserId();
+         
+            final CVoucherHeader existingVH = (CVoucherHeader) persistenceService.find(" from CVoucherHeader where id=?",
+                    paymentheader.getVoucherheader().getId());
+         
+            updateVoucherHeaderForPayment(parameters, existingVH, paymentheader.getVoucherheader());
+           
+         
+            paymentheader.setPaymentAmount(new BigDecimal(parameters.get("grandTotal")[0]));
+          
+            paymentheader.setBankaccount(ba);
+       
+            update(paymentheader);
+           
+        } catch (final ValidationException e) {
+            throw e;
+        } catch (final Exception e) {
+            LOGGER.error(e.getMessage());
+            final List<ValidationError> errors = new ArrayList<ValidationError>();
+            errors.add(new ValidationError("createPayment", e.getMessage()));
+            throw new ValidationException(errors);
+        }
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Completed updatePayment.");
+        return paymentheader;
+    }
+
+    public Paymentheader createPaymentHeaderForContra(final CVoucherHeader voucherHeader, final Bankaccount ba,final String payModType,final String paidAmt) {
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Starting createPaymentHeader...");
+        final Paymentheader paymentheader = new Paymentheader();
+        paymentheader.setType(payModType);
+        paymentheader.setVoucherheader(voucherHeader);
+        paymentheader.setBankaccount(ba);
+        paymentheader.setPaymentAmount(BigDecimal.valueOf(Double.valueOf(paidAmt)));
+        applyAuditing(paymentheader);
+        persist(paymentheader);
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Completed createPaymentHeader.");
+        return paymentheader;
+    }
+    public String getEmployeeName(Long empId){
+        
+        return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+     }
+    
 }

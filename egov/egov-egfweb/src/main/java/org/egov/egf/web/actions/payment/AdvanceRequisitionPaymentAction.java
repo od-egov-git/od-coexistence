@@ -164,7 +164,7 @@ public class AdvanceRequisitionPaymentAction extends BaseVoucherAction {
             parameters.put("grandTotal", new String[] { advanceRequisition.getAdvanceRequisitionAmount().toPlainString() });
             paymentheader = paymentService.createPayment(parameters, headerdetails, accountcodedetails, subledgerdetails,
                     bankaccount);
-            paymentheader.transition().start().withOwner(paymentService.getPosition()).withComments(narration);
+            paymentheader.transition().start().withOwner(paymentService.getPosition()).withComments(narration).withOwnerName((paymentService.getPosition().getId() != null && paymentService.getPosition().getId() > 0L) ? getEmployeeName(paymentService.getPosition().getId()):"");
             Integer userId = null;
             if (null != parameters.get("approverUserId") && Integer.valueOf(parameters.get("approverUserId")[0]) != -1)
                 userId = Integer.valueOf(parameters.get("approverUserId")[0]);
@@ -459,5 +459,10 @@ public class AdvanceRequisitionPaymentAction extends BaseVoucherAction {
     public Fund getFund() {
         return fund;
     }
+    
+    public String getEmployeeName(Long empId){
+        
+        return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+     }
 
 }

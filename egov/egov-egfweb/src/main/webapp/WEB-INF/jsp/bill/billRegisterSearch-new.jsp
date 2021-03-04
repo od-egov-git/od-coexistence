@@ -77,7 +77,7 @@
 						class="mandatory1">*</span></td>
 					<td class="bluebox"><s:select name="expType" id="expType"
 							list="dropdownData.expType" headerKey="-1"
-							headerValue="%{getText('lbl.choose.options')}" value="%{expType}" /></td>
+							headerValue="----Choose----" value="%{expType}" /></td>
 					<td class="greybox"><s:text name="bill.search.billnumber" /></td>
 					<td class="greybox"><s:textfield name="billnumber"
 							id="billnumber" value="%{billnumber}"
@@ -130,7 +130,7 @@
 						<th class="bluebgheadtd"><s:text name="lbl.bill.amount"/></th>
 						<th class="bluebgheadtd"><s:text name="lbl.passed.amount"/></th>
 						<th class="bluebgheadtd"><s:text name="lbl.bill.status"/></th>
-						<th class="bluebgheadtd"><s:text name="lbl.owner.name"/></th>
+						<th class="bluebgheadtd"><s:text name="lbl.pending.with"/></th>
 					</tr>
 
 					<s:iterator var="p" value="billList" status="s">
@@ -191,6 +191,8 @@
 	</s:form>
 	<script>
 	 function validateFormAndSubmit(){
+		 var amount=document.getElementById('amount').value;
+		 var party=document.getElementById('partyName').value;
 		 if(jQuery('#billnumber').val()!="")
 			 {
 				 if(jQuery('#expType').val()==-1)

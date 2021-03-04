@@ -53,7 +53,7 @@
 <tiles-definitions>
 
     <definition name="base_layout" template="/WEB-INF/views/template/main.jsp">
-        <put-attribute name="title" value="eGov Urban Portal"/>
+        <put-attribute name="title" value=""/>
         <put-attribute name="header" value="/WEB-INF/views/template/header.jsp"/>
         <put-attribute name="body" value=""/>
         <put-attribute name="footer" value="/WEB-INF/views/template/footer.jsp"/>
@@ -73,7 +73,7 @@
     <definition name="login" template="/WEB-INF/views/login.jsp"/>
 
     <definition name="home" template="/WEB-INF/views/home/home.jsp">
-        <put-attribute name="title" value="eGov Urban Portal"/>
+        <put-attribute name="title" value=""/>
     </definition>
 
     <definition name="help" extends="base_layout">
@@ -262,4 +262,8 @@
         <put-attribute name="page-title" value="title.feature.role.audit.report" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/admin/auditing/feature-role-change-audit-report.jsp"/>
     </definition>
+    <definition name="inbox-view" extends="base_layout">
+		<put-attribute name="page-title" value="lbl.tasks" cascade="true"/>
+		<put-attribute name="body" value="/WEB-INF/views/inbox/inbox.jsp"></put-attribute>
+	</definition>
 </tiles-definitions>

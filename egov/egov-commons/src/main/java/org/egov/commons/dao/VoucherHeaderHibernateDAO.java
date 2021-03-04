@@ -116,4 +116,13 @@ public class VoucherHeaderHibernateDAO  implements VoucherHeaderDAO {
         qry.setString("cgn", cgn);
         return (CVoucherHeader) qry.uniqueResult();
     }
+    // Implemented by Prasanta
+	@Override
+	public int updateStatusInVoucherHeader(final Integer status, final Long vHeaderId) throws Exception{
+		System.out.println("IN Dao Vaucher Header.."+ status+ ".."+vHeaderId);
+		final Query qry = getCurrentSession().createQuery("update CVoucherHeader vh set vh.status=:status where vh.id=:vHeaderId");
+		qry.setInteger("status", status);
+		qry.setLong("vHeaderId", vHeaderId);
+		return qry.executeUpdate();
+	}
 }

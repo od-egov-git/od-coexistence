@@ -103,6 +103,7 @@ public class BalanceSheetService extends ReportService {
 
     public void addCurrentOpeningBalancePerFund(final Statement balanceSheet, final List<Fund> fundList,
             final String transactionQuery) {
+    	try {
         final BigDecimal divisor = balanceSheet.getDivisor();
         final Query query = persistenceService.getSession()
                 .createSQLQuery(
@@ -135,6 +136,10 @@ public class BalanceSheetService extends ReportService {
                                         divideAndRound(total, divisor));
                         }
             }
+    	}catch(Exception e)
+    	{
+    		e.printStackTrace();
+    	}
     }
 
     public void addOpeningBalancePrevYear(final Statement balanceSheet, final String transactionQuery, final Date fromDate) {
@@ -255,6 +260,7 @@ public class BalanceSheetService extends ReportService {
         minorCodeLength = Integer.valueOf(getAppConfigValueFor(Constants.EGF, "coa_minorcode_length"));
         coaType.add('A');
         coaType.add('L');
+     
         final Date fromDate = getFromDate(balanceSheet);
         final Date toDate = getToDate(balanceSheet);
         String   voucherStatusToExclude = getAppConfigValueFor("EGF", "statusexcludeReport");

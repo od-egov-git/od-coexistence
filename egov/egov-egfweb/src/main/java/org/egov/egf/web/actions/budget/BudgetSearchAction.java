@@ -57,10 +57,12 @@ import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.convention.annotation.Results;
 import org.egov.commons.CFinancialYear;
 import org.egov.commons.CFunction;
+import org.egov.commons.EgwStatus;
 import org.egov.commons.Functionary;
 import org.egov.commons.Fund;
 import org.egov.commons.Scheme;
 import org.egov.commons.SubScheme;
+import org.egov.commons.dao.EgwStatusHibernateDAO;
 import org.egov.commons.dao.FinancialYearHibernateDAO;
 import org.egov.egf.model.BudgetAmountView;
 import org.egov.eis.service.EisCommonService;
@@ -139,6 +141,7 @@ public class BudgetSearchAction extends BaseFormAction {
     private String twopreviousfinYearRange = "";
     private boolean shouldShowREAppropriations = true;
     List<AppConfigValues> excludeList = new ArrayList<AppConfigValues>();
+    
 
     @Autowired
     @Qualifier("persistenceService")
@@ -156,6 +159,9 @@ public class BudgetSearchAction extends BaseFormAction {
     @Autowired
     @Qualifier("masterDataCache")
     private EgovMasterDataCaching masterDataCache;
+    
+    @Autowired
+    private EgwStatusHibernateDAO egwStatusDAO;
 
     public String getMessage() {
         return message;
@@ -336,6 +342,10 @@ public class BudgetSearchAction extends BaseFormAction {
     // serach screen
     @Action(value = "/budget/budgetSearch-groupedBudgets")
     public String groupedBudgets() {
+    	try
+    	{
+    		
+    	
         final Budget budget = budgetDetail.getBudget();
         final Budget selectedBudget=budget;
         // Dont restrict search by the selected budget, but by all budgets in the tree of selected budget
@@ -350,6 +360,10 @@ public class BudgetSearchAction extends BaseFormAction {
             addActionError(getText("budget.no.details.found"));
         budgetDetail.setBudget(selectedBudget);
         setRelatedEntitiesOn();
+    	}catch (Exception e) {
+			System.out.println("error : "+e.getMessage());
+			e.printStackTrace();
+		} 
         return Constants.LIST;
     }
 
@@ -426,13 +440,13 @@ public class BudgetSearchAction extends BaseFormAction {
 
     public BigDecimal divideAndRoundStrToBigDec(final String amountStr) {
         BigDecimal value = new BigDecimal(amountStr);
-        value = value.divide(new BigDecimal(1000), 2, BigDecimal.ROUND_HALF_UP);
+        value = value.divide(new BigDecimal(1), 2, BigDecimal.ROUND_HALF_UP);
         return value;
     }
 
     public String divideAndRoundBigDecToString(final BigDecimal amount) {
         BigDecimal value = amount;
-        value = value.divide(new BigDecimal(1000), 2, BigDecimal.ROUND_HALF_UP);
+        value = value.divide(new BigDecimal(1), 2, BigDecimal.ROUND_HALF_UP);
         return value.toString();
     }
 
@@ -460,6 +474,7 @@ public class BudgetSearchAction extends BaseFormAction {
             computeTwopreviousYearRange();
         }
         criteria.setBudget(null);
+        criteria.setStatus(egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "Approved"));        
         savedbudgetDetailList = budgetDetailService.findAllBudgetDetailsWithReAppropriation(budget, criteria);
         re = checkRe(budget);
         computeAmounts(savedbudgetDetailList);
@@ -519,13 +534,13 @@ public class BudgetSearchAction extends BaseFormAction {
                             .getApprovedAmount().toString());
             if (re) {
                 if (getConsiderReAppropriationAsSeperate())
-                    view.setCurrentYearReApproved(divideAndRoundBigDecToString(detail.getApprovedAmount()));
+                    view.setCurrentYearReApproved(divideAndRoundBigDecToString(approvedAmt));
                 else {
                     view.setCurrentYearReApproved(divideAndRoundBigDecToString(calculateTotal(detail)));
                     shouldShowREAppropriations = false;
                 }
             } else
-                view.setCurrentYearBeApproved(divideAndRoundBigDecToString(detail.getApprovedAmount()));
+                view.setCurrentYearBeApproved(divideAndRoundBigDecToString(approvedAmt));
             detail.setAnticipatoryAmount(detail.getAnticipatoryAmount() == null ? BigDecimal.ZERO
                     : divideAndRoundStrToBigDec(detail.getAnticipatoryAmount().toString()));
             detail.setOriginalAmount(divideAndRoundStrToBigDec(detail.getOriginalAmount().toString()));

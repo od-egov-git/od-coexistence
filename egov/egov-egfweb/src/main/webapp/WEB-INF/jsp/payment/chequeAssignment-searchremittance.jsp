@@ -112,7 +112,7 @@
 						<td style="text-align: center" class="blueborderfortdnew"><s:hidden
 								id="voucherHeaderId"
 								name="chequeAssignmentList[%{#s.index}].voucherHeaderId"
-								value="%{voucherHeaderId}" /> <s:checkbox
+								value="%{voucherHeaderId}" /> <s:checkbox 
 								name="chequeAssignmentList[%{#s.index}].isSelected"
 								id="isSelected%{#s.index}" onclick="update(this)" /></td>
 						<td align="left" style="text-align: center"

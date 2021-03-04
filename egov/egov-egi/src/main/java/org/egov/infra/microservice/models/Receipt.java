@@ -1,7 +1,6 @@
 package org.egov.infra.microservice.models;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -25,6 +24,12 @@ public class Receipt {
 
     // Read only, populated during search
     private Long receiptDate;
+    
+    private String subdivison;
+    
+    private String paymentStatus;
+    
+    private String gstNo;
 
     @NotNull
     @Size(min = 1, max = 1)
@@ -39,30 +44,6 @@ public class Receipt {
     
     @JsonIgnore
     private String paymentId;
-    
-    @JsonIgnore
-    private Date remittedOn;
-    
-    @JsonIgnore
-    private String remitterId;
-    
-    @JsonIgnore
-    private String bankName;
-    
-    @JsonIgnore
-    private String branchName;
-    
-    @JsonIgnore
-    private String accNumber;
-    
-    @JsonIgnore
-    private String payee;
-    
-    @JsonIgnore
-    private String drawer;
-    
-    @JsonIgnore
-    private String transactionNumber;
 
     public String getTenantId() {
         return tenantId;
@@ -135,70 +116,28 @@ public class Receipt {
     public void setPaymentId(String paymentId) {
         this.paymentId = paymentId;
     }
-    
-    public String getRemitterId() {
-        return remitterId;
-    }
-    
-    public void setRemitterId(String remitterId) {
-        this.remitterId = remitterId;
-    }
 
-    public String getBankName() {
-        return bankName;
-    }
+	public String getSubdivison() {
+		return subdivison;
+	}
 
-    public void setBankName(String bankName) {
-        this.bankName = bankName;
-    }
+	public void setSubdivison(String subdivison) {
+		this.subdivison = subdivison;
+	}
 
-    public String getBranchName() {
-        return branchName;
-    }
+	public String getGstNo() {
+		return gstNo;
+	}
 
-    public void setBranchName(String branchName) {
-        this.branchName = branchName;
-    }
+	public void setGstNo(String gstNo) {
+		this.gstNo = gstNo;
+	}
 
-    public String getAccNumber() {
-        return accNumber;
-    }
+	public String getPaymentStatus() {
+		return paymentStatus;
+	}
 
-    public void setAccNumber(String accNumber) {
-        this.accNumber = accNumber;
-    }
-
-    public String getPayee() {
-        return payee;
-    }
-
-    public void setPayee(String payee) {
-        this.payee = payee;
-    }
-
-    public String getDrawer() {
-        return drawer;
-    }
-
-    public void setDrawer(String drawer) {
-        this.drawer = drawer;
-    }
-
-    public String getTransactionNumber() {
-        return transactionNumber;
-    }
-
-    public void setTransactionNumber(String transactionNumber) {
-        this.transactionNumber = transactionNumber;
-    }
-
-    public Date getRemittedOn() {
-        return remittedOn;
-    }
-
-    public void setRemittedOn(Date remittedOn) {
-        this.remittedOn = remittedOn;
-    }
-    
-    
+	public void setPaymentStatus(String paymentStatus) {
+		this.paymentStatus = paymentStatus;
+	}
 }

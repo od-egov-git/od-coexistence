@@ -205,18 +205,18 @@ background: #DEDEDE;
 
 					</tr>
 					<tr>
-						<%-- <td class="greybox"><s:text
-								name="generalLedger.financingSource" /></td>
-						<td class="greybox"><s:select name="fundSource_id"
-								id="fundSource_id" list="dropdownData.fundsourceList"
-								listKey="id" listValue="name" headerKey=""
-								headerValue="%{getText('lbl.choose.options')}" /></td> --%>
-						
-						<%-- <td class="bluebox"><s:text name="generalLedger.field" /></td>
-						<td class="bluebox"><s:select name="fieldId" id="fieldId"
-								list="dropdownData.fieldList" listKey="id" listValue="name"
+						<td class="bluebox"><s:text name="scheme" /></td>
+						<td class="bluebox"><s:select 
+						name="schemeId" id="schemeId"	list="dropdownData.schemeList" listKey="id" listValue="name" onchange="getval(this);"
 								headerKey="" headerValue="%{getText('lbl.choose.options')}" /></td>
- --%>
+
+
+						<td class="bluebox"><s:text name="subscheme" /></td>
+						<td class="bluebox"><select id="subschemeId" name="subschemeId" >	
+								<option value=""> ----Choose----</option>
+						</select></td>
+
+
 					</tr>
 
 				</table>

@@ -63,10 +63,10 @@
 			<%@include file="budgetReport-form.jsp"%>
 			<s:hidden name="onSaveOrForward" />
 			<div class="buttonbottom" style="padding-bottom: 10px;">
-				<s:submit  key="lbl.search"  cssClass="buttonsubmit"
+				<s:submit value="Search" cssClass="buttonsubmit"
 					onclick="return validateFinYear('getFunctionwiseReport');" />
 					<s:reset name="button" type="submit" cssClass="button" id="button"
-					 key="lbl.reset"/>
+					value="Reset" />
 				<input type="button" value="<s:text name='lbl.close'/>"
 					onclick="window.parent.postMessage('close','*');window.close();" class="button" />
 			</div>

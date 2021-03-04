@@ -114,6 +114,11 @@ function validateCancel()
 		bootbox.alert("<s:text name='msg.please.select.atleast.one.bill'/>");
 		return false;
 	}
+	else if(rows > 1)
+	{
+		bootbox.alert("<s:text name='msg.please.select.atleast.one.bill.cancel'/>");
+		return false;
+	}
 	document.billForm.action='/services/EGF/voucher/cancelBill-cancelBill.action';
 	document.billForm.submit();
 	return true;

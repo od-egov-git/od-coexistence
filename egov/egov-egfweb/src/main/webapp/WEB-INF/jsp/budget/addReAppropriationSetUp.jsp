@@ -222,6 +222,7 @@ function makeAmountFieldFormatter(prefix,suffix){
 					</s:if>
 					"amount":'<s:property value="deltaAmount"/>',
 					"planningPercent":'<s:property value="planningPercent"/>',
+					"quarterPercent":'<s:property value="quarterPercent"/>',
 					"planningBudgetApproved":'<s:property value="planningBudgetApproved"/>',
 					"total_available":'<s:property value="originalAmount"/>'
 				});
@@ -255,6 +256,7 @@ function makeAmountFieldFormatter(prefix,suffix){
 			</s:if>
 			{key:"amount",label:'Budget Estimate(Rs)',width:"50em", formatter:createTextFieldFormatterWithOnblur('budgetReAppropriationTable',BUDGET_REAPPROPRIATION_LIST,".deltaAmount")},
 			{key:"planningPercent",label:'Planning Budget<br/>Percentage',width:"50em", formatter:createTextFieldFormatterWithOnblur('budgetReAppropriationTable',BUDGET_REAPPROPRIATION_LIST,".planningPercent")},
+			{key:"quarterPercent",label:'Quarter Budget<br/>Percentage',width:"50em", formatter:createTextFieldFormatterWithOnblur('budgetReAppropriationTable',BUDGET_REAPPROPRIATION_LIST,".quarterPercent")},
 			{key:"planningBudgetApproved",label:'Planning Budget Approved(Rs)',width:"50em", formatter:makeAmountFieldFormatter(BUDGET_REAPPROPRIATION_LIST,".planningBudgetApproved")},
 			{key:"total_available",label:'Budget Provision avail<br/> after Additional Appropriation(Rs)',width:"90", formatter:makeAmountFieldFormatter(BUDGET_REAPPROPRIATION_LIST,".remainingAmount")},
 			{key:'Add',label:'Add',formatter:createAddImageFormatter("${pageContext.request.contextPath}")},

@@ -65,4 +65,6 @@ public interface VoucherHeaderDAO {
 	      CVoucherHeader    update(  CVoucherHeader    entity);
 
 	    void delete(  CVoucherHeader    entity);
+	    // Method added By Prasanta
+		public int updateStatusInVoucherHeader(Integer status, Long vHeaderId) throws Exception;
 }

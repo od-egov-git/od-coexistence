@@ -72,7 +72,7 @@ public class Miscbilldetail implements java.io.Serializable
     private CVoucherHeader billVoucherHeader;
 
     private CVoucherHeader payVoucherHeader;
-
+    
     private String billnumber;
 
     private Date billdate;
@@ -218,5 +218,6 @@ public class Miscbilldetail implements java.io.Serializable
     public void setPaidby(final User paidby) {
         this.paidby = paidby;
     }
+
 
 }

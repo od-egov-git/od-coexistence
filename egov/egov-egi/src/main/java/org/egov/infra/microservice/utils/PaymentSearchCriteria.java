@@ -75,6 +75,7 @@ public class PaymentSearchCriteria {
     private Set<String> businessServices;
     private String transactionNumber;
     private String mobileNumber;
+    private String department;
     private Long fromDate;
     private Long toDate;
     private Integer offset;

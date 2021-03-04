@@ -85,6 +85,11 @@ public abstract class BaseFormAction extends ActionSupport
         implements ModelDriven<Object>, ParameterAware, SessionAware, Preparable, RequestAware, ParameterNameAware {
     public static final String INDEX = "index";
     public static final String NEW = "new";
+    public static final String POST = "post";
+    public static final String SUMMARYFORM = "summaryForm";
+    public static final String NEWCAO = "newCao";
+    public static final String NEWACMC = "newAcmc";
+    public static final String NEWMC = "newMc";
     public static final String EDIT = "edit";
     public static final String VIEW = "view";
     protected static final Logger LOG = LoggerFactory.getLogger(BaseFormAction.class);

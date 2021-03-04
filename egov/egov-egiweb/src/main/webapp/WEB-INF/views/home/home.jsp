@@ -61,7 +61,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <meta name="description" content="eGov Urban Portal"/>
+    <meta name="description" content=""/>
     <meta name="author" content="eGovernments Foundation"/>
     <spring:eval expression="@environment.getProperty('user.pwd.strength')" var="pwdstrengthmsg"/>
     <spring:message code="usr.pwd.strength.msg.${pwdstrengthmsg}" var="pwdmsg" htmlEscape="true"/>
@@ -244,9 +244,7 @@
                 </li>
 
                 <li class="dropdown">
-                    <a href="http://www.egovernments.org" target="_blank">
-                        <img src="<cdn:url value='/resources/global/images/logo@2x.png'/>" title="Powered by eGovernments" height="25px" style="padding-top:5px">
-                    </a>
+                    
                 </li>
             </ul>
         </div>

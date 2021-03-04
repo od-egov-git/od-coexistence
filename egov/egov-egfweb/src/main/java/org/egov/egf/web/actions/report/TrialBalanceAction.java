@@ -151,6 +151,15 @@ public class TrialBalanceAction extends BaseFormAction {
 	private Map<String, BigDecimal> fundWiseTotalMap = new LinkedHashMap<String, BigDecimal>();
 	private FinancialYearDAO financialYearDAO;
 	private String removeEntrysWithZeroAmount = "";
+	  private String schemeId;
+
+	public String getSchemeId() {
+		return schemeId;
+	}
+
+	public void setSchemeId(String schemeId) {
+		this.schemeId = schemeId;
+	}
 
 	@Autowired
 	@Qualifier("persistenceService")
@@ -182,6 +191,7 @@ public class TrialBalanceAction extends BaseFormAction {
 		addDropdownData("functionaryList", masterDataCache.get("egi-functionary"));
 		addDropdownData("fieldList", masterDataCache.get("egi-ward"));
 		addDropdownData("functionList", masterDataCache.get("egi-function"));
+		addDropdownData("schemeList",persistenceService.findAllBy(" from Scheme where isactive=true order by name"));
 
 	}
 
@@ -296,6 +306,7 @@ public class TrialBalanceAction extends BaseFormAction {
 		String fieldIdCond = "";
 		String tsFieldIdCond = "";
 		String fundcondition = "";
+		String misSchemeCond ="";
 		List<TrialBalanceBean> forAllFunds = new ArrayList<TrialBalanceBean>();
 
 		if (rb.getFundId() != null)
@@ -304,7 +315,7 @@ public class TrialBalanceAction extends BaseFormAction {
 			fundcondition = " and fundid in (select id from fund where isactive=true and isnotleaf!=true )";
 		// if(LOGGER.isInfoEnabled()) LOGGER.info("fund cond query
 		// "+fundcondition);
-		if ((null != rb.getDepartmentCode() && !rb.getDepartmentCode().isEmpty()) || null != rb.getFunctionaryId()) {
+		if ((null != rb.getDepartmentCode() && !rb.getDepartmentCode().isEmpty()) || null != rb.getFunctionaryId() || (schemeId != null && !schemeId.isEmpty())) {
 			voucherMisTable = ",vouchermis mis ";
 			misClause = " and mis.voucherheaderid=vh.id ";
 		}
@@ -312,6 +323,10 @@ public class TrialBalanceAction extends BaseFormAction {
 		if (null != rb.getDepartmentCode() && !rb.getDepartmentCode().isEmpty()) {
 			misDeptCond = " and mis.DEPARTMENTCODE= :departmentCode";
 			tsDeptCond = " and DEPARTMENTCODE= :departmentCode";
+		}
+		if(schemeId != null && !schemeId.isEmpty())
+		{
+			misSchemeCond= " and mis.schemeid = :scheme";
 		}
 		if (null != rb.getFunctionaryId()) {
 			functionaryCond = " and mis.FUNCTIONARYID= :functionaryId";
@@ -344,7 +359,7 @@ public class TrialBalanceAction extends BaseFormAction {
 				+ voucherMisTable + " WHERE coa.glcode=gl.glcode AND gl.voucherheaderid=vh.id" + misClause
 				+ " AND vh.status not in (" + defaultStatusExclude + ") "
 				+ " AND  vh.voucherdate<=:toDate AND vh.voucherdate>=(SELECT startingdate FROM financialyear WHERE  startingdate<=:toDate AND   endingdate>=:toDate) "
-				+ fundcondition + " " + misDeptCond + functionaryCond + functionIdCond + fieldIdCond
+				+ fundcondition + " " + misDeptCond + misSchemeCond +functionaryCond + functionIdCond + fieldIdCond
 				+ " GROUP BY gl.glcode,coa.name,vh.fundid    HAVING (SUM(debitamount)>0 OR SUM(creditamount)>0)    And"
 				+ " (SUM(debitamount)+SUM((SELECT case when SUM(OPENINGDEBITBALANCE) IS NULL then 0 else SUM(OPENINGDEBITBALANCE) end FROM"
 				+ " transactionsummary WHERE  financialyearid=(SELECT id FROM financialyear       WHERE startingdate <=:toDate"
@@ -367,7 +382,7 @@ public class TrialBalanceAction extends BaseFormAction {
 				+ tsFieldIdCond
 				+ " AND glcodeid =(SELECT id   FROM chartofaccounts WHERE  glcode=coa.glcode) ) AND coa.id NOT IN(SELECT glcodeid FROM generalledger gl,voucherheader vh "
 				+ voucherMisTable + " WHERE " + " vh.status not in (" + defaultStatusExclude + ") " + misClause
-				+ misDeptCond + functionaryCond + functionIdCond + fieldIdCond
+				+ misDeptCond +misSchemeCond + functionaryCond + functionIdCond + fieldIdCond
 				+ " AND vh.id=gl.voucherheaderid AND vh.fundid=fu.id AND vh.voucherdate<=:toDate AND vh.voucherdate>=(SELECT startingdate FROM financialyear WHERE  startingdate<=:toDate AND   endingdate>=:toDate) "
 				+ fundcondition + ")" + " GROUP BY coa.glcode,coa.name, fu.id"
 				+ " HAVING((SUM((SELECT case when SUM(OPENINGDEBITBALANCE) IS NULL then 0 else SUM(OPENINGDEBITBALANCE) end FROM transactionsummary WHERE"
@@ -396,6 +411,11 @@ public class TrialBalanceAction extends BaseFormAction {
 				SQLQuery.setInteger("divisionId", rb.getDivisionId());
 			if (null != rb.getFromDate())
 				SQLQuery.setDate("fromDate", rb.getFromDate());
+			
+			if(schemeId != null && !schemeId.isEmpty())
+			{
+				SQLQuery.setInteger("scheme", Integer.parseInt(schemeId));
+			}
 			SQLQuery.setDate("toDate", rb.getToDate());
 			if (LOGGER.isInfoEnabled())
 				LOGGER.info("query ---->" + SQLQuery);
@@ -538,8 +558,9 @@ public class TrialBalanceAction extends BaseFormAction {
 		String tsFunctionIdCond = "";
 		String tsdivisionIdCond = "";
 		String misdivisionIdCond = "";
+		String misSchemeCond="";
 		if ((null != rb.getDepartmentCode() && !rb.getDepartmentCode().isEmpty()) || null != rb.getFunctionaryId()
-				|| null != rb.getDivisionId()) {
+				|| null != rb.getDivisionId() || (schemeId != null && !schemeId.isEmpty())) {
 			voucherMisTable = ",vouchermis mis ";
 			misClause = " and mis.voucherheaderid=vh.id ";
 		}
@@ -547,6 +568,10 @@ public class TrialBalanceAction extends BaseFormAction {
 		if (null != rb.getDepartmentCode() && !rb.getDepartmentCode().isEmpty()) {
 			misDeptCond = " and mis.DepartmentCode= :departmentCode";
 			tsDeptCond = " and ts.DepartmentCode= :departmentCode";
+		}
+		if(schemeId != null && !schemeId.isEmpty())
+		{
+			misSchemeCond=" and mis.schemeid= :scheme ";
 		}
 		if (null != rb.getFunctionaryId()) {
 			functionaryCond = " and mis.FunctionaryId= :functionaryId";
@@ -609,7 +634,7 @@ public class TrialBalanceAction extends BaseFormAction {
 		final String tillDateOPBStr = "SELECT coa.glcode AS accCode ,coa.name  AS accName, SUM(gl.creditAmount) as tillDateCreditOPB,sum(gl.debitAmount) as tillDateDebitOPB"
 				+ " FROM generalledger  gl,chartofaccounts coa,financialyear fy,Voucherheader vh " + voucherMisTable
 				+ " WHERE gl.glcodeid=coa.id and vh.id=gl.voucherheaderid  and vh.fundid=:fundId " + misClause
-				+ misDeptCond + functionaryCond + functionIdCond + misdivisionIdCond
+				+ misDeptCond + functionaryCond + functionIdCond + misdivisionIdCond +misSchemeCond
 				+ " AND vh.voucherdate>=fy.startingdate AND vh.voucherdate<=:fromDateMinus1 "
 				+ " AND fy.startingdate<=:fromDate AND fy.endingdate>=:toDate" + " AND vh.status not in ("
 				+ defaultStatusExclude + ")" + " GROUP BY gl.glcodeid,coa.glcode,coa.name ORDER BY coa.glcode ASC";
@@ -627,7 +652,10 @@ public class TrialBalanceAction extends BaseFormAction {
 			tillDateOPBQry.setInteger("functionId", rb.getFunctionId());
 		if (null != rb.getDivisionId())
 			tillDateOPBQry.setInteger("divisionId", rb.getDivisionId());
-
+		if(schemeId != null && !schemeId.isEmpty())
+		{
+			tillDateOPBQry.setInteger("scheme", Integer.parseInt(schemeId));
+		}
 		tillDateOPBQry.setDate("fromDate", rb.getFromDate());
 		// tillDateOPBQry.setDate("fromDate",rb.getFromDate());
 		tillDateOPBQry.setDate("toDate", rb.getToDate());
@@ -644,7 +672,7 @@ public class TrialBalanceAction extends BaseFormAction {
 		final String currentDebitCreditStr = "SELECT coa.glcode AS accCode ,coa.name  AS accName, SUM(gl.creditAmount) as creditAmount,sum(gl.debitAmount) as debitAmount"
 				+ " FROM generalledger gl,chartofaccounts coa,financialyear fy,Voucherheader vh " + voucherMisTable
 				+ " WHERE gl.glcodeid=coa.id and vh.id= gl.voucherheaderid AND  vh.fundid=:fundId " + misClause
-				+ misDeptCond + functionaryCond + functionIdCond + misdivisionIdCond
+				+ misDeptCond + functionaryCond + functionIdCond + misdivisionIdCond + misSchemeCond
 				+ " AND vh.voucherdate>=:fromDate AND vh.voucherdate<=:toDate "
 				+ " AND fy.startingdate<=:fromDate AND fy.endingdate>=:toDate" + " AND vh.status not in ("
 				+ defaultStatusExclude + ") " + " GROUP BY gl.glcodeid,coa.glcode,coa.name ORDER BY coa.glcode ASC";
@@ -663,7 +691,10 @@ public class TrialBalanceAction extends BaseFormAction {
 			currentDebitCreditQry.setInteger("divisionId", rb.getDivisionId());
 		currentDebitCreditQry.setDate("fromDate", rb.getFromDate());
 		currentDebitCreditQry.setDate("toDate", rb.getToDate());
-
+		if(schemeId != null && !schemeId.isEmpty())
+		{
+			currentDebitCreditQry.setInteger("scheme", Integer.parseInt(schemeId));
+		}
 		final List<TrialBalanceBean> currentDebitCreditList = currentDebitCreditQry.list();
 		if (LOGGER.isInfoEnabled())
 			LOGGER.info("closing balance query ---->" + currentDebitCreditQry);

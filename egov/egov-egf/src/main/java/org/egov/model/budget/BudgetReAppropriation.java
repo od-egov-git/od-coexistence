@@ -54,7 +54,7 @@ import org.egov.pims.commons.Position;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class BudgetReAppropriation extends StateAware {
+public class BudgetReAppropriation extends StateAware implements Comparable< BudgetReAppropriation > {
     private static final long serialVersionUID = 2343135780753283100L;
     private Long id = null;
     private BudgetDetail budgetDetail;
@@ -152,6 +152,11 @@ public class BudgetReAppropriation extends StateAware {
 
     public void setAsOnDate(final Date asOnDate) {
         this.asOnDate = asOnDate;
+    }
+    
+    @Override
+    public int compareTo(BudgetReAppropriation o) {
+        return this.getId().compareTo(o.getId());
     }
 
 }

@@ -65,9 +65,11 @@ import org.egov.commons.Accountdetailkey;
 import org.egov.commons.service.AccountDetailKeyService;
 import org.egov.commons.service.AccountdetailtypeService;
 import org.egov.commons.service.EntityTypeService;
+import org.egov.egf.expensebill.repository.DocumentUploadRepository;
 import org.egov.egf.masters.repository.ContractorRepository;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.validation.exception.ValidationException;
+import org.egov.model.bills.DocumentUpload;
 import org.egov.model.masters.Contractor;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,6 +95,9 @@ public class ContractorService implements EntityTypeService {
 
     @Autowired
     private AccountdetailtypeService accountdetailtypeService;
+    
+    @Autowired
+    private DocumentUploadRepository documentUploadRepository;
 
     public Session getCurrentSession() {
         return entityManager.unwrap(Session.class);
@@ -200,6 +205,10 @@ public class ContractorService implements EntityTypeService {
     public List<? extends org.egov.commons.utils.EntityType> getEntitiesById(List<Long> idsList) throws ValidationException {
         // TODO Auto-generated method stub
         return null;
+    }
+    
+    public List<DocumentUpload> findByObjectIdAndObjectType(final Long objectId, final String objectType) {
+        return documentUploadRepository.findByObjectIdAndObjectType(objectId, objectType);
     }
 
 }

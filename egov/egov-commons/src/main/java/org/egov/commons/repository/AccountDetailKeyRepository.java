@@ -66,4 +66,6 @@ public interface AccountDetailKeyRepository extends JpaRepository<Accountdetailk
     
     @Query("from Accountdetailkey where accountdetailtype.id=:detailtypeid")
     public List<Accountdetailkey> findByDetailType(@Param("detailtypeid")Integer typeid);
+    
+    Accountdetailkey findById(Integer typeid);
 }

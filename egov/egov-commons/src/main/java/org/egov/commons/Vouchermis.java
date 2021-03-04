@@ -103,6 +103,10 @@ public class Vouchermis implements java.io.Serializable {
     @JoinColumn(name = "functionid")
     private CFunction function;
     private String sourcePath;
+    
+    @Column(name = "reciept_number")
+    private String recieptNumber;
+    
     @Column(name = "budgetary_appnumber")
     private String budgetaryAppnumber;
     private Boolean budgetCheckReq = true;
@@ -269,4 +273,12 @@ public class Vouchermis implements java.io.Serializable {
     public void setServiceName(String serviceName) {
         this.serviceName = serviceName;
     }
+
+	public String getRecieptNumber() {
+		return recieptNumber;
+	}
+
+	public void setRecieptNumber(String recieptNumber) {
+		this.recieptNumber = recieptNumber;
+	}
 }

@@ -152,7 +152,7 @@ public class BudgetAppropriationRegisterReportAction extends BaseFormAction {
         // TODO Auto-generated method stub
         if (fund.getId() != null && fund.getId() != -1){
             fund = (Fund) persistenceService.find("from Fund where id=?", fund.getId());
-            if (department.getCode() != null && department.getCode() != 0+""){
+            if (department.getCode() != null && department.getCode() != "0"){
                 department = microserviceUtils.getDepartmentByCode(department.getCode());
                 ArrayList<Department> listOfDepartments = new ArrayList<Department>();
                 List<String> deptCodeList = budgetDetailService.getDepartmentFromBudgetDetailByFundId(fund.getId());
@@ -301,7 +301,7 @@ public class BudgetAppropriationRegisterReportAction extends BaseFormAction {
             strsubQuery.append(" (vmis.budgetary_appnumber  != 'null' and vmis.budgetary_appnumber is not null) and vh.status != 4 and vh.voucherdate  >=:strStDate");
             strsubQuery.append(" and vh.voucherdate <=:strAODate");
             strsubQuery.append(getFunctionQuery("gl.functionid"));
-            strsubQuery.append(getDepartmentQuery("vmis.departmentid"));
+            strsubQuery.append(getDepartmentQuery("vmis.departmentcode"));
             strsubQuery.append(getFundQuery("vh.fundid"));
             strsubQuery.append("  order by bdgApprNumber ");
 
@@ -356,7 +356,7 @@ public class BudgetAppropriationRegisterReportAction extends BaseFormAction {
 
     private String getDepartmentQuery(final String string) {
         final String query = "";
-        if (department.getCode() != null && "-1".equals(department.getCode()))
+        if (department.getCode() != null )
             return " and " + string + " =:departmentcode ";
         return query;
     }
@@ -548,7 +548,8 @@ public class BudgetAppropriationRegisterReportAction extends BaseFormAction {
         {
             query.setLong("functionId", function.getId()) ; 
         }
-        if (department.getCode() != null && "-1".equals(department.getCode()))
+        System.out.println("dept :"+department.getCode());
+        if (department.getCode() != null )
         {
             query.setString("departmentcode", department.getCode()) ; 
         }

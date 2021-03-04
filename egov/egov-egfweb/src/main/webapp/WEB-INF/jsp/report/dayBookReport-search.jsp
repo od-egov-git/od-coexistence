@@ -46,7 +46,8 @@
   ~
   --%>
 
-
+<%@ taglib prefix="s" uri="/WEB-INF/tags/struts-tags.tld"%>
+<%@ taglib prefix="egov" tagdir="/WEB-INF/tags"%>
 <%@ include file="/includes/taglibs.jsp"%>
 <%@ page language="java"%>
 <%@page contentType="text/html"%>
@@ -100,7 +101,17 @@
 }
 </style>
 <script type="text/javascript"
-	src="/services/EGF/resources/javascript/ajaxCommonFunctions.js?rnd=${app_release_no}"></script>
+	src="/services/EGF/resources/javascript/ajaxCommonFunctions.js?rnd=${app_release_no}">
+	function populatesubSchemes(scheme){
+		
+		populatesubschemeid({schemeId:scheme.options[scheme.selectedIndex].value});	
+		populatefundsourceId({subSchemeId:-1});
+	}
+	function populateFundSource(subSchemeId){
+		
+		populatefundsourceId({subSchemeId:subSchemeId.options[subSchemeId.selectedIndex].value});	
+	}
+	</script>
 <script type="text/javascript"
 	src="/services/EGF/resources/javascript/calender.js"></script>
 <script type="text/javascript"
@@ -156,8 +167,8 @@
 								data-inputmask="'mask': 'd/m/y'" /></td>
 
 
-						<td class="bluebox"><s:text name="dayBook.endDate" /><span
-							class="mandatory"></span></td>
+						<td class="bluebox"><s:text name="dayBook.endDate" />
+						<span class="mandatory"></span></td>
 						<td class="bluebox"><s:textfield id="endDate" name="endDate"
 								value="%{currentDate}"
 								onkeyup="DateFormat(this,this.value,event,false,'3')"
@@ -175,7 +186,26 @@
 						<td class="greybox"></td>
 					</tr>
 
-
+					<tr>
+						<td style="width: 5%"></td>
+						<td class="greybox"><s:text name="scheme" /></td>
+						<td class="greybox"><s:select 
+						name="schemeId" id="schemeId"	list="dropdownData.schemeList" listKey="id" listValue="name" onchange="getval(this);"
+								headerKey="" headerValue="%{getText('lbl.choose.options')}" /></td>
+						<td class="greybox"><s:text name="subscheme" /></td>
+						<td class="greybox"><select id="subschemeId" name="subschemeId" >	
+								<option value=""> ----Choose----</option>
+						</select></td>
+					</tr>
+					<tr>
+						<td style="width: 5%"></td>
+						<td class="greybox"><s:text name="daybook.naration" /></td>
+						<td class="greybox"><s:textfield id="narration"
+								name="narration" value="%{narration}"/></td>
+						<td class="greybox">&nbsp;</td>
+						<td class="greybox">&nbsp;</td>
+					</tr>
+					
 				</table>
 				<br />
 
@@ -200,5 +230,32 @@
 		<div id="codescontainer" />
 
 	</s:form>
+	 <script type="text/javascript">
+	function getval(schemeId){
+		  var formData = schemeId;
+	    jQuery.ajax({
+            url: '/report/daybookReport-subscheme-ajaxsearch.action?scheme='+schemeId,
+            data:  schemeId,
+            type : 'POST',
+    		async : false,
+    		datatype : 'text',  
+    		processData: false, 
+    		contentType: false,
+        	
+        success: function(data)
+        {
+        	console.log(data);
+            //document.getElementById("resultDiv").innerHTML=data;
+            //document.getElementById("resultDiv").style.display="block";
+            //undoLoadingMask();
+        },
+         error: function(jqXHR, textStatus, errorThrown)
+         {
+        	 undoLoadingMask();
+         }         
+        });
+	};
+	
+	</script> 
 </body>
 </html>

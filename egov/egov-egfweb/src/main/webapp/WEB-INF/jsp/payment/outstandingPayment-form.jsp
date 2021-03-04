@@ -80,7 +80,7 @@ function getData(){
 	isValid = validateData();
 	if(isValid == false)
 		return false;
-	var url = '/EGF/payment/outstandingPayment!ajaxLoadPaymentHeader.action?skipPrepare=true&bankAccount.id='+bankAccount+'&asOnDate='+asOnDate;
+	var url = '/services/EGF/payment/outstandingPayment!ajaxLoadPaymentHeader.action?skipPrepare=true&bankAccount.id='+bankAccount+'&asOnDate='+asOnDate;
 	YAHOO.util.Connect.asyncRequest('POST', url, callback, null);
 	doAfterSubmit();
 }

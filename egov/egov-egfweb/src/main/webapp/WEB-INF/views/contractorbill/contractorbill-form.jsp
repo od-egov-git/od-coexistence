@@ -119,7 +119,6 @@
      <div class="tab-pane fade in active" id="contractorbillheader">
          <jsp:include page="contractorbill-header.jsp"/>
          <div class="panel panel-primary" data-collapsed="0">
-          <jsp:include page="contractor-accountcode-tempate.jsp"/>
              <jsp:include page="contractorbill-debitdetails.jsp"/>
              <jsp:include page="contractorbill-creditdetails.jsp"/>
              <jsp:include page="contractorbill-netpayable.jsp"/>

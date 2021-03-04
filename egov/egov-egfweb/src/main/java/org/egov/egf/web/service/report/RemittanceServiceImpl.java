@@ -75,7 +75,7 @@ public class RemittanceServiceImpl implements RemittanceService{
     public List<RemittanceReportModel> getRemittanceColectionsReports(RemittanceReportModel model) {
         RemittanceSearcCriteria criteria = new RemittanceSearcCriteria();
         this.prepareRemittanceSearchCriteria(model, criteria);
-        RemittanceResponse response = microserviceUtils.getRemittance(criteria);
+        RemittanceResponse response = null/*microserviceUtils.getRemittance(criteria)*/;
         List<Remittance> remittances = response.getRemittances();
         List<RemittanceReportModel> resultList = new ArrayList<>();
         if(remittances.isEmpty()){
@@ -162,19 +162,19 @@ public class RemittanceServiceImpl implements RemittanceService{
     private void prepareResultListForChequeReport(List<Receipt> receipts, List<RemittanceReportModel> resultList) {
         receipts.stream().forEach(rec -> {
             RemittanceReportModel model = new RemittanceReportModel();
-            String remittedOn = DateUtils.toDefaultDateFormat(rec.getRemittedOn());
-            model.setRemittedOn(remittedOn);
+            //String remittedOn = DateUtils.toDefaultDateFormat(rec.getRemittedOn());
+            //model.setRemittedOn(remittedOn);
             BillDetail billDetail = rec.getBill().get(0).getBillDetails().get(0);
             model.setService(billDetail.getBusinessService());
             model.setInstrumentType(rec.getInstrument().getInstrumentType().getName());
             model.setFund(billDetail.getFund());
             model.setDepartment(billDetail.getDepartment());
-            model.setBankAccount(rec.getAccNumber());
-            model.setPayee(StringUtils.defaultIfBlank(rec.getPayee(), "--"));
-            model.setDrawer(rec.getDrawer());
-            model.setTransactionNumber(rec.getTransactionNumber());
-            model.setRemitterId(rec.getRemitterId() != null ? rec.getRemitterId().toString() : "--");
-            model.setInstrumentAmount(rec.getInstrument().getAmount());
+            //model.setBankAccount(rec.getAccNumber());
+            //model.setPayee(StringUtils.defaultIfBlank(rec.getPayee(), "--"));
+            //model.setDrawer(rec.getDrawer());
+            //model.setTransactionNumber(rec.getTransactionNumber());
+            //model.setRemitterId(rec.getRemitterId() != null ? rec.getRemitterId().toString() : "--");
+            //model.setInstrumentAmount(rec.getInstrument().getAmount());
             resultList.add(model);
         });
     }
@@ -210,7 +210,7 @@ public class RemittanceServiceImpl implements RemittanceService{
         List<Department> departmentList = microserviceUtils.getDepartments();
         List<BusinessService> businessServiceList = microserviceUtils.getBusinessService(null);
         Set<Long> ids = resultList.stream().map(RemittanceReportModel::getRemitterId).map(ri -> Long.parseLong(ri)).collect(Collectors.toSet());
-        List<EmployeeInfo> emps = microserviceUtils.getEmployeeByIds(ids );
+        List<EmployeeInfo> emps =null /* microserviceUtils.getEmployeeByIds(ids )*/;
         Map<String, String> fundCodeNameMap = new HashMap<>();
         Map<String, String> deptCodeNameMap = new HashMap<>();
         Map<String, String> businessDetailsCodeNameMap = new HashMap<>();
@@ -329,7 +329,7 @@ public class RemittanceServiceImpl implements RemittanceService{
     private void groupByRemittedOn(Map<String, List<Receipt>> receiptDateWiseMap, List<Receipt> receipts) {
         String remittedOn;
         for (Receipt receipt : receipts) {
-            remittedOn = DateUtils.toDefaultDateFormat(receipt.getRemittedOn());
+            remittedOn = null/*DateUtils.toDefaultDateFormat(receipt.getRemittedOn())*/;
             if (!receiptDateWiseMap.containsKey(remittedOn)) {
                 List<Receipt> list = new ArrayList<Receipt>();
                 list.add(receipt);
@@ -396,7 +396,7 @@ public class RemittanceServiceImpl implements RemittanceService{
     
     private void groupByBankAccount(String key, Map<String, List<Receipt>> accountWiseMap, List<Receipt> tempList) {
         for (Receipt r : tempList) {
-            String accNumber = r.getAccNumber();
+            String accNumber = null/*r.getAccNumber()*/;
             if (accNumber != null) {
                 if (!accountWiseMap.containsKey(key + "-" + accNumber)) {
                     List<Receipt> list = new ArrayList<Receipt>();
@@ -411,7 +411,7 @@ public class RemittanceServiceImpl implements RemittanceService{
 
     private void groupByRemitter(String key, Map<String, List<Receipt>> remitterWiseMap, List<Receipt> tempList) {
         for (Receipt r : tempList) {
-            String remitterId = r.getRemitterId();
+            String remitterId = null/*r.getRemitterId()*/;
             if (remitterId != null) {
                 if (!remitterWiseMap.containsKey(key + "-" + remitterId)) {
                     List<Receipt> list = new ArrayList<Receipt>();
@@ -431,13 +431,13 @@ public class RemittanceServiceImpl implements RemittanceService{
             receipts.stream().forEach(rec -> {
                 Instrument instrument = recInstrumentMap.get(rec.getPaymentId());
                 Remittance remittance = instrumentRemittanceMap.get(instrument.getId());
-                rec.setRemittedOn(new Date(remittance.getReferenceDate()));
-                rec.setRemitterId(remittance.getAuditDetails().getCreatedBy());
+                //rec.setRemittedOn(new Date(remittance.getReferenceDate()));
+                //rec.setRemitterId(remittance.getAuditDetails().getCreatedBy());
                 String accountNumber = instrument.getBankAccount().getAccountNumber();
-                rec.setAccNumber(accountNumber);
-                rec.setPayee(rec.getBill().get(0).getPaidBy());
-                rec.setDrawer(instrument.getDrawer());
-                rec.setTransactionNumber(instrument.getTransactionNumber());
+                //rec.setAccNumber(accountNumber);
+                //rec.setPayee(rec.getBill().get(0).getPaidBy());
+                //rec.setDrawer(instrument.getDrawer());
+                //rec.setTransactionNumber(instrument.getTransactionNumber());
             });
             break;
 
@@ -445,13 +445,13 @@ public class RemittanceServiceImpl implements RemittanceService{
             receipts.stream().forEach(rec -> {
                 Instrument instrument = recInstrumentMap.get(rec.getBill().get(0).getBillDetails().get(0).getReceiptNumber());
                 Remittance remittance = instrumentRemittanceMap.get(instrument.getId());
-                rec.setRemittedOn(new Date(remittance.getReferenceDate()));
-                rec.setRemitterId(remittance.getAuditDetails().getCreatedBy());
+                //rec.setRemittedOn(new Date(remittance.getReferenceDate()));
+                //rec.setRemitterId(remittance.getAuditDetails().getCreatedBy());
                 String accountNumber = instrument.getBankAccount().getAccountNumber();
-                rec.setAccNumber(accountNumber);
-                rec.setPayee(rec.getBill().get(0).getPaidBy());
-                rec.setDrawer(instrument.getDrawer());
-                rec.setTransactionNumber(instrument.getTransactionNumber());
+                //rec.setAccNumber(accountNumber);
+                //rec.setPayee(rec.getBill().get(0).getPaidBy());
+                //rec.setDrawer(instrument.getDrawer());
+                //rec.setTransactionNumber(instrument.getTransactionNumber());
             });
             break;
         }
@@ -484,7 +484,7 @@ public class RemittanceServiceImpl implements RemittanceService{
     }
     
     private List<Bankaccount> getBankAccounts(Set accNos){
-        return bankaccountHibernateDAO.getBankAccountByAccountNumbers(accNos);
+        return null/*bankaccountHibernateDAO.getBankAccountByAccountNumbers(accNos)*/;
     }
 
     public List<RemittanceReportModel> getPendingRemittance(RemittanceReportModel remittanceReportModel) throws Exception{
@@ -527,8 +527,8 @@ public class RemittanceServiceImpl implements RemittanceService{
         }
         if(receipts == null || receipts.isEmpty())
             return reportModelList;
-        List<CVoucherHeader> voucherHeaderList = voucherHibDAO
-                .getVoucherHeaderByNumber(receiptVoucherMap.values().stream().collect(Collectors.toSet()));
+        List<CVoucherHeader> voucherHeaderList = null/*voucherHibDAO
+                .getVoucherHeaderByNumber(receiptVoucherMap.values().stream().collect(Collectors.toSet()))*/;
         Map<String, CVoucherHeader> voucherHeaderMap = voucherHeaderList.stream()
                 .collect(Collectors.toMap(CVoucherHeader::getVoucherNumber, Function.identity()));
 
@@ -636,7 +636,7 @@ public class RemittanceServiceImpl implements RemittanceService{
         try {
             Set<String> serviceSet = tempReportModelList.stream().map(RemittanceReportModel::getService).collect(Collectors.toSet());
             Set<String> deptSet = tempReportModelList.stream().map(RemittanceReportModel::getDepartment).collect(Collectors.toSet());
-            List<BusinessService> serviceByCodes = microserviceUtils.getBusinessServiceByCodes(serviceSet);
+            List<BusinessService> serviceByCodes = null /*microserviceUtils.getBusinessServiceByCodes(serviceSet)*/;
             Map<String, BusinessService> businessCodeMap = serviceByCodes.stream().collect(Collectors.toMap(BusinessService::getCode, Function.identity()));
             List<Department> departments = microserviceUtils.getDepartments(StringUtils.join(deptSet, ","));
             Map<String, Department> deptCodeMap = departments.stream().collect(Collectors.toMap(Department::getCode, Function.identity()));

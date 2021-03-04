@@ -142,4 +142,10 @@ public interface BudgetDetailsDAO {
 
     public List<CFunction> getFunctionsByFundAndDepartment(final Integer fund, final Long department)
             throws ValidationException;
+
+    public BigDecimal getBudgetedAmtForQtr(Map<String, Object> paramMap) throws ValidationException;
+
+	public BigDecimal getActualBudgetUtilizedForBudgetaryCheckQtr(Map<String, Object> paramMap) throws ValidationException;
+
+	public BigDecimal getBillAmountForBudgetCheckQtr(Map<String, Object> paramMap) throws ValidationException;
 }

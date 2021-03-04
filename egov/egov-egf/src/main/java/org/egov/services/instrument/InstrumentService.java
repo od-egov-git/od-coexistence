@@ -91,6 +91,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.egov.utils.FinancialConstants.INSTRUMENT_TYPE_ADVICE;
+import static org.egov.utils.FinancialConstants.INSTRUMENT_TYPE_PEX;
 import static org.egov.utils.FinancialConstants.INSTRUMENT_TYPE_ATM;
 import static org.egov.utils.FinancialConstants.INSTRUMENT_TYPE_BANK;
 import static org.egov.utils.FinancialConstants.INSTRUMENT_TYPE_BANK_TO_BANK;
@@ -235,6 +236,9 @@ public class InstrumentService {
             case INSTRUMENT_TYPE_ADVICE:
                 validateAndAssingnAdvice(instrHeader, instrMap);
                 break;
+            case INSTRUMENT_TYPE_PEX:
+                validateAndAssingnAdvice(instrHeader, instrMap);
+                break;
             case INSTRUMENT_TYPE_BANK:
                 validateAndAssingnAdvice(instrHeader, instrMap);
                 break;
@@ -368,6 +372,7 @@ public class InstrumentService {
                     .toString());
         else
             throw new IllegalArgumentException(TRANSACTION_NUMBER + IS_NULL);
+        
         if (instrMap.get(TRANSACTION_DATE) == null)
             throw new IllegalArgumentException(TRANSACTION_DATE + IS_NULL);
         else if (new Date().compareTo((Date) instrMap.get(TRANSACTION_DATE)) == -1)
@@ -376,6 +381,19 @@ public class InstrumentService {
         else
             instrHeader.setTransactionDate((Date) instrMap
                     .get(TRANSACTION_DATE));
+        
+        if (instrMap.get(BANK_CODE) != null) {
+            final Bank bank = getBank(instrMap.get(BANK_CODE).toString());
+            if (bank == null)
+                throw new ApplicationRuntimeException(BANK_CODE + "'"
+                        + instrMap.get(BANK_CODE).toString()
+                        + "' is not defined in the system ");
+            else
+                instrHeader.setBankId(bank);
+        } else
+            throw new ApplicationRuntimeException(BANK_CODE + IS_NULL);
+
+        
         if (instrMap.get(BANKACCOUNTID) == null)
             throw new IllegalArgumentException(BANKACCOUNTID + IS_NULL);
         if (instrMap.get(BANKACCOUNTID) != null) {

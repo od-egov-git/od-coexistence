@@ -81,6 +81,7 @@ public class Voucher {
 	private String tenantId;
 	private String serviceName;
 	private String referenceDocument;
+	private String receiptNumber;
 
 	public Voucher(CVoucherHeader vh) {
 		SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
@@ -300,6 +301,14 @@ public class Voucher {
     public void setReferenceDocument(String referenceDocument) {
         this.referenceDocument = referenceDocument;
     }
+
+	public String getReceiptNumber() {
+		return receiptNumber;
+	}
+
+	public void setReceiptNumber(String receiptNumber) {
+		this.receiptNumber = receiptNumber;
+	}
 	
 
 }

@@ -52,8 +52,7 @@
 		<div class="col-md-12">
 			<div class="panel panel-primary" data-collapsed="0">
 				<div class="panel-heading">
-					<div class="panel-title"><spring:message
-								code="title.financial.year.master" /></div>
+					<div class="panel-title">Financial Year Master</div>
 				</div>
 				<input type="hidden" value="${mode}" id="mode" /> <input
 					type="hidden" value="${startingDate}" id="finYearStartDate" />
@@ -122,9 +121,9 @@
 						<table id="fiscalPeriodTable" width="60%" border=0 id="labelid"
 							class="table table-bordered">
 							<thead>
-								<th><spring:message code="lbl.fiscal.period.name" /> <span class="mandatory"></span></th>
-								<th><spring:message code="lbl.startingdate" /></th>
-								<th><spring:message code="lbl.endingdate" /></th>
+								<th>Fiscal Period Name <span class="mandatory"></span></th>
+								<th>Starting Date</th>
+								<th>Ending Date</th>
 								<th></th>
 							</thead>
 							<c:choose>

@@ -47,7 +47,6 @@
   --%>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <style>
-
 #chequebankrow .searchBoxCls button{
     float: inherit;
     width: 8%;
@@ -59,11 +58,9 @@
     /* border-left: none; */
     cursor: pointer;
 }
-
 #chequebankrow .searchBoxCls button:hover {
   background: #0b7dda;
 }
-
 #chequebankrow .searchBoxCls::after {
   content: "";
   clear: both;
@@ -71,14 +68,12 @@
 }
 </style>
 <script>
-
 function callpopulateapportioningamountforbills(){
 	<s:if test="%{!isBillSourcemisc()}">  
 		populateapportioningamount();
 	</s:if>
 	
 }
-
 apportionLoadFailureHandler= function(){
 	   // document.getElementById("errorstyle").style.display='';
 		//document.getElementById("errorstyle").innerHTML='Error Loading Apportioned Amount';
@@ -90,7 +85,6 @@ apportionLoadFailureHandler= function(){
 		var checkpartpaymentvalue=document.getElementById("partPaymentAllowed").value;
 		var checkoverridevalue=document.getElementById("overrideAccountHeads").value;
 		var collectiontotal=0,cashamount=0,chequeamount=0,cardamount=0,bankamount=0;
-
 		var noofaccounts=document.getElementById("totalNoOfAccounts").value;
 		var credittotal=0;
 		collectiontotal=calculateCollectionTotal();
@@ -104,7 +98,6 @@ apportionLoadFailureHandler= function(){
 				break;
 			}
 		}
-
 		if(document.getElementById("callbackForApportioning").value=="true")
 		{
 			document.getElementById("amountoverrideerror").style.display="none";
@@ -223,9 +216,6 @@ apportionLoadFailureHandler= function(){
 				}//end of if checkpartpaymentvalue=="true"
 			}	
 	}//end of function populateapportioningamount
-
-
-
 	apportionLoadHandler = function(req,res){
 	  results=res.results;
 	  var noofaccounts=document.getElementById("totalNoOfAccounts").value;
@@ -242,8 +232,6 @@ apportionLoadFailureHandler= function(){
 	    } 
 	  }
 	}
-
-
 function showInstrumentDetails(obj){
 	console.log('obj.id : ',obj.id);
 	if(obj.id=='cashradiobutton'){
@@ -298,6 +286,32 @@ function showInstrumentDetails(obj){
 		clearChequeDDDetails();
 		//clearManualReceiptData();
 	}
+	else if(obj.id=='posmohbdradiobutton'){
+		document.getElementById('cashdetails').style.display='none';
+		document.getElementById('chequeDDdetails').style.display='none';
+		document.getElementById('carddetails').style.display='table-row';
+		document.getElementById('bankdetails').style.display='none';
+		document.getElementById('onlinedetails').style.display='none';
+		document.getElementById('instrumentTypeCashOrCard').value="posmohbd";
+		document.getElementById('instrHeaderCard.instrumentAmount').value = document.getElementById('totalamountdisplay').value;
+		clearCashDetails();
+		clearBankDetails();
+		clearChequeDDDetails();
+		//clearManualReceiptData();
+	}
+	else if(obj.id=='posmohcattleradiobutton'){
+		document.getElementById('cashdetails').style.display='none';
+		document.getElementById('chequeDDdetails').style.display='none';
+		document.getElementById('carddetails').style.display='table-row';
+		document.getElementById('bankdetails').style.display='none';
+		document.getElementById('onlinedetails').style.display='none';
+		document.getElementById('instrumentTypeCashOrCard').value="posmohcattle";
+		document.getElementById('instrHeaderCard.instrumentAmount').value = document.getElementById('totalamountdisplay').value;
+		clearCashDetails();
+		clearBankDetails();
+		clearChequeDDDetails();
+		//clearManualReceiptData();
+	}
 	else if(obj.id=='bankradiobutton'){
 		document.getElementById('cashdetails').style.display='none';
 		document.getElementById('chequeDDdetails').style.display='none';
@@ -329,11 +343,34 @@ function showInstrumentDetails(obj){
 		//clearManualReceiptData();
 	}
 }
+function checkAlphaNumericKey(e){
+	
+	 
+	        var k;
+	        document.all ? k = e.keyCode : k = e.which;
+	        return ((k > 64 && k < 91) || (k > 96 && k < 123) || k == 8 || k == 32 || (k >= 48 && k <= 57));
+	       
+	
+	/* 
+	if(document.getElementById("instrHeaderCard.transactionNumber")!=null){
+		document.getElementById("instrHeaderCard.transactionNumber").onkeypress = function (e) {
+			isAlphaNumeric(e.key, e)
+		};
+	} */
+}
+function isAlphaNumeric(key, e) {
+	var letters = /^[0-9a-zA-Z]/g; //g means global
+	if (!(key).match(letters)) {
+    e.preventDefault();
+    }
+    
+}
 function validateTransactionNumber()
 {
+	
 	document.getElementById("receipt_error_area").innerHTML="";    
 	document.getElementById("receipt_error_area").style.display="none";
-	 if(document.getElementById("cardradiobutton").checked)
+	 if(document.getElementById("cardradiobutton").checked || document.getElementById("posmohbdradiobutton").checked || document.getElementById("posmohcattleradiobutton").checked || document.getElementById("posmohslhradiobutton").checked)
 		 {    
 		 	 var instrumentNum="";
 		 	 var confirmInstrumentNo="";
@@ -353,7 +390,6 @@ function validateTransactionNumber()
 			}
 		 }
 }
-
 function findBankDetailsByIfsc(){
 	var ifscCode = document.getElementById("instrumentIfscCode").value;
         if(ifscCode.length == 11){
@@ -408,7 +444,23 @@ loadBankDetailFailureHandler = function(){
 			onClick="showInstrumentDetails(this);setinstrumenttypevalue(this);" type="radio" align="absmiddle"
 			value="card" id="cardradiobutton" name="paytradiobutton" /> Credit/Debit card
 			&nbsp;
-	</span> <span style="float: left;" id="bankradiobuttonspan"> <input
+	</span>
+	<span style="float: left;" id="posmohbdradiobuttonspan"> <input
+			onClick="showInstrumentDetails(this);setinstrumenttypevalue(this);" type="radio" align="absmiddle"
+			value="posmohbd" id="posmohbdradiobutton" name="paytradiobutton" /> POS MOH B&D
+			&nbsp;
+	</span>
+	<span style="float: left;" id="posmohcattleradiobuttonspan"> <input
+			onClick="showInstrumentDetails(this);setinstrumenttypevalue(this);" type="radio" align="absmiddle"
+			value="posmohcattle" id="posmohcattleradiobutton" name="paytradiobutton" /> POS MOH Cattle
+			&nbsp;
+	</span>
+	<span style="float: left;" id="posmohslhradiobuttonspan"> <input
+			onClick="showInstrumentDetails(this);setinstrumenttypevalue(this);" type="radio" align="absmiddle"
+			value="posmohslh" id="posmohslhradiobutton" name="paytradiobutton" /> POS MOH SLH
+			&nbsp;
+	</span>
+	 <span style="float: left;" id="bankradiobuttonspan"> <input
 			onClick="showInstrumentDetails(this);setinstrumenttypevalue(this);" type="radio" align="absmiddle"
 			value="bankchallan" id="bankradiobutton" name="paytradiobutton" /> Direct Bank &nbsp;
 	</span> </span> <span style="float: left;" id="onlineradiobuttonspan"> <input
@@ -427,7 +479,7 @@ loadBankDetailFailureHandler = function(){
 			label="instrumentAmount" id="instrHeaderCash.instrumentAmount"
 			name="instrHeaderCash.instrumentAmount" maxlength="14" size="18"
 			cssClass="form-control patternvalidation text-right"
-			data-pattern="number" placeholder="0" readonly='true'/></td>
+			data-pattern="number" placeholder="0" /></td>
 </tr>
 <tr>
 	<td colspan="5">
@@ -468,8 +520,7 @@ loadBankDetailFailureHandler = function(){
 							<tr id="chequebankrow">
 								<td class="bluebox" width="3%"></td>
 								<td class="bluebox"><s:text
-										name="billreceipt.payment.ifsccode" /><span
-									class="mandatory1">*</span></td>
+										name="billreceipt.payment.ifsccode" /></td>
 								<td class="bluebox"><s:textfield
 										label="instrumentIfscCode" id="instrumentIfscCode"
 										maxlength="50" name="instrumentProxyList[0].ifscCode"
@@ -483,7 +534,7 @@ loadBankDetailFailureHandler = function(){
 										name="billreceipt.payment.bankname" /><span
 									class="mandatory1">*</span></td>
 								<td class="bluebox"><s:textfield id="bankName" type="text"
-										name="instrumentProxyList[0].bankId.name" readonly="true"/> <s:hidden id="bankCode"
+										name="instrumentProxyList[0].bankId.name" /> <s:hidden id="bankCode"
 										name="instrumentProxyList[0].bankId.code" />
 									<div id="bankcodescontainer"></div></td>
 							</tr>
@@ -495,7 +546,7 @@ loadBankDetailFailureHandler = function(){
 								<td class="bluebox"><s:textfield
 										label="instrumentBranchName" id="instrumentBranchName"
 										maxlength="50" name="instrumentProxyList[0].bankBranchName"
-										size="18" readonly="true"/></td>
+										size="18" /></td>
 								<td class="bluebox"><s:text
 										name="billreceipt.payment.instrumentAmount" /><span
 									class="mandatory1">*</span></td>
@@ -640,13 +691,13 @@ loadBankDetailFailureHandler = function(){
 								class="mandatory1">*</span></td>
 							<td class="bluebox"><s:textfield
 									label="instrHeaderCard.transactionNumber"
-									id="instrHeaderCard.transactionNumber" maxlength="14"
+									id="instrHeaderCard.transactionNumber" maxlength="25"
 									name="instrHeaderCard.transactionNumber" size="18"
 									value="%{instrHeaderCard.transactionNumber}" onblur="validateTransactionNumber();" /></td>
 								<td class="bluebox"><s:text
 									name="billreceipt.payment.reenter.transactionnumber" /><span
 								class="mandatory1">*</span></td>									
-							<td class="bluebos"> <s:password id="confirmtransactionNumber"  maxlength="14"
+							<td class="bluebos"> <s:password id="confirmtransactionNumber"  maxlength="25"
 							                   name ="confirmtransactionNumber"  size="18" onblur="validateTransactionNumber();" /></td>		
 						</tr>
 

@@ -51,8 +51,7 @@
 		<div class="col-md-12">
 			<div class="panel panel-primary" data-collapsed="0">
 				<div class="panel-heading">
-					<div class="panel-title"><spring:message
-								code="lbl.close.financial.year" /></div>
+					<div class="panel-title">Close a Financial Year</div>
 				</div>
 				<div class="panel-body">
 

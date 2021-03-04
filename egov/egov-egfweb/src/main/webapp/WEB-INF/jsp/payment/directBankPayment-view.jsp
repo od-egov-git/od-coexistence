@@ -401,7 +401,7 @@ function printVoucher(){
 						</div>
 					</div>
 
-					<div class="tabbertab" id="chequetab">
+					<!-- <div class="tabbertab" id="chequetab"> -->
 						<h2>Cheque Details</h2>
 						<span>
 							<table align="center" border="0" cellpadding="0" cellspacing="0"

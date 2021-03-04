@@ -85,7 +85,7 @@
 	function exportXls() {
 		window
 				.open(
-						'/EGF/bill/expenseBillPrint-exportXls.action?id=<s:property value="id"/>',
+						'/services/EGF/bill/expenseBillPrint-exportXls.action?id=<s:property value="id"/>',
 						'',
 						'resizable=yes,height=650,width=900,scrollbars=yes,left=30,top=30,status=no');
 	}
@@ -93,7 +93,7 @@
 	function exportPdf() {
 		window
 				.open(
-						'/EGF/bill/expenseBillPrint-exportPdf.action?id=<s:property value="id"/>',
+						'/services/EGF/bill/expenseBillPrint-exportPdf.action?id=<s:property value="id"/>',
 						'',
 						'resizable=yes,height=650,width=900,scrollbars=yes,left=30,top=30,status=no');
 	}
@@ -102,7 +102,7 @@
 <body>
 	<div id="container">
 		<iframe id="report" name="report"
-			src='/EGF/bill/expenseBillPrint-ajaxPrint.action?id=<s:property value="id"/>'></iframe>
+			src='/services/EGF/bill/expenseBillPrint-ajaxPrint.action?id=<s:property value="id"/>'></iframe>
 	</div>
 	<s:form name="expenseBillPrint" action="expenseBillPrint"
 		theme="simple">

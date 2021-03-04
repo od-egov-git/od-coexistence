@@ -145,12 +145,21 @@ function checkMiscAttributes(obj)
 }
 function check()                   
 {
-	resetSelectedRowsId('contingentList','selectedContingentRows');
-	resetSelectedRowsId('contractorList','selectedContractorRows');
-	resetSelectedRowsId('supplierList','selectedSupplierRows');
+	var billtypeObjArr= new Array();
+	resetSelectedRowsId('contingentList','selectedContingentRows',billtypeObjArr);
+	resetSelectedRowsId('contractorList','selectedContractorRows',billtypeObjArr);
+	resetSelectedRowsId('supplierList','selectedSupplierRows',billtypeObjArr);
 	var rtgsMode = document.getElementById("rtgsDefaultMode").value;
 	//var restrictionDate = document.getElementById("paymentRestrictionDateForCJV").value;
 	var restrictionDateForCJV = document.getElementById("rtgsModeRestrictionDateForCJV").value;
+	
+	if(billtypeObjArr.length > 1)
+	{
+	 bootbox.alert("Multiple type bills are not allowed!");
+	 return false;
+	
+        
+	}
 	if(rtgsMode =='Y' || rtgsMode=='Yes' || rtgsMode=='YES')
 	{
 		var length=0;
@@ -168,6 +177,7 @@ function check()
 				*/
 			}
 		}             
+		
 		
 		if(!document.getElementById("paymentModertgs").checked &&  isAnyOneContratorBillChecked)
 		{
@@ -629,8 +639,22 @@ function checkContingentForSameMisAttribs(obj,len)
 		   }
 		   return expcount;
 }
+function inBilltypeObjArray(billTypeObj, billtypeObjArr) {
+    var length = billtypeObjArr.length;
 
-function resetSelectedRowsId(billTypeObj,selectedRowsId){
+    for(var i = 0; i < length; i++) {
+    
+        if(billtypeObjArr[i] == billTypeObj)
+        	{
+        	//alert("BilltyprObj exist"+billTypeObj);
+            return false;
+            break;
+        	}
+    }
+    //alert("BilltyprObj not exist"+billTypeObj);
+    return true;
+}
+function resetSelectedRowsId(billTypeObj,selectedRowsId,billtypeObjArr){
 		var	length = 0;
 		if(billTypeObj == "contingentList"){
 			length = <s:property value="%{contingentList.size()}"/>;
@@ -642,9 +666,27 @@ function resetSelectedRowsId(billTypeObj,selectedRowsId){
 			length = <s:property value="%{supplierList.size()}"/>;
 			}
 	selectedRowsArr = new Array();
+	
+	
 		for(var index=0;index<length;index++){
 			var isChecked = document.getElementsByName(billTypeObj+"["+index+"].isSelected")[0].checked;
 			if(isChecked){
+			//alert("Bill obj-->"+billTypeObj);
+				
+			 // alert("Bill Types obj size-->"+billtypeObjArr.length);
+				if(billtypeObjArr.length > 1)
+					{
+				 	//bootbox.alert("Multiple type bills are not allowed!");
+					return false;
+					break;
+				        
+					}else{
+						if(inBilltypeObjArray(billTypeObj,billtypeObjArr))
+					    {						
+						
+							 billtypeObjArr.push(billTypeObj);
+						}
+					}
 			var deptName = document.getElementsByName(billTypeObj+"["+index+"].deptName")[0];
 			deptName = deptName == undefined || deptName == 'undefined' == 'undefined'? '' : deptName.value;
 			var functionName = document.getElementsByName(billTypeObj+"["+index+"].functionName")[0];
@@ -783,9 +825,9 @@ function disableSelectedRows()
 															<tr>
 																<td align="center" colspan="5">
 																	<div class="buttonbottom">
-																		<input type="button" method="search"  value="<s:text name='lbl.search'/>"
+																		<input type="button" method="search" value="Search"
 																			Class="button" onclick="return search()" />
-																		<input type="button" value="<s:text name='lbl.close'/>"
+																		<input type="button" value="Close"
 																			onclick="javascript:window.close()" class="button" />
 																		<s:hidden name="miscount" id="miscount" />
 																		<s:hidden name="miscattributes" id="miscattributes"
@@ -1354,15 +1396,15 @@ function disableSelectedRows()
 					</tr>
 					<tr>
 						<td colspan="2" class="modeofpayment"><strong><s:text
-									name="payment.mode" /><span class="mandatory1">*</span></strong> <input
-							name="paymentMode" id="paymentModecheque" checked="checked"
+									name="payment.mode" /><span class="mandatory1">*</span></strong> 
+							<input
+							name="paymentMode" id="paymentModecheque" 
 							value="cheque" type="radio"><label
-							for="paymentModecheque"><s:text name="lbl.cheque"/> </label> <input name="paymentMode"
-							id="paymentModecash" value="cash" type="radio"><label
-							for="paymentModecash"><s:text
-									name="cash.consolidated.cheque" /></label><input name="paymentMode"
+							for="paymentModecheque"><s:text name="lbl.cheque"/> </label> 
+							<input name="paymentMode"
 							id="paymentModertgs" value="rtgs" type="radio"><label
-							for="paymentModertgs"><s:text name="lbl.rtgs"/></label></td>
+							for="paymentModertgs"><s:text name="lbl.rtgs"/></label>
+							</td>
 					</tr>
 					<tr>
 						<td colspan="2" align="center">

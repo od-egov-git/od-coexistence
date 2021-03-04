@@ -50,21 +50,32 @@ package org.egov.egf.web.actions.contra;
 import org.apache.log4j.Logger;
 import org.egov.billsaccounting.services.CreateVoucher;
 import org.egov.billsaccounting.services.VoucherConstant;
+import org.egov.commons.Accountdetailkey;
+import org.egov.commons.Accountdetailtype;
 import org.egov.commons.Bankaccount;
+import org.egov.commons.CFunction;
 import org.egov.commons.CVoucherHeader;
 import org.egov.commons.Fund;
+import org.egov.commons.service.AccountdetailtypeService;
 import org.egov.egf.commons.EgovCommon;
+import org.egov.egf.masters.services.OtherPartyService;
 import org.egov.infra.admin.master.entity.Department;
 import org.egov.infra.exception.ApplicationRuntimeException;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.validation.exception.ValidationError;
 import org.egov.infra.validation.exception.ValidationException;
 import org.egov.infstr.services.PersistenceService;
+import org.egov.model.bills.Miscbilldetail;
 import org.egov.model.contra.ContraBean;
 import org.egov.model.contra.ContraJournalVoucher;
 import org.egov.model.instrument.InstrumentHeader;
+import org.egov.model.masters.OtherParty;
+import org.egov.model.payment.Paymentheader;
 import org.egov.services.cheque.ChequeService;
 import org.egov.services.instrument.InstrumentService;
+import org.egov.commons.service.AccountDetailKeyService;
+import org.egov.services.payment.MiscbilldetailService;
+import org.egov.services.payment.PaymentService;
 import org.egov.services.voucher.ContraJournalVoucherService;
 import org.egov.utils.Constants;
 import org.egov.utils.FinancialConstants;
@@ -89,6 +100,7 @@ public class ContraBTBActionHelper {
 	final private static Logger LOGGER = Logger.getLogger(ContraBTBActionHelper.class);
 	private static final String MDC_CHEQUE = "cheque";
 	private static final String MDC_OTHER = "RTGS/NEFT";
+	private static final String MDC_PEX ="pex";
 	private static final String EXCEPTION_WHILE_SAVING_DATA = "Exception while saving Data";
 	private static final String TRANSACTION_FAILED = "Transaction failed";
 	private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Constants.LOCALE);
@@ -107,6 +119,17 @@ public class ContraBTBActionHelper {
 	@Autowired
 	@Qualifier("contraJournalVoucherService")
 	private ContraJournalVoucherService contraJournalVoucherService;
+	@Autowired
+	private PaymentService paymentService;
+	@Autowired
+	@Qualifier("miscbilldetailService")
+	private MiscbilldetailService miscbilldetailService;
+	@Autowired
+	private OtherPartyService otherPartyService;
+	@Autowired
+	private AccountdetailtypeService accountdetailtypeService;
+	@Autowired
+	private AccountDetailKeyService accountdetailkeyService;
 
 	private CVoucherHeader voucherHeader2 = null;
 	
@@ -118,33 +141,79 @@ public class ContraBTBActionHelper {
 			CVoucherHeader voucherHeader) throws Exception {
 		try {
 			voucherHeader2 = null;
-			final List<InstrumentHeader> instrumentList = instrumentService
+			 List<InstrumentHeader> instrumentList = null;
+			if(!contraBean.getModeOfCollection().equalsIgnoreCase(MDC_PEX))
+			{
+			instrumentList = instrumentService
 					.addToInstrument(createInstruments(contraBean, contraVoucher, voucherHeader));
+			}
 			if (contraBean.getToFundId() != null && !voucherHeader.getFundId().getId().equals(contraBean.getToFundId()))
 				voucherHeader = callCreateVoucherForInterFund(voucherHeader, contraVoucher, contraBean);
 			else
 				voucherHeader = callCreateVoucher(voucherHeader, contraVoucher, contraBean);
+			if(contraBean.getModeOfCollection().equalsIgnoreCase(MDC_PEX))
+			{
+				final Bankaccount ba = getBankaccount(contraVoucher.getFromBankAccountId().getId());
+				contraVoucher = addOrupdateContraJournalVoucherPEX(contraVoucher,
+						voucherHeader, contraBean); 
+				
+	        	paymentService.createPaymentHeaderForContra( voucherHeader,  ba,contraBean.getModeOfCollection(),contraBean.getAmount().toString());
+	        	final Miscbilldetail miscBilldetail = new Miscbilldetail();
+	        	miscBilldetail.setBillamount(contraBean.getAmount());
+	        	miscBilldetail.setBillVoucherHeader(voucherHeader);
+	        	miscBilldetail.setPaidamount(contraBean.getAmount());
+	        	miscBilldetail.setPassedamount(contraBean.getAmount());
+	        	 if(ba.getPayTo()!=null && !ba.getPayTo().equalsIgnoreCase(""))
+	        	  {
+	        	miscBilldetail.setPaidto(ba.getPayTo());
+	        	 }else {
+	        		 miscBilldetail.setPaidto(contraVoucher.getToBankAccountId().getBankbranch().getBank().getName());
+	        	 }
+	           miscBilldetail.setPaidby(null);
+	           miscbilldetailService.create(miscBilldetail);
+	           
+	          
+			}else {
 			updateInstrument(instrumentList.get(0), voucherHeader);
 			contraVoucher = addOrupdateContraJournalVoucher(contraVoucher, instrumentList.get(0), voucherHeader,
 					contraBean);
+			}
 			ContraJournalVoucher contraVoucher2 = null;
 			if (voucherHeader2 != null) {
 				final List<Map<String, Object>> createInstrumentMap = createInstrumentsForReceipt(contraBean,
 						contraVoucher, voucherHeader);
 				// set is pay cheque to 0 saying it is a receipt cheque
+				if(contraBean.getModeOfCollection().equalsIgnoreCase(MDC_PEX))
+				{
+					
+					contraVoucher = addOrupdateContraJournalVoucherPEX(contraVoucher,
+							voucherHeader, contraBean);   
+		        	
+				}else {
 				createInstrumentMap.get(0).put("Is pay cheque", "0");
 				final List<InstrumentHeader> instrumentList2 = instrumentService.addToInstrument(createInstrumentMap);
 				contraVoucher2 = new ContraJournalVoucher();
+				
 				contraVoucher2 = addOrupdateContraJournalVoucher(contraVoucher2, instrumentList2.get(0), voucherHeader2,
 						contraBean);
 				updateInstrument(instrumentList2.get(0), voucherHeader2);
+				}
 			} else {
 				List<Map<String, Object>> iList = new ArrayList<Map<String, Object>>();
+				if(contraBean.getModeOfCollection().equalsIgnoreCase(MDC_PEX))
+				{
+					
+					contraVoucher = addOrupdateContraJournalVoucherPEX(contraVoucher,
+							voucherHeader, contraBean);   
+					
+		        	
+				}else {
 				iList = createInstrumentsForReceipt(contraBean, contraVoucher, voucherHeader);
 				final List<InstrumentHeader> receiptInstrumentList = instrumentService.addToInstrument(iList);
 				updateInstrument(receiptInstrumentList.get(0), voucherHeader);
 				contraVoucher = addOrupdateContraJournalVoucher(contraVoucher, receiptInstrumentList.get(0),
 						voucherHeader, contraBean);
+			}
 			}
 		} catch (final ValidationException e) {
 			throw new ValidationException(Arrays
@@ -154,7 +223,11 @@ public class ContraBTBActionHelper {
 		}
 		return voucherHeader;
 	}
+		 private Bankaccount getBankaccount(final Long bankAccountId) {
+		        return (Bankaccount) persistenceService.find(
+		                "from Bankaccount where id=?",bankAccountId);
 
+		    }
 	private List<Map<String, Object>> createInstrumentsForReceipt(final ContraBean cBean,
 			final ContraJournalVoucher cVoucher, CVoucherHeader voucherHeader) {
 		final List<Map<String, Object>> iList = new ArrayList<Map<String, Object>>();
@@ -205,6 +278,18 @@ public class ContraBTBActionHelper {
                             iMap.put("Transaction date", dt);
                             // change this to advice type later
                             iMap.put("Instrument type", FinancialConstants.INSTRUMENT_TYPE_BANK_TO_BANK);
+                    } else if(cBean.getModeOfCollection().equalsIgnoreCase(MDC_PEX)){
+
+                        iMap.put("Transaction number", cBean.getChequeNumber());
+                        try {
+                                dt = sdf.parse(cBean.getChequeDate());
+                        } catch (final ParseException e) {
+                                throw new ValidationException(Arrays.asList(
+                                                new ValidationError("Exception while formatting ChequeDate ", "TRANSACTION_FAILED")));
+                        }
+                        iMap.put("Transaction date", dt);
+                        // change this to advice type later
+                        iMap.put("Instrument type", FinancialConstants.INSTRUMENT_TYPE_PEX);
                     } else {
 
 				iMap.put("Transaction number", cBean.getChequeNumber());
@@ -314,7 +399,7 @@ public class ContraBTBActionHelper {
 
 			HashMap<String, Object> detailMap = null;
 			List<HashMap<String, Object>> accountdetails = new ArrayList<HashMap<String, Object>>();
-			final List<HashMap<String, Object>> subledgerDetails = new ArrayList<HashMap<String, Object>>();
+			List<HashMap<String, Object>> subledgerDetails = new ArrayList<HashMap<String, Object>>();
 
 			detailMap = new HashMap<String, Object>();
 			detailMap.put(VoucherConstant.CREDITAMOUNT, contraBean.getAmount().toString());
@@ -332,6 +417,27 @@ public class ContraBTBActionHelper {
 			// e
 			// here
 			accountdetails.add(detailMap);
+			
+			detailMap = new HashMap<String, Object>();
+			final Bankaccount ba = getBankaccount(contraVoucher.getToBankAccountId().getId());
+			   OtherParty otherparty = new OtherParty();
+	           otherparty.setCode(ba.getAccountnumber());
+	           otherparty.setName(ba.getAccountnumber());
+	           List<OtherParty> othePartyList = otherPartyService.search(otherparty);
+	           otherparty = (OtherParty)othePartyList.get(0);
+	        Accountdetailtype  accountdetailtype =  accountdetailtypeService.findByName(otherparty.getClass().getSimpleName());
+	        List<Accountdetailkey>  accountdetailkeyList =accountdetailkeyService.findByDetailName(accountdetailtype.getId(),otherparty.getName());
+            
+	        detailMap.put(VoucherConstant.FUNCTIONCODE,"");            
+	   
+	        detailMap.put(VoucherConstant.DEBITAMOUNT, contraBean.getAmount().toString());
+	        detailMap.put(VoucherConstant.DETAILTYPEID, accountdetailtype.getId());
+	        detailMap.put(VoucherConstant.DETAILKEYID, accountdetailkeyList.get(0).getDetailkey());
+	        detailMap.put(VoucherConstant.GLCODE, contraVoucher.getToBankAccountId().getChartofaccounts().getGlcode());
+
+            subledgerDetails.add(detailMap);
+			
+			
 			voucher = createVoucher.createVoucher(headerDetails, accountdetails, subledgerDetails);
 
 			// update ContraBTB source path
@@ -339,6 +445,7 @@ public class ContraBTBActionHelper {
 			// "/services/EGF/contra/contraBTB!beforeView.action?voucherHeader.id=");
 
 			accountdetails = new ArrayList<HashMap<String, Object>>();
+			subledgerDetails= new ArrayList<HashMap<String, Object>>();
 			// overriding voucherName
 			headerDetails.put(VoucherConstant.VOUCHERNAME, FinancialConstants.CONTRAVOUCHER_NAME_INTERFUND);
 			headerDetails.put(VoucherConstant.VOUCHERNAME, voucher.getName());
@@ -368,6 +475,20 @@ public class ContraBTBActionHelper {
 			detailMap.put(VoucherConstant.CREDITAMOUNT, "0");
 			detailMap.put(VoucherConstant.GLCODE, contraVoucher.getToBankAccountId().getChartofaccounts().getGlcode());
 			accountdetails.add(detailMap);
+		
+				detailMap = new HashMap<String, Object>();
+			 
+		        detailMap.put(VoucherConstant.FUNCTIONCODE,"");            
+		   
+		        detailMap.put(VoucherConstant.DEBITAMOUNT, contraBean.getAmount().toString());
+		        detailMap.put(VoucherConstant.DETAILTYPEID, accountdetailtype.getId());
+		        detailMap.put(VoucherConstant.DETAILKEYID, accountdetailkeyList.get(0).getDetailkey());
+		        detailMap.put(VoucherConstant.GLCODE, contraVoucher.getToBankAccountId().getChartofaccounts().getGlcode());
+
+	            subledgerDetails.add(detailMap);
+	            
+			
+            
 			voucherHeader2 = createVoucher.createVoucher(headerDetails, accountdetails, subledgerDetails);
 
 		} catch (final HibernateException e) {
@@ -397,6 +518,11 @@ public class ContraBTBActionHelper {
 		headerdetails.put(VoucherConstant.VOUCHERNUMBER, voucherHeader.getVoucherNumber());
 		headerdetails.put(VoucherConstant.VOUCHERDATE, voucherHeader.getVoucherDate());
 		headerdetails.put(VoucherConstant.DESCRIPTION, voucherHeader.getDescription());
+		//modified added by Prasanta
+				if (voucherHeader.getFirstsignatory() != null)
+		            headerdetails.put("firstsignatory", voucherHeader.getFirstsignatory());
+		        if (voucherHeader.getSecondsignatory() != null)
+		            headerdetails.put("secondsignatory", voucherHeader.getSecondsignatory());
 
 		if (voucherHeader.getVouchermis().getDepartmentcode() != null)
 			headerdetails.put(VoucherConstant.DEPARTMENTCODE, voucherHeader.getVouchermis().getDepartmentcode());
@@ -422,6 +548,7 @@ public class ContraBTBActionHelper {
 	public CVoucherHeader callCreateVoucher(CVoucherHeader voucher, final ContraJournalVoucher contraVoucher,
 			ContraBean contraBean) {
 		try {
+			 LOGGER.info("Subledger Details inside callCreateVoucher==> ");
 			final HashMap<String, Object> headerDetails = createHeaderAndMisDetails(voucher);
 			// update ContraBTB source path
 			headerDetails.put(VoucherConstant.SOURCEPATH, "/services/EGF/contra/contraBTB-beforeView.action?voucherHeader.id=");
@@ -441,11 +568,41 @@ public class ContraBTBActionHelper {
 					contraVoucher.getFromBankAccountId().getChartofaccounts().getGlcode());
 			accountdetails.add(detailMap);
 
+			
 			detailMap = new HashMap<String, Object>();
 			detailMap.put(VoucherConstant.DEBITAMOUNT, contraBean.getAmount().toString());
 			detailMap.put(VoucherConstant.CREDITAMOUNT, "0");
 			detailMap.put(VoucherConstant.GLCODE, contraVoucher.getToBankAccountId().getChartofaccounts().getGlcode());
 			accountdetails.add(detailMap);
+			
+			/*if(contraBean.getModeOfCollection().equalsIgnoreCase(MDC_PEX))
+			{*/
+			detailMap = new HashMap<String, Object>();
+			 LOGGER.info("Subledder Details getToBankAccountID==> " + contraVoucher.getToBankAccountId().getId());
+			final Bankaccount ba = getBankaccount(contraVoucher.getToBankAccountId().getId());
+			   OtherParty otherparty = new OtherParty();
+	           otherparty.setCode(ba.getAccountnumber());
+	           otherparty.setName(ba.getAccountnumber());
+	           LOGGER.info("Subledder Details BankAccount Number==> " +  ba.getAccountnumber());
+	           List<OtherParty> othePartyList = otherPartyService.search(otherparty);
+	           otherparty = (OtherParty)othePartyList.get(0);
+	        Accountdetailtype  accountdetailtype =  accountdetailtypeService.findByName(otherparty.getClass().getSimpleName());
+	        List<Accountdetailkey>  accountdetailkeyList =accountdetailkeyService.findByDetailName(accountdetailtype.getId(),otherparty.getName());
+            
+	        LOGGER.info("Subledder Details DETAILKEYID==> " +  accountdetailkeyList.get(0).getDetailkey());
+	        detailMap.put(VoucherConstant.FUNCTIONCODE, "");            
+	   
+	        detailMap.put(VoucherConstant.DEBITAMOUNT, contraBean.getAmount().toString());
+	        detailMap.put(VoucherConstant.DETAILTYPEID, accountdetailtype.getId());
+	        detailMap.put(VoucherConstant.DETAILKEYID, accountdetailkeyList.get(0).getDetailkey());
+	        detailMap.put(VoucherConstant.GLCODE, contraVoucher.getToBankAccountId().getChartofaccounts().getGlcode());
+
+            subledgerDetails.add(detailMap);
+            LOGGER.info("Subledger Details size==> " + subledgerDetails.size());
+            for (final HashMap<String, Object> subdetailDetailMap : subledgerDetails) {
+            	LOGGER.info("Subledger Details DETAILTYPEID==> " +	subdetailDetailMap.get(VoucherConstant.DETAILTYPEID).toString());
+            }
+            
 			voucher = createVoucher.createVoucher(headerDetails, accountdetails, subledgerDetails);
 
 		} catch (final HibernateException e) {
@@ -510,7 +667,32 @@ public class ContraBTBActionHelper {
 		}
 		return cjv;
 	}
+	@Transactional
+	public ContraJournalVoucher addOrupdateContraJournalVoucherPEX(ContraJournalVoucher cjv, 
+			final CVoucherHeader vh, ContraBean contraBean) {
+		try {
 
+			cjv.setVoucherHeaderId(vh);
+			cjv = getHibObjectsFromContraBean(contraBean, cjv);
+			if (cjv.getId() != null) {
+				contraJournalVoucherService.applyAuditing(cjv);
+				contraJournalVoucherService.update(cjv);
+				if (LOGGER.isInfoEnabled())
+					LOGGER.info("Contra Journal Voucher Updated");
+			} else {
+				contraJournalVoucherService.applyAuditing(cjv);
+				contraJournalVoucherService.persist(cjv);
+				if (LOGGER.isInfoEnabled())
+					LOGGER.info("Contra Journal Voucher created");
+			}
+		} catch (final ValidationException e) {
+			throw new ValidationException(Arrays
+					.asList(new ValidationError(e.getErrors().get(0).getMessage(), e.getErrors().get(0).getMessage())));
+		} catch (final Exception e) {
+			throw new ValidationException(Arrays.asList(new ValidationError(e.getMessage(), e.getMessage())));
+		}
+		return cjv;
+	}
 	private ContraJournalVoucher getHibObjectsFromContraBean(final ContraBean contraBean,
 			final ContraJournalVoucher contraVoucher) {
 		final String bankQry = "from Bankaccount where id=?";

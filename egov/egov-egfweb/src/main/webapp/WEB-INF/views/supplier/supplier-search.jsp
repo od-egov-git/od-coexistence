@@ -57,18 +57,18 @@
       <div class="col-md-12">
         <div class="panel panel-primary" data-collapsed="0">
           <div class="panel-heading">
-            <div class="panel-title"><spring:message code="title.supplier.search"/> </div>
+            <div class="panel-title"><spring:message code="title.supplier.search" text="Search Supplier"/> </div>
           </div>
           <div class="panel-body">
           <input type="hidden" id="mode" name="mode" value="${mode}" />
              <div class="form-group">
-	           	 <label class="col-sm-3 control-label text-right"><spring:message code="lbl.name"/> </label>
+	           	 <label class="col-sm-3 control-label text-right"><spring:message code="lbl.name" text="Name"/> </label>
 	              <div class="col-sm-3 add-margin">
 	                <form:input path="name" class="form-control text-left patternvalidation" data-pattern="alphanumeric"
 	                  maxlength="50" />
 	                <form:errors path="name" cssClass="error-msg" />
 	              </div>
-	              <label class="col-sm-3 control-label text-right"><spring:message code="lbl.code"/> </label>
+	              <label class="col-sm-3 control-label text-right"><spring:message code="lbl.code" text="Code"/> </label>
 	              <div class="col-sm-3 add-margin">
 	                <form:input path="code" class="form-control text-left patternvalidation" data-pattern="alphanumeric"
 	                  maxlength="50" />
@@ -78,10 +78,10 @@
             <div class="form-group">
               <div class="text-center">
                 <button type='button' class='btn btn-primary' id="btnsearch">
-                  <spring:message code='lbl.search'/>
+                  <spring:message code='lbl.search' text="Search"/>
                 </button>
                 <a href='javascript:void(0)' class='btn btn-default' onclick="javascript:window.parent.postMessage('close','*');"><spring:message
-                    code='lbl.close'/></a>
+                    code='lbl.close' text="Close"/></a>
               </div>
             </div>
           </div>
@@ -91,7 +91,7 @@
   </div>
 </form:form>
 <div class="row display-hide report-section">
-  <div class="col-md-12 table-header text-left"><spring:message code="lbl.supplier.search.result"/></div>
+  <div class="col-md-12 table-header text-left">Supplier Search Result</div>
   <div class="col-md-12 form-group report-table-container">
     <table class="table table-bordered table-hover multiheadertbl" id="resultTable">
       <thead>
@@ -112,32 +112,21 @@
 		}
 	});
 </script>
-<link rel="stylesheet"
-	href="<cdn:url value='/resources/global/css/jquery/plugins/datatables/jquery.dataTables.min.css' context='/services/egi'/>" />
-<link rel="stylesheet"
-	href="<cdn:url value='/resources/global/css/jquery/plugins/datatables/dataTables.bootstrap.min.css' context='/services/egi'/>">
-<link rel="stylesheet"
-	href="<cdn:url value='/resources/global/css/jquery/plugins/datatables/buttons.bootstrap.min.css' context='/services/egi'/>">
+<link rel="stylesheet" href="<cdn:url value='/resources/global/css/bootstrap/bootstrap-datepicker.css' context='/services/egi'/>" />
+<link rel="stylesheet" href="<cdn:url value='/resources/global/css/jquery/plugins/datatables/jquery.dataTables.min.css' context='/services/egi'/>"/>
+<link rel="stylesheet" href="<cdn:url value='/resources/global/css/jquery/plugins/datatables/dataTables.bootstrap.min.css' context='/services/egi'/>">
 <script type="text/javascript"
-	src="<cdn:url value='/resources/global/js/jquery/plugins/datatables/jquery.dataTables.min.js' context='/services/egi'/>"></script>
+  src="<cdn:url value='/resources/global/js/jquery/plugins/datatables/jquery.dataTables.min.js' context='/services/egi'/>"></script>
 <script type="text/javascript"
-	src="<cdn:url value='/resources/global/js/jquery/plugins/datatables/dataTables.bootstrap.js' context='/services/egi'/>"></script>
+  src="<cdn:url value='/resources/global/js/jquery/plugins/datatables/dataTables.bootstrap.js' context='/services/egi'/>"></script>
 <script type="text/javascript"
-	src="<cdn:url value='/resources/global/js/jquery/plugins/datatables/extensions/buttons/dataTables.buttons.min.js' context='/services/egi'/>"></script>
+  src="<cdn:url value='/resources/global/js/jquery/plugins/datatables/dataTables.tableTools.js' context='/services/egi'/>"></script>
 <script type="text/javascript"
-	src="<cdn:url value='/resources/global/js/jquery/plugins/datatables/extensions/buttons/buttons.bootstrap.min.js' context='/services/egi'/>"></script>
+  src="<cdn:url value='/resources/global/js/jquery/plugins/datatables/TableTools.min.js' context='/services/egi'/>"></script>
+<script type="text/javascript" src="<cdn:url value='/resources/global/js/bootstrap/typeahead.bundle.js' context='/services/egi'/>"></script>
+<script src="<cdn:url value='/resources/global/js/jquery/plugins/jquery.inputmask.bundle.min.js' context='/services/egi'/>"></script>
 <script type="text/javascript"
-	src="<cdn:url value='/resources/global/js/jquery/plugins/datatables/extensions/buttons/buttons.flash.min.js' context='/services/egi'/>"></script>
-<script type="text/javascript"
-	src="<cdn:url value='/resources/global/js/jquery/plugins/datatables/extensions/buttons/jszip.min.js' context='/services/egi'/>"></script>
-<script type="text/javascript"
-	src="<cdn:url value='/resources/global/js/jquery/plugins/datatables/extensions/buttons/pdfmake.min.js' context='/services/egi'/>"></script>
-<script type="text/javascript"
-	src="<cdn:url value='/resources/global/js/jquery/plugins/datatables/extensions/buttons/vfs_fonts.js' context='/services/egi'/>"></script>
-<script type="text/javascript"
-	src="<cdn:url value='/resources/global/js/jquery/plugins/datatables/extensions/buttons/buttons.html5.min.js' context='/services/egi'/>"></script>
-<script type="text/javascript"
-	src="<cdn:url value='/resources/global/js/jquery/plugins/datatables/extensions/buttons/buttons.print.min.js' context='/services/egi'/>"></script>
-<script type="text/javascript"
-	src="<cdn:url value='/resources/global/js/jquery/plugins/jquery.validate.min.js' context='/services/egi'/>"></script>
+  src="<cdn:url value='/resources/global/js/jquery/plugins/jquery.validate.min.js' context='/services/egi'/>"></script>
+<script src="<cdn:url value='/resources/global/js/bootstrap/bootstrap-datepicker.js' context='/services/egi'/>"
+  type="text/javascript"></script>
 <script type="text/javascript" src="<cdn:url value='/resources/app/js/supplierHelper.js?rnd=${app_release_no}' context='/services/EGF'/>"></script>

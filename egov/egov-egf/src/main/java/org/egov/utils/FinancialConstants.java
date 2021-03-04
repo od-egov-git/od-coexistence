@@ -97,7 +97,7 @@ public interface FinancialConstants {
 	public static final String SALARYBILL_PASSED_STATUS = "Passed";
 	public static final String SALARYBILL_PAID_STATUS = "paid";
 	// Status for Contingent Bills
-	public static final String CONTINGENCYBILL_CREATED_STATUS = "CREATED";
+	public static final String CONTINGENCYBILL_CREATED_STATUS = "Created";
 	public static final String CONTINGENCYBILL_CANCELLED_STATUS = "Cancelled";
 	public static final String CONTINGENCYBILL_APPROVED_STATUS = "Approved";
 	public static final String CONTINGENCYBILL_PASSED_STATUS = "Voucher Created";
@@ -356,6 +356,7 @@ public interface FinancialConstants {
 	public static final String BUTTONSAVE = "Save";
 	public static final String BUTTONCANCEL = "Cancel";
 	public static final String BUTTONVERIFY = "Verify";
+	public static final String BUTTONSAVEASDRAFT = "SaveAsDraft";
 
 	public static final String WORKFLOW_STATE_NEW = "NEW";
 	public static final String WORKFLOW_STATE_APPROVED = "Approved";
@@ -453,6 +454,13 @@ public interface FinancialConstants {
 	public static final String STATUS_MODULE_NAME_SUPPLIER = "Supplier";
 	public static final Integer FINANCIALYEAR_STARTING_MONTH = 4;
 	public static final String EMPTY_STRING = "";
+    public static final String INSTRUMENT_TYPE_PEX = "pex";
+    public static final String MODEOFPAYMENT_PEX  = "pex";
+    public static final String CONTINGENCYBILL_PENDING_AUDIT = "Pending with Audit";
+    public static final String CONTINGENCYBILL_PENDING_FINANCE = "Pending with Finance";
+    public static final String AUDIT_ = "audit_";
+    public static final String WORKFLOW_STATE_SAVEASDRAFT  = "SaveAsDraft";
+    public static final String CONTINGENCYBILL_PENDING_CANCEL = "Pending for Cancellation";
 
 	
 }

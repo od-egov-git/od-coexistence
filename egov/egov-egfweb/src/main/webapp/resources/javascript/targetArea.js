@@ -88,7 +88,7 @@ function getData(){
 	doLoadingMask();
 	document.getElementById("resultDiv").style.display="none";
     var formObj = jQuery(this);
-    var formURL = '/EGF/master/targetArea!ajaxSearch.action';
+    var formURL = '/services/EGF/master/targetArea-ajaxSearch.action';
     var formData = new FormData(document.getElementById("targetAreaForm"));
     jQuery.ajax({
         url: formURL,
@@ -124,7 +124,7 @@ var path="../..";
 var oAutoCompEntityForJV;
 function autocompleteCode(obj)
 {
-  	   oACDS = new YAHOO.widget.DS_XHR(path+"/services/EGF/common/eBCommon!ajaxLoadTargetAreaCodes.action", [ "~^"]);
+  	   oACDS = new YAHOO.widget.DS_XHR(path+"/services/EGF/common/eBCommon-ajaxLoadTargetAreaCodes.action", [ "~^"]);
 	   oACDS.responseType = YAHOO.widget.DS_XHR.TYPE_FLAT;
 	   oACDS.scriptQueryParam = "startsWith";
 	   oAutoCompEntityForJV = new YAHOO.widget.AutoComplete(obj.name,'codescontainer',oACDS);

@@ -61,6 +61,7 @@
 			<tr>
 				<th><spring:message code="lbl.account.code" text="Account Code"/></th>
 				<th><spring:message code="lbl.account.head" text="Account Head"/></th>
+				<th><spring:message code="lbl.account.rate" text="Rate"/></th>
 				<th><spring:message code="lbl.credit.amount" text="Credit Amount"/></th>
 				<th><spring:message code="lbl.action" text="Action"/></th> 					
 			</tr>
@@ -68,7 +69,7 @@
 		<tbody>
 			<tr id="creditdetailsrow">
 				<td>
-					<input type="text" id="tempCreditDetails[0].creditGlcode" name="tempCreditDetails[0].creditGlcode" class="form-control table-input creditDetailGlcode creditGlcode"  data-errormsg="Account Code is mandatory!" data-idx="0" data-optional="0"   placeholder="Type first 3 letters of Account code" >
+					<input type="text" id="tempCreditDetails[0].creditGlcode" name="tempCreditDetails[0].creditGlcode" class="form-control table-input creditDetailGlcode creditGlcode"  data-errormsg="Account Code is mandatory!" data-idx="0" data-optional="0"   placeholder="Type any letters of Account code" >
 					<form:hidden path="" name="tempCreditDetails[0].glcode" id="tempCreditDetails[0].glcode" class="form-control table-input hidden-input creditaccountcode"/> 
 					<form:hidden path="" name="tempCreditDetails[0].glcodeid" id="tempCreditDetails[0].glcodeid"  class="form-control table-input hidden-input creditdetailid"/>
 					<form:hidden path="" name="tempCreditDetails[0].isSubLedger" id="tempCreditDetails[0].isSubLedger" class="form-control table-input hidden-input creditIsSubLedger"/>
@@ -81,9 +82,32 @@
 					<input type="text" id="tempCreditDetails[0].creditAccountHead" name="tempCreditDetails[0].creditAccountHead"  class="form-control creditdetailname" disabled>  
 				</td>
 				<td>
+					<form:select path="" name="tempCreditDetails[0].rate" id="tempCreditDetails[0].rate" onchange="calcualteNetpaybleAmount();" class="form-control table-input text-right" >
+					<form:option value="0">---Select---</form:option>
+					<form:option value="0.125">0.125%</form:option>
+					<form:option value="0.25">0.25%</form:option>
+					<form:option value="1.500">1.500%</form:option>
+					<form:option value="1">1%</form:option>
+					<form:option value="2">2%</form:option>
+					<form:option value="2.5">2.5%</form:option>
+					<form:option value="3">3%</form:option>
+					<form:option value="5">5%</form:option>
+					<form:option value="6">6%</form:option>
+					<form:option value="9">9%</form:option>
+					<form:option value="10">10%</form:option>
+					<form:option value="12">12%</form:option>
+					<form:option value="14">14%</form:option>
+					<form:option value="15">15%</form:option>
+					<form:option value="18">18%</form:option>
+					<form:option value="20">20%</form:option>
+					<form:option value="28">28%</form:option>
+					<form:option value="30">30%</form:option>
+					</form:select>
+				</td> 
+				<td>
 					<form:input path="" name="tempCreditDetails[0].creditamount" id="tempCreditDetails[0].creditamount" data-errormsg="Credit Amount is mandatory!" onkeyup="decimalvalue(this);" onblur="calcualteNetpaybleAmount();" data-pattern="decimalvalue" data-idx="0" data-optional="0" class="form-control table-input text-right creditAmount"   maxlength="12"  />
 				</td> 
-				<td class="text-center"><span style="cursor:pointer;" onclick="addCreditDetailsRow();" tabindex="0" id="tempCreditDetails[0].addButton" data-toggle="tooltip" title="" data-original-title="press SPACE to Add!" aria-hidden="true"><i class="fa fa-plus"></i></span>
+				<td class="text-center"><span style="cursor:pointer;" onclick="addCreditDetailsRow();" tabindex="0" id="tempCreditDetails[0].addButton" data-toggle="tooltip" title="" data-original-title="press ENTER to Add!" aria-hidden="true"><i class="fa fa-plus"></i></span>
 				 <span class="add-padding credit-delete-row" onclick="deleteCreditDetailsRow(this);"><i class="fa fa-trash" data-toggle="tooltip" title="" data-original-title="Delete!"></i></span> </td>
 			</tr>
 		</tbody>

@@ -47,15 +47,33 @@
  */
 package org.egov.egf.web.controller.contractor;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper;
+import org.apache.struts2.dispatcher.multipart.UploadedFile;
 import org.egov.commons.dao.EgwStatusHibernateDAO;
 import org.egov.egf.commons.bank.service.CreateBankService;
+import org.egov.egf.expensebill.repository.DocumentUploadRepository;
 import org.egov.egf.masters.services.ContractorService;
+import org.egov.egf.utils.FinancialUtils;
 import org.egov.egf.web.adaptor.ContractorJsonAdaptor;
+import org.egov.infra.filestore.service.FileStoreService;
+import org.egov.model.bills.DocumentUpload;
+import org.egov.model.bills.EgBillregister;
 import org.egov.model.masters.Contractor;
 import org.egov.utils.FinancialConstants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,6 +105,14 @@ public class CreateContractorController {
     private static final String EDIT = "contractor-edit";
     private static final String VIEW = "contractor-view";
     private static final String SEARCH = "contractor-search";
+    
+    private static final int BUFFER_SIZE = 4096;
+    
+    @Autowired
+    private DocumentUploadRepository documentUploadRepository;
+    
+    @Autowired
+    private FinancialUtils financialUtils;
 
     @Autowired
     private CreateBankService createBankService;
@@ -96,6 +122,9 @@ public class CreateContractorController {
 
     @Autowired
     private ContractorService contractorService;
+    
+    @Autowired
+    private FileStoreService fileStoreService;
 
     @Autowired
     private MessageSource messageSource;
@@ -115,18 +144,51 @@ public class CreateContractorController {
 
     @RequestMapping(value = "/create", method = RequestMethod.POST)
     public String create(@Valid @ModelAttribute final Contractor contractor, final BindingResult errors,
-            final Model model, final RedirectAttributes redirectAttrs) throws IOException {
+            final Model model, final HttpServletRequest request,final RedirectAttributes redirectAttrs) throws IOException {
 
         if (errors.hasErrors()) {
             prepareNewForm(model);
             return NEW;
         }
-        String GSTState=contractor.getGstRegisteredState().toUpperCase();
-        contractor.setGstRegisteredState(GSTState);
-        String GST=contractor.getTinNumber().toUpperCase();
-        contractor.setTinNumber(GST);
-        contractorService.create(contractor);
-
+        System.out.println("start of file upload");
+        String[] contentType = ((MultiPartRequestWrapper) request).getContentTypes("file");
+        List<DocumentUpload> list = new ArrayList<>();
+        UploadedFile[] uploadedFiles = ((MultiPartRequestWrapper) request).getFiles("file");
+        String[] fileName = ((MultiPartRequestWrapper) request).getFileNames("file");
+        if(uploadedFiles!=null)
+        {
+        	System.out.println("file upload");
+        for (int i = 0; i < uploadedFiles.length; i++) {
+        	System.out.println("loop1 :::"+i);
+        	if(uploadedFiles[i] == null || uploadedFiles[i].getAbsolutePath().isEmpty())
+			{
+				continue;
+			}
+            Path path = Paths.get(uploadedFiles[i].getAbsolutePath());
+            byte[] fileBytes = Files.readAllBytes(path);
+            ByteArrayInputStream bios = new ByteArrayInputStream(fileBytes);
+            DocumentUpload upload = new DocumentUpload();
+            upload.setInputStream(bios);
+            upload.setFileName(fileName[i]);
+            upload.setContentType(contentType[i]);
+            list.add(upload);
+        }
+        contractor.setDocumentDetail(list);
+        }
+        Contractor savedContractor=contractorService.create(contractor);
+        System.out.println("ID ::::"+savedContractor.getId());
+        
+        List<DocumentUpload> files = contractor.getDocumentDetail() == null ? null : contractor.getDocumentDetail();
+        final List<DocumentUpload> documentDetails;
+        if(files!=null && !files.isEmpty())
+        {
+        	documentDetails = financialUtils.getDocumentDetails(files, savedContractor,
+                    "egf_contractor");
+            if (!documentDetails.isEmpty()) {
+                persistDocuments(documentDetails);
+            }
+        }
+        
         redirectAttrs.addFlashAttribute("message", messageSource.getMessage("msg.contractor.success", null, null));
 
         return "redirect:/contractor/result/" + contractor.getId() + "/create";
@@ -134,7 +196,9 @@ public class CreateContractorController {
 
     @RequestMapping(value = "/edit/{id}", method = RequestMethod.POST)
     public String edit(@PathVariable("id") final Long id, final Model model) {
-        final Contractor contractor = contractorService.getById(id);
+         Contractor contractor = contractorService.getById(id);
+         final List<DocumentUpload> documents = documentUploadRepository.findByObjectId(id);
+         contractor.setDocumentDetail(documents);
         prepareNewForm(model);
         model.addAttribute("contractor", contractor);
         return EDIT;
@@ -142,22 +206,63 @@ public class CreateContractorController {
 
     @RequestMapping(value = "/update", method = RequestMethod.POST)
     public String update(@Valid @ModelAttribute final Contractor contractor, final BindingResult errors,
-            final Model model, final RedirectAttributes redirectAttrs) {
+            final Model model,final HttpServletRequest request, final RedirectAttributes redirectAttrs) throws IOException {
         if (errors.hasErrors()) {
             prepareNewForm(model);
             return EDIT;
         }
-        contractorService.update(contractor);
+        System.out.println("start of file upload");
+        String[] contentType = ((MultiPartRequestWrapper) request).getContentTypes("file");
+        List<DocumentUpload> list = new ArrayList<>();
+        UploadedFile[] uploadedFiles = ((MultiPartRequestWrapper) request).getFiles("file");
+        String[] fileName = ((MultiPartRequestWrapper) request).getFileNames("file");
+        if(uploadedFiles!=null)
+        {
+        	System.out.println("file upload");
+        for (int i = 0; i < uploadedFiles.length; i++) {
+        	System.out.println("loop :::"+i);
+        	if(uploadedFiles[i] == null || uploadedFiles[i].getAbsolutePath().isEmpty())
+			{
+				continue;
+			}
+            Path path = Paths.get(uploadedFiles[i].getAbsolutePath());
+            byte[] fileBytes = Files.readAllBytes(path);
+            ByteArrayInputStream bios = new ByteArrayInputStream(fileBytes);
+            DocumentUpload upload = new DocumentUpload();
+            upload.setInputStream(bios);
+            upload.setFileName(fileName[i]);
+            upload.setContentType(contentType[i]);
+            list.add(upload);
+        }
+        contractor.setDocumentDetail(list);
+        }
+        Contractor savedContractor = contractorService.update(contractor);
+        System.out.println("ID ::::"+savedContractor.getId());
+        
+        List<DocumentUpload> files = contractor.getDocumentDetail() == null ? null : contractor.getDocumentDetail();
+        final List<DocumentUpload> documentDetails;
+        if(files !=null && !files.isEmpty())
+        {
+        	documentDetails = financialUtils.getDocumentDetails(files, savedContractor,
+                    "egf_contractor");
+            if (!documentDetails.isEmpty()) {
+                persistDocuments(documentDetails);
+            }
+        }
+        
         redirectAttrs.addFlashAttribute("message", messageSource.getMessage("msg.contractor.success", null, null));
         return "redirect:/contractor/result/" + contractor.getId() + "/view";
     }
 
     @RequestMapping(value = "/view/{id}", method = RequestMethod.POST)
     public String view(@PathVariable("id") final Long id, final Model model) {
-        final Contractor contractor = contractorService.getById(id);
+         Contractor contractor = contractorService.getById(id);
+        final List<DocumentUpload> documents = documentUploadRepository.findByObjectId(id);
+        contractor.setDocumentDetail(documents);
         prepareNewForm(model);
         model.addAttribute("contractor", contractor);
         model.addAttribute("mode", "view");
+        model.addAttribute("fileMode", "readOnly");
         return VIEW;
     }
 
@@ -186,10 +291,70 @@ public class CreateContractorController {
 
     @RequestMapping(value = "/result/{id}/{mode}", method = RequestMethod.GET)
     public String result(@PathVariable("id") final Long id, @PathVariable("mode") final String mode, final Model model) {
-        final Contractor contractor = contractorService.getById(id);
+         Contractor contractor = contractorService.getById(id);
+         final List<DocumentUpload> documents = documentUploadRepository.findByObjectId(id);
+         contractor.setDocumentDetail(documents);
         model.addAttribute("contractor", contractor);
         model.addAttribute("mode", mode);
+        model.addAttribute("fileMode", "readOnly");
         return RESULT;
+    }
+    
+    @RequestMapping(value = "/downloadBillDoc", method = RequestMethod.GET)
+    public void getBillDoc(final HttpServletRequest request, final HttpServletResponse response)
+            throws IOException {
+        final ServletContext context = request.getServletContext();
+        final String fileStoreId = request.getParameter("fileStoreId");
+        String fileName = "";
+        final File downloadFile = fileStoreService.fetch(fileStoreId, FinancialConstants.FILESTORE_MODULECODE);
+        final FileInputStream inputStream = new FileInputStream(downloadFile);
+        Contractor egBillregister = contractorService.getById(Long.parseLong(request.getParameter("contractorId")));
+        egBillregister = getBillDocuments(egBillregister);
+
+        for (final DocumentUpload doc : egBillregister.getDocumentDetail())
+            if (doc.getFileStore().getFileStoreId().equalsIgnoreCase(fileStoreId))
+                fileName = doc.getFileStore().getFileName();
+
+        // get MIME type of the file
+        String mimeType = context.getMimeType(downloadFile.getAbsolutePath());
+        if (mimeType == null)
+            // set to binary type if MIME mapping not found
+            mimeType = "application/octet-stream";
+
+        // set content attributes for the response
+        response.setContentType(mimeType);
+        response.setContentLength((int) downloadFile.length());
+
+        // set headers for the response
+        final String headerKey = "Content-Disposition";
+        final String headerValue = String.format("attachment; filename=\"%s\"", fileName);
+        response.setHeader(headerKey, headerValue);
+
+        // get output stream of the response
+        final OutputStream outStream = response.getOutputStream();
+
+        final byte[] buffer = new byte[BUFFER_SIZE];
+        int bytesRead = -1;
+
+        // write bytes read from the input stream into the output stream
+        while ((bytesRead = inputStream.read(buffer)) != -1)
+            outStream.write(buffer, 0, bytesRead);
+
+        inputStream.close();
+        outStream.close();
+    }
+    
+    private Contractor getBillDocuments(final Contractor egBillregister) {
+        List<DocumentUpload> documentDetailsList = contractorService.findByObjectIdAndObjectType(egBillregister.getId(),
+                "egf_contractor");
+        egBillregister.setDocumentDetail(documentDetailsList);
+        return egBillregister;
+    }
+    
+    public void persistDocuments(final List<DocumentUpload> documentDetailsList) {
+        if (documentDetailsList != null && !documentDetailsList.isEmpty())
+            for (final DocumentUpload doc : documentDetailsList)
+                documentUploadRepository.save(doc);
     }
 
 }

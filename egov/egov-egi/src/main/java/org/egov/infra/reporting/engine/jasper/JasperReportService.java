@@ -64,12 +64,14 @@ import net.sf.jasperreports.engine.export.JRPdfExporter;
 import net.sf.jasperreports.engine.export.JRRtfExporter;
 import net.sf.jasperreports.engine.export.JRTextExporter;
 import net.sf.jasperreports.engine.export.JRXlsExporter;
+import net.sf.jasperreports.engine.export.ooxml.JRDocxExporter;
 import net.sf.jasperreports.engine.query.JRHibernateQueryExecuterFactory;
 import net.sf.jasperreports.engine.util.JRLoader;
 import net.sf.jasperreports.export.Exporter;
 import net.sf.jasperreports.export.ExporterConfiguration;
 import net.sf.jasperreports.export.ExporterOutput;
 import net.sf.jasperreports.export.SimpleCsvExporterConfiguration;
+import net.sf.jasperreports.export.SimpleDocxExporterConfiguration;
 import net.sf.jasperreports.export.SimpleExporterInput;
 import net.sf.jasperreports.export.SimpleHtmlExporterConfiguration;
 import net.sf.jasperreports.export.SimpleHtmlExporterOutput;
@@ -104,6 +106,7 @@ import static org.egov.infra.reporting.engine.ReportFormat.PDF;
 import static org.egov.infra.reporting.engine.ReportFormat.RTF;
 import static org.egov.infra.reporting.engine.ReportFormat.TXT;
 import static org.egov.infra.reporting.engine.ReportFormat.XLS;
+import static org.egov.infra.reporting.engine.ReportFormat.DOCX;
 
 public class JasperReportService extends AbstractReportService<JasperReport> {
 
@@ -153,11 +156,14 @@ public class JasperReportService extends AbstractReportService<JasperReport> {
             } else {
                 dataSource = new JRBeanArrayDataSource(new Object[]{reportData}, false);
             }
+            LOGGER.info("Jasper fillReport start->"+reportInput.getReportTemplate());
             JasperPrint jasperPrint = JasperFillManager.fillReport(getTemplate(reportInput.getReportTemplate()),
                     reportInput.getReportParams(), dataSource);
+            LOGGER.info("Jasper fillReport end->"+reportInput.getReportTemplate());
             return new ReportOutput(exportReport(reportInput, jasperPrint), reportInput);
-        } catch (JRException | IOException e) {
-            LOGGER.error(EXCEPTION_IN_REPORT_CREATION, e);
+        } catch (Exception e) {
+        	System.out.println("Error1 :::"+e.getMessage());
+            e.printStackTrace();
             throw new ApplicationRuntimeException(EXCEPTION_IN_REPORT_CREATION, e);
         }
 
@@ -193,19 +199,23 @@ public class JasperReportService extends AbstractReportService<JasperReport> {
 
     private byte[] exportReport(ReportRequest reportInput, JasperPrint jasperPrint) throws JRException, IOException {
         try (ByteArrayOutputStream reportOutputStream = new ByteArrayOutputStream()) {
+        	System.out.println("start export");
             Exporter exporter = getExporter(reportInput, jasperPrint, reportOutputStream);
             exporter.exportReport();
+            System.out.println("export");
             return reportOutputStream.toByteArray();
         } catch (Exception e) {
-            LOGGER.error(EXCEPTION_IN_REPORT_CREATION, e);
+        	System.out.println("Error2 :::"+e.getMessage());
+            e.printStackTrace();
             throw new ApplicationRuntimeException(EXCEPTION_IN_REPORT_CREATION, e);
         }
     }
 
     private Exporter getExporter(ReportRequest reportInput, JasperPrint jasperPrint, OutputStream outputStream) {
-        Exporter exporter;
-        ExporterConfiguration exporterConfiguration;
+        Exporter exporter = null;
+        ExporterConfiguration exporterConfiguration = null;
         ExporterOutput exporterOutput = null;
+        System.out.println("reportInput.getReportFormat() :::"+reportInput.getReportFormat());
         if (PDF.equals(reportInput.getReportFormat())) {
             SimplePdfExporterConfiguration pdfExporterConfiguration = new SimplePdfExporterConfiguration();
             if (reportInput.isPrintDialogOnOpenReport())
@@ -213,8 +223,14 @@ public class JasperReportService extends AbstractReportService<JasperReport> {
             exporter = new JRPdfExporter();
             exporterConfiguration = pdfExporterConfiguration;
         } else if (XLS.equals(reportInput.getReportFormat())) {
-            exporter = new JRXlsExporter();
-            exporterConfiguration = new SimpleXlsExporterConfiguration();
+        	System.out.println("xls ::: "+XLS);
+        	try
+        	{
+        		exporter = new JRXlsExporter();
+                exporterConfiguration = new SimpleXlsExporterConfiguration();
+        	}catch (Exception e) {
+				e.printStackTrace();
+			}
         } else if (RTF.equals(reportInput.getReportFormat())) {
             exporter = new JRRtfExporter();
             exporterConfiguration = new SimpleRtfExporterConfiguration();
@@ -229,13 +245,23 @@ public class JasperReportService extends AbstractReportService<JasperReport> {
         } else if (CSV.equals(reportInput.getReportFormat())) {
             exporter = new JRCsvExporter();
             exporterConfiguration = new SimpleCsvExporterConfiguration();
+        } else if (DOCX.equals(reportInput.getReportFormat())) {
+            exporter = new JRDocxExporter();
+            exporterConfiguration = new SimpleDocxExporterConfiguration();
         } else {
+        	System.out.println("else");
             throw new ApplicationRuntimeException("Invalid report format [" + reportInput.getReportFormat() + "]");
         }
-
-        exporter.setConfiguration(exporterConfiguration);
-        exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
-        exporter.setExporterOutput(exporterOutput == null ? new SimpleOutputStreamExporterOutput(outputStream) : exporterOutput);
+        try
+        {
+        	System.out.println("xxxx");
+        	exporter.setConfiguration(exporterConfiguration);
+            exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
+            exporter.setExporterOutput(exporterOutput == null ? new SimpleOutputStreamExporterOutput(outputStream) : exporterOutput);
+            
+        }catch (Exception e) {
+			e.printStackTrace(); 
+		}
         return exporter;
     }
 }

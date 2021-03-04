@@ -142,7 +142,7 @@ function createTextFieldFormatterJV(prefix,suffix,type){
 	
     return function(el, oRecord, oColumn, oData) {
 		var value = (YAHOO.lang.isValue(oData))?oData:"";
-		el.innerHTML = " <input type='"+type+"' id='"+prefix+"["+billDetailTableIndex+"]"+suffix+"' name='"+prefix+"["+billDetailTableIndex+"]"+suffix+"' style='width:90px;' onkeyup='autocompletecode(this,event)' autocomplete='off' onblur='fillNeibrAfterSplitGlcode(this);'/>";
+		el.innerHTML = " <input type='"+type+"' id='"+prefix+"["+billDetailTableIndex+"]"+suffix+"' name='"+prefix+"["+billDetailTableIndex+"]"+suffix+"' style='width:100%;' onkeyup='autocompletecode(this,event)' autocomplete='off' onblur='fillNeibrAfterSplitGlcode(this);'/>";
 		
 	}
 }
@@ -173,7 +173,7 @@ function createSLTextFieldwithSearchBtnFormatterJV(prefix,suffix,onblurfunction,
 function createLongTextFieldFormatterJV(prefix,suffix){
     return function(el, oRecord, oColumn, oData) {
     	var value = (YAHOO.lang.isValue(oData))?oData:"";
-		el.innerHTML = "<input type='text' id='"+prefix+"["+index+"]"+suffix+"' name='"+prefix+"["+index+"]"+suffix+"' readOnly style='width:250px;'/>";
+		el.innerHTML = "<input type='text' id='"+prefix+"["+index+"]"+suffix+"' name='"+prefix+"["+index+"]"+suffix+"' readOnly style='width:100%;'/>";
 
     
     }
@@ -187,7 +187,7 @@ function createLongTextFieldFormatterJV(prefix,suffix){
 function createAmountFieldFormatterJV(prefix,suffix,onblurfunction){
     return function(el, oRecord, oColumn, oData) {
 		var value = (YAHOO.lang.isValue(oData))?oData:"";
-		el.innerHTML = "<input type='text' id='"+prefix+"["+billDetailTableIndex+"]"+suffix+"' name='"+prefix+"["+billDetailTableIndex+"]"+suffix+"' style='text-align:right;width:90px;' maxlength='18' onblur='validateDigitsAndDecimal(this);"+onblurfunction+"'/>";
+		el.innerHTML = "<input type='text' id='"+prefix+"["+billDetailTableIndex+"]"+suffix+"' name='"+prefix+"["+billDetailTableIndex+"]"+suffix+"' style='text-align:right;width:100%;' maxlength='18' onblur='validateDigitsAndDecimal(this);"+onblurfunction+"'/>";
 	}
 }
 function createSLTextFieldFormatterJV(prefix,suffix,onblurfunction){
@@ -406,9 +406,9 @@ function loadCoa(id){
 	if(coaCode != 'undefined' && coaCode!=''){
 		var url;
 		if(isNaN(coaCode))
-			url = '/EGF/payment/advanceRequisitionPayment-ajaxLoadCoa.action?coaDescription='+coaCode;
+			url = '/services/EGF/payment/advanceRequisitionPayment-ajaxLoadCoa.action?coaDescription='+coaCode;
 		else
-			url = '/EGF/payment/advanceRequisitionPayment-ajaxLoadCoa.action?coaCode='+coaCode;
+			url = '/services/EGF/payment/advanceRequisitionPayment-ajaxLoadCoa.action?coaCode='+coaCode;
 	
 		var req2 = initiateRequest();
 		req2.onreadystatechange = function(){
@@ -973,6 +973,10 @@ function fillNeibrAfterSplitGlcode(obj)
 		var currRow=getRowIndex(obj);
 		document.getElementById('billDetailslist['+currRow+'].glcodeIdDetail').value=allGlcodes[key];
 		document.getElementById('billDetailslist['+currRow+'].accounthead').value=temp[1].split("`~`")[0];
+		if((obj.value).startsWith("3"))
+		{
+			document.getElementById('billDetailslist['+currRow+'].rateDetail').style.visibility="visible";
+		}
 		var flag=false;
 		for (var i=0; i<slDetailTableIndex;i++ )
 		{
@@ -2333,4 +2337,215 @@ function disableForm() {
 		}
 } 
 
+function createRateFieldFormatterJV(prefix,suffix,onblurfunction){
+    return function(el, oRecord, oColumn, oData) {
+		var value = (YAHOO.lang.isValue(oData))?oData:"";
+		el.innerHTML ="<select id='"+prefix+"["+billDetailTableIndex+"]"+suffix+"' name='"+prefix+"["+billDetailTableIndex+"]"+suffix+"' onchange='updateRateDetailJV()' style='text-align:right;width:100%;visibility: hidden' maxlength='18'><option value='0'>--Select--</option><option value='0.125'>0.125%</option><option value='0.25'>0.25%</option><option value='1.500'>1.500%</option><option value='1'>1%</option><option value='2'>2%</option><option value='2.50'>2.50%</option><option value='3'>3.00%</option><option value='5'>5%</option><option value='6'>6%</option><option value='9'>9%</option><option value='10'>10%</option><option value='12'>12%</option><option value='14'>14%</option><option value='15'>15%</option><option value='18'>18%</option><option value='20'>20%</option><option value='28'>28%</option><option value='30'>30%</option></select>";
+	}
+}
+function updateRateDetailJV()
+{
+	var deb=0;
+	var cred=0;
+	var rateDeb=0;
+	for(var i=0;i<billDetailTableIndex+1;i++)
+		{
+			if(null != document.getElementById('billDetailslist['+i+'].rateDetail') && (document.getElementById('billDetailslist['+i+'].rateDetail')).value != 0)
+				{
+					var rate=document.getElementById('billDetailslist['+i+'].rateDetail').value;
+					var amount=0;
+					if(!isNaN(rate))
+						{
+							amount=parseFloat((rate*rateDeb)/100);
+							if((document.getElementById('billDetailslist['+i+'].accounthead').value).includes("GST"))
+							{
+								document.getElementById('billDetailslist['+i+'].debitAmountDetail').value=amount;
+								deb=deb+amount;
+							}
+							else
+								{
+								document.getElementById('billDetailslist['+i+'].creditAmountDetail').value=amount;
+								cred=cred+amount;
+								}
+						}
+					
+				}
+			else if(null != document.getElementById('billDetailslist['+i+'].debitAmountDetail') && document.getElementById('billDetailslist['+i+'].debitAmountDetail').value != 0)
+				{
+					rateDeb=rateDeb+parseFloat(document.getElementById('billDetailslist['+i+'].debitAmountDetail').value);
+					deb=deb+parseFloat(document.getElementById('billDetailslist['+i+'].debitAmountDetail').value);
+				}
+			else if(null != document.getElementById('billDetailslist['+i+'].creditAmountDetail') && document.getElementById('billDetailslist['+i+'].creditAmountDetail').value != 0)
+				{
+					cred=cred+parseFloat(document.getElementById('billDetailslist['+i+'].creditAmountDetail').value);
+				}
+		}
+	document.getElementById('totaldbamount').value = amountConverter(deb);
+	document.getElementById('totalcramount').value = amountConverter(cred);
+	
+	
+	
+}
+
+function updateDebitAmountJV()
+{	
+	var amt=0;
+	
+	for(var i=0;i<billDetailTableIndex+1;i++)
+	{
+		
+		if(null != document.getElementById('billDetailslist['+i+'].debitAmountDetail')){
+			var val = document.getElementById('billDetailslist['+i+'].debitAmountDetail').value;
+			if(val!="" && !isNaN(val))
+			{
+				amt = amt + parseFloat(val);
+			}
+		}
+	}
+	document.getElementById('totaldbamount').value = amountConverter(amt);
+}
+function deductionRateFormatter(tableName,columnName,type){
+    return function(el, oRecord, oColumn, oData) {
+    	 var table_name=eval(tableName);  var index=table_name.getRecordIndex(oRecord);  	 var fieldName=tableName+"["+index+"]"+columnName;  	 while(document.getElementById(fieldName))    	 {    		 index++;    fieldName=tableName+"["+index+"]"+columnName; 	 }
+		var value = (YAHOO.lang.isValue(oData))?oData:"";
+		el.innerHTML ="<select id='"+tableName+"["+index+"]"+columnName+"' name='"+tableName+"["+index+"]"+columnName+"' onchange='calculateNet(this)' ><option value='0'>--Select--</option><option value='0.125'>0.125%</option><option value='0.25'>0.25%</option><option value='1.500'>1.500%</option><option value='1'>1%</option><option value='2'>2%</option><option value='2.50'>2.50%</option><option value='3'>3.00%</option><option value='5'>5%</option><option value='6'>6%</option><option value='9'>9%</option><option value='10'>10%</option><option value='12'>12%</option><option value='14'>14%</option><option value='15'>15%</option><option value='18'>18%</option><option value='20'>20%</option><option value='28'>28%</option><option value='30'>30%</option></select>";
+		
+	}
+		
+}
+
+
+function populateBudgetLink()
+{
+
+	var dept=document.getElementById('vouchermis.departmentid').value;
+	var fund=document.getElementById('fundId').value;
+	var func=document.getElementById('vouchermis.function').value;
+	var status=false;
+	var accCode;
+	if(fund == null || fund == -1 || fund == '-1')
+		{
+		bootbox.alert("Select Fund to view Budget Details");
+		status=true;
+		}
+	else if(dept == null || dept == -1 || dept == '-1')
+	{
+		bootbox.alert("Select Department to view Budget Details");
+		status=true;
+	}
+	else if(func == null || func == -1 || func == '-1')
+	{
+		bootbox.alert("Select Function to view Budget Details");
+		status=true;
+	}
+	var accStatus=false;
+	if(status == false)
+		{
+		for(i=0;i<=25;i++)
+		{
+			if(document.getElementById('billDetailslist['+i+'].debitAmountDetail') != null && (document.getElementById('billDetailslist['+i+'].debitAmountDetail').value == '0' ||document.getElementById('billDetailslist['+i+'].debitAmountDetail').value == '0.00'))
+			{
+				accStatus = false;
+			}
+			else if(document.getElementById('billDetailslist['+i+'].debitAmountDetail') != null && (document.getElementById('billDetailslist['+i+'].debitAmountDetail').value != '0' && document.getElementById('billDetailslist['+i+'].debitAmountDetail').value != '0.00'))
+			{
+				
+				if(document.getElementById('billDetailslist['+i+'].glcodeDetail') != null && document.getElementById('billDetailslist['+i+'].glcodeDetail').value != '')
+					{
+						accStatus = true;
+						 accCode = document.getElementById('billDetailslist['+i+'].glcodeDetail').value;
+						 break;
+					}
+			}
+		
+		}
+		}
+	
+	if(accStatus == false)
+		{
+		bootbox.alert("Select Account Code and debit amout to view Budget Details");
+		}
+	if(status == false && accStatus == true)
+		{
+		var today = new Date();
+		var date = today.getDate()+'/'+(today.getMonth()+1)+'/'+today.getFullYear();
+		var url1 = '/services/EGF/report/budgetVarianceReport-loadData.action?asOnDate='+date+'&dept='+dept+'&funds='+fund+'&func='+func+'&accCode='+accCode+'&vtype=jv';
+		window.open(url1,'Source','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700')
+		}
+	
+	
+}
+
+function openBudget()
+{
+	var vId=document.getElementById('pId');
+	if(vId != null)
+		{
+		var vhId=vId.value;
+			if(vhId != null && vhId != '')
+			{
+			var today = new Date();
+			var date = today.getDate()+'/'+(today.getMonth()+1)+'/'+today.getFullYear();
+			var url1 = '/services/EGF/report/budgetVarianceReport-loadData.action?asOnDate='+date+'&vtype=bpw&vhId='+vhId;
+			window.open(url1,'Source','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700')
+			}
+}	
+
+	
+}
+
+function openBudgetDetails()
+{
+	var vhId='';
+	var vId=document.getElementById('billVoucherId0');
+	if(vId != null)
+	{
+		vhId=vId.value;
+	}
+	if(vhId != null && vhId != '')
+	{
+		var today = new Date();
+		var date = today.getDate()+'/'+(today.getMonth()+1)+'/'+today.getFullYear();
+		var url1 = '/services/EGF/report/budgetVarianceReport-loadData.action?asOnDate='+date+'&vtype=jvw&vhId='+vhId;
+		window.open(url1,'Source','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700')
+	}
+	
+	}
+
+function removeVoucher() {
+	
+	var instrumentAmount=document.getElementById('voucherAmount').innerText;
+	
+	document.preApprovedVoucher.action = '/services/EGF/voucher/preApprovedVoucher-removeVoucher.action?instrumentAmount='+instrumentAmount;
+	document.preApprovedVoucher.submit();
+	
+}
+
+function openSource(){
+	
+	
+	var vouchermissourcepath=document.getElementById('vouchermissourcepath').value;
+	
+	if(vouchermissourcepath=="" || vouchermissourcepath=='null')
+		bootbox.alert('Source is not available');
+	else{
+		var url = vouchermissourcepath+'&showMode=view';
+		window.open(url,'Source','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700')
+	}   
+}
+function checkLength(obj)
+{
+	if(obj.value.length>1024)
+	{
+		bootbox.alert('Max 1024 characters are allowed for comments. Remaining characters are truncated.')
+		obj.value = obj.value.substring(1,1024);
+	}
+}
+
+
+/*$( "#buttonRemove" ).click(function() {
+	  alert( "Handler for .click() called." );
+	});
+
+*/
 

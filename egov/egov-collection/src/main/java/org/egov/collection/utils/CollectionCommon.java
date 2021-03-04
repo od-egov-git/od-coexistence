@@ -99,9 +99,11 @@ import org.egov.commons.dao.FunctionHibernateDAO;
 import org.egov.commons.dao.FundSourceHibernateDAO;
 import org.egov.commons.utils.EntityType;
 import org.egov.egf.commons.EgovCommon;
+import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.entity.Boundary;
 import org.egov.infra.admin.master.entity.Department;
 import org.egov.infra.admin.master.entity.User;
+import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.admin.master.service.BoundaryService;
 import org.egov.infra.admin.master.service.CityService;
 import org.egov.infra.exception.ApplicationRuntimeException;
@@ -151,6 +153,8 @@ public class CollectionCommon {
 
     @Autowired
     private CityService cityService;
+    @Autowired
+    private AppConfigValueService appConfigValuesService;
 
     /**
      * @param receiptHeaderService the receipt header Service to be set
@@ -387,12 +391,25 @@ public class CollectionCommon {
                 }
 
             }
-        if (receiptType == CollectionConstants.RECEIPT_TYPE_BILL)
+        /*if (receiptType == CollectionConstants.RECEIPT_TYPE_BILL)
+        {
+        	System.out.println("receiptType : "+receiptType);
             reportParams.put(CollectionConstants.LOGO_PATH, cityService.getCityLogoAsStream());
+        }
         else
-            reportParams.put(CollectionConstants.LOGO_PATH, cityService.getCityLogoAsBytes());
+        {
+        	System.out.println("receiptType : "+receiptType);
+            //reportParams.put(CollectionConstants.LOGO_PATH, cityService.getCityLogoAsBytes());
+        	reportParams.put(CollectionConstants.LOGO_PATH, cityService.getCityLogoAsStream());
+        } */  
+        final List<AppConfigValues> appList = appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+                "receiptImagePath");
+        final String imgPath = appList.get(0).getValue();
+        
         final ReportRequest reportInput = new ReportRequest(templateName, receiptList, reportParams);
-
+        reportParams.put("BACKGROUND", imgPath+"background.png");
+        reportParams.put("CORNER_LOGO_PATH", imgPath+"logo.png");
+        reportParams.put("RECEIPT_HEADER", imgPath+"receiptHeader.png");
         // Set the flag so that print dialog box is automatically opened
         // whenever the PDF is opened
         reportInput.setReportFormat(ReportFormat.PDF);

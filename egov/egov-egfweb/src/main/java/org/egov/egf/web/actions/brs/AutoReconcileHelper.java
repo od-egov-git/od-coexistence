@@ -1019,6 +1019,7 @@ public class AutoReconcileHelper{
         HashSet<Long> instTypeIds = new HashSet<Long>();
         instTypeIds.add(getInstrumentType(FinancialConstants.INSTRUMENT_TYPE_BANK_TO_BANK));
         instTypeIds.add(getInstrumentType(FinancialConstants.INSTRUMENT_TYPE_ADVICE));
+        instTypeIds.add(getInstrumentType(FinancialConstants.INSTRUMENT_TYPE_PEX));
         final String recociliationQuery = "update EGF_InstrumentHeader set id_status=:statusId,  lastmodifiedby=:userId,lastmodifieddate=CURRENT_DATE"
                 +
                 " where id = (select ih.id from egf_instrumentheader ih,egf_instrumentvoucher iv,voucherheader vh where  "

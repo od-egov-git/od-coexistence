@@ -119,6 +119,11 @@ function callAjaxSearch() {
 }
 
 $('#reBudget').change(function() {
+	var divId=document.getElementById("toogleDiv");
+	if(null != divId)
+		{
+			divId.style.display="block";
+		}
 	$('#referenceBudget').html('');
 	console.log($('#reBudget').val());
 	if($('#reBudget').val()!=''){

@@ -70,6 +70,8 @@ import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.entity.Department;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.exception.ApplicationRuntimeException;
+import org.egov.infra.filestore.entity.FileStoreMapper;
+import org.egov.infra.filestore.service.FileStoreService;
 import org.egov.infra.script.service.ScriptService;
 import org.egov.infra.utils.NumberToWord;
 import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
@@ -165,6 +167,9 @@ public class ContingentBillAction extends BaseBillAction {
 
     @Autowired
     private AutonumberServiceBeanResolver beanResolver;
+    
+    @Autowired
+    protected FileStoreService fileStoreService;
 
     @Override
     public StateAware getModel() {
@@ -406,6 +411,18 @@ public class ContingentBillAction extends BaseBillAction {
                 addActionMessage(getText("bill.forwarded",
                         new String[] { voucherService.getEmployeeNameForPositionId(bill.getState().getOwnerPosition()) }));
             }
+            for(int i=0;i<supportingDocuments.size();i++)
+            {
+            	if(supportingDocuments.get(i) != null)
+            	{
+            		final FileStoreMapper originalFileStore = fileStoreService.store(supportingDocuments.get(i),
+            				commonBean.getBillNumber()+i+"_"+supportingDocumentsFileName.get(i),
+                            supportingDocumentsContentType.get(i), FinancialConstants.MODULE_NAME_APPCONFIG,false);
+                    
+                    persistenceService.persist(originalFileStore);
+            	}
+            	
+            }
         } catch (final ValidationException e) {
             if (LOGGER.isInfoEnabled())
                 LOGGER.info("Inside catch block");
@@ -430,7 +447,7 @@ public class ContingentBillAction extends BaseBillAction {
         if (!cutOffDateconfigValue.isEmpty())
         {
             if (null == bill || null == bill.getId() || bill.getCurrentState().getValue().endsWith("NEW")) {
-                validActions = Arrays.asList(FORWARD, FinancialConstants.CREATEANDAPPROVE);
+                validActions = Arrays.asList(FORWARD);
             } else {
                 if (bill.getCurrentState() != null) {
                     validActions = this.customizedWorkFlowService.getNextValidActions(bill
@@ -685,11 +702,9 @@ public class ContingentBillAction extends BaseBillAction {
     @Action(value = "/bill/contingentBill-beforeView")
     public String beforeView() throws ClassNotFoundException {
         bill = egBillRegisterService.find("from EgBillregister where id=?", billRegisterId);
-        /*
-         * if (cbill.getState() != null && cbill.getState().getValue() != null) if
-         * ((cbill.getState().getValue().contains("REJECT") || cbill.getState().getValue().contains("reject")) && null !=
-         * parameters.get(MODE) && parameters.get(MODE)[0].equalsIgnoreCase(APPROVE)) return beforeEdit();
-         */
+        originalFiles = (List<FileStoreMapper>) persistenceService.getSession().createQuery(
+                "from FileStoreMapper where fileName like '%"+bill.getBillnumber()+"%' order by id desc ").setMaxResults(10).list();
+
         bill = prepareForViewModifyReverse();
         addDropdownData(USER_LIST, Collections.EMPTY_LIST);
         addDropdownData("billDepartmentList", persistenceService.findAllBy("from Department order by name"));

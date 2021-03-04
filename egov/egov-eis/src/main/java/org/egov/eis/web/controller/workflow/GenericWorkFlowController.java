@@ -49,17 +49,24 @@ package org.egov.eis.web.controller.workflow;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.egov.eis.web.contract.WorkflowContainer;
 import org.egov.infra.admin.master.service.DepartmentService;
+import org.egov.infra.microservice.models.Assignment;
 import org.egov.infra.microservice.models.Department;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.workflow.entity.State;
 import org.egov.infra.workflow.entity.StateAware;
+import org.egov.infra.workflow.matrix.entity.WorkFlowDeptDesgMap;
 import org.egov.infra.workflow.matrix.entity.WorkFlowMatrix;
 import org.egov.infra.workflow.matrix.service.CustomizedWorkFlowService;
+import org.egov.infra.workflow.matrix.service.WorkFlowDeptDesgMapService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -67,12 +74,17 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 
 @Controller
 public abstract class GenericWorkFlowController {
-
+	private static final String CURRENT_STATE = "currentState";
+	private static final String ADDITIONALRULE = "additionalRule";
+	
     @Autowired
     protected CustomizedWorkFlowService customizedWorkFlowService;
 
     @Autowired
     protected DepartmentService departmentService;
+    
+    @Autowired
+    protected WorkFlowDeptDesgMapService workFlowDeptDesgMapService;
 
     @Autowired
     HttpServletRequest serRequest;
@@ -99,7 +111,56 @@ public abstract class GenericWorkFlowController {
      */
     protected void prepareWorkflow(final Model prepareModel, final StateAware model,
             final WorkflowContainer container) {
-        prepareModel.addAttribute("approverDepartmentList", addAllDepartments());
+    	if(null != model)
+    	{
+    		System.out.println("Type  : "+model.getStateType());
+    	}
+    	prepareWorkflow(prepareModel, model, container, false);
+    }
+    
+    /**
+     * @param prepareModel
+     * @param model
+     * @param container
+     * @param isWfDeptFromMap
+     */
+    protected void prepareWorkflow(final Model prepareModel, final StateAware model,
+            final WorkflowContainer container, boolean isWfDeptFromMap) {
+
+    	if(isWfDeptFromMap) {
+    		List<Department> departments=null;
+    		String currentState = "";
+    		String additionalRule = "";
+    		String objectType= model.getStateType();
+
+    		if(prepareModel.containsAttribute(CURRENT_STATE)) {
+            	currentState = prepareModel.asMap().get(CURRENT_STATE).toString();
+            }
+    		if(prepareModel.containsAttribute(ADDITIONALRULE)) {
+    			additionalRule = prepareModel.asMap().get(ADDITIONALRULE).toString();
+            }
+    		
+    		List<WorkFlowDeptDesgMap> deptDesgMap = null;
+    		if(!StringUtils.isBlank(additionalRule)) {
+    			deptDesgMap = workFlowDeptDesgMapService.findByObjectTypeAndCurrentStateAndAddRule(objectType, currentState, additionalRule);
+    		}else {
+    			deptDesgMap = workFlowDeptDesgMapService.findByObjectTypeAndCurrentState(objectType, currentState);
+    		}
+    		if(!CollectionUtils.isEmpty(deptDesgMap)) {
+    			String deptCodes = deptDesgMap.stream().map(WorkFlowDeptDesgMap::getNextDepartment).collect(Collectors.joining(","));
+    			departments = getDepartmentsFromMs(deptCodes);
+    		}
+    		
+    		prepareModel.addAttribute("approverDepartmentList", departments);
+    	}else {
+    		prepareModel.addAttribute("approverDepartmentList", addAllDepartments());
+    	}
+    	populateActions(prepareModel, model, container);
+    }
+    
+    private void populateActions(final Model prepareModel, final StateAware model,
+            final WorkflowContainer container) {
+
         prepareModel.addAttribute("validActionList", getValidActions(model, container));
         prepareModel.addAttribute("nextAction", getNextAction(model, container));
 
@@ -124,6 +185,11 @@ public abstract class GenericWorkFlowController {
                         container.getWorkFlowDepartment(), container.getAmountRule(), container.getAdditionalRule(),
                         model.getCurrentState().getValue(), container.getPendingActions(), model.getCreatedDate(),
                         container.getCurrentDesignation());
+        if(null != wfMatrix)
+        {
+        	System.out.println("NextAction : "+wfMatrix.getNextAction());
+        }
+        
         return wfMatrix == null ? "" : wfMatrix.getNextAction();
     }
 
@@ -133,21 +199,28 @@ public abstract class GenericWorkFlowController {
      * @return List of WorkFlow Buttons From Matrix By Passing parametres Type,CurrentState,CreatedDate
      */
     public List<String> getValidActions(final StateAware model, final WorkflowContainer container) {
-        List<String> validActions;
+        List<String> validActions = null;
         if (model == null || model.getId() == null || model.getCurrentState() == null
                 || model.getCurrentState().getValue().equals("Closed")
                 || model.getCurrentState().getValue().equals("END"))
             validActions = Arrays.asList("Forward");
-        else if (model.getCurrentState() != null)
+        	 
+         if (model.getCurrentState() != null)
+        	 
+        	
             validActions = customizedWorkFlowService.getNextValidActions(model.getStateType(),
                     container.getWorkFlowDepartment(), container.getAmountRule(), container.getAdditionalRule(),
                     model.getCurrentState().getValue(), container.getPendingActions(), model.getCreatedDate(),
                     container.getCurrentDesignation());
+        
+        		
+        	
         else
             validActions = customizedWorkFlowService.getNextValidActions(model.getStateType(),
                     container.getWorkFlowDepartment(), container.getAmountRule(), container.getAdditionalRule(),
                     State.DEFAULT_STATE_VALUE_CREATED, container.getPendingActions(), model.getCreatedDate(),
                     container.getCurrentDesignation());
+        System.out.println("Valid Actions : "+validActions);
         return validActions;
     }
 
@@ -159,4 +232,12 @@ public abstract class GenericWorkFlowController {
 
     }
 
+    public List<Department> getDepartmentsFromMs(String codes) {
+
+        List<Department> departments = microserviceUtils.getDepartments(codes);
+
+        return departments;
+
+    }
+    
 }

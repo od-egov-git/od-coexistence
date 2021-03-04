@@ -103,6 +103,9 @@ import java.util.Map;
 @ParentPackage("egov")
 @Results({
         @Result(name = "new", location = "budgetReAppropriation-new.jsp"),
+        @Result(name = "newCao", location = "budgetReAppropriation-newCao.jsp"),
+        @Result(name = "newAcmc", location = "budgetReAppropriation-newAcmc.jsp"),
+        @Result(name = "newMc", location = "budgetReAppropriation-newMc.jsp"),
         @Result(name = "search", location = "budgetReAppropriation-search.jsp"),
         @Result(name = "beRe", location = "budgetReAppropriation-beRe.jsp")
 })
@@ -279,6 +282,23 @@ public class BudgetReAppropriationAction extends BaseFormAction {
     public String execute() throws Exception {
         return NEW;
     }
+    
+    @Action(value = "/budget/budgetReAppropriation-budgetCAO")
+    public String budgetCAO() {
+        
+        return NEWCAO;
+    }
+    
+    @Action(value = "/budget/budgetReAppropriation-budgetACMC")
+    public String budgetACMC() {
+        
+        return NEWACMC;
+    }
+    @Action(value = "/budget/budgetReAppropriation-budgetMC")
+    public String budgetMC() {
+        System.out.println("MC --> "+NEWMC);
+        return NEWMC;
+    }
 
     @Override
     public void prepare() {
@@ -319,7 +339,28 @@ public class BudgetReAppropriationAction extends BaseFormAction {
     @Action(value = "/budget/budgetReAppropriation-create")
     public String create() {
         save(ApplicationThreadLocals.getUserId().intValue());
+        System.out.println("XXXXX");
         return NEW;
+    }
+    
+    @Action(value = "/budget/budgetReAppropriation-createCao")
+    public String createCao() {
+    	System.out.println("Cao");
+        saveCao(ApplicationThreadLocals.getUserId().intValue());
+        System.out.println("End Cao");
+        return NEWCAO;
+    }
+    
+    @Action(value = "/budget/budgetReAppropriation-createAcmc")
+    public String createAcmc() {
+        saveAcmc(ApplicationThreadLocals.getUserId().intValue());
+        return NEWACMC;
+    }
+    
+    @Action(value = "/budget/budgetReAppropriation-createMc")
+    public String createMc() {
+        saveMc(ApplicationThreadLocals.getUserId().intValue());
+        return NEWMC;
     }
 
     @Action(value = "/budget/budgetReAppropriation-createAndForward")
@@ -358,19 +399,56 @@ public class BudgetReAppropriationAction extends BaseFormAction {
             });
             misc = budgetReAppropriationService.createBudgetReAppropriationMisc(parameters.get(ACTIONNAME)[0] + "|" + userId,
                     beRe, financialYear, appropriationMisc, null);
+            System.out.println("11");
             removeEmptyReAppropriation(budgetReAppropriationList);
             reAppropriationCreated = budgetReAppropriationService.createReAppropriation(parameters.get(ACTIONNAME)[0] + "|"
                     + userId,
                     budgetReAppropriationList, null, financialYear, beRe, misc,
                     parameters.get("appropriationMisc.reAppropriationDate")[0]);
+            System.out.println("22");
             removeEmptyReAppropriation(newBudgetReAppropriationList);
             reAppForNewBudgetCreated = budgetReAppropriationService.createReAppropriationForNewBudgetDetail(
                     parameters.get(ACTIONNAME)[0] + "|" + userId,
                     newBudgetReAppropriationList, null, misc);
+            System.out.println("33");
             if (!reAppropriationCreated && !reAppForNewBudgetCreated)
                 throw new ValidationException(Arrays.asList(new ValidationError("budgetDetail.budgetGroup.mandatory",
                         "budgetDetail.budgetGroup.mandatory")));
             newBudgetReAppropriationList.clear();
+            budgetReAppropriationList.clear();
+        } catch (final ValidationException e) {
+        	e.printStackTrace();
+            throw new ValidationException(Arrays.asList(new ValidationError(e.getErrors().get(0).getMessage(),
+                    e.getErrors().get(0).getMessage())));
+        } catch (final Exception e) {
+        	e.printStackTrace();
+            throw new ValidationException(Arrays.asList(new ValidationError(e.getMessage(),
+                    e.getMessage())));
+        }
+        if (reAppropriationCreated)
+            addActionMessage(getText("budget.reappropriation.existing.new.saved"));
+        if (reAppForNewBudgetCreated)
+            addActionMessage(getText("budget.reappropriation.new.saved") + misc.getSequenceNumber());
+        clearFields();
+        return misc;
+    }
+    
+    private BudgetReAppropriationMisc saveCao(final Integer userId) {
+        boolean reAppropriationCreated = false;
+        BudgetReAppropriationMisc misc = null;
+        if (financialYear != null && financialYear.getId() != 0)
+            financialYear = (CFinancialYear) persistenceService.find("from CFinancialYear where id=?", financialYear.getId());
+        try {
+            removeEmptyReAppropriation(budgetReAppropriationList);
+            System.out.println("CAO1");
+            reAppropriationCreated = budgetReAppropriationService.createReAppropriationCao(parameters.get(ACTIONNAME)[0] + "|"
+                    + userId,
+                    budgetReAppropriationList, null, financialYear, beRe, misc,
+                    parameters.get("appropriationMisc.reAppropriationDate")[0]);
+            System.out.println("CAO2");
+            if (!reAppropriationCreated)
+                throw new ValidationException(Arrays.asList(new ValidationError("budgetDetail.budgetGroup.mandatory",
+                        "budgetDetail.budgetGroup.mandatory")));
             budgetReAppropriationList.clear();
         } catch (final ValidationException e) {
             throw new ValidationException(Arrays.asList(new ValidationError(e.getErrors().get(0).getMessage(),
@@ -380,9 +458,67 @@ public class BudgetReAppropriationAction extends BaseFormAction {
                     e.getMessage())));
         }
         if (reAppropriationCreated)
-            addActionMessage(getText("budget.reappropriation.existing.saved") + misc.getSequenceNumber());
-        if (reAppForNewBudgetCreated)
-            addActionMessage(getText("budget.reappropriation.new.saved") + misc.getSequenceNumber());
+            addActionMessage(getText("budget.reappropriation.existing.cao.saved"));
+        
+        clearFields();
+        return misc;
+    }
+    
+    private BudgetReAppropriationMisc saveAcmc(final Integer userId) {
+        boolean reAppropriationCreated = false;
+        BudgetReAppropriationMisc misc = null;
+        if (financialYear != null && financialYear.getId() != 0)
+            financialYear = (CFinancialYear) persistenceService.find("from CFinancialYear where id=?", financialYear.getId());
+        try {
+            
+            removeEmptyReAppropriation(budgetReAppropriationList);
+            reAppropriationCreated = budgetReAppropriationService.createReAppropriationAcmc(parameters.get(ACTIONNAME)[0] + "|"
+                    + userId,
+                    budgetReAppropriationList, null, financialYear, beRe, misc,
+                    parameters.get("appropriationMisc.reAppropriationDate")[0]);
+            
+            if (!reAppropriationCreated)
+                throw new ValidationException(Arrays.asList(new ValidationError("budgetDetail.budgetGroup.mandatory",
+                        "budgetDetail.budgetGroup.mandatory")));
+            budgetReAppropriationList.clear();
+        } catch (final ValidationException e) {
+            throw new ValidationException(Arrays.asList(new ValidationError(e.getErrors().get(0).getMessage(),
+                    e.getErrors().get(0).getMessage())));
+        } catch (final Exception e) {
+            throw new ValidationException(Arrays.asList(new ValidationError(e.getMessage(),
+                    e.getMessage())));
+        }
+        if (reAppropriationCreated)
+            addActionMessage(getText("budget.reappropriation.existing.acmc.saved"));
+        clearFields();
+        return misc;
+    }
+    
+    private BudgetReAppropriationMisc saveMc(final Integer userId) {
+        boolean reAppropriationCreated = false;
+        BudgetReAppropriationMisc misc = null;
+        if (financialYear != null && financialYear.getId() != 0)
+            financialYear = (CFinancialYear) persistenceService.find("from CFinancialYear where id=?", financialYear.getId());
+        try {
+            
+            removeEmptyReAppropriation(budgetReAppropriationList);
+            reAppropriationCreated = budgetReAppropriationService.createReAppropriationMc(parameters.get(ACTIONNAME)[0] + "|"
+                    + userId,
+                    budgetReAppropriationList, null, financialYear, beRe, misc,
+                    parameters.get("appropriationMisc.reAppropriationDate")[0]);
+            if (!reAppropriationCreated)
+                throw new ValidationException(Arrays.asList(new ValidationError("budgetDetail.budgetGroup.mandatory",
+                        "budgetDetail.budgetGroup.mandatory")));
+            budgetReAppropriationList.clear();
+        } catch (final ValidationException e) {
+            throw new ValidationException(Arrays.asList(new ValidationError(e.getErrors().get(0).getMessage(),
+                    e.getErrors().get(0).getMessage())));
+        } catch (final Exception e) {
+            throw new ValidationException(Arrays.asList(new ValidationError(e.getMessage(),
+                    e.getMessage())));
+        }
+        if (reAppropriationCreated)
+            addActionMessage(getText("budget.reappropriation.existing.mc.saved"));
         clearFields();
         return misc;
     }
@@ -435,6 +571,7 @@ public class BudgetReAppropriationAction extends BaseFormAction {
     @ValidationErrorPage(value = NEW)
     @Action(value = "/budget/budgetReAppropriation-loadActuals")
     public String loadActuals() {
+    	System.out.println("Load");
         removeEmptyReAppropriation(budgetReAppropriationList);
         removeEmptyReAppropriation(newBudgetReAppropriationList);
         //Updating the ExecutingDepartment in BudgetReAppropriation
@@ -444,29 +581,106 @@ public class BudgetReAppropriationAction extends BaseFormAction {
         });
         if (budgetReAppropriationService.rowsToAddForExistingDetails(budgetReAppropriationList))
             loadData(budgetReAppropriationList);
+        System.out.println("load 1");
         if (budgetReAppropriationService.rowsToAddExists(newBudgetReAppropriationList))
             loadData(newBudgetReAppropriationList);
+        System.out.println("Processed");
         return NEW;
     }
+    
+    @ValidationErrorPage(value = NEWCAO)
+    @Action(value = "/budget/budgetReAppropriation-loadActualsCao")
+    public String loadActualsCao() {
+        //removeEmptyReAppropriation(budgetReAppropriationList);
+        //removeEmptyReAppropriation(newBudgetReAppropriationList);
+        
+        List<BudgetDetail> detailList = budgetDetailService.getBudgetDetailsForReAppCao();
+    	budgetReAppropriationList.clear();
+    	BudgetReAppropriationView vw=null;
+    	for(BudgetDetail bd:detailList)
+    	{
+    		vw=new BudgetReAppropriationView();
+    		vw.setBudgetDetail(bd);
+    		//vw.setChangeRequestType("Addition");
+    		budgetReAppropriationList.add(vw);
+    	}
+            loadData(budgetReAppropriationList);
+        
+        return NEWCAO;
+    }
+    
+    @ValidationErrorPage(value = NEWACMC)
+    @Action(value = "/budget/budgetReAppropriation-loadActualsAcmc")
+    public String loadActualsAcmc() {
+        //removeEmptyReAppropriation(budgetReAppropriationList);
+        //removeEmptyReAppropriation(newBudgetReAppropriationList);
+        
+        //if (budgetReAppropriationService.rowsToAddForExistingDetails(budgetReAppropriationList))
+        List<BudgetDetail> detailList = budgetDetailService.getBudgetDetailsForReAppAcmc();
+    	budgetReAppropriationList.clear();
+    	BudgetReAppropriationView vw=null;
+    	for(BudgetDetail bd:detailList)
+    	{
+    		vw=new BudgetReAppropriationView();
+    		vw.setBudgetDetail(bd);
+    		//vw.setChangeRequestType("Addition");
+    		budgetReAppropriationList.add(vw);
+    	}
+    	//Updating the ExecutingDepartment in BudgetReAppropriation
+            loadData(budgetReAppropriationList);
+        return NEWACMC;
+    }
+    @ValidationErrorPage(value = NEWMC)
+    @Action(value = "/budget/budgetReAppropriation-loadActualsMc")
+    public String loadActualsMc() {
+        //removeEmptyReAppropriation(budgetReAppropriationList);
+        //removeEmptyReAppropriation(newBudgetReAppropriationList);
+        
+        //if (budgetReAppropriationService.rowsToAddForExistingDetails(budgetReAppropriationList))
+        List<BudgetDetail> detailList = budgetDetailService.getBudgetDetailsForReAppMc();
+    	budgetReAppropriationList.clear();
+    	BudgetReAppropriationView vw=null;
+    	for(BudgetDetail bd:detailList)
+    	{
+    		vw=new BudgetReAppropriationView();
+    		vw.setBudgetDetail(bd);
+    		//vw.setChangeRequestType("Addition");
+    		budgetReAppropriationList.add(vw);
+    	}
+            loadData(budgetReAppropriationList);
+        return NEWMC;
+    }
+    
 
     private void loadData(final List<BudgetReAppropriationView> reAppList) {
+    	System.out.println("Inside load");
         budgetReAppropriationService.validateMandatoryFields(reAppList);
         for (final BudgetReAppropriationView entry : reAppList) {
             entry.setBudgetDetail(budgetReAppropriationService.setRelatedValues(entry.getBudgetDetail()));
             final List<BudgetDetail> detailList = budgetDetailService.searchByCriteriaWithTypeAndFY(financialYear.getId(), beRe,
                     entry.getBudgetDetail());
+            System.out.println("detailSize ::"+financialYear.getId()+":::"+beRe);
+            System.out.println("detailSize ::"+detailList.size());
             if (detailList.size() == 1) {
+            	System.out.println("1");
                 final BudgetDetail budgetDetail = detailList.get(0);
+                System.out.println("2");
                 final Map<String, Object> paramMap = budgetDetailHelper.constructParamMap(getValueStack(), budgetDetail);
+                System.out.println("3");
                 paramMap.put(Constants.ASONDATE, appropriationMisc.getReAppropriationDate());
                 budgetDetail.getBudgetReAppropriations().stream().forEach(app -> {
                     LOGGER.info("app.getStatus()  :: "+app.getStatus());
                 });
+                System.out.println("4");
                 BigDecimal totalActualsFor = budgetDetailHelper.getTotalActualsFor(paramMap, appropriationMisc.getReAppropriationDate());
+                System.out.println("5 : "+totalActualsFor);
                 entry.setActuals(totalActualsFor);
+                System.out.println("6 : ");
                 entry.setApprovedAmount(budgetDetail.getApprovedAmount());
+                System.out.println("7 : "+budgetDetail.getPlanningPercent());
                 // this is total of reappropriated amount
-                entry.setAppropriatedAmount(budgetDetail.getApprovedReAppropriationsTotal());
+                entry.setAppropriatedAmount(budgetDetail.getApprovedReAppropriationsTotalReapp());
+                System.out.println("8");
                 entry.setAvailableAmount(entry.getApprovedAmount().add(entry.getAppropriatedAmount())
                         .subtract(entry.getActuals()));
                 if (budgetDetail.getPlanningPercent() == null)
@@ -474,6 +688,12 @@ public class BudgetReAppropriationAction extends BaseFormAction {
                     entry.setPlanningPercent(BigDecimal.ZERO);
                 else
                     entry.setPlanningPercent(budgetDetail.getPlanningPercent());
+                System.out.println("quarter :"+budgetDetail.getQuarterpercent());
+                if (budgetDetail.getQuarterpercent() == null)
+                    // TODO change the planningPercentage to planningPercent
+                    entry.setQuarterPercent(BigDecimal.ZERO);
+                else
+                    entry.setQuarterPercent(budgetDetail.getQuarterpercent());
 
                 if (budgetDetail.getPlanningPercent() == BigDecimal.ZERO)
                     entry.setPlanningBudgetApproved(entry.getApprovedAmount().add(entry.getAppropriatedAmount()));

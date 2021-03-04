@@ -58,7 +58,7 @@
 <meta http-equiv=Content-Type content="text/html; charset=x-user-defined">
 
 
-	<TITLE>eGov Financials</TITLE>	
+	<TITLE>MCC Financials</TITLE>	
 	<LINK rel="stylesheet" type="text/css" href="<c:url value="/commoncss/egov.css" />
 	
 	

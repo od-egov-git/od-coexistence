@@ -66,7 +66,7 @@ public class ChequeDishonouredReportController {
     public List<DishonoredChequeBean> getDishonouredChequeSearch(@ModelAttribute final DishonoredChequeBean dishonoredChequeBean)
             throws ParseException {
         List<DishonoredChequeBean> resultList = new ArrayList<>();
-        resultList = dishonorChequeService.getDishonouredChequeReport(dishonoredChequeBean);
+        resultList = null/*dishonorChequeService.getDishonouredChequeReport(dishonoredChequeBean)*/;
         return resultList;
 
     }

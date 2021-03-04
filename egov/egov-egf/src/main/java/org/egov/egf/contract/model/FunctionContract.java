@@ -117,9 +117,5 @@ public class FunctionContract {
 		this.code=code2;
 		return this;
 	}
-	public FunctionContract id(Long id) {
-            this.id=id;
-            return this;
-    }
 
 }

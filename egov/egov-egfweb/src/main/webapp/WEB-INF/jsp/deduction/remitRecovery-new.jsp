@@ -90,7 +90,7 @@
 					<td class="greybox"><s:text name="remit.recovery.search.code" /><span
 						class="mandatory"></span></td>
 					<td class="greybox">
-						<s:select name="remittanceBean.recoveryId" id="recoveryId" list="dropdownData.recoveryList" listKey="id" listValue="chartofaccounts.glcode+'-'+type+'-'+recoveryName" headerKey="-1" headerValue="%{getText('lbl.choose.options')}" value="%{remittanceBean.recoveryId}" />
+						<s:select name="remittanceBean.recoveryId" id="recoveryId" list="dropdownData.recoveryList" listKey="id" listValue="chartofaccounts.glcode+'-'+recoveryName" headerKey="-1" headerValue="%{getText('lbl.choose.options')}" value="%{remittanceBean.recoveryId}" />
 					</td>
 					<td class="greybox" width="10%">
 					<td class="greybox">
@@ -167,7 +167,7 @@
 						<td><s:textfield name="remittanceBean.totalAmount" id="totalAmount" style="width:90px;text-align:right" readonly="true" value="0" /></td>
 					</tr>
 					<tr>
-						<td colspan="2" class="modeofpayment"><strong><s:text name="payment.mode"/><span class="mandatory1">*</span></strong><s:radio name="modeOfPayment" list="modeOfCollectionMap" value="defaultPaymentMode"/></td>
+						<td colspan="3" class="modeofpayment"><strong><s:text name="payment.mode"/><span class="mandatory1">*</span></strong><s:radio name="modeOfPayment" list="modeOfCollectionMap" value="defaultPaymentMode"/></td>
 					</tr>
 				</table>
 				<div id ="remitTotal" />

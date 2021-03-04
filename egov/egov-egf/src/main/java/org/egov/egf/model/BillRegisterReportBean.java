@@ -51,7 +51,12 @@
 package org.egov.egf.model;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
+import org.egov.infra.microservice.models.BillDetail;
+import org.egov.infra.microservice.models.ChartOfAccounts;
 
 /**
  * @author manoranjan
@@ -73,6 +78,26 @@ public class BillRegisterReportBean {
     private String remittanceVoucherNumber;
     private String remittanceChequeNumberAndDate;
     private Date ChequeDate;
+    private Long vhId;
+    private Long phId;
+    private Long deducVhId;
+    private String deducVoucherNumber;
+    private String pexNo;
+    private String deducPexNo;
+    private String departmentCode;
+    private String pexNodate;
+    private List<ChartOfAccounts> chartOfAccounts;
+    private List<BillDetail> billDetailList=new ArrayList<BillDetail>();
+    private String budgetHead;
+    private BigDecimal taxAmount;
+    private BigDecimal igstAmount;
+    private BigDecimal cgstAmount;
+    private BigDecimal labourcessAmount;
+    private BigDecimal collectionchargesAmount;
+    private BigDecimal waterChargesAmount;
+    private BigDecimal qualityAmount;
+    private BigDecimal penaltyAmount;
+    private BigDecimal securitAmount;
 
     public String getBillNumber() {
         return billNumber;
@@ -187,4 +212,165 @@ public class BillRegisterReportBean {
         this.remittanceChequeNumberAndDate = remittanceChequeNumberAndDate;
     }
 
+	public Long getVhId() {
+		return vhId;
+	}
+
+	public void setVhId(Long vhId) {
+		this.vhId = vhId;
+	}
+
+	public Long getPhId() {
+		return phId;
+	}
+
+	public void setPhId(Long phId) {
+		this.phId = phId;
+	}
+
+	public Long getDeducVhId() {
+		return deducVhId;
+	}
+
+	public void setDeducVhId(Long deducVhId) {
+		this.deducVhId = deducVhId;
+	}
+
+	public String getDeducVoucherNumber() {
+		return deducVoucherNumber;
+	}
+
+	public void setDeducVoucherNumber(String deducVoucherNumber) {
+		this.deducVoucherNumber = deducVoucherNumber;
+	}
+
+	public String getPexNo() {
+		return pexNo;
+	}
+
+	public void setPexNo(String pexNo) {
+		this.pexNo = pexNo;
+	}
+
+	public String getDeducPexNo() {
+		return deducPexNo;
+	}
+
+	public void setDeducPexNo(String deducPexNo) {
+		this.deducPexNo = deducPexNo;
+	}
+
+	public String getDepartmentCode() {
+		return departmentCode;
+	}
+
+	public void setDepartmentCode(String departmentCode) {
+		this.departmentCode = departmentCode;
+	}
+
+	public String getPexNodate() {
+		return pexNodate;
+	}
+
+	public void setPexNodate(String pexNodate) {
+		this.pexNodate = pexNodate;
+	}
+
+	public List<ChartOfAccounts> getChartOfAccounts() {
+		return chartOfAccounts;
+	}
+
+	public void setChartOfAccounts(List<ChartOfAccounts> chartOfAccounts) {
+		this.chartOfAccounts = chartOfAccounts;
+	}
+
+	public List<BillDetail> getBillDetailList() {
+		return billDetailList;
+	}
+
+	public void setBillDetailList(List<BillDetail> billDetailList) {
+		this.billDetailList = billDetailList;
+	}
+
+	public String getBudgetHead() {
+		return budgetHead;
+	}
+
+	public void setBudgetHead(String budgetHead) {
+		this.budgetHead = budgetHead;
+	}
+
+	public BigDecimal getTaxAmount() {
+		return taxAmount;
+	}
+
+	public void setTaxAmount(BigDecimal taxAmount) {
+		this.taxAmount = taxAmount;
+	}
+
+	public BigDecimal getIgstAmount() {
+		return igstAmount;
+	}
+
+	public void setIgstAmount(BigDecimal igstAmount) {
+		this.igstAmount = igstAmount;
+	}
+
+	public BigDecimal getCgstAmount() {
+		return cgstAmount;
+	}
+
+	public void setCgstAmount(BigDecimal cgstAmount) {
+		this.cgstAmount = cgstAmount;
+	}
+
+	public BigDecimal getLabourcessAmount() {
+		return labourcessAmount;
+	}
+
+	public void setLabourcessAmount(BigDecimal labourcessAmount) {
+		this.labourcessAmount = labourcessAmount;
+	}
+
+	public BigDecimal getCollectionchargesAmount() {
+		return collectionchargesAmount;
+	}
+
+	public void setCollectionchargesAmount(BigDecimal collectionchargesAmount) {
+		this.collectionchargesAmount = collectionchargesAmount;
+	}
+
+	public BigDecimal getWaterChargesAmount() {
+		return waterChargesAmount;
+	}
+
+	public void setWaterChargesAmount(BigDecimal waterChargesAmount) {
+		this.waterChargesAmount = waterChargesAmount;
+	}
+
+	public BigDecimal getQualityAmount() {
+		return qualityAmount;
+	}
+
+	public void setQualityAmount(BigDecimal qualityAmount) {
+		this.qualityAmount = qualityAmount;
+	}
+
+	public BigDecimal getPenaltyAmount() {
+		return penaltyAmount;
+	}
+
+	public void setPenaltyAmount(BigDecimal penaltyAmount) {
+		this.penaltyAmount = penaltyAmount;
+	}
+
+	public BigDecimal getSecuritAmount() {
+		return securitAmount;
+	}
+
+	public void setSecuritAmount(BigDecimal securitAmount) {
+		this.securitAmount = securitAmount;
+	}
+
+	
 }

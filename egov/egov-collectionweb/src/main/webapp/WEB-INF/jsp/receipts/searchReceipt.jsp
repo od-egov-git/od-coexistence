@@ -52,6 +52,56 @@
 <link rel="stylesheet" type="text/css" href="<egov:url path='/yui/assets/skins/sam/autocomplete.css'/>" />
 <head>
 	<title><s:text name="searchreceipts.title"/></title>
+<style type="text/css">
+	
+.modal {
+  display: none; 
+  position: fixed;
+  z-index: 9999; 
+  left: 0;
+  top: 0;
+  width: 100%; 
+  height: 100%;
+  overflow: auto;
+  background-color: rgb(0,0,0); 
+  background-color: rgba(0,0,0,0.4);
+}
+
+
+.modal-content {
+	 /*    opacity: 0.7;
+	    margin-right: 350px;
+  background-color: #d8d7e4; */
+  margin: 15% auto; /* 15% from the top and centered */
+/*   padding: 45px;
+  border: 1px solid #888;*/
+  width: 80%;  /* Could be more or less, depending on screen size */
+}
+
+
+.close {
+ /*  color: #aaa; */
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+.modal-header {
+    padding: 9px;
+}
+
+.modal in{
+	padding-left: 8px;
+    display: none;
+}
+
+</style>	
 <script  >
 
 jQuery.noConflict();
@@ -65,6 +115,20 @@ jQuery(document).ready(function() {
 
 jQuery(window).load(function () {
 	undoLoadingMask();
+});
+/* Modal Hide */
+jQuery("#myModal").modal({backdrop: false});
+jQuery('#myModal').modal('hide');  
+
+jQuery(".showModal").click(function(){
+	
+	  jQuery("#myModal").modal('show');
+	});
+jQuery(document).ready(function($) {
+	jQuery("#myModal").modal({
+		backdrop : false
+	});
+	jQuery('#myModal').modal('hide');  
 });
 
 function isChecked(chk) {
@@ -91,7 +155,7 @@ function checkselectedreceiptcount(obj)
 		if (cnt[i].checked == true )
 		{
 			j++; 
-			if(obj=='cancel' && receiptstatus[i].value=="Cancelled")
+			if(obj=='cancel' && receiptstatus[i].value=="CANCELLED")
 			{
 				dom.get("selectedcancelledreceiptserror").style.display="block";
 				return -1;
@@ -256,13 +320,13 @@ function validate()
 		return false;
 	} */
 
-	if(serviceType==-1){
+	/* if(serviceType==-1){
 		valSuccess=false;
 		dom.get("error_area").style.display="block";
 		dom.get("error_area").innerHTML = '<s:text name="service.servictype.null" />' + '<br>';
 		window.scroll(0,0);
 		return false;
-	}
+	} */
 	
 	if(fromdate!="" && todate!="" && fromdate!=todate)
 	{
@@ -301,8 +365,9 @@ var manualReceiptNumberSearchSelectionHandler = function(sType, arguments) {
 var manualReceiptNumberSelectionEnforceHandler = function(sType, arguments) {
 		warn('impropermanualReceiptNumberSelectionWarning');
 } */
-function checkviewforselectedrecord()
-{
+
+function checkCheckboxValidator(){
+	console.log("In Cancel button");
 	dom.get("norecordselectederror").style.display="none";
 	dom.get("selectprinterror").style.display="none";
 	dom.get("selectcancelerror").style.display="none";
@@ -316,6 +381,52 @@ function checkviewforselectedrecord()
 			j++; 
 		}
 	}
+	//no records have been selected for view
+	if(j==0)
+	{
+		dom.get("norecordselectederror").style.display="block";
+		window.scroll(0,0);
+		return false;
+	}
+	else if(j>1)
+	{
+		dom.get("nocancelselectederror").style.display="block";
+		window.scroll(0,0);
+		return false;
+	}
+	// multiple records have been chosen . Viewing is allowed
+	else
+	{	
+		console.log("inside else block>>>"+j);		
+		doLoadingMask('#loadingMask');
+		document.searchReceiptForm.action="receipt-viewReceiptsChangeStatus.action";
+		document.searchReceiptForm.submit();
+	}	
+
+	
+}
+function checkviewforselectedrecord()
+{
+	dom.get("norecordselectederror").style.display="none";
+	dom.get("selectprinterror").style.display="none";
+	dom.get("selectcancelerror").style.display="none";
+	var cnt=document.getElementsByName('selectedReceipts');
+	var receiptstatus=document.getElementsByName('receiptstatus');
+	var j=0;
+	for (i = 0; i < cnt.length; i++)
+	{
+		if (cnt[i].checked == true )
+		{
+			j++; 
+			//added for check Status CANCELLED
+			if(receiptstatus[i].value=="CANCELLED")
+			{
+				dom.get("selectedcancelledreceiptserror").style.display="block";
+				j--;
+		}
+		}
+	}
+		
 	//no records have been selected for view
 	if(j==0)
 	{
@@ -339,6 +450,39 @@ function onChangeServiceClass(obj)
     	populateserviceType({serviceClass:obj.value});
     }
 }
+
+function ConfirmDialog(message) {
+	  $('<div></div>').appendTo('body')
+	    .html('<div><h6>' + message + '?</h6></div>')
+	    .dialog({
+	      modal: true,
+	      title: 'Delete message',
+	      zIndex: 10000,
+	      autoOpen: true,
+	      width: 'auto',
+	      resizable: false,
+	      buttons: {
+	        Yes: function() {
+	          // $(obj).removeAttr('onclick');                                
+	          // $(obj).parents('.Parent').remove();
+
+	          $('body').append('<h1>Confirm Dialog Result: <i>Yes</i></h1>');
+
+	          $(this).dialog("close");
+	        },
+	        No: function() {
+	          $('body').append('<h1>Confirm Dialog Result: <i>No</i></h1>');
+
+	          $(this).dialog("close");
+	        }
+	      },
+	      close: function(event, ui) {
+	        $(this).remove();
+	      }
+	    });
+	};
+
+
 </script> 
 </head>
 <body>
@@ -378,6 +522,11 @@ function onChangeServiceClass(obj)
      <font size="2" color="red"><b><s:text name="error.norecordselected"/></b></font>
   </li>
 </span>
+<span align="center" style="display: none" id="nocancelselectederror">
+  <li>
+     <font size="2" color="red"><b><s:text name="error.nocancelselected"/></b></font>
+  </li>
+</span>
 <span align="center" style="display: none" id="selectedcancelledreceiptserror">
   <li>
      <font size="2" color="red"><b><s:text name="error.selectedcancelledreceiptserror"/></b></font>
@@ -414,7 +563,7 @@ function onChangeServiceClass(obj)
 			</td>
 			<%--  <egov:ajaxdropdown id="serviceTypeDropdown" fields="['Text','Value']" dropdownId='serviceType'
                 url='receipts/ajaxReceiptCreate-ajaxLoadServiceByClassification.action' /> --%>
-	      <td width="21%" class="bluebox"><s:text name="searchreceipts.criteria.servicetype"/> <span class="mandatory"></td>
+	      <td width="21%" class="bluebox"><s:text name="searchreceipts.criteria.servicetype"/> </td>
 	      <td width="24%" class="bluebox"><s:select headerKey="-1"  headerValue="%{getText('searchreceipts.servicetype.select')}"  name="serviceTypeId" id="serviceType" cssClass="selectwk" list="dropdownData.serviceTypeList" listKey="code" listValue="businessService" value="%{serviceTypeId}" /> </td>
 	      
 	      <%-- <td width="21%" class="bluebox"><s:text name="searchreceipts.criteria.counter"/></td>
@@ -511,16 +660,18 @@ function onChangeServiceClass(obj)
 <input type="hidden" name="receiptstatus" id="receiptstatus" value="${currentRow.curretnStatus}" />
 <input type="hidden" name="receipttype" id="receipttype" value="${currentreceipttype}" />
 </display:column>
-<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Receipt No." style="width:8%;text-align:right" property="receiptnumber"/>
-<display:column headerClass="bluebgheadtd" class="blueborderfortd" property="receiptdate" title="Receipt Date" format="{0,date,dd/MM/yyyy}" style="width:8%;text-align: center" />
-<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="G8 Receipt number/Date" style="width:8%;text-align:right" property="g8data"/>
+<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Receipt No." style="width:10%;text-align:right" property="receiptnumber"/>
+<display:column headerClass="bluebgheadtd" class="blueborderfortd" property="receiptdate" title="Receipt Date" format="{0,date,dd/MM/yyyy}" style="width:10%;text-align: center" />
+<%-- <display:column headerClass="bluebgheadtd" class="blueborderfortd" title="G8 Receipt number/Date" style="width:8%;text-align:right" property="g8data"/>--%>
 <%-- <display:column headerClass="bluebgheadtd" class="blueborderfortd" property="manualreceiptdate" title="G8 Receipt Date" format="{0,date,dd/MM/yyyy}" style="width:8%;text-align: center" /> --%>
-<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Service" style="width:12%;text-align:left" property="service" />
+<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Service" style="width:35%;text-align:left" property="service" />
 <%-- <display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Bill Number" style="width:8%;text-align:right" property="referencenumber" /> --%>
-<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Bill Description" style="width:27%;text-align:left" property="referenceDesc" />
-<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Paid By" style="width:27%;text-align:left" property="paidBy" />
-<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Amount (Rs.)" property="totalAmount" style="width:8%; text-align: right" format="{0, number, #,##0.00}" />
-<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Mode of Payment" style="width:8%"  property="modOfPayment"/>
+<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Particulars" style="width:27%;text-align:left" property="referenceDesc" />
+<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Payee name & address" style="width:15%;text-align:left" property="paidBy" />
+<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Sub Divison" style="width:27%;text-align:left" property="subdivison" />
+<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="GST No." style="width:27%;text-align:left" property="gstno" />
+<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Amount (Rs.)" property="totalAmount" style="width:10%; text-align: right" format="{0, number, #,##0.00}" />
+<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Mode of Payment" style="width:10%"  property="modOfPayment"/>
 <%-- <div align="center">
 <s:set var="instrtype" value="" />
 <s:iterator status="stat1" value="#attr.currentRow.receiptInstrument">
@@ -545,9 +696,31 @@ function onChangeServiceClass(obj)
   <input name="button32" type="button" class="buttonsubmit" id="button32" value="Cancel Receipt" onclick="return checkcancelforselectedrecord()"/>
   </egov-authz:authorize> --%>
   <input name="button32" type="button" class="button" id="button32" value="<s:text name='lbl.close'/>" onclick="window.parent.postMessage('close','*');window.close();"/>
+  <input name="buttonCancel" type="button" class="buttonsubmit showModal" id="buttonCancel" value="Cancel" data-toggle='modal' data-target='#myModal'/>
+  
+  
 </div>
 </s:if>
 </s:form>
+ <!-- Modal --> 
+	<div class="modal fade" id="myModal" role="dialog" style="display: none;">
+		<div class="modal-dialog" role="dailog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title"><b>Cancel Confirmation</b></h4>
+				</div>
+				<div class="modal-body">
+				<p>Do You Really Want To Change Status?</p>
+					<!-- <font style="align: center;">Are You Sure To Delete Record?</font> -->
+					</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-danger" onclick="return checkCheckboxValidator()" data-dismiss="modal" style="width: 100px;">Yes</button>
+					<button type="button" class="btn btn-primary" data-dismiss="modal" style="width: 100px;">No</button>
+				</div>
+			</div>
+		</div>
+	</div>
 </body>
 
 	

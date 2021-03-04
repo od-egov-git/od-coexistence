@@ -141,8 +141,7 @@ public class RemittanceSchedulerService {
             final Bankaccount bankaccount, final Instrument instrumentHeader, final CVoucherHeader voucherHeader) {
 
         List<Instrument> instruments = microserviceUtils.getInstruments(instrumentHeader.getId().toString());
-        instrumentDepositMap.put("instruments", instruments);
-        instrumentDepositMap.put("bankId", bankaccount.getBankbranch().getBank().getId());
+
         instrumentDepositMap.put("instrumentheader", instrumentHeader.getId());
         instrumentDepositMap.put("bankaccountid", bankaccount.getId());
         instrumentDepositMap.put("bankaccountNumber", bankaccount.getAccountnumber());

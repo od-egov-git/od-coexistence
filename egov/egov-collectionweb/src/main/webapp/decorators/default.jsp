@@ -100,7 +100,7 @@
 		</c:if>
         <%@ include file="/includes/meta.jsp" %>
 
-        <title>eGov  - <decorator:title/> </title>
+        <title>MCC  - <decorator:title/> </title>
 
    
     <link rel="icon" href="<cdn:url value='/resources/global/images/favicon.png' context='/services/egi'/>" sizes="32x32">
@@ -154,7 +154,7 @@
 		    
 		    <!-- footer -->
 		    <footer class="main">
-			    Powered by <a href="http://egovernments.org/" target="_blank">eGovernments Foundation</a>
+			    
 			</footer>
 	</div>
 	

@@ -50,7 +50,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>eGov - Access Denied</title>
+<title>MCC - Access Denied</title>
 <style>
 .hiddenError {
 	display: none;

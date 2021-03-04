@@ -127,7 +127,9 @@ public class ContraBTBAction extends BaseVoucherAction {
 	private SimpleDateFormat sqlformat = new SimpleDateFormat("dd-MMM-yyyy");
 	private static final String EXCEPTION_WHILE_SAVING_DATA = "Exception while saving Data";
 	private static final String MDC_CHEQUE = "cheque";
+	
 	private static final String MDC_OTHER = "RTGS/NEFT";
+	private static final String MDC_PEX ="pex";
 	private static final String REVERSE = "reverse";
 	private static final long serialVersionUID = 1L;
 	private static final String TRANSACTION_FAILED = "Transaction failed";
@@ -195,11 +197,14 @@ public class ContraBTBAction extends BaseVoucherAction {
 	@Autowired
 	private EgovCommon egovCommon;
 
+	private String firstsignatory="-1";
+    private String secondsignatory="-1";
 	@Override
 	public void prepare() {
 		super.prepare();
 		ModeOfCollectionMap = new LinkedHashMap<String, String>();
 		// ModeOfCollectionMap.put(MDC_CHEQUE, MDC_CHEQUE);
+		ModeOfCollectionMap.put(MDC_PEX,MDC_PEX);
 		ModeOfCollectionMap.put(MDC_OTHER, MDC_OTHER);
 		ModeOfCollectionMap.put(MDC_CHEQUE, MDC_CHEQUE);
 		final List<CChartOfAccounts> glCodeList = persistenceService.findAllBy(
@@ -253,12 +258,24 @@ public class ContraBTBAction extends BaseVoucherAction {
 	@ValidationErrorPage(value = NEW)
 	@Action(value = "/contra/contraBTB-create")
 	public String create() throws ValidationException {
+		String fSignatory = firstsignatory;
+		String sSignatory = secondsignatory;
+		
+		
+			if(fSignatory!=null) {
+				voucherHeader.setFirstsignatory(fSignatory);
+			}
+			if(sSignatory!=null) {
+				voucherHeader.setSecondsignatory(sSignatory);
+			}
+		
+		
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("Starting Bank to Bank Transfer ...");
 		try {
 			getHibObjectsFromContraBean();
 			if (egovCommon.isShowChequeNumber())
-				if (contraBean.getModeOfCollection().equals(MDC_CHEQUE))
+				if (contraBean.getModeOfCollection().equalsIgnoreCase(MDC_CHEQUE))
 					validateChqNumber(contraBean.getChequeNumber(), contraVoucher.getFromBankAccountId().getId(),
 							voucherHeader);
 			voucherHeader = contraBTBActionHelper.create(contraBean, contraVoucher, voucherHeader);
@@ -363,7 +380,7 @@ public class ContraBTBAction extends BaseVoucherAction {
 			if (instrumentVoucher2 != null)
 				instrumentService.cancelInstrument(instrumentVoucher2.getInstrumentHeaderId());
 			persistenceService.getSession().flush();
-			if (contraBean.getModeOfCollection().equals(MDC_CHEQUE))
+			if (contraBean.getModeOfCollection().equalsIgnoreCase(MDC_CHEQUE))
 				if (!egovCommon.isShowChequeNumber())
 					try {
 						contraBean.setChequeNumber(chequeService.nextChequeNumber(contraBean.getFromBankAccountId(), 1,voucherHeader.getVouchermis().getDepartmentcode()));
@@ -736,12 +753,15 @@ public class ContraBTBAction extends BaseVoucherAction {
 					|| voucherHeader.getVouchermis().getFunction().getId() == null) {
 				addFieldError("voucherHeader.vouchermis.departmentid", getText("fromFunction.required"));
 			}
+			if(!contraBean.getModeOfCollection().equals(MDC_PEX))
+			{
 			if (egovCommon.isShowChequeNumber() || contraBean.getModeOfCollection().equals(MDC_OTHER)) {
 				if (contraBean.getChequeNumber() == null || contraBean.getChequeNumber().isEmpty())
 					addFieldError("contraBean.chequeNumber", getText("ChequeNumber.required"));
 
 				if (contraBean.getChequeDate() == null || contraBean.getChequeDate().isEmpty())
 					addFieldError("contraBean.chequeDate", getText("fromChequeDate.required"));
+				}
 			}
 			if (checkIfInterFund()) {
 				if (contraBean.getDestinationGlcode() == null || contraBean.getDestinationGlcode().equals("-1"))
@@ -1616,5 +1636,20 @@ public class ContraBTBAction extends BaseVoucherAction {
 
 	public void setChartOfAccounts(ChartOfAccounts chartOfAccounts) {
 		this.chartOfAccounts = chartOfAccounts;
+	}
+	public String getFirstsignatory() {
+		return firstsignatory;
+	}
+
+	public void setFirstsignatory(String firstsignatory) {
+		this.firstsignatory = firstsignatory;
+	}
+
+	public String getSecondsignatory() {
+		return secondsignatory;
+	}
+
+	public void setSecondsignatory(String secondsignatory) {
+		this.secondsignatory = secondsignatory;
 	}
 }

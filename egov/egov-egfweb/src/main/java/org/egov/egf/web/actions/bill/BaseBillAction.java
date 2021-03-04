@@ -60,6 +60,7 @@ import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.exception.ApplicationRuntimeException;
+import org.egov.infra.filestore.entity.FileStoreMapper;
 import org.egov.infra.script.service.ScriptService;
 import org.egov.infra.validation.exception.ValidationError;
 import org.egov.infra.validation.exception.ValidationException;
@@ -78,6 +79,7 @@ import org.egov.utils.FinancialConstants;
 import org.egov.utils.VoucherHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -103,6 +105,10 @@ public class BaseBillAction extends BaseVoucherAction {
     protected List<VoucherDetails> billDetailsTableNetFinal;
     protected List<VoucherDetails> billDetailsTableCreditFinal;
     protected List<CheckListHelper> checkListsTable;
+    protected List<File> supportingDocuments;
+    protected List<String> supportingDocumentsContentType;
+    protected List<String> supportingDocumentsFileName;
+    protected List<FileStoreMapper> originalFiles ;
     protected SimpleWorkflowService<EgBillregister> billRegisterWorkflowService;
     protected EgBillRegisterService egBillRegisterService;
     protected EgovCommon egovCommon;
@@ -445,5 +451,37 @@ public class BaseBillAction extends BaseVoucherAction {
     public void setFinancialYearDAO(final FinancialYearDAO financialYearDAO) {
         this.financialYearDAO = financialYearDAO;
     }
+
+	public List<File> getSupportingDocuments() {
+		return supportingDocuments;
+	}
+
+	public void setSupportingDocuments(List<File> supportingDocuments) {
+		this.supportingDocuments = supportingDocuments;
+	}
+
+	public List<String> getSupportingDocumentsContentType() {
+		return supportingDocumentsContentType;
+	}
+
+	public void setSupportingDocumentsContentType(List<String> supportingDocumentsContentType) {
+		this.supportingDocumentsContentType = supportingDocumentsContentType;
+	}
+
+	public List<String> getSupportingDocumentsFileName() {
+		return supportingDocumentsFileName;
+	}
+
+	public void setSupportingDocumentsFileName(List<String> supportingDocumentsFileName) {
+		this.supportingDocumentsFileName = supportingDocumentsFileName;
+	}
+
+	public List<FileStoreMapper> getOriginalFiles() {
+		return originalFiles;
+	}
+
+	public void setOriginalFiles(List<FileStoreMapper> originalFiles) {
+		this.originalFiles = originalFiles;
+	}
 
 }

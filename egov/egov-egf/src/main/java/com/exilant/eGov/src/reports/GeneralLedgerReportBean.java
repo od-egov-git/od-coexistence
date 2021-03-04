@@ -110,6 +110,7 @@ public class GeneralLedgerReportBean
     public String functionCodeId;
     public String functionCode;
     public String heading;
+    private String schemeId;
 
     public GeneralLedgerReportBean(final String str)
     {
@@ -130,6 +131,7 @@ public class GeneralLedgerReportBean
         mode = "";
         accEntityKey = "";
         accEntityId = "";
+        schemeId = "";
 
         rcptVchrDate = str;
         rcptVchrNo = str;
@@ -179,7 +181,8 @@ public class GeneralLedgerReportBean
         ulbName = "";
         accEntityKey = "";
         accEntityId = "";
-
+        schemeId = "";
+        
         rcptVchrDate = "&nbsp;";
         rcptVchrNo = "&nbsp;";
         rcptAccCode = "&nbsp;";
@@ -768,5 +771,13 @@ public class GeneralLedgerReportBean
     public void setSubledger(final Integer subledger) {
         this.subledger = subledger;
     }
+
+	public String getSchemeId() {
+		return schemeId;
+	}
+
+	public void setSchemeId(String schemeId) {
+		this.schemeId = schemeId;
+	}
 
 }

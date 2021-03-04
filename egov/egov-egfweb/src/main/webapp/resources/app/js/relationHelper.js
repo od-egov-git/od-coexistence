@@ -77,7 +77,7 @@ function callAjaxSearch() {
 							'click',
 							function() {
 								console.log(data.id);
-								window.open('/EGF/relation/' + $('#mode').val()
+								window.open('/services/EGF/relation/' + $('#mode').val()
 										+ '/' + data.id, '',
 										'width=800, height=600');
 							});

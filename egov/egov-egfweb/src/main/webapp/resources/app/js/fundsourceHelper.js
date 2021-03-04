@@ -74,7 +74,7 @@ function callAjaxSearch() {
 				"fnRowCallback": function (row, data, index) {
 						$(row).on('click', function() {
 				console.log(data.id);
-				window.open('/EGF/fundsource/'+ $('#mode').val() +'/'+data.id,'','width=800, height=600');
+				window.open('/services/EGF/fundsource/'+ $('#mode').val() +'/'+data.id,'','width=800, height=600');
 			});
 				 },
 				"bDestroy" : true,

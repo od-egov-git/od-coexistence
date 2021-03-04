@@ -163,6 +163,12 @@ public class BaseVoucherAction extends GenericWorkFlowAction {
 		return NEW;
 
 	}
+	
+	@SkipValidation
+	public String assignNumber() {
+		return SUMMARYFORM;
+
+	}
 
 	@Override
 	public void prepare() {
@@ -298,6 +304,12 @@ public class BaseVoucherAction extends GenericWorkFlowAction {
 					voucherHeader.getVouchermis().getFunctionary().getCode());
 		if (voucherHeader.getVouchermis().getFunction() != null)
 			headerdetails.put(VoucherConstant.FUNCTIONCODE, voucherHeader.getVouchermis().getFunction().getCode());
+		//modified added by Prasanta
+		if (voucherHeader.getFirstsignatory() != null)
+            headerdetails.put("firstsignatory", voucherHeader.getFirstsignatory());
+        if (voucherHeader.getSecondsignatory() != null)
+            headerdetails.put("secondsignatory", voucherHeader.getSecondsignatory());
+        
 		return headerdetails;
 	}
 
@@ -644,19 +656,16 @@ public class BaseVoucherAction extends GenericWorkFlowAction {
 			final List<Bankaccount> bankAccountList = getPersistenceService().findAllBy(
 					"from Bankaccount ba where ba.bankbranch.id=? " + "  and isactive=true order by id", branchId);
 			addDropdownData("accNumList", bankAccountList);
-			if (LOGGER.isDebugEnabled())
-				LOGGER.debug("Account number list size " + bankAccountList.size());
+				LOGGER.info("Account number list size " + bankAccountList.size());
 		}
 
 	}
 
 	@SuppressWarnings("unchecked")
 	public void loadBankBranchForFund() {
-		if (LOGGER.isDebugEnabled())
-			LOGGER.debug("BaseVoucherAction | loadBankBranchForFund | Start");
+			LOGGER.info("BaseVoucherAction | loadBankBranchForFund | Start");
 		try {
-			if (LOGGER.isDebugEnabled())
-				LOGGER.debug("FUND ID = " + voucherHeader.getFundId().getId());
+				LOGGER.info("FUND ID = " + voucherHeader.getFundId().getId());
 			final List<Object[]> bankBranch = getPersistenceService().findAllBy(
 					"select DISTINCT concat(concat(bank.id,'-'),bankBranch.id) as bankbranchid,concat(concat(bank.name,' '),bankBranch.branchname) as bankbranchname "
 							+ " FROM Bank bank,Bankbranch bankBranch,Bankaccount bankaccount "
@@ -664,8 +673,7 @@ public class BaseVoucherAction extends GenericWorkFlowAction {
 							+ " and bankaccount.fund.id=?",
 					voucherHeader.getFundId().getId());
 
-			if (LOGGER.isDebugEnabled())
-				LOGGER.debug("Bank list size is " + bankBranch.size());
+				LOGGER.info("Bank list size is " + bankBranch.size());
 			final List<Map<String, Object>> bankBranchList = new ArrayList<>();
 			Map<String, Object> bankBrmap;
 			for (final Object[] element : bankBranch) {
@@ -674,8 +682,7 @@ public class BaseVoucherAction extends GenericWorkFlowAction {
 				bankBrmap.put("bankBranchName", element[1].toString());
 				bankBranchList.add(bankBrmap);
 			}
-			if (LOGGER.isDebugEnabled())
-				LOGGER.debug("Bank branch list size :" + bankBranchList.size());
+				LOGGER.info("Bank branch list size :" + bankBranchList.size());
 			addDropdownData("bankList", bankBranchList);
 		} catch (final HibernateException e) {
 			LOGGER.error("Exception occured while getting the data for bank dropdown " + e.getMessage(),
@@ -764,6 +771,29 @@ public class BaseVoucherAction extends GenericWorkFlowAction {
 			}
 		}
 	}
+	
+	 protected void removeEmptyRowsAccoutDraftDetail(final List list) {
+	        for (final Iterator<VoucherDetails> detail = list.iterator(); detail.hasNext();) {
+	            final VoucherDetails next = detail.next();
+	            if (next == null)
+	                detail.remove();
+	            else {
+	                if (next.getDebitAmountDetail() == null)
+	                    next.setDebitAmountDetail(BigDecimal.ZERO);
+	                
+	                if (next.getCreditAmountDetail() == null)
+	                    next.setCreditAmountDetail(BigDecimal.ZERO);
+	                
+	                if (next.getGlcodeDetail()== null)
+	                    next.setGlcodeDetail("");
+	                
+	                if (next.getFunctionDetail()==null)
+	                    next.setFunctionDetail("");
+	                
+	                
+	            }
+	        }
+	    }
 
 	protected void removeEmptyRowsSubledger(final List<VoucherDetails> list) {
 		for (final Iterator<VoucherDetails> detail = list.iterator(); detail.hasNext();) {

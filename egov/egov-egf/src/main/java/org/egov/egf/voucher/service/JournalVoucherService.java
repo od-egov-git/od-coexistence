@@ -75,6 +75,7 @@ import org.egov.eis.service.PositionMasterService;
 import org.egov.infra.admin.master.entity.User;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.exception.ApplicationRuntimeException;
+import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.persistence.utils.GenericSequenceNumberGenerator;
 import org.egov.infra.security.utils.SecurityUtils;
 import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
@@ -177,6 +178,9 @@ public class JournalVoucherService {
 
     @Autowired
     private ExpenseBillService expenseBillService;
+    
+    @Autowired
+	protected MicroserviceUtils microserviceUtils;
 
     public Session getCurrentSession() {
         return entityManager.unwrap(Session.class);
@@ -373,7 +377,7 @@ public class JournalVoucherService {
             voucherHeader.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
                     .withComments(approvalComent)
                     .withStateValue(stateValue).withDateInfo(currentDate.toDate())
-                    .withOwner(wfInitiator.getPosition())
+                    .withOwner(wfInitiator.getPosition()).withOwnerName((wfInitiator.getPosition().getId() != null && wfInitiator.getPosition().getId() > 0L) ? getEmployeeName(wfInitiator.getPosition().getId()):"")
                     .withNextAction("")
                     .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_VOUCHER_DISPLAYNAME);
         } else {
@@ -385,7 +389,7 @@ public class JournalVoucherService {
                         null, additionalRule, currState, null);
                 voucherHeader.transition().start().withSenderName(user.getUsername() + "::" + user.getName())
                         .withComments(approvalComent)
-                        .withStateValue(wfmatrix.getNextState()).withDateInfo(new Date()).withOwner(pos)
+                        .withStateValue(wfmatrix.getNextState()).withDateInfo(new Date()).withOwner(pos).withOwnerName((pos.getId() != null && pos.getId() > 0L) ? getEmployeeName(pos.getId()):"")
                         .withNextAction(wfmatrix.getNextAction())
                         .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_VOUCHER_DISPLAYNAME);
             } else if (FinancialConstants.BUTTONAPPROVE.toString().equalsIgnoreCase(workFlowAction)) {
@@ -395,7 +399,7 @@ public class JournalVoucherService {
                         null, additionalRule, voucherHeader.getCurrentState().getValue(), null);
                 voucherHeader.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
                         .withComments(approvalComent)
-                        .withStateValue(stateValue).withDateInfo(currentDate.toDate()).withOwner(pos)
+                        .withStateValue(stateValue).withDateInfo(currentDate.toDate()).withOwner(pos).withOwnerName((pos.getId() != null && pos.getId() > 0L) ? getEmployeeName(pos.getId()):"")
                         .withNextAction("")
                         .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_VOUCHER_DISPLAYNAME);
             } else if (FinancialConstants.BUTTONCANCEL.toString().equalsIgnoreCase(workFlowAction)) {
@@ -405,7 +409,7 @@ public class JournalVoucherService {
                         null, additionalRule, voucherHeader.getCurrentState().getValue(), null);
                 voucherHeader.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
                         .withComments(approvalComent)
-                        .withStateValue(stateValue).withDateInfo(currentDate.toDate()).withOwner(pos)
+                        .withStateValue(stateValue).withDateInfo(currentDate.toDate()).withOwner(pos).withOwnerName((pos.getId() != null && pos.getId() > 0L) ? getEmployeeName(pos.getId()):"")
                         .withNextAction("")
                         .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_VOUCHER_DISPLAYNAME);
             } else {
@@ -413,7 +417,7 @@ public class JournalVoucherService {
                         null, additionalRule, voucherHeader.getCurrentState().getValue(), null);
                 voucherHeader.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
                         .withComments(approvalComent)
-                        .withStateValue(wfmatrix.getNextState()).withDateInfo(new Date()).withOwner(pos)
+                        .withStateValue(wfmatrix.getNextState()).withDateInfo(new Date()).withOwner(pos).withOwnerName((pos.getId() != null && pos.getId() > 0L) ? getEmployeeName(pos.getId()):"")
                         .withNextAction(wfmatrix.getNextAction())
                         .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_VOUCHER_DISPLAYNAME);
             }
@@ -615,5 +619,10 @@ public class JournalVoucherService {
         }
         return cgnType;
     }
+    
+    public String getEmployeeName(Long empId){
+        
+        return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+     }
 
 }

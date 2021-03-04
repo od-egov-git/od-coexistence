@@ -245,10 +245,10 @@ public class ChallanInfo {
 	public String getChallanServiceName() {
 		if (receiptHeader.getChallan() == null)
 			return receipHeaderReferenceObj.getChallan().getService() == null ? null
-					: receipHeaderReferenceObj.getChallan().getService().getName();
+					: receipHeaderReferenceObj.getChallan().getService();
 		else
 			return receiptHeader.getChallan().getService() == null ? null
-					: receiptHeader.getChallan().getService().getName();
+					: receiptHeader.getChallan().getService();
 
 	}
 

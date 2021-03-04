@@ -48,6 +48,20 @@
 package org.egov.services.deduction;
 
 
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.egov.billsaccounting.services.CreateVoucher;
 import org.egov.billsaccounting.services.VoucherConstant;
 import org.egov.commons.Bankaccount;
@@ -65,6 +79,7 @@ import org.egov.infra.admin.master.entity.User;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.exception.ApplicationRuntimeException;
+import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.validation.exception.ValidationError;
 import org.egov.infra.validation.exception.ValidationException;
 import org.egov.infra.workflow.service.SimpleWorkflowService;
@@ -87,20 +102,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-
-import java.math.BigDecimal;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * @author mani
@@ -179,6 +180,9 @@ public class ScheduledRemittanceService {
     private Position nextOwner;
     @Autowired
     private AppConfigValueService appConfigValueService;
+    
+    @Autowired
+	protected MicroserviceUtils microserviceUtils;
 
     /**
      * Our jboss Trnasaction manager does not support nested transactions https://community.jboss.org/thread/206684 so all have to
@@ -933,7 +937,7 @@ public class ScheduledRemittanceService {
         miscbillDetail.setPaidto(remitted);
         persistenceService.getSession().save(miscbillDetail);
 
-        ph.transition().start().withOwner(nextOwner);
+        ph.transition().start().withOwner(nextOwner).withOwnerName((nextOwner.getId() != null && nextOwner.getId() > 0L) ? getEmployeeName(nextOwner.getId()):"");
         paymentWorkflowService.transition("uac_ao_approve|" + user.getId(), ph, "created from schedular");
 
         return voucherHeader;
@@ -1436,5 +1440,10 @@ public class ScheduledRemittanceService {
     public void setErrorMessage(final StringBuffer errorMessage) {
         this.errorMessage = errorMessage;
     }
+    
+    public String getEmployeeName(Long empId){
+        
+        return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+     }
 
 }

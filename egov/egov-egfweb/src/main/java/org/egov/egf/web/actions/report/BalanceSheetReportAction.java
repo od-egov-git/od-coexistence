@@ -228,10 +228,8 @@ public class BalanceSheetReportAction extends BaseFormAction {
             balanceSheet.setFinancialYear((CFinancialYear) getPersistenceService().find("from CFinancialYear where id=?",
                     balanceSheet.getFinancialYear().getId()));
         if (balanceSheet.getDepartment() != null && balanceSheet.getDepartment().getCode() != null
-                && !"null".equalsIgnoreCase(balanceSheet.getDepartment().getCode())) {
+                && !balanceSheet.getDepartment().getCode().isEmpty()) {
             Department dept= microserviceUtils.getDepartmentByCode(balanceSheet.getDepartment().getCode());
-//            balanceSheet.setDepartment((Department) getPersistenceService().find("from Department where id=?",
-//                    balanceSheet.getDepartment().getId()));
             balanceSheet.setDepartment(dept);
             header.append(" in " + balanceSheet.getDepartment().getName());
         } else
@@ -455,12 +453,22 @@ public class BalanceSheetReportAction extends BaseFormAction {
     //TODO- This table is not used. Check reference and remove
   
     public String getCurrentYearToDate() {
+    	if ("Date".equalsIgnoreCase(balanceSheet.getPeriod()))
+ 	   {
+         return balanceSheetService.getFormattedDate(balanceSheet.getFromDate())  +" To "+balanceSheetService.getFormattedDate(balanceSheet.getToDate());
+ 	   }else {
         return balanceSheetService.getFormattedDate(balanceSheetService.getToDate(balanceSheet));
+    }
     }
 
     public String getPreviousYearToDate() {
+    	if ("Date".equalsIgnoreCase(balanceSheet.getPeriod()))
+  	   {
+        return balanceSheetService.getFormattedDate(balanceSheetService.getPreviousYearFor(balanceSheet.getFromDate())) +" To "+ balanceSheetService.getFormattedDate(balanceSheetService.getPreviousYearFor(balanceSheet.getToDate()));
+  	   }else {
         return balanceSheetService.getFormattedDate(balanceSheetService.getPreviousYearFor(balanceSheetService
                 .getToDate(balanceSheet)));
+  	   }
     }
 
     public Date getTodayDate() {

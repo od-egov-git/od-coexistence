@@ -51,15 +51,18 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.ParentPackage;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.convention.annotation.ResultPath;
 import org.apache.struts2.convention.annotation.Results;
-import org.egov.infra.microservice.models.Designation;
+import org.egov.eis.service.DesignationService;
+import org.egov.pims.commons.Designation;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.web.struts.actions.BaseFormAction;
 import org.egov.infra.workflow.matrix.entity.WorkFlowMatrix;
@@ -95,6 +98,8 @@ public class AjaxWorkFlowAction extends BaseFormAction {
     private String departmentRule;
     private String designation;
     private transient List<String> roleList;
+    @Autowired
+    private transient DesignationService designationService;
 
     @Autowired
     private MicroserviceUtils microserviceUtils;
@@ -111,14 +116,18 @@ public class AjaxWorkFlowAction extends BaseFormAction {
 
     @Action(value = "/workflow/ajaxWorkFlow-getDesignationsByObjectType")
     public String getDesignationsByObjectType() {
-        /*
-         * if ("END".equals(currentState)) currentState = ""; if (StringUtils.isNotBlank(designation)) designationList =
-         * designationService.getDesignationsByNames(customizedWorkFlowService.getNextDesignations(type, departmentRule,
-         * amountRule, additionalRule, currentState, pendingAction, new Date(), designation)); else designationList =
-         * designationService.getDesignationsByNames(customizedWorkFlowService.getNextDesignations(type, departmentRule,
-         * amountRule, additionalRule, currentState, pendingAction, new Date()));
-         */
-            designationList = microserviceUtils.getDesignations();
+
+		if ("END".equals(currentState))
+			currentState = "";
+		if (StringUtils.isNotBlank(designation))
+			designationList = designationService
+					.getDesignationsByNames(customizedWorkFlowService.getNextDesignations(type, departmentRule,
+							amountRule, additionalRule, currentState, pendingAction, new Date(), designation));
+		else
+			designationList = designationService.getDesignationsByNames(customizedWorkFlowService.getNextDesignations(
+					type, departmentRule, amountRule, additionalRule, currentState, pendingAction, new Date()));
+         
+            //designationList = microserviceUtils.getDesignations();
         return WF_DESIGNATIONS;
     }
 

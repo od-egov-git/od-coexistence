@@ -61,6 +61,7 @@ import org.egov.eis.entity.Assignment;
 import org.egov.eis.service.AssignmentService;
 import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.entity.User;
+import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.security.utils.SecurityUtils;
 import org.egov.infra.validation.exception.ValidationError;
 import org.egov.infra.validation.exception.ValidationException;
@@ -104,6 +105,9 @@ public class EgBillRegisterService extends PersistenceService<EgBillregister, Lo
 
     @PersistenceContext
     private EntityManager entityManager;
+    
+    @Autowired
+	protected MicroserviceUtils microserviceUtils;
 
     public Session getCurrentSession() {
         return this.entityManager.unwrap(Session.class);
@@ -201,7 +205,7 @@ public class EgBillRegisterService extends PersistenceService<EgBillregister, Lo
                 final String stateValue = FinancialConstants.WORKFLOW_STATE_REJECTED;
                 billregister.transition().progressWithStateCopy().withSenderName(user.getName())
                         .withComments(workflowBean.getApproverComments())
-                        .withStateValue(stateValue).withDateInfo(currentDate.toDate())
+                        .withStateValue(stateValue).withDateInfo(currentDate.toDate()).withOwnerName((wfInitiator.getPosition().getId() != null && wfInitiator.getPosition().getId() > 0L) ? getEmployeeName(wfInitiator.getPosition().getId()):"")
                         .withOwner(wfInitiator.getPosition()).withNextAction(FinancialConstants.WF_STATE_EOA_Approval_Pending);
             }
 
@@ -212,7 +216,7 @@ public class EgBillRegisterService extends PersistenceService<EgBillregister, Lo
             billregister.transition().progressWithStateCopy().withSenderName(user.getName())
                     .withComments(workflowBean.getApproverComments())
                     .withStateValue(wfmatrix.getCurrentDesignation() + " Approved").withDateInfo(currentDate.toDate())
-                    .withOwner(pos)
+                    .withOwner(pos).withOwnerName((pos.getId() != null && pos.getId() > 0L) ? getEmployeeName(pos.getId()):"")
                     .withNextAction(wfmatrix.getNextAction());
 
             EgwStatus egwStatus = egwStatusHibernateDAO.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
@@ -236,7 +240,7 @@ public class EgBillRegisterService extends PersistenceService<EgBillregister, Lo
                         null, null, workflowBean.getCurrentState(), null);
                 billregister.transition().start().withSenderName(user.getName())
                         .withComments(workflowBean.getApproverComments())
-                        .withStateValue(wfmatrix.getNextState()).withDateInfo(currentDate.toDate()).withOwner(pos)
+                        .withStateValue(wfmatrix.getNextState()).withDateInfo(currentDate.toDate()).withOwner(pos).withOwnerName((pos.getId() != null && pos.getId() > 0L) ? getEmployeeName(pos.getId()):"")
                         .withNextAction(wfmatrix.getNextAction());
             } else if (billregister.getCurrentState().getNextAction().equalsIgnoreCase("END"))
                 billregister.transition().end().withSenderName(user.getName())
@@ -247,7 +251,7 @@ public class EgBillRegisterService extends PersistenceService<EgBillregister, Lo
                         null, null, billregister.getCurrentState().getValue(), null);
                 billregister.transition().progressWithStateCopy().withSenderName(user.getName())
                         .withComments(workflowBean.getApproverComments())
-                        .withStateValue(wfmatrix.getNextState()).withDateInfo(currentDate.toDate()).withOwner(pos)
+                        .withStateValue(wfmatrix.getNextState()).withDateInfo(currentDate.toDate()).withOwner(pos).withOwnerName((pos.getId() != null && pos.getId() > 0L) ? getEmployeeName(pos.getId()):"")
                         .withNextAction(wfmatrix.getNextAction());
             }
         }
@@ -266,5 +270,10 @@ public class EgBillRegisterService extends PersistenceService<EgBillregister, Lo
         qry.setString("workOrderNumber", workOrderNumber);
         return qry.list();
     }
+    
+    public String getEmployeeName(Long empId){
+        
+        return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+     }
 
 }

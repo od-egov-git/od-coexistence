@@ -77,6 +77,7 @@ public interface VoucherConstant {
     public static final String DETAILTYPEID = "detailtypeid";
     public static final String DETAILKEYID = "detailkeyid";
     public static final String FUNCTIONCODE = "functioncode";
+    public static final String BUDGETARYAPPNUMBER = "budgetaryAppnumber";
     public static final String FUNCTIONARYCODE = "functionarycode";
     public static final String SOURCEPATH = "sourcepath";
     public static final String REFERENCEDOC = "referencedocument";
@@ -131,5 +132,9 @@ public interface VoucherConstant {
     public static final String TRANSACTION_NUMBER = "Transaction number";
     public static final String TRANSACTION_DATE = "Transaction date";
 	public static final String ALLOWNEGETIVE = "allow Negetive Amount In Budget";
-    public static final String BILLNUMBER = "billnumber"; 
+    public static final String BILLNUMBER = "billnumber";
+    public static final String FUNCTIONIDDETAILS = "FunctionIdDetail"; 
+    public static final String FUNCTIONDETAILS = "FunctionDetail"; 
+    
+    
 }

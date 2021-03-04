@@ -125,7 +125,8 @@
 				{key:"function",hidden:true,label:'<s:text name="lbl.function.name"/>', formatter:createTextFieldFormatterForFunctionJV(VOUCHERDETAILLIST,".functionDetail","hidden")},    
 				{key:"glcodeid",hidden:true, formatter:createTextFieldFormatterJV(VOUCHERDETAILLIST,".glcodeIdDetail","hidden")},
 				{key:"glcode",label:'<s:text name="lbl.account.code"/> <span class="mandatory1">*</span>',   formatter:createTextFieldFormatterJV(VOUCHERDETAILLIST,".glcodeDetail","text")},
-				{key:"accounthead", label:'<s:text name="lbl.account.head"/>',formatter:createLongTextFieldFormatterJV(VOUCHERDETAILLIST,".accounthead")},				
+				{key:"accounthead", label:'<s:text name="lbl.account.head"/>',formatter:createLongTextFieldFormatterJV(VOUCHERDETAILLIST,".accounthead")},
+				{key:"rate", label:'Rate',formatter:createRateFieldFormatterJV(VOUCHERDETAILLIST,".rateDetail","updateRateDetailJV()")},				
 				{key:"debitamount",label:'<s:text name="lbl.debit.amount"/>', formatter:createAmountFieldFormatterJV(VOUCHERDETAILLIST,".debitAmountDetail","updateDebitAmountJV()")}, 
 				{key:"creditamount",label:'<s:text name="lbl.credit.amount"/>',formatter:createAmountFieldFormatterJV(VOUCHERDETAILLIST,".creditAmountDetail","updateCreditAmountJV()")},
 				{key:'Add',label:'<s:text name="lbl.add"/>',formatter:createAddImageFormatter("${pageContext.request.contextPath}")},
@@ -138,7 +139,8 @@
        			{key:"function",label:'<s:text name="lbl.function.name"/>', formatter:createTextFieldFormatterForFunctionJV(VOUCHERDETAILLIST,".functionDetail","text")},         
        			{key:"glcodeid",hidden:true, formatter:createTextFieldFormatterJV(VOUCHERDETAILLIST,".glcodeIdDetail","hidden")},
        			{key:"glcode",label:'<s:text name="lbl.account.code"/> <span class="mandatory1">*</span>',formatter:createTextFieldFormatterJV(VOUCHERDETAILLIST,".glcodeDetail","text")},
-       			{key:"accounthead", label:'<s:text name="lbl.account.head"/>',formatter:createLongTextFieldFormatterJV(VOUCHERDETAILLIST,".accounthead")},				
+       			{key:"accounthead", label:'<s:text name="lbl.account.head"/>',formatter:createLongTextFieldFormatterJV(VOUCHERDETAILLIST,".accounthead")},
+       			{key:"rate", label:'Rate',formatter:createRateFieldFormatterJV(VOUCHERDETAILLIST,".rateDetail","updateRateDetailJV()")},
        			{key:"debitamount",label:'<s:text name="lbl.debit.amount"/>', formatter:createAmountFieldFormatterJV(VOUCHERDETAILLIST,".debitAmountDetail","updateDebitAmountJV()")}, 
        			{key:"creditamount",label:'<s:text name="lbl.credit.amount"/>',formatter:createAmountFieldFormatterJV(VOUCHERDETAILLIST,".creditAmountDetail","updateCreditAmountJV()")},
        			{key:'Add',label:'<s:text name="lbl.add"/>',formatter:createAddImageFormatter("${pageContext.request.contextPath}")},
@@ -204,7 +206,7 @@
 		var tfoot = billDetailsTable.getTbodyEl().parentNode.createTFoot();
 		var tr = tfoot.insertRow(-1);
 		var th = tr.appendChild(document.createElement('th'));
-		th.colSpan = 5;
+		th.colSpan = 6;
 		th.innerHTML = 'Total&nbsp;&nbsp;&nbsp;';
 		th.align='right';
 		var td = tr.insertCell(-1);
@@ -441,6 +443,44 @@ function onSubmit()
 	var balanceCheckMandatory='<s:text name="payment.mandatory"/>';
 	var balanceCheckWarning='<s:text name="payment.warning"/>';
 	var noBalanceCheck='<s:text name="payment.none"/>';
+	var firstsignatory='';
+	var backlogEntry='';
+	if(document.getElementById('firstsignatory') == null || document.getElementById('firstsignatory').value == '-1')
+	{
+		bootbox.alert("Please select First Signatory");
+		undoLoadingMask();
+		return false;
+	}
+	else
+		{
+			firstsignatory=document.getElementById('firstsignatory').value;
+		}
+	var secondsignatory=''
+	if(document.getElementById('secondsignatory') == null || document.getElementById('secondsignatory').value == '-1')
+	{
+		bootbox.alert("Please select Second Signatory");
+		undoLoadingMask();
+		return false;
+	}
+	else
+	{
+		secondsignatory=document.getElementById('secondsignatory').value;
+	}
+	if(document.getElementById('backlogEntry') == null || document.getElementById('backlogEntry').value == '-1')
+	{
+		bootbox.alert("Please select whether it is backdated entry");
+		undoLoadingMask();
+		return false;
+	}
+	else
+		{
+		backlogEntry=document.getElementById('backlogEntry').value;
+		}
+	if(document.getElementById("description") == null || document.getElementById("description").value =='')
+		{
+		bootbox.alert("<s:text name='msg.payment.narration.mandatory'/>");
+		 return false;
+		}
 	if (!validateForm_directBankPayment()) {
 		undoLoadingMask();
 		return false;
@@ -451,7 +491,15 @@ function onSubmit()
 	}
 	else if(jQuery("#bankBalanceCheck").val()==noBalanceCheck)
 		{
-		document.dbpform.action = '/services/EGF/payment/directBankPayment-create.action';
+		if(document.getElementById("modeOfPaymentrtgs").checked == true || document.getElementById("modeOfPaymentpex").checked == true)
+			{
+				if(document.getElementById("subLedgerlist[0].glcode.id") == null  || document.getElementById("subLedgerlist[0].glcode.id").value == '0' || document.getElementById("subLedgerlist[0].detailType.id") == null || document.getElementById("subLedgerlist[0].detailType.id").value == '0' ||  document.getElementById("subLedgerlist[0].detailCode") == null || document.getElementById("subLedgerlist[0].detailCode").value == ''  || document.getElementById("subLedgerlist[0].amount") == null  || document.getElementById("subLedgerlist[0].amount").value == '')
+					{
+					bootbox.alert("<s:text name='msg.sub.ledger.mandatory'/>");
+					 return false;
+					}
+			}
+		document.dbpform.action = '/services/EGF/payment/directBankPayment-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory+'&backlogEntry='+backlogEntry;
 		return true;
 		}
 	else if(!balanceCheck() && jQuery("#bankBalanceCheck").val()==balanceCheckMandatory){
@@ -459,10 +507,18 @@ function onSubmit()
 			 return false;
 			}
 	else if(!balanceCheck() && jQuery("#bankBalanceCheck").val()==balanceCheckWarning){
+		if(document.getElementById("modeOfPaymentrtgs").checked == true || document.getElementById("modeOfPaymentpex").checked == true)
+		{
+			if(document.getElementById("subLedgerlist[0].glcode.id") == null  || document.getElementById("subLedgerlist[0].glcode.id").value == '0' || document.getElementById("subLedgerlist[0].detailType.id") == null || document.getElementById("subLedgerlist[0].detailType.id").value == '0' ||  document.getElementById("subLedgerlist[0].detailCode") == null || document.getElementById("subLedgerlist[0].detailCode").value == ''  || document.getElementById("subLedgerlist[0].amount") == null  || document.getElementById("subLedgerlist[0].amount").value == '')
+				{
+				bootbox.alert("<s:text name='msg.sub.ledger.mandatory'/>");
+				 return false;
+				}
+		}
 		 var msg = confirm("<s:text name='msg.insuff.bank.bal.do.you.want.to.process'/>");
 		 if (msg == true) {
-			 document.dbpform.action = '/services/EGF/payment/directBankPayment-create.action';
-			 //document.dbpform.submit();
+			 document.dbpform.action = '/services/EGF/payment/directBankPayment-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory+'&backlogEntry='+backlogEntry;
+			 document.dbpform.submit();
 			return true;
 		 } else {
 			 undoLoadingMask();
@@ -470,8 +526,16 @@ function onSubmit()
 			}
 		}
 	else{
-		document.dbpform.action = '/services/EGF/payment/directBankPayment-create.action';
-		//document.dbpform.submit();
+		if(document.getElementById("modeOfPaymentrtgs").checked == true || document.getElementById("modeOfPaymentpex").checked == true)
+		{
+			if(document.getElementById("subLedgerlist[0].glcode.id") == null  || document.getElementById("subLedgerlist[0].glcode.id").value == '0' || document.getElementById("subLedgerlist[0].detailType.id") == null || document.getElementById("subLedgerlist[0].detailType.id").value == '0' ||  document.getElementById("subLedgerlist[0].detailCode") == null || document.getElementById("subLedgerlist[0].detailCode").value == ''  || document.getElementById("subLedgerlist[0].amount") == null  || document.getElementById("subLedgerlist[0].amount").value == '')
+				{
+				bootbox.alert("<s:text name='msg.sub.ledger.mandatory'/>");
+				 return false;
+				}
+		}
+		document.dbpform.action = '/services/EGF/payment/directBankPayment-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory+'&backlogEntry='+backlogEntry;
+		document.dbpform.submit();
 	}
 		
 }

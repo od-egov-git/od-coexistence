@@ -58,6 +58,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.ParentPackage;
@@ -91,7 +92,6 @@ import org.egov.infstr.services.PersistenceService;
 import org.egov.infstr.utils.EgovMasterDataCaching;
 import org.egov.model.contra.ContraJournalVoucher;
 import org.egov.model.payment.Paymentheader;
-import org.egov.payment.dao.PaymentheaderHibernateDAO;
 import org.egov.utils.Constants;
 import org.egov.utils.FinancialConstants;
 import org.egov.utils.ReportHelper;
@@ -100,6 +100,7 @@ import org.hibernate.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
+
 import com.opensymphony.xwork2.validator.annotations.Validation;
 
 @Results(value = {
@@ -149,8 +150,6 @@ public class VoucherStatusReportAction extends BaseFormAction {
         private VoucherHelper voucherHelpers;
 	@Autowired
         private Environment environment;
-	@Autowired 
-    private PaymentheaderHibernateDAO paymentheaderHibernateDAO;	
 	
 	private Department deptImpl = new Department();
 
@@ -307,11 +306,6 @@ public class VoucherStatusReportAction extends BaseFormAction {
 			voucherMap.put("deptName", depMap.get(voucherheader.getVouchermis().getDepartmentcode()));
 			for (final CGeneralLedger detail : voucherheader.getGeneralledger())
 				amt = amt + detail.getDebitAmount();
-			List<Paymentheader> paymentHeader=paymentheaderHibernateDAO.getPaymentheaderByVoucherHeader(voucherheader);
-			if(paymentHeader.isEmpty())
-				voucherMap.put("accountNumber","NA");
-			else
-				voucherMap.put("accountNumber",paymentHeader.get(0).getBankaccount().getAccountnumber());
 			voucherMap.put("amount", amt);
 			voucherMap.put("status", getVoucherStatus(voucherheader.getStatus()));
 			voucherMap.put("source", getVoucherModule(voucherheader.getModuleId()));
@@ -676,7 +670,7 @@ public class VoucherStatusReportAction extends BaseFormAction {
 	public void setFinancialYearDAO(FinancialYearDAO financialYearDAO) {
 		this.financialYearDAO = financialYearDAO;
 	}
-	 
+
 	public InputStream getInputStream() {
 		return inputStream;
 	}

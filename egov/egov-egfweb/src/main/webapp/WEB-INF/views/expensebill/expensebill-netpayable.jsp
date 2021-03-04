@@ -50,7 +50,7 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
-<div class="panel-heading custom_form_panel_heading">
+<%-- <div class="panel-heading custom_form_panel_heading">
 	<div class="panel-title">
 		<spring:message code="lbl.netpayable" text="Net payable"/>
 	</div>
@@ -85,7 +85,7 @@
 			</tr>
 		</tbody>
 	</table>
-</div>
+</div> --%>
 
 <div class="text-center">
 	<button type="button" id="populateAccountDetails" class="btn btn-secondary" align="center"><spring:message code="lbl.done" text="Done"/></button>

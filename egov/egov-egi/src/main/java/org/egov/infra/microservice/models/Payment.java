@@ -151,7 +151,26 @@ public class Payment {
 
     @JsonProperty("paymentStatus")
     private PaymentStatusEnum paymentStatus;
+    
+    @Size(max=1024)
+    @JsonProperty("narration")
+    private String narration = null;
 
+    @Size(max=100)
+    @JsonProperty("bankName")
+    private String bankName = null;
+
+    @Size(max=100)
+    @JsonProperty("bankBranch")
+    private String bankBranch = null;
+   
+    @Size(max=100)
+    @JsonProperty("subdivison")
+    private String subdivison = null;
+   
+    @Size(max=100)
+    @JsonProperty("gstno")
+    private String gstno = null;
 
     public Payment addpaymentDetailsItem(PaymentDetail paymentDetail) {
         if (this.paymentDetails == null) {

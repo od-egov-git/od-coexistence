@@ -50,6 +50,14 @@
  */
 package org.egov.egf.web.actions.voucher;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -57,18 +65,25 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletContext;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.struts2.ServletActionContext;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.ParentPackage;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.convention.annotation.Results;
 import org.apache.struts2.interceptor.validation.SkipValidation;
+import org.egov.common.contstants.CommonConstants;
 import org.egov.commons.CVoucherHeader;
+import org.egov.commons.DocumentUploads;
 import org.egov.commons.dao.FinancialYearDAO;
 import org.egov.eis.service.EisCommonService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
+import org.egov.infra.exception.ApplicationException;
 import org.egov.infra.exception.ApplicationRuntimeException;
+import org.egov.infra.filestore.service.FileStoreService;
 import org.egov.infra.microservice.models.EmployeeInfo;
 import org.egov.infra.script.service.ScriptService;
 import org.egov.infra.validation.exception.ValidationError;
@@ -110,6 +125,7 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
     private VoucherService voucherService;
     private List<VoucherDetails> billDetailslist;
     private List<VoucherDetails> subLedgerlist;
+    private List<DocumentUploads> documentDetail = new ArrayList<>();
     private String voucherNumManual;
     private String target;
     private String saveMode;
@@ -119,6 +135,12 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
     private Integer departmentId;
     private String wfitemstate;
     private VoucherHelper voucherHelper;
+    private InputStream inputStream;
+    private String fileName;
+    private String mimeType;
+    private File[] file;
+    private String[] fileContentType;
+	private String[] fileFileName;
     // private boolean isRejectedVoucher=false;
 
     @Autowired
@@ -149,6 +171,9 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
     @Autowired
     private EgovMasterDataCaching masterDataCache;
 
+    @Autowired
+    private FileStoreService fileStoreService;
+
     @SuppressWarnings("unchecked")
     @Override
     public void prepare() {
@@ -175,6 +200,9 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
             voucherHeader = (CVoucherHeader) getPersistenceService().find(VOUCHERQUERY, Long.valueOf(voucherHeaderId));
         final Map<String, Object> vhInfoMap = voucherService.getVoucherInfo(voucherHeader.getId());
         voucherHeader = (CVoucherHeader) vhInfoMap.get(Constants.VOUCHERHEADER);
+        List<DocumentUploads> voucherDocList = voucherService.findByObjectIdAndObjectType(voucherHeader.getId(), CommonConstants.JOURNAL_VOUCHER_OBJECT);
+        voucherHeader.setDocumentDetail(voucherDocList);
+        voucherHeader.setDocumentMode(CommonConstants.DOCUMENT_ADD_VIEW_MODE);
         try {
             if (voucherHeader != null && voucherHeader.getState() != null)
                 if (voucherHeader.getState().getValue().contains("Rejected")) {
@@ -183,7 +211,11 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
                 else if (voucherHeader.getState().getValue().contains("Closed")) {
                     if (LOGGER.isDebugEnabled())
                         LOGGER.debug("Valid Owner :return true");
-                } else if (parameters.get("showMode")[0].equalsIgnoreCase("view")) {
+                }
+				else if (voucherHeader.getState().getValue().contains("SaveAsDraft")) {
+                	positionsForUser = eisService.getPositionsForUser(ApplicationThreadLocals.getUserId(), new Date());
+                }
+				else if (parameters.get("showMode")[0].equalsIgnoreCase("view")) {
                     if (LOGGER.isDebugEnabled())
                         LOGGER.debug("Valid Owner :return true");
                 } else
@@ -227,7 +259,8 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
         voucherHeader = preApprovedActionHelper.sendForApproval(voucherHeader, workflowBean);
         if (FinancialConstants.BUTTONFORWARD.equalsIgnoreCase(workflowBean.getWorkFlowAction()))
             addActionMessage(getText("pjv.voucher.approved",
-                    new String[] { voucherService.getEmployeeNameForPositionId(voucherHeader.getState().getOwnerPosition()) }));
+                    new String[] {this.getEmployeeName(voucherHeader.getState()
+                            .getOwnerPosition())}));
         if (FinancialConstants.BUTTONCANCEL.equalsIgnoreCase(workflowBean.getWorkFlowAction())) {
             addActionMessage(getText("billVoucher.file.canceled"));
             if (!"JVGeneral".equalsIgnoreCase(voucherHeader.getName()))
@@ -268,8 +301,7 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
     @SuppressWarnings("deprecation")
     @Action(value = "/voucher/journalVoucherModify-update")
     public String update() {
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("JournalVoucherModifyAction | updateVoucher | Start");
+            LOGGER.info("JournalVoucherModifyAction | updateVoucher | Start");
         target = "";
         loadSchemeSubscheme();
 
@@ -277,8 +309,12 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
         if (voucherHeader.getId() == null)
             voucherHeader.setId(Long.valueOf(parameters.get(VHID)[0]));
         validateBeforeEdit(voucherHeader);
+        LOGGER.info("Validate");
         CVoucherHeader oldVh = voucherHeader;
         populateWorkflowBean();
+        File[] uploadedFiles = getFile();
+        String[] fileName = getFileFileName();
+        String[] contentType = getFileContentType();
         if (FinancialConstants.BUTTONCANCEL.equalsIgnoreCase(workflowBean.getWorkFlowAction())) {
             voucherHeader = (CVoucherHeader) voucherService.findById(Long.parseLong(parameters.get(VHID)[0]), false);
             sendForApproval();
@@ -290,11 +326,30 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
 
         removeEmptyRowsAccoutDetail(billDetailslist);
         removeEmptyRowsSubledger(subLedgerlist);
-
+        LOGGER.info("before Submit");
         try {
             if (!validateData(billDetailslist, subLedgerlist)) {
+            	LOGGER.info("edit");
+            	 if(uploadedFiles!=null)
+                 {
+ 	                for (int i = 0; i < uploadedFiles.length; i++)
+ 	                {
+ 	
+ 	                    Path path = Paths.get(uploadedFiles[i].getAbsolutePath());
+ 	                    byte[] fileBytes = Files.readAllBytes(path);
+ 	                    ByteArrayInputStream bios = new ByteArrayInputStream(fileBytes);
+ 	                    DocumentUploads upload = new DocumentUploads();
+ 	                    upload.setInputStream(bios);
+ 	                    upload.setFileName(fileName[i]);
+ 	                    upload.setContentType(contentType[i]);
+ 	                    documentDetail.add(upload);
+ 	                }
+                 }
+                
                 voucherHeader = journalVoucherActionHelper.editVoucher(billDetailslist, subLedgerlist, voucherHeader,
                         voucherTypeBean, workflowBean, parameters.get("totaldbamount")[0]);
+                voucherHeader.setDocumentDetail(documentDetail);
+                journalVoucherActionHelper.saveDocuments(voucherHeader);
                 target = "success";
             }
             else {
@@ -309,11 +364,16 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
                 resetVoucherHeader();
 
             if (FinancialConstants.BUTTONFORWARD.equalsIgnoreCase(workflowBean.getWorkFlowAction())){
-                EmployeeInfo employee = microserviceUtils.getEmployeeByPositionId(voucherHeader.getState().getOwnerPosition());
                 addActionMessage(getText("pjv.voucher.approved",
-                        new String[] { employee != null ? employee.getUser().getName() : "" }));
+                        new String[] { this.getEmployeeName(voucherHeader.getState()
+                                .getOwnerPosition()) }));
+            }
+			if ("Save As Draft".equalsIgnoreCase(workflowBean.getWorkFlowAction())){               
+            	 addActionMessage(getText("msg.expense.bill.saveasdraft.success",
+                         new String[] { voucherHeader.getVoucherNumber() }));
             }
         } catch (final ValidationException e) {
+        	e.printStackTrace();
             resetVoucherHeader();
             voucherHeader = oldVh;
             setOneFunctionCenterValue();
@@ -323,6 +383,7 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
             errors.add(new ValidationError("exp", e.getErrors().get(0).getMessage()));
             throw new ValidationException(errors);
         } catch (final Exception e) {
+        	e.printStackTrace();
             resetVoucherHeader();
             voucherHeader = oldVh;
             setOneFunctionCenterValue();
@@ -599,4 +660,34 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
     public void setWorkflowBean(WorkflowBean workflowBean) {
         this.workflowBean = workflowBean;
     }
+    
+    public String getEmployeeName(Long empId){
+        
+        return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+     }
+
+	public File[] getFile() {
+		return file;
+	}
+
+	public void setFile(File[] file) {
+		this.file = file;
+	}
+
+	public String[] getFileContentType() {
+		return fileContentType;
+	}
+
+	public void setFileContentType(String[] fileContentType) {
+		this.fileContentType = fileContentType;
+	}
+
+	public String[] getFileFileName() {
+		return fileFileName;
+	}
+
+	public void setFileFileName(String[] fileFileName) {
+		this.fileFileName = fileFileName;
+	}
+    
 }

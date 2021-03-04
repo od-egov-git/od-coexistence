@@ -95,8 +95,10 @@ public class BalanceSheetScheduleService extends ScheduleService {
         voucherStatusToExclude = getAppConfigValueFor("EGF", "statusexcludeReport");
         minorCodeLength = Integer.valueOf(balanceSheetService.getAppConfigValueFor(Constants.EGF, "coa_minorcode_length"));
         majorCodeLength = Integer.valueOf(balanceSheetService.getAppConfigValueFor(Constants.EGF, "coa_majorcode_length"));
+              
         final Date fromDate = balanceSheetService.getFromDate(balanceSheet);
         final Date toDate = balanceSheetService.getToDate(balanceSheet);
+      
         final CChartOfAccounts coa = (CChartOfAccounts) find("from CChartOfAccounts where glcode=?", majorCode);
         final List<Fund> fundList = balanceSheet.getFunds();
         populateCurrentYearAmountForSchedule(balanceSheet, fundList, balanceSheetService.getFilterQuery(balanceSheet), toDate,
@@ -358,8 +360,10 @@ public class BalanceSheetScheduleService extends ScheduleService {
         minorCodeLength = Integer.valueOf(balanceSheetService.getAppConfigValueFor(Constants.EGF, "coa_minorcode_length"));
         majorCodeLength = Integer.valueOf(balanceSheetService.getAppConfigValueFor(Constants.EGF, "coa_majorcode_length"));
         detailCodeLength = Integer.valueOf(balanceSheetService.getAppConfigValueFor(Constants.EGF, "coa_detailcode_length"));
+       
         final Date fromDate = balanceSheetService.getFromDate(balanceSheet);
         final Date toDate = balanceSheetService.getToDate(balanceSheet);
+        
         final List<Fund> fundList = balanceSheet.getFunds();
         populateCurrentYearAmountForAllSchedules(balanceSheet, fundList,
                 amountPerFundQueryForAllSchedules(balanceSheetService.getFilterQuery(balanceSheet), toDate, fromDate, BS));

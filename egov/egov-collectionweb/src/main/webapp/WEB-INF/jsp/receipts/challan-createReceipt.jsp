@@ -379,9 +379,10 @@ function checkForCurrentDate(obj)
 
 function onBodyLoad()
 {
+	console.log("start");
 	<s:if test='%{model.id!=null && model.status.code=="PENDING" && model.challan.status.code=="VALIDATED"}'>
 		loadDropDownCodesBank();
-	
+	console.log("1");
 		// To hide delete button in cheque grid on page load
 		var chequetable=document.getElementById('chequegrid');
 		if(getControlInBranch(chequetable.rows[3],'addchequerow')!=null)
@@ -401,9 +402,13 @@ function onBodyLoad()
 		if(document.getElementById('challanDate').value!=""){
 			document.getElementById("challanDate").disabled=true;
 		}
+		console.log("2");
 		displayPaytModes();
+		console.log("3");
 		displayPaymentDetails();
+		console.log("4");
 		loadchequedetails();
+		console.log("5");
 	</s:if>
 }
 
@@ -446,6 +451,7 @@ function validate()
  	
 	var instrTypeCash = dom.get("cashradiobutton").checked;
 	var instrTypeCheque = dom.get("chequeradiobutton").checked;
+	var instrTypeDD = document.getElementById("ddradiobutton").checked;
 	var instrTypeCard = dom.get("cardradiobutton").checked;
 	var chequetable=document.getElementById('chequegrid')
 	var chequetablelen1 =chequetable.rows.length;
@@ -470,6 +476,7 @@ function validate()
 				}
 				collectiontotal=collectiontotal+cashamount;
 			}
+			document.getElementById('instrumentTypeCashOrCard').value="cash";
 		}
 	}
 	//if mode of payment is card
@@ -503,6 +510,7 @@ function validate()
 				collectiontotal=collectiontotal+cardamount;
 			}
 		}
+		document.getElementById('instrumentTypeCashOrCard').value="card";
 	}
 	//if mode of payment is cheque/DD
 	if(instrTypeCheque){
@@ -520,6 +528,7 @@ function validate()
 	    		}
 			}//end of for loop
 		}//end of else
+	    document.getElementById('instrumentTypeCashOrCard').value="";
 	}
 	
 	if(collectiontotal!=0){

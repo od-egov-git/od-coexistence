@@ -113,7 +113,7 @@ public class ChequeDishonourController {
         model.addAttribute(CollectionConstants.DROPDOWN_DATA_DISHONOR_REASONS_LIST, persistenceService.getSession()
                 .createSQLQuery("select * from egf_instrument_dishonor_reason").list());
         DishonoredChequeBean attributeValue = new DishonoredChequeBean();
-        attributeValue.setDishonorDate(new Date());
+        //attributeValue.setDishonorDate(new Date());
         model.addAttribute("dishonoredChequeModel", attributeValue);
         model.addAttribute("instrumentModesMap", getInstrumentModeMap());
         return "dishonour-cheque-form";
@@ -144,7 +144,7 @@ public class ChequeDishonourController {
     public String submit(@ModelAttribute DishonoredChequeBean chequeBean, final Model model, RedirectAttributes redAttribute){
         String returnPage = "dishonor_cheque_success";
         try {
-            dishonorChequeService.processDishonor(chequeBean);                
+            //dishonorChequeService.processDishonor(chequeBean);                
             model.addAttribute("dishonoredChequeModel", chequeBean);
             return returnPage;       
         } catch (Exception e) {
@@ -156,12 +156,12 @@ public class ChequeDishonourController {
     
     private List<DishonoredChequeBean> getDishonorCheque(DishonoredChequeBean model) throws Exception {
         List<DishonoredChequeBean> resultList = new ArrayList<>();
-        String bankBranch = model.getBankBranch();
+        String bankBranch = null /*model.getBankBranch()*/;
         String bankId = null;
         if(StringUtils.isNotBlank(bankBranch)){
             bankId = bankBranch.split("-")[0].trim();
         }
-        resultList = dishonorChequeService.getCollectionListForDishonorInstrument(model.getInstrumentMode(), bankId, model.getAccountNumber(), model.getInstrumentNumber(), model.getTransactionDate());
+        resultList = null /*dishonorChequeService.getCollectionListForDishonorInstrument(model.getInstrumentMode(), bankId, model.getAccountNumber(), model.getInstrumentNumber(), model.getTransactionDate())*/;
         return resultList;
     }
     

@@ -48,7 +48,6 @@
 package org.egov.commons.dao;
 
 import java.util.List;
-import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -56,7 +55,6 @@ import javax.persistence.PersistenceContext;
 import org.egov.commons.Bankaccount;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -161,9 +159,5 @@ public class BankaccountHibernateDAO {
             bankAccount = qry.list();
         }
         return bankAccount;
-    }
-    
-    public List<Bankaccount> getBankAccountByAccountNumbers(Set<String> accNumbers){
-        return getCurrentSession().createCriteria(Bankaccount.class).add(Restrictions.in("accountnumber", accNumbers)).list();
     }
 }

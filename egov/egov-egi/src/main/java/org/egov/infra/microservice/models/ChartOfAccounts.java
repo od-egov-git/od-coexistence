@@ -55,12 +55,6 @@ public class ChartOfAccounts {
     private String glcode;
 
     private String name;
-    
-    private Boolean isSubLedger;
-
-    public ChartOfAccounts() {
-        // TODO Auto-generated constructor stub
-    }
 
     public Long getId() {
         return id;
@@ -84,14 +78,6 @@ public class ChartOfAccounts {
 
     public void setName(String name) {
         this.name = name;
-    }
-    
-    public Boolean getIsSubLedger() {
-        return isSubLedger;
-    }
-    
-    public void setIsSubLedger(Boolean isSubLedger) {
-        this.isSubLedger = isSubLedger;
     }
 
 }

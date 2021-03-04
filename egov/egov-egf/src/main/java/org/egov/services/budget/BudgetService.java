@@ -388,13 +388,216 @@ public class BudgetService extends PersistenceService<Budget, Long> {
     }
 
     public List<Budget> getBudgetsForUploadReport() {
-        return findAllBy("select distinct b from Budget b where b.name like '%RE%' and b.materializedPath  in (select distinct substring(bd.materializedPath,  1 , 1) from BudgetDetail bd where bd.status.code = 'Created')");
+    	List<Budget> budgetList=new ArrayList<Budget>();
+    	budgetList=findAllBy("select distinct b from Budget b where b.name like '%RE%' and b.materializedPath  in (select distinct substring(bd.materializedPath,1,1) from BudgetDetail bd where bd.status.code = 'Created')");
+    	if(budgetList!= null && budgetList.isEmpty())
+    	{
+    		budgetList=findAllBy("select distinct b from Budget b where b.name like '%RE%' and b.materializedPath  in (select distinct substring(bd.materializedPath,1,2) from BudgetDetail bd where bd.status.code = 'Created')");
+    	}
+    	if(budgetList != null && budgetList.isEmpty())
+    	{
+    		budgetList=findAllBy("select distinct b from Budget b where b.name like '%RE%' and b.materializedPath  in (select distinct substring(bd.materializedPath,1,3) from BudgetDetail bd where bd.status.code = 'Created')");
+    	}
+    	if(budgetList != null && budgetList.isEmpty())
+    	{
+    		budgetList=findAllBy("select distinct b from Budget b where b.name like '%RE%' and b.materializedPath  in (select distinct substring(bd.materializedPath,1,4) from BudgetDetail bd where bd.status.code = 'Created')");
+    	}
+        return budgetList;
     }
 
     @Transactional
     public void updateByMaterializedPath(final String materializedPath) {
         EgwStatus approvedStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGET", "Approved");
         EgwStatus createdStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGET", "Created");
+        persistenceService
+                .getSession()
+                .createSQLQuery(
+                        "update egf_budget set status = :approvedStatus where status =:createdStatus and  materializedPath like'"
+                                + materializedPath + "%'").setLong("approvedStatus", approvedStatus.getId())
+                .setLong("createdStatus", createdStatus.getId()).executeUpdate();
+    }
+    
+    public List<Budget> getBudgetsForUploadReportCAO() {
+    	List<Budget> budgetList=new ArrayList<>();
+    	budgetList=findAllBy("select distinct b from Budget b where b.name like '%RE%' and b.materializedPath  in (select distinct substring(bd.materializedPath,1,1) from BudgetDetail bd where bd.status.code = 'CAO Verify')");
+    	if(budgetList != null && budgetList.isEmpty())
+    	{
+    		budgetList=findAllBy("select distinct b from Budget b where b.name like '%RE%' and b.materializedPath  in (select distinct substring(bd.materializedPath,1,2) from BudgetDetail bd where bd.status.code = 'CAO Verify')");
+    	}
+    	if(budgetList != null && budgetList.isEmpty())
+    	{
+    		budgetList=findAllBy("select distinct b from Budget b where b.name like '%RE%' and b.materializedPath  in (select distinct substring(bd.materializedPath,1,3) from BudgetDetail bd where bd.status.code = 'CAO Verify')");
+    	}
+    	if(budgetList != null && budgetList.isEmpty())
+    	{
+    		budgetList=findAllBy("select distinct b from Budget b where b.name like '%RE%' and b.materializedPath  in (select distinct substring(bd.materializedPath,1,4) from BudgetDetail bd where bd.status.code = 'CAO Verify')");
+    	}
+        return budgetList;
+    }
+    
+    public List<Budget> getBudgetsForUploadReportSO() {
+    	List<Budget> budgetList=new ArrayList<>();
+    	budgetList=findAllBy("select distinct b from Budget b where b.name like '%RE%' and b.materializedPath  in (select distinct substring(bd.materializedPath,1,1) from BudgetDetail bd where bd.status.code = 'CAO REJECTED')");
+    	if(budgetList != null && budgetList.isEmpty())
+    	{
+    		budgetList=findAllBy("select distinct b from Budget b where b.name like '%RE%' and b.materializedPath  in (select distinct substring(bd.materializedPath,1,2) from BudgetDetail bd where bd.status.code = 'CAO REJECTED')");
+    	}
+    	if(budgetList != null && budgetList.isEmpty())
+    	{
+    		budgetList=findAllBy("select distinct b from Budget b where b.name like '%RE%' and b.materializedPath  in (select distinct substring(bd.materializedPath,1,3) from BudgetDetail bd where bd.status.code = 'CAO REJECTED')");
+    	}
+    	if(budgetList != null && budgetList.isEmpty())
+    	{
+    		budgetList=findAllBy("select distinct b from Budget b where b.name like '%RE%' and b.materializedPath  in (select distinct substring(bd.materializedPath,1,4) from BudgetDetail bd where bd.status.code = 'CAO REJECTED')");
+    	}
+        return budgetList;
+    }
+    
+    
+    public List<Budget> getBudgetsForUploadReportACMC() {
+    	List<Budget> budgetList=new ArrayList<Budget>();
+    	budgetList=findAllBy("select distinct b from Budget b where b.name like '%RE%' and b.materializedPath  in (select distinct substring(bd.materializedPath,1,1) from BudgetDetail bd where bd.status.code = 'ACMC Verify')");
+    	if(budgetList != null && budgetList.isEmpty())
+    	{
+    		budgetList=findAllBy("select distinct b from Budget b where b.name like '%RE%' and b.materializedPath  in (select distinct substring(bd.materializedPath,1,2) from BudgetDetail bd where bd.status.code = 'ACMC Verify')");
+    	}
+    	if(budgetList != null && budgetList.isEmpty())
+    	{
+    		budgetList=findAllBy("select distinct b from Budget b where b.name like '%RE%' and b.materializedPath  in (select distinct substring(bd.materializedPath,1,3) from BudgetDetail bd where bd.status.code = 'ACMC Verify')");
+    	}
+    	if(budgetList != null && budgetList.isEmpty())
+    	{
+    		budgetList=findAllBy("select distinct b from Budget b where b.name like '%RE%' and b.materializedPath  in (select distinct substring(bd.materializedPath,1,4) from BudgetDetail bd where bd.status.code = 'ACMC Verify')");
+    	}
+        return budgetList;
+    }
+    
+    @Transactional
+    public void updateByMaterializedPathCAO(final String materializedPath) {
+        EgwStatus approvedStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGET", "ACMC Verify");
+        EgwStatus createdStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGET", "CAO Verify");
+        persistenceService
+                .getSession()
+                .createSQLQuery(
+                        "update egf_budget set status = :approvedStatus where status =:createdStatus and  materializedPath like'"
+                                + materializedPath + "%'").setLong("approvedStatus", approvedStatus.getId())
+                .setLong("createdStatus", createdStatus.getId()).executeUpdate();
+    }
+    
+    
+    @Transactional
+    public void updateByMaterializedPathSO(final String materializedPath) {
+        EgwStatus approvedStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGET", "CAO REJECTED");
+       EgwStatus createdStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGET", "CAO Verify");
+        persistenceService
+                .getSession()
+                .createSQLQuery(
+                        "update egf_budget  set status = :approvedStatus where status =:createdStatus and  materializedPath like'"
+                                + materializedPath + "%'")
+                .setLong("approvedStatus", approvedStatus.getId()).setLong("createdStatus", createdStatus.getId())
+                .executeUpdate();
+        
+        
+    }
+    
+    @Transactional
+    public void updateByMaterializedPathReturnByACMC(final String materializedPath) {
+    	 EgwStatus approvedStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGET", "CAO REJECTED");
+          EgwStatus createdStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGET", "ACMC Verify");
+        persistenceService
+                .getSession()
+                .createSQLQuery(
+                        "update egf_budget  set status = :approvedStatus where status =:createdStatus and  materializedPath like'"
+                                + materializedPath + "%'")
+                .setLong("approvedStatus", approvedStatus.getId()).setLong("createdStatus", createdStatus.getId())
+                .executeUpdate();
+    }
+    
+    @Transactional
+    public void updateByMaterializedPathReturnByMC(final String materializedPath) {
+    	 EgwStatus approvedStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGET", "CAO REJECTED");
+          EgwStatus createdStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGET", "Created");
+        persistenceService
+                .getSession()
+                .createSQLQuery(
+                        "update egf_budget  set status = :approvedStatus where status =:createdStatus and  materializedPath like'"
+                                + materializedPath + "%'")
+                .setLong("approvedStatus", approvedStatus.getId()).setLong("createdStatus", createdStatus.getId())
+                							.executeUpdate();
+    }
+    
+    
+    @Transactional
+    public void updateByMaterializedPathSTATUSCancelBySO(final String materializedPath) {
+        EgwStatus approvedStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGET", "CANCEL");
+        EgwStatus createdStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGET", "CAO REJECTED");
+        persistenceService
+                .getSession()
+                .createSQLQuery(
+                        "update egf_budget  set status = :approvedStatus where status =:createdStatus and  materializedPath like'"
+                                + materializedPath + "%'")
+                .setLong("approvedStatus", approvedStatus.getId()).setLong("createdStatus", createdStatus.getId())
+                .executeUpdate();
+    }
+    
+    @Transactional
+    public void updateByMaterializedPathSTATUSCancelByCAO(final String materializedPath) {
+        EgwStatus approvedStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGET", "CANCEL");
+        EgwStatus createdStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGET", "CAO Verify");
+        persistenceService
+                .getSession()
+                .createSQLQuery(
+                        "update egf_budget  set status = :approvedStatus where status =:createdStatus and  materializedPath like'"
+                                + materializedPath + "%'")
+                .setLong("approvedStatus", approvedStatus.getId()).setLong("createdStatus", createdStatus.getId())
+                .executeUpdate();
+    }
+    
+    @Transactional
+    public void updateByMaterializedPathSTATUSCancelByACMC(final String materializedPath) {
+        EgwStatus approvedStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGET", "CANCEL");
+        EgwStatus createdStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGET", "ACMC Verify");
+        persistenceService
+                .getSession()
+                .createSQLQuery(
+                        "update egf_budget  set status = :approvedStatus where status =:createdStatus and  materializedPath like'"
+                                + materializedPath + "%'")
+                .setLong("approvedStatus", approvedStatus.getId()).setLong("createdStatus", createdStatus.getId())
+                .executeUpdate();
+    }
+    
+    @Transactional
+    public void updateByMaterializedPathSTATUSCancelByMC(final String materializedPath) {
+        EgwStatus approvedStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGET", "CANCEL");
+        EgwStatus createdStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGET", "Created");
+        persistenceService
+                .getSession()
+                .createSQLQuery(
+                        "update egf_budget  set status = :approvedStatus where status =:createdStatus and  materializedPath like'"
+                                + materializedPath + "%'")
+                .setLong("approvedStatus", approvedStatus.getId()).setLong("createdStatus", createdStatus.getId())
+                .executeUpdate();
+    }
+    
+    
+    @Transactional
+    public void updateByMaterializedPathForReVerify(final String materializedPath) {
+        EgwStatus approvedStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGET", "CAO Verify");
+        EgwStatus createdStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGET", "CAO REJECTED");
+        persistenceService
+                .getSession()
+                .createSQLQuery(
+                        "update egf_budget set status = :approvedStatus where status =:createdStatus and  materializedPath like'"
+                                + materializedPath + "%'")
+                .setLong("approvedStatus", approvedStatus.getId()).setLong("createdStatus", createdStatus.getId())
+                .executeUpdate();
+    }
+    
+    
+    @Transactional
+    public void updateByMaterializedPathACMC(final String materializedPath) {
+        EgwStatus approvedStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGET", "Created");
+        EgwStatus createdStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGET", "ACMC Verify");
         persistenceService
                 .getSession()
                 .createSQLQuery(

@@ -121,10 +121,10 @@
 									<s:iterator value="incomeExpenditureStatement.funds"
 										status="stat">
 										<th class="bluebgheadtd" width="15%" align="center"
-											colspan="1"><s:text name="report.currentTotals" />
+											colspan="1"><%--<s:text name="report.currentTotals" />--%>
 											<s:property value="currentYearToDate" /></th>
 										<th class="bluebgheadtd" width="15%" align="center"
-											colspan="1"><s:text name="report.previousTotals" />
+											colspan="1"><%--<s:text name="report.previousTotals" />--%>
 											<s:property value="previousYearToDate" /></th>
 									</s:iterator>
 								</s:else>
@@ -214,8 +214,9 @@
 		<div class="buttonbottom" id="ieReport">
 			<s:text name="report.export.options" />
 			: <a
-				href='/services/EGF/report/incomeExpenditureReport-generateIncomeExpenditureXls.action?showDropDown=false&model.period=<s:property value="model.period"/>&model.currency=<s:property value="model.currency"/>&model.financialYear.id=<s:property value="model.financialYear.id"/>&model.department.id=<s:property value="model.department.id"/>&model.asOndate=<s:property value="model.asOndate"/>&model.fund.id=<s:property value="model.fund.id"/>&model.function.id=<s:property value="model.function.id"/>&model.functionary.id=<s:property value="model.functionary.id"/>&model.field.id=<s:property value="model.field.id"/>'>Excel</a>
+				<%--href='/services/EGF/report/incomeExpenditureReport-generateIncomeExpenditureXls.action?showDropDown=false&model.period=<s:property value="model.period"/>&model.currency=<s:property value="model.currency"/>&model.financialYear.id=<s:property value="model.financialYear.id"/>&model.department.id=<s:property value="model.department.id"/>&model.asOndate=<s:property value="model.asOndate"/>&model.fund.id=<s:property value="model.fund.id"/>&model.function.id=<s:property value="model.function.id"/>&model.functionary.id=<s:property value="model.functionary.id"/>&model.field.id=<s:property value="model.field.id"/>'>Excel</a>--%>
+				href='/services/EGF/report/incomeExpenditureReport-generateIncomeExpenditureXls.action?showDropDown=false&model.period=<s:property value="model.period"/>&model.currency=<s:property value="model.currency"/>&model.financialYear.id=<s:property value="model.financialYear.id"/>&model.department.id=<s:property value="model.department.id"/>&model.fromDate=<s:property value="model.fromDate"/>&model.toDate=<s:property value="model.toDate"/>&model.fund.id=<s:property value="model.fund.id"/>&model.function.id=<s:property value="model.function.id"/>&model.functionary.id=<s:property value="model.functionary.id"/>&model.field.id=<s:property value="model.field.id"/>'>Excel</a>
 			| <a
-				href='/services/EGF/report/incomeExpenditureReport-generateIncomeExpenditurePdf.action?showDropDown=false&model.period=<s:property value="model.period"/>&model.currency=<s:property value="model.currency"/>&model.financialYear.id=<s:property value="model.financialYear.id"/>&model.department.id=<s:property value="model.department.id"/>&model.asOndate=<s:property value="model.asOndate"/>&model.fund.id=<s:property value="model.fund.id"/>&model.function.id=<s:property value="model.function.id"/>&model.functionary.id=<s:property value="model.functionary.id"/>&model.field.id=<s:property value="model.field.id"/>'>PDF</a>
+				href='/services/EGF/report/incomeExpenditureReport-generateIncomeExpenditurePdf.action?showDropDown=false&model.period=<s:property value="model.period"/>&model.currency=<s:property value="model.currency"/>&model.financialYear.id=<s:property value="model.financialYear.id"/>&model.department.id=<s:property value="model.department.id"/>&model.fromDate=<s:property value="model.fromDate"/>&model.toDate=<s:property value="model.toDate"/>&model.fund.id=<s:property value="model.fund.id"/>&model.function.id=<s:property value="model.function.id"/>&model.functionary.id=<s:property value="model.functionary.id"/>&model.field.id=<s:property value="model.field.id"/>'>PDF</a>
 		</div>
 	</div>

@@ -65,7 +65,7 @@ public class Challan extends StateAware implements Auditable {
     private String challanNumber;
     private Date challanDate;
     private Date validUpto;
-    private ServiceDetails service;
+    private String service;
     private String reasonForCancellation;
     private CVoucherHeader voucherHeader;
     private String oldChallanNumber;
@@ -110,11 +110,11 @@ public class Challan extends StateAware implements Auditable {
         this.challanDate = challanDate;
     }
 
-    public ServiceDetails getService() {
+    public String getService() {
         return service;
     }
 
-    public void setService(final ServiceDetails service) {
+    public void setService(final String service) {
         this.service = service;
     }
 

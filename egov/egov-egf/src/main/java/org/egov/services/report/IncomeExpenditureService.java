@@ -122,6 +122,7 @@ public class IncomeExpenditureService extends ReportService {
         minorCodeLength = Integer.valueOf(getAppConfigValueFor(Constants.EGF, "coa_minorcode_length"));
         coaType.add('I');
         coaType.add('E');
+      
         Date  fromDate = getFromDate(ie);
         Date  toDate = getToDate(ie);
         final String filterQuery = getFilterQuery(ie);
@@ -129,6 +130,7 @@ public class IncomeExpenditureService extends ReportService {
         // populateSchedule(ie,IE);
         ie = addBudgetDetails(ie);
         removeFundsWithNoDataIE(ie);
+        
     }
 
     private Statement addBudgetDetails(final Statement ie) {
@@ -471,9 +473,8 @@ public class IncomeExpenditureService extends ReportService {
         if (incomeExpenditureStatement.getFund() != null && incomeExpenditureStatement.getFund().getId() != null
                 && incomeExpenditureStatement.getFund().getId() != 0)
             queryStr.append(" and bd.fund=" + incomeExpenditureStatement.getFund().getId());
-        if (incomeExpenditureStatement.getDepartment() != null && !"null".equals(incomeExpenditureStatement.getDepartment().getCode())){
-            Department dept =this.microserviceUtils.getDepartmentByCode(incomeExpenditureStatement.getDepartment().getCode());
-            queryStr.append(" and bd.executing_department=" + dept.getId());
+        if (incomeExpenditureStatement.getDepartment() != null && incomeExpenditureStatement.getDepartment().getCode() != null && !incomeExpenditureStatement.getDepartment().getCode().isEmpty()){
+            queryStr.append(" and bd.executing_department='" + incomeExpenditureStatement.getDepartment().getCode()+"' ");
         }
         if (incomeExpenditureStatement.getFunction() != null && incomeExpenditureStatement.getFunction().getId() != null
                 && incomeExpenditureStatement.getFunction().getId() != 0)
@@ -506,9 +507,8 @@ public class IncomeExpenditureService extends ReportService {
         if (incomeExpenditureStatement.getFund() != null && incomeExpenditureStatement.getFund().getId() != null
                 && incomeExpenditureStatement.getFund().getId() != 0)
             queryStr.append(" and bd.fund=" + incomeExpenditureStatement.getFund().getId());
-        if (incomeExpenditureStatement.getDepartment() != null && !"null".equals(incomeExpenditureStatement.getDepartment().getCode())){
-            Department dept =this.microserviceUtils.getDepartmentByCode(incomeExpenditureStatement.getDepartment().getCode());
-            queryStr.append(" and bd.executing_department=" + dept.getId());
+        if (incomeExpenditureStatement.getDepartment() != null && incomeExpenditureStatement.getDepartment().getCode() != null &&  !incomeExpenditureStatement.getDepartment().getCode().isEmpty()){
+            queryStr.append(" and bd.executing_department='" + incomeExpenditureStatement.getDepartment().getCode()+"' ");
         }
         if (incomeExpenditureStatement.getFunction() != null && incomeExpenditureStatement.getFunction().getId() != null
                 && incomeExpenditureStatement.getFunction().getId() != 0)

@@ -121,8 +121,9 @@
 											<th class="bluebgheadtd" width="100%" colspan="5"><strong
 												style="font-size: 15px;"><s:property
 														value="ulbName" /><br />
-												<s:text name="report.balancesheet.schedule" /> <s:property
-														value="model.financialYear.finYearRange" /> <s:property
+												<%--<s:text name="report.balancesheet.schedule" /> <s:property
+														value="model.financialYear.finYearRange" />--%>
+														<s:text name="report.balancesheet.sch" /> <s:property
 														value="header" /></strong></th>
 											</td>
 										</tr>
@@ -242,7 +243,7 @@
 					<div class="buttonbottom">
 						<s:text name="report.export.options" />
 						: <a
-							href='/EGF/report/balanceSheetReport-generateDetailedScheduleXls.action?showDropDown=false&model.period=<s:property value="model.period"/>&model.currency=<s:property value="model.currency"/>&model.financialYear.id=<s:property value="model.financialYear.id"/>&model.department.id=<s:property value="model.department.id"/>&model.fund.id=<s:property value="model.fund.id"/>&model.asOndate=<s:property value="model.asOndate"/>&model.function.id=<s:property value="model.function.id"/>&model.functionary.id=<s:property value="model.functionary.id"/>&model.field.id=<s:property value="model.field.id"/>&majorCode=<s:property value="#parameters['majorCode']" />'>Excel</a>
+							href='/EGF/report/balanceSheetReport-generateDetailedScheduleXls.action?showDropDown=false&model.period=<s:property value="model.period"/>&model.currency=<s:property value="model.currency"/>&model.financialYear.id=<s:property value="model.financialYear.id"/>&model.department.id=<s:property value="model.department.id"/>&model.fund.id=<s:property value="model.fund.id"/>&model.fromDate=<s:property value="model.fromDate"/>&model.toDate=<s:property value="model.toDate"/>&model.function.id=<s:property value="model.function.id"/>&model.functionary.id=<s:property value="model.functionary.id"/>&model.field.id=<s:property value="model.field.id"/>&majorCode=<s:property value="#parameters['majorCode']" />'>Excel</a>
 						| <a
-							href='/EGF/report/balanceSheetReport-generateDetailedSchedulePdf.action?showDropDown=false&model.period=<s:property value="model.period"/>&model.currency=<s:property value="model.currency"/>&model.financialYear.id=<s:property value="model.financialYear.id"/>&model.department.id=<s:property value="model.department.id"/>&model.fund.id=<s:property value="model.fund.id"/>&model.asOndate=<s:property value="model.asOndate"/>&model.function.id=<s:property value="model.function.id"/>&model.functionary.id=<s:property value="model.functionary.id"/>&model.field.id=<s:property value="model.field.id"/>&majorCode=<s:property value="#parameters['majorCode']" />'>PDF</a>
+							href='/EGF/report/balanceSheetReport-generateDetailedSchedulePdf.action?showDropDown=false&model.period=<s:property value="model.period"/>&model.currency=<s:property value="model.currency"/>&model.financialYear.id=<s:property value="model.financialYear.id"/>&model.department.id=<s:property value="model.department.id"/>&model.fund.id=<s:property value="model.fund.id"/>&model.fromDate=<s:property value="model.fromDate"/>&model.toDate=<s:property value="model.toDate"/>&model.function.id=<s:property value="model.function.id"/>&model.functionary.id=<s:property value="model.functionary.id"/>&model.field.id=<s:property value="model.field.id"/>&majorCode=<s:property value="#parameters['majorCode']" />'>PDF</a>
 					</div>

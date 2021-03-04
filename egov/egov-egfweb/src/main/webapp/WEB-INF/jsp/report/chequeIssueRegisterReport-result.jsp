@@ -65,7 +65,7 @@
 					</tr>
 					<tr>
 						<th class="bluebgheadtd" width="100%"><strong
-							style="font-size: 15px;"><s:text name="lbl.cheque.issue.register.report" /> 
+							style="font-size: 15px;"> Cheque issue register report
 								for <b><s:property value="formattedBankName" /></b> with <br />account
 								no:<b><s:property value="accountNumber.accountnumber" /></b>
 								from <b><s:property value="fromDate" /></b> to <b><s:property
@@ -138,7 +138,7 @@
 											<td class="blueborderfortd"><div align="center">
 													<a
 														href='/services/EGF/report/chequeIssueRegisterReport-bankAdviceExcel.action?instrumentHeaderId=<s:property value="instrumentHeaderId" />'>
-														<s:text name="instrument.chequeissueadvice" />
+														<s:text name="instrument.bankadvice" />
 													</a>
 												</div></td>
 											<s:if
@@ -167,10 +167,9 @@
 							<div class="excelpdf">
 								<a
 									href='/services/EGF/report/chequeIssueRegisterReport-generateXls.action?fromDate=<s:property value="fromDate"/>&toDate=<s:property value="toDate"/>&accountNumber.id=<s:property value="accountNumber.id"/>&deptImpl.code=<s:property value="deptImpl.code"/>&function.id=<s:property value="function.id"/>&functionary.id=<s:property value="functionary.id"/>&fund.id=<s:property value="fund.id"/>&field.id=<s:property value="field.id"/>&bank=<s:property value="bank"/>'>Excel</a>
-								<img align="absmiddle"
-									src="/egi/resources/erp2/images/excel.png"> | <a
+								&nbsp; | <a
 									href='/services/EGF/report/chequeIssueRegisterReport-generatePdf.action?fromDate=<s:property value="fromDate"/>&toDate=<s:property value="toDate"/>&accountNumber.id=<s:property value="accountNumber.id"/>&deptImpl.code=<s:property value="deptImpl.code"/>&function.id=<s:property value="function.id"/>&functionary.id=<s:property value="functionary.id"/>&fund.id=<s:property value="fund.id"/>&field.id=<s:property value="field.id"/>&bank=<s:property value="bank"/>'>PDF</a>
-								<img align="absmiddle" src="/egi/resources/erp2/images/pdf.png">
+								
 							</div>
 						</td>
 					</tr>

@@ -68,7 +68,7 @@ public class MDCLoggingFilter implements Filter {
     @Override
     public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain) throws IOException, ServletException {
         try {
-            MDC.put(ULBCODE, ApplicationThreadLocals.getCityName());
+            //MDC.put(ULBCODE, ApplicationThreadLocals.getCityName());
             MDC.put(APPNAME, WebUtils.currentContextPath(request).toUpperCase());
             chain.doFilter(request, response);
         } finally {

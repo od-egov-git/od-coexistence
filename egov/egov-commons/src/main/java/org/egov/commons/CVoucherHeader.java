@@ -114,6 +114,11 @@ public class CVoucherHeader extends StateAware implements java.io.Serializable{
 
     @Transient
     private List<CGeneralLedgerDetail> subLedgerDetails = new ArrayList<>();
+    @Transient
+    private List<DocumentUploads> documentDetail = new ArrayList<>();
+  
+    @Transient
+    private String documentMode;
 
     @Transient
     private String partyName;
@@ -144,7 +149,28 @@ public class CVoucherHeader extends StateAware implements java.io.Serializable{
     
     @Transient
     private String fiscalName;
-    public CVoucherHeader() {
+    
+    @Transient
+    private Integer deptId;
+    @Transient
+    private Date billFrom;
+    @Transient
+    private Date billTo;
+    
+    
+    private String firstsignatory;
+    private String secondsignatory;
+    private String postauditprocessing;
+    private String backdateentry;
+    public String getPostauditprocessing() {
+		return postauditprocessing;
+	}
+
+	public void setPostauditprocessing(String postauditprocessing) {
+		this.postauditprocessing = postauditprocessing;
+	}
+
+	public CVoucherHeader() {
         // TODO Auto-generated constructor stub
     }
 
@@ -522,4 +548,68 @@ public class CVoucherHeader extends StateAware implements java.io.Serializable{
     public void setFiscalName(String fiscalName) {
         this.fiscalName = fiscalName;
     }
+
+	public String getFirstsignatory() {
+		return firstsignatory;
+	}
+
+	public void setFirstsignatory(String firstsignatory) {
+		this.firstsignatory = firstsignatory;
+	}
+
+	public String getSecondsignatory() {
+		return secondsignatory;
+	}
+
+	public void setSecondsignatory(String secondsignatory) {
+		this.secondsignatory = secondsignatory;
+	}
+
+	public List<DocumentUploads> getDocumentDetail() {
+		return documentDetail;
+	}
+
+	public void setDocumentDetail(List<DocumentUploads> documentDetail) {
+		this.documentDetail = documentDetail;
+	}
+
+	public String getDocumentMode() {
+		return documentMode;
+	}
+
+	public void setDocumentMode(String documentMode) {
+		this.documentMode = documentMode;
+	}
+
+	public Integer getDeptId() {
+		return deptId;
+	}
+
+	public void setDeptId(Integer deptId) {
+		this.deptId = deptId;
+	}
+
+	public Date getBillFrom() {
+		return billFrom;
+	}
+
+	public void setBillFrom(Date billFrom) {
+		this.billFrom = billFrom;
+	}
+
+	public Date getBillTo() {
+		return billTo;
+	}
+
+	public void setBillTo(Date billTo) {
+		this.billTo = billTo;
+	}
+
+	public String getBackdateentry() {
+		return backdateentry;
+	}
+
+	public void setBackdateentry(String backdateentry) {
+		this.backdateentry = backdateentry;
+	}
 }

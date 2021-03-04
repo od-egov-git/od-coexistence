@@ -94,7 +94,7 @@
 						<div class="headingsmallbg">
 							<td class="bluebgheadtd" width="100%" colspan="5"><strong
 								style="font-size: 15px;"><s:text name="lbl.bank.details"/></strong></td>
-						</div
+						</div>
 					</tr>
 				</table>
 				</br>

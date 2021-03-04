@@ -69,6 +69,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
@@ -86,9 +87,11 @@ import org.egov.commons.CFinancialYear;
 import org.egov.commons.CFunction;
 import org.egov.commons.EgwStatus;
 import org.egov.commons.Fund;
+import org.egov.commons.dao.BankBranchHibernateDAO;
 import org.egov.commons.dao.FinancialYearDAO;
 import org.egov.commons.service.BankAccountService;
 import org.egov.commons.utils.EntityType;
+import org.egov.egf.autonumber.PexNumberGenerator;
 import org.egov.egf.autonumber.RtgsNumberGenerator;
 import org.egov.egf.commons.EgovCommon;
 import org.egov.egf.model.BankAdviceReportInfo;
@@ -138,12 +141,24 @@ import net.sf.jasperreports.engine.JRException;
         @Result(name = "search", location = "chequeAssignment-search.jsp"),
         @Result(name = "view", location = "chequeAssignment-view.jsp"),
         @Result(name = "viewRtgs", location = "chequeAssignment-viewRtgs.jsp"),
+        @Result(name = "viewPex", location = "chequeAssignment-viewPex.jsp"),
         @Result(name = "surrenderRTGSsearch", location = "chequeAssignment-surrenderRTGSsearch.jsp"),
         @Result(name = "viewReceiptDetailsResult", location = "chequeAssignment-viewReceiptDetailsResult.jsp"),
         @Result(name = "before_pension_search", location = "chequeAssignment-before_pension_search.jsp"),
         @Result(name = "surrenderRTGS", location = "chequeAssignment-surrenderRTGS.jsp"),
+        @Result(name = "surrenderPEXsearch", location = "chequeAssignment-surrenderPEXsearch.jsp"),
+        @Result(name = "surrenderPEX", location = "chequeAssignment-surrenderPEX.jsp"),
+        @Result(name = "searchPexResult", location = "chequeAssignment-searchPexResult.jsp"),
+        @Result(name = "pexSearch", location = "chequeAssignment-pexSearch.jsp"),
+        @Result(name = "searchStopPayment", location = "stopPayment-search.jsp"),
+        @Result(name = "success", location = "stopPayment-success.jsp"),
+        @Result(name = "process", location = "stopPayment-process.jsp"),
+        @Result(name = "accountList", location = "stopPayment-accountList.jsp"),
         @Result(name = "viewsurrender", location = "chequeAssignment-viewsurrender.jsp"),
         @Result(name = "remittanceRtgsSearch", location = "chequeAssignment-remittanceRtgsSearch.jsp"),
+        @Result(name = "remittancePexSearch", location = "chequeAssignment-remittancePexSearch.jsp"),
+        @Result(name = "searchRemittanceRtgsResult", location = "chequeAssignment-searchRemittanceRtgsResult.jsp"),
+        @Result(name = "searchRemittancePexResult", location = "chequeAssignment-searchRemittancePexResult.jsp"),
         @Result(name = "before_remittance_search", location = "chequeAssignment-before_remittance_search.jsp"),
         @Result(name = "before_salary_search", location = "chequeAssignment-before_salary_search.jsp"),
         @Result(name = "searchRtgsResult", location = "chequeAssignment-searchRtgsResult.jsp"),
@@ -166,6 +181,27 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
     private static final long serialVersionUID = -3721873563220007939L;
     private static final String SURRENDERSEARCH = "surrendersearch";
     private static final String SURRENDERRTGSSEARCH = "surrenderRTGSsearch";
+    private static final String SURRENDERPEXSEARCH = "surrenderPEXsearch";
+    private static final String BANKACCOUNT_LIST = "bankaccountList";
+    public static final String SEARCH = "search";
+    public static final String DROPDOWN_DATA_DISHONOR_REASONS_LIST = "dishonorReasonsList";
+    public static final String DROPDOWN_DATA_BANKBRANCH_LIST = "bankBranchList";
+    public static final String DROPDOWN_DATA_ACCOUNT_NO_LIST = "accountNumberList";
+    public static final String DROPDOWN_DATA_INST_MODE_LIST = "instrumentModeList";
+    private static final String BILL_PAYMENT = "BillPayment";
+    private static final String RTGS_TRANSACTION_SUCCESS = "rtgs.transaction.success";
+    public static final TreeMap<String, String> INSTRUMENT_MODES_MAP = new TreeMap<String, String>() {
+
+        private static final long serialVersionUID = -3923246500888439628L;
+        {
+            put("cheque", "Cheque");
+            put("dd", "DD");
+            put("PEX","PEX");
+        }
+    };
+    private Map instrumentModesMap;
+    @Autowired
+    private BankBranchHibernateDAO bankBranchHibernateDAO;
     private String paymentMode, inFavourOf;
     private Integer bankaccount, selectedRows = 0, bankbranch;
     private String bank_branch;
@@ -178,6 +214,16 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
     private String typeOfAccount;
     private List<Map<String, Object>> bankbranchList;
     private String fileName;
+    private static final String PEX_TRANSACTION_SUCCESS = "pex.transaction.success";
+    private static final String ACCOUNT_NO_AND_PEX_ENTRY_MAP = "accountNoAndPexEntryMapSession";
+    private transient Map<Bankaccount, List<ChequeAssignment>> accountNoAndPexEntryMap = new HashMap<>();
+    private transient Map<String, String> pexdateMap = new HashMap<>();
+    private transient Map<String, String> pexRefNoMap = new HashMap<>();
+    private transient Map<String, Boolean> pexSeceltedAccMap = new HashMap<>();
+    private transient List<ChequeAssignment> pexList = new LinkedList<>();
+    private boolean pexNoGenerationAuto;
+    private boolean containsPEX = false;
+    
 
     @Autowired
     @Qualifier("persistenceService")
@@ -254,6 +300,7 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
     private Map chequeSlNoMap;
     Map<Bankaccount, List<ChequeAssignment>> accountNoAndRtgsEntryMap = new HashMap<Bankaccount, List<ChequeAssignment>>();
     Map<BankAccountRemittanceCOA, List<ChequeAssignment>> accountNoAndRemittanceRtgsEntryMap = new HashMap<BankAccountRemittanceCOA, List<ChequeAssignment>>();
+    Map<BankAccountRemittanceCOA, List<ChequeAssignment>> accountNoAndRemittancePexEntryMap = new HashMap<BankAccountRemittanceCOA, List<ChequeAssignment>>();
     Map<String, String> rtgsdateMap = new HashMap<String, String>();
     Map<String, String> rtgsRefNoMap = new HashMap<String, String>();
     Map<String, Boolean> rtgsSeceltedAccMap = new HashMap<String, Boolean>();
@@ -272,6 +319,7 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
     private Boolean nonSubledger = false;
     private FinancialYearDAO financialYearDAO;
     private boolean containsRTGS = false;
+    private static final String RTGS_DATE_LESS_THAN_PAYMENT_DATE = "rtgs.date.less.than.payment.date";
     private List<CFinancialYear> yearCodeList;
     private Long departmentId;
     private boolean chequePrintingEnabled;
@@ -340,6 +388,7 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
         addDropdownData("regionsList", VoucherHelper.TNEB_REGIONS);
         chequeNoGenerationAuto = paymentService.isChequeNoGenerationAuto();
         rtgsNoGenerationAuto = paymentService.isRtgsNoGenerationAuto();
+        pexNoGenerationAuto = paymentService.isPexNoGenerationAuto();
         typeOfAccount = FinancialConstants.TYPEOFACCOUNT_PAYMENTS + "," + FinancialConstants.TYPEOFACCOUNT_RECEIPTS_PAYMENTS;
         currentDate = new Date();
         // overriding department Mandatory Condition only for remittance cheque assignment search
@@ -348,7 +397,7 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
 
         // overriding function Mandatory Condition only for cheque assignment search
         mandatoryFields.remove("function");
-        voucherHeader.getVouchermis().setDepartmentcode(getDefaultDepartmentValueForPayment());
+        //voucherHeader.getVouchermis().setDepartmentcode(getDefaultDepartmentValueForPayment());
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Completed prepare.");
     }
@@ -469,95 +518,107 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Completed prepareBeforeRemittanceRtgsSearch.");
     }
+    
+    public void prepareBeforeSearchForPexRemittance() {
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Starting prepareBeforeSearchForPexRemittance...");
+        addDropdownData("drawingofficerList", getPersistenceService().findAllBy("from DrawingOfficer where id in" +
+                " (select drawingOfficer.id from DepartmentDOMapping) order by code"));
+        final List<Recovery> listRecovery = recoveryService.getAllActiveAutoRemitTds();
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("RemitRecoveryAction | Tds list size : " + listRecovery.size());
+        addDropdownData("recoveryList", listRecovery);
+        paymentMode = FinancialConstants.MODEOFPAYMENT_PEX;
+        rtgsContractorAssignment = false;
+        if (deptNonMandatory == true)
+            mandatoryFields.remove("department");
+        if (mandatoryFields.contains("fund"))
+            mandatoryFields.remove("fund");
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Completed prepareBeforeSearchForPexRemittance.");
+    }
 
     @SkipValidation
     @Action(value = "/payment/chequeAssignment-beforeRemittanceRtgsSearch")
     public String beforeRemittanceRtgsSearch() {
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Starting beforeRemittanceRtgsSearch...");
+    	if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Starting beforeSearchForRemittance...");
+        headerFields.remove("scheme");
+        headerFields.remove("subscheme");
         paymentMode = FinancialConstants.MODEOFPAYMENT_RTGS;
-        rtgsContractorAssignment = true;
+        modeOfPaymentMap = new LinkedHashMap<String, String>();
+        modeOfPaymentMap.put(FinancialConstants.MODEOFPAYMENT_RTGS, getText("rtgs.type.mode"));
+        final List<Recovery> listRecovery = recoveryService.getAllActiveRecoverys();
         if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Completed beforeRemittanceRtgsSearch.");
+            LOGGER.debug("RemitRecoveryAction | Tds list size : " + listRecovery.size());
+        addDropdownData("recoveryList", listRecovery);
+        // typeOfAccount = FinancialConstants.TYPEOFACCOUNT_PAYMENTS+","+FinancialConstants.TYPEOFACCOUNT_RECEIPTS_PAYMENTS;
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Completed beforeSearchForRemittance.");
+        
         return "remittanceRtgsSearch";
+    }
+    
+    @SkipValidation
+    @Action(value = "/payment/chequeAssignment-beforeSearchForPexRemittance")
+    public String beforeSearchForPexRemittance() {
+    	if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Starting beforeSearchForRemittance...");
+        headerFields.remove("scheme");
+        headerFields.remove("subscheme");
+        paymentMode = FinancialConstants.MODEOFPAYMENT_PEX;
+        modeOfPaymentMap = new LinkedHashMap<String, String>();
+        modeOfPaymentMap.put(FinancialConstants.MODEOFPAYMENT_PEX, getText("pex.type.mode"));
+        final List<Recovery> listRecovery = recoveryService.getAllActiveRecoverys();
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("RemitRecoveryAction | Tds list size : " + listRecovery.size());
+        addDropdownData("recoveryList", listRecovery);
+        // typeOfAccount = FinancialConstants.TYPEOFACCOUNT_PAYMENTS+","+FinancialConstants.TYPEOFACCOUNT_RECEIPTS_PAYMENTS;
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Completed beforeSearchForRemittance.");
+        return "remittancePexSearch";
     }
 
     @ValidationErrorPage(value = "remittanceRtgsSearch")
     @SkipValidation
+    @Action(value = "/payment/chequeAssignment-searchRemittanceRTGS")
     public String searchRemittanceRTGS() throws ApplicationException, ParseException {
+    	if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Starting searchChequesOfRemittance...");
+        final Recovery recovery = (Recovery) persistenceService.find("from Recovery where id=?", recoveryId);
+        voucherHeader.setType(FinancialConstants.STANDARD_VOUCHER_TYPE_PAYMENT);
+        voucherHeader.setName(FinancialConstants.PAYMENTVOUCHER_NAME_REMITTANCE);
+        loadChequeSerialNo(bankaccount);
+        chequeAssignmentList = paymentService.getPaymentVoucherNotInInstrument(parameters, voucherHeader);
+        if (recovery != null && recovery.getRemitted() != null)
+            inFavourOf = recovery.getRemitted();
+        else
+            inFavourOf = "";
+        loadBankAndAccount();
         if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Starting searchRemittanceRTGS...");
-        List<ChequeAssignment> rtgsChequeAssignmentList = null;
-        List<ChequeAssignment> rtgsEntry = new ArrayList<ChequeAssignment>();
-        rtgsContractorAssignment = true;
-        boolean addList = false;
-        // TODO Initialize to null not new ()
-        Bankaccount bnkAcc = new Bankaccount();
-        new BankAccountRemittanceCOA();
-        // TODO Initialize to null not new ()
-        CChartOfAccounts coa = new CChartOfAccounts();
-
-        rtgsChequeAssignmentList = paymentService.getPaymentVoucherForRemittanceRTGSInstrument(parameters, voucherHeader);
-
-        for (final ChequeAssignment chqAssgn : rtgsChequeAssignmentList) {
-            BankAccountRemittanceCOA bnkAccCOA = new BankAccountRemittanceCOA();
-            if (accountNoAndRemittanceRtgsEntryMap.isEmpty()) {
-                rtgsEntry = new ArrayList<ChequeAssignment>();
-                bnkAcc = (Bankaccount) persistenceService.find("from Bankaccount where id=?",
-                        Long.parseLong(chqAssgn.getBankAccountId().toString()));
-                coa = (CChartOfAccounts) persistenceService.find("from CChartOfAccounts where id =?", new Long(chqAssgn
-                        .getGlcodeId().toString()));
-                bnkAccCOA.setBankAccount(bnkAcc);
-                bnkAccCOA.setRemittanceCOA(coa);
-                rtgsEntry.add(chqAssgn);
-                accountNoAndRemittanceRtgsEntryMap.put(bnkAccCOA, rtgsEntry);
-                rtgsdateMap.put(bnkAcc.getId().toString(), formatter.format(currentDate));
-            } else {
-                final Set<BankAccountRemittanceCOA> bankAccntKeySet = accountNoAndRemittanceRtgsEntryMap.keySet();
-                final java.util.Iterator keySetitr = bankAccntKeySet.iterator();
-                while (keySetitr.hasNext()) {
-                    final BankAccountRemittanceCOA bkcoa = (BankAccountRemittanceCOA) keySetitr.next();
-                    addList = false;
-                    if (bkcoa.getBankAccount().getId().equals(Integer.parseInt(chqAssgn.getBankAccountId().toString())) &&
-                            bkcoa.getRemittanceCOA().getId().toString().equals(chqAssgn.getGlcodeId().toString())) {
-                        bnkAccCOA = bkcoa;
-                        addList = false;
-                        break;
-                    } else
-                        addList = true;
-                }
-                if (!addList) {
-                    accountNoAndRemittanceRtgsEntryMap.get(bnkAccCOA).add(chqAssgn);
-                } else {
-                    rtgsEntry = new ArrayList<ChequeAssignment>();
-                    bnkAcc = (Bankaccount) persistenceService.find("from Bankaccount where id=?",
-                            Long.parseLong(chqAssgn.getBankAccountId().toString()));
-                    coa = (CChartOfAccounts) persistenceService.find("from CChartOfAccounts where id =?", new Long(chqAssgn
-                            .getGlcodeId().toString()));
-                    bnkAccCOA.setBankAccount(bnkAcc);
-                    bnkAccCOA.setRemittanceCOA(coa);
-                    rtgsEntry.add(chqAssgn);
-                    accountNoAndRemittanceRtgsEntryMap.put(bnkAccCOA, rtgsEntry);
-                    rtgsdateMap.put(bnkAcc.getId().toString(), formatter.format(currentDate));
-                }
-            }
-        }
-        getSession().put("accountNoAndRtgsEntryMapSession", accountNoAndRemittanceRtgsEntryMap);
-        if (0 != drawingOfficerId) {
-            final DrawingOfficer drawingOfficer = (DrawingOfficer) persistenceService.find("from DrawingOfficer where id =?",
-                    drawingOfficerId);
-            drawingOfficerCode = drawingOfficer.getCode();
-        }
-        assignmentType = "BillPayment";
-        if (!"".equals(parameters.get("recoveryId")[0])) {
-            final Recovery recovery = (Recovery) persistenceService.find("from Recovery where id=?",
-                    new Long(parameters.get("recoveryId")[0]));
-            if (recovery.getChartofaccounts().getChartOfAccountDetails().isEmpty())
-                nonSubledger = true;
-        }
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Completed searchRemittanceRTGS.");
+            LOGGER.debug("Completed searchChequesOfRemittance.");        
         return "searchRemittanceRtgsResult";
+    }
+    
+    @ValidationErrorPage(value = "remittancePexSearch")
+    @SkipValidation
+    @Action(value = "/payment/chequeAssignment-searchRemittancePEX")
+    public String searchRemittancePEX() throws ApplicationException, ParseException {
+    	if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Starting searchChequesOfRemittance...");
+        final Recovery recovery = (Recovery) persistenceService.find("from Recovery where id=?", recoveryId);
+        voucherHeader.setType(FinancialConstants.STANDARD_VOUCHER_TYPE_PAYMENT);
+        voucherHeader.setName(FinancialConstants.PAYMENTVOUCHER_NAME_REMITTANCE);
+        loadChequeSerialNo(bankaccount);
+        chequeAssignmentList = paymentService.getPaymentVoucherNotInInstrument(parameters, voucherHeader);
+        if (recovery != null && recovery.getRemitted() != null)
+            inFavourOf = recovery.getRemitted();
+        else
+            inFavourOf = "";
+        loadBankAndAccount();
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Completed searchChequesOfRemittance.");  
+        return "searchRemittancePexResult";
     }
 
     @SkipValidation
@@ -1051,7 +1112,6 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
                 return "searchRtgsResult";
             }
             createRtgsAssignment(resultMap);
-            selectedRows = paymentService.selectedRows;
         } catch (final ValidationException e) {
             searchRTGS();
             LOGGER.error(e.getMessage());
@@ -1081,7 +1141,9 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
     {
 
         LOGGER.error("size--------" + parameters.size());
-        if (!paymentMode.equalsIgnoreCase("cash"))
+        LOGGER.info("paymentMode :::: "+paymentMode);
+        LOGGER.info("selectedRowsId ::: "+selectedRowsId);
+        if ((!paymentMode.equalsIgnoreCase("cash") && !paymentMode.equalsIgnoreCase("rtgs") && !paymentMode.equalsIgnoreCase("pex")))
             prepareChequeAssignmentList();
         final List<AppConfigValues> printAvailConfig = appConfigValuesService
                 .getConfigValuesByModuleAndKey(FinancialConstants.MODULE_NAME_APPCONFIG, "chequeprintavailableat");
@@ -1100,16 +1162,81 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
             }
         }
 
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Starting createInstrument...");
+            LOGGER.info("Starting createInstrument...");
         loadChequeSerialNo(bankaccount);
         try {
+        	System.out.println("Before");
             validateData();
+            System.out.println("Before After");
+            System.out.println("reassignSurrenderChq    :::"+reassignSurrenderChq);
+            System.out.println("isChequeNoGenerationAuto()   ::: "+isChequeNoGenerationAuto());
+            
             if (reassignSurrenderChq || !isChequeNoGenerationAuto())
                 validateDataForManual();
+            System.out.println("Before After All");
+            //final String[] dateArray1 = new String[]{parameters.get("chequeDt")[0]};
+        	//System.out.println("date : "+dateArray1[0]);
+            System.out.println("mode :::"+paymentMode);
+            if(paymentMode.equalsIgnoreCase(FinancialConstants.MODEOFPAYMENT_RTGS))
+            {
+            	final String[] dateArray = new String[]{parameters.get("chequeDt")[0]};
+            	System.out.println("date : "+dateArray[0]);
+            	Date rtgsdate = null;
+                final Date autoNoCutOffDate = FinancialConstants.RTGS_FINYEAR_WISE_ROLLING_SEQ_CUTOFF_DATE;
+                String rtgsNo = "";
+                if (dateArray[0] != null) {
+                    final String date = dateArray[0];
+                    // LOGGER.debug(date);
+                    rtgsdate = formatter.parse(date);
+                    // LOGGER.debug(rtgsdate);
+                }
+                final String finYearRange = financialYearDAO.getFinancialYearByDate(rtgsdate).getFinYearRange();
 
+                RtgsNumberGenerator r = (RtgsNumberGenerator) beanResolver
+                        .getAutoNumberServiceFor(RtgsNumberGenerator.class);
+                if (null == autoNoCutOffDate || rtgsdate.after(autoNoCutOffDate)) {
+                    rtgsNo = r.getNextNumber("RTGS_RefNumber_" + finYearRange.replace('-', '_'));
+
+                    rtgsNo = rtgsNo + "/" + finYearRange;
+                } else
+                    rtgsNo = r.getNextNumber("RTGS_RefNumber");
+
+                System.out.println("No ; "+rtgsNo);
+                final String[] refNoArray = new String[] { rtgsNo };
+                parameters.put("rtgsRefNo", refNoArray);
+                parameters.put("rtgsDate", dateArray);
+            }
+            else if(paymentMode.equalsIgnoreCase(FinancialConstants.MODEOFPAYMENT_PEX))
+            {
+            	final String[] dateArray = new String[]{parameters.get("chequeDt")[0]};
+            	System.out.println("date : "+dateArray[0]);
+            	Date pexdate = null;
+                final Date autoNoCutOffDate = FinancialConstants.RTGS_FINYEAR_WISE_ROLLING_SEQ_CUTOFF_DATE;
+                String pexNo;
+                if (dateArray[0] != null) {
+                    final String date = dateArray[0];
+                    pexdate = formatter.parse(date);
+                    System.out.println("pexdate:: " +pexdate);
+                }
+                final String finYearRange = financialYearDAO.getFinancialYearByDate(pexdate).getFinYearRange();
+
+                PexNumberGenerator pexNumberGenerator = beanResolver.getAutoNumberServiceFor(PexNumberGenerator.class);
+                if (pexdate != null && pexdate.after(autoNoCutOffDate)) {
+                    pexNo = pexNumberGenerator.getNextNumber("RTGS_RefNumber_" + finYearRange.replace('-', '_'));
+
+                    pexNo = new StringBuilder().append(pexNo).append("/").append(finYearRange).toString();
+                } else
+                    pexNo = pexNumberGenerator.getNextNumber("RTGS_RefNumber");
+                
+                System.out.println("pexNo:: " +pexNo);
+
+                final String[] refNoArray = new String[]{pexNo};
+                parameters.put("pexRefNo", refNoArray);
+                System.out.println("refNoArray1:: " +refNoArray);
+                parameters.put("pexDate", dateArray);
+            }
             if (getFieldErrors().isEmpty()) {
-                if (reassignSurrenderChq && !paymentMode.equalsIgnoreCase(FinancialConstants.MODEOFPAYMENT_RTGS))
+                if (reassignSurrenderChq && !paymentMode.equalsIgnoreCase(FinancialConstants.MODEOFPAYMENT_RTGS) && !paymentMode.equalsIgnoreCase(FinancialConstants.MODEOFPAYMENT_PEX))
                     instHeaderList = chequeAssignmentHelper.reassignInstrument(chequeAssignmentList, paymentMode, bankaccount,
                             parameters, voucherHeader.getVouchermis().getDepartmentcode());
                 else
@@ -1118,6 +1245,10 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
                 selectedRows = paymentService.selectedRows;
                 if (paymentMode.equalsIgnoreCase(FinancialConstants.MODEOFPAYMENT_RTGS))
                     addActionMessage(getMessage("rtgs.transaction.success"));
+                else if(paymentMode.equalsIgnoreCase(FinancialConstants.MODEOFPAYMENT_PEX))
+                {
+                	addActionMessage(getMessage("pex.transaction.success"));
+                }
                 else
                     addActionMessage(getMessage("chq.assignment.transaction.success"));
 
@@ -1127,21 +1258,32 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
                 return "searchpayment";
             }
         } catch (final ValidationException e) {
+        	e.printStackTrace();
             final List<ValidationError> errors = new ArrayList<ValidationError>();
             errors.add(new ValidationError("exp", e.getErrors().get(0).getMessage()));
             throw new ValidationException(errors);
         } catch (final Exception e) {
+        	e.printStackTrace();
             final List<ValidationError> errors = new ArrayList<ValidationError>();
             errors.add(new ValidationError("exp", e.getMessage()));
             throw new ValidationException(errors);
         }
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Completed createInstrument.");
-
+            LOGGER.info("Completed createInstrument.");
+        if(instHeaderList != null && !instHeaderList.isEmpty())
+        {
+        	
+        	for( InstrumentHeader row :instHeaderList)
+        	{
+        		final InstrumentVoucher instrumentHeaderDtl = instrumentVoucherService.getInstrumentVoucherByVoucherHeader(row.getId());
+        		row.setVoucherNumber(instrumentHeaderDtl.getVoucherHeaderId().getVoucherNumber());
+        	}
+        }
+        System.out.println("done");
         return "view";
     }
 
     public List<ChequeAssignment> prepareChequeAssignmentList() {
+    	System.out.println("XXXX");
         chequeAssignmentList = new ArrayList<>();
         String[] selectedRowsIdArray;
         if (selectedRowsId != null)
@@ -1149,6 +1291,7 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
         else
             selectedRowsIdArray = new String[0];
         int length = selectedRowsIdArray.length;
+        System.out.println("length ::::"+length);
         for (int i = 0; i < length; i++) {
             ChequeAssignment chequeAssignment = new ChequeAssignment();
             String[] items = selectedRowsIdArray[i].split("\\~");
@@ -1170,42 +1313,10 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
             chequeAssignment.setIsSelected(true);
             chequeAssignmentList.add(chequeAssignment);
         }
+        System.out.println("chequeAssignmentList.size() ::::"+chequeAssignmentList.size());
         return chequeAssignmentList;
     }
 
-    public List<ChequeAssignment> prepareRtgsAssignmentList() {
-        String[] selectedRowsIdArray;
-        if (selectedRowsId != null)
-            selectedRowsIdArray = selectedRowsId.split(";,");
-        else
-            selectedRowsIdArray = new String[0];
-        int length = selectedRowsIdArray.length;
-        for (int i = 0; i < length; i++) {
-            ChequeAssignment chequeAssignment = new ChequeAssignment();
-            String[] items = selectedRowsIdArray[i].split("\\~");
-            chequeAssignment.setVoucherHeaderId(Long.valueOf(items[0]));
-            chequeAssignment.setPaidTo(items[1]);
-            chequeAssignment.setVoucherNumber(items[2]);
-            try {
-                chequeAssignment.setVoucherDate(formatter.parse(items[3]));
-                chequeAssignment.setChequeDate(formatter.parse(items[9]));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            String item = items[11];
-            if (item.contains(";"))
-                item = items[11].replace(";", "");
-            chequeAssignment.setBankAccountId(Long.valueOf(items[4]));
-            chequeAssignment.setBillNumber(items[5]);
-            chequeAssignment.setDepartmentName(items[6]);
-            chequeAssignment.setBillId(Long.valueOf(items[7]));
-            chequeAssignment.setExpenditureType(items[8]);
-            chequeAssignment.setPaidAmount(BigDecimal.valueOf(Double.valueOf(item)));
-            chequeAssignment.setIsSelected(true);
-            rtgsList.add(chequeAssignment);
-        }
-        return rtgsList;
-    }
     private void createRtgsAssignment(final Map<String, List<ChequeAssignment>> resultMap) throws Exception {
         instVoucherList = new ArrayList<InstrumentVoucher>();
         // InstrumentHeader instHeaderObj=new InstrumentHeader();
@@ -1277,10 +1388,8 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
         new ArrayList<InstrumentHeader>();
         // if(expType==null || expType.equals("-1") || expType.equals("Purchase")) Works
         // FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT
-        rtgsList=new ArrayList<ChequeAssignment>();
-        rtgsList = prepareRtgsAssignmentList();
-            for (final ChequeAssignment chqAssgn : rtgsList) 
-                if (resultMap.isEmpty()) {
+        for (final ChequeAssignment chqAssgn : rtgsList)
+            if (resultMap.isEmpty()) {
                 rtgsEntry = new ArrayList<ChequeAssignment>();
                 rtgsEntry.add(chqAssgn);
                 if (chqAssgn.getBankAccountId() != null && !"".equals(chqAssgn.getBankAccountId()))
@@ -1486,15 +1595,7 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Starting validateData...");
         // rtgsContractorAssignment is true only for rtgs assignment for asstbudget user
-        if (paymentMode.equalsIgnoreCase(FinancialConstants.MODEOFPAYMENT_RTGS)) {
-            if (!rtgsContractorAssignment) {
-                if (rtgsRefNo == null || rtgsRefNo.equalsIgnoreCase(""))
-                    addFieldError("rtgsrefno", getMessage("rtgs.refno.empty"));
-                if (rtgsDate == null || rtgsDate.equalsIgnoreCase(""))
-                    addFieldError("rtgsdate", getMessage("rtgs.date.empty"));
-            }
-            return;
-        }
+        
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Completed validateData.");
         checkMandatory("vouchermis.departmentcode", Constants.DEPARTMENT, voucherHeader.getVouchermis().getDepartmentcode(),
@@ -1588,6 +1689,7 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Completed searchChequesForSurrender.");
         containsRTGS = false;
+        containsPEX = false;
         return "surrendercheques";
     }
 
@@ -1605,7 +1707,7 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
                         "bankaccountList",
                         persistenceService.findAllBy(" from Bankaccount where bankbranch.id=? and isactive=true ",
                                 Integer.valueOf(bank_branch.split("-")[1])));
-            loadReasonsForSurrendaring();
+            loadReasonsForSurrendaringRTGS();
             return beforeSearchForRTGSSurrender();
         }
 
@@ -1640,7 +1742,7 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
             getSession().put("instrumentHeaderList", instrumentHeaderList);
 
             if (instrumentVoucherList.size() > 0)
-                loadReasonsForSurrendaring();
+                loadReasonsForSurrendaringRTGS();
             loadChequeSerialNo(bankaccount);
 
         } catch (final ParseException e) {
@@ -1651,6 +1753,68 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Completed searchRTGSForSurrender.");
         return "surrenderRTGS";
+    }
+    
+    @SkipValidation
+    @ValidationErrorPage(value = SURRENDERPEXSEARCH)
+    @Action(value = "/payment/chequeAssignment-searchForPEXSurrender")
+    public String searchForPEXSurrender() {
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Starting searchRTGSForSurrender...");
+
+        validateForSurrenderSearch();
+        if (getFieldErrors().size() > 0) {
+            if (bank_branch != null && !bank_branch.equals("-1"))
+                addDropdownData(
+                        "bankaccountList",
+                        persistenceService.findAllBy(" from Bankaccount where bankbranch.id=? and isactive=true ",
+                                Integer.valueOf(bank_branch.split("-")[1])));
+            loadReasonsForSurrendaringPEX();
+            return beforeSearchForRTGSSurrender();
+        }
+
+        final StringBuffer sql = new StringBuffer();
+        try {
+            if (!"".equals(fromDate))
+                sql.append(" and iv.voucherHeaderId.voucherDate>='" + sdf.format(formatter.parse(fromDate)) + "' ");
+            if (!"".equals(toDate))
+                sql.append(" and iv.voucherHeaderId.voucherDate<='" + sdf.format(formatter.parse(toDate)) + "'");
+            if (bankaccount != null && bankaccount != -1)
+                sql.append(" and  ih.bankAccountId.id=" + bankaccount);
+            if (instrumentNumber != null && !instrumentNumber.isEmpty())
+                sql.append(" and  ih.transactionNumber='" + instrumentNumber + "'");
+            if (department != null && !department.equalsIgnoreCase("-1") && !department.equalsIgnoreCase("0"))
+                sql.append(" and  iv.voucherHeaderId.vouchermis.departmentcode='" + department + "'");
+            if (voucherHeader.getVoucherNumber() != null && !voucherHeader.getVoucherNumber().isEmpty())
+                sql.append(" and  iv.voucherHeaderId.voucherNumber='" + voucherHeader.getVoucherNumber() + "'");
+            final String mainquery = "select ih from  InstrumentVoucher iv,InstrumentHeader ih ,InstrumentType it where iv.instrumentHeaderId.id =ih.id and ih.transactionNumber is not null and ih.instrumentType=it.id and it.type = 'pex' and   iv.voucherHeaderId.status=0  and iv.voucherHeaderId.type='"
+                    + FinancialConstants.STANDARD_VOUCHER_TYPE_PAYMENT + "'  " + sql + " "
+
+                    + " and ih.statusId.id in (?)  order by iv.voucherHeaderId.voucherDate";
+            final EgwStatus created = instrumentService.getStatusId(FinancialConstants.INSTRUMENT_CREATED_STATUS);
+            instrumentHeaderList = persistenceService.findAllBy(mainquery, created.getId());
+            final LinkedHashSet lhs = new LinkedHashSet();
+            lhs.addAll(instrumentHeaderList);
+            instrumentHeaderList.clear();
+            instrumentHeaderList.addAll(lhs);
+            instrumentVoucherList = new ArrayList<InstrumentVoucher>();
+            for (final InstrumentHeader ih : instrumentHeaderList)
+                instrumentVoucherList.addAll(ih.getInstrumentVouchers());
+            getSession().put("instrumentVoucherList", instrumentVoucherList);
+            getSession().put("instrumentHeaderList", instrumentHeaderList);
+
+            if (instrumentVoucherList.size() > 0)
+                loadReasonsForSurrendaringPEX();
+            loadChequeSerialNo(bankaccount);
+
+        } catch (final ParseException e) {
+            LOGGER.error(e.getMessage());
+            throw new ValidationException(Arrays.asList(new ValidationError("Unparsable Date", "Unparsable Date")));
+        }
+        getheader();
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Completed searchRTGSForSurrender.");
+        return "surrenderPEX";
     }
 
     /**
@@ -1751,7 +1915,7 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Completed validateForSurrenderSearch.");
     }
-
+  
     @ValidationErrorPage(value = "surrendercheques")
     @SkipValidation
     @Action(value = "/payment/chequeAssignment-save")
@@ -1761,7 +1925,19 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
         final StringBuffer reasonMissingRows = new StringBuffer(50);
         prepareInstrumentList();
         loadBankAndAccount();
-        loadReasonsForSurrendaring();
+        if(containsPEX)
+        {
+        	loadReasonsForSurrendaringPEX();
+        }
+        else if (containsRTGS)
+        {
+        	loadReasonsForSurrendaringRTGS();
+        }
+        else
+        {
+        	loadReasonsForSurrendaring();
+        }
+        
         loadChequeSerialNo(bankaccount);
 
         try {
@@ -1771,10 +1947,14 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
                     addActionError("Please select atleast one Cheque for Surrendering");
                     return searchForRTGSSurrender();
 
-                } else
+                }
+				else if(containsPEX){
+					addActionError("Please select atleast one Cheque for Surrendering");
+				    return searchForPEXSurrender();
+				}
+				else
                     throw new ValidationException(Arrays.asList(new ValidationError("Exception while surrender Cheque ",
                             "Please select atleast one Cheque for Surrendering ")));
-
             }
             final List<InstrumentHeader> suurenderChequelist = new ArrayList<InstrumentHeader>();
             final List<String> chequeNoList = new ArrayList<String>();
@@ -1810,26 +1990,41 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
                     if (instrumentHeader != null) {
                         instrumentHeader.setSurrendarReason(surrendarReasons[i]);
                         suurenderChequelist.add(instrumentHeader);
-                        if (instrumentHeader.getTransactionNumber() != null)
-                            containsRTGS = true;
+                        if (instrumentHeader.getTransactionNumber() != null){
+                        	if(instrumentHeader.getInstrumentType().getType().equalsIgnoreCase("pex")){
+                        		containsPEX = true;
+                        	}
+                        	else if(instrumentHeader.getInstrumentType().getType().equalsIgnoreCase("advice")){
+                        		containsRTGS = true;
+                        	}
+						}
                     }
-
                 }
                 if (!reasonMissingRows.toString().isEmpty())
                     if (containsRTGS) {
                         addActionError("please select the Reason for Surrendering the cheque for selected  rows");
                         return searchForRTGSSurrender();
-
-                    } else
+                    }
+                    else if(containsPEX){
+                    	addActionError("please select the Reason for Surrendering the cheque for selected  rows");
+                        return searchForPEXSurrender();
+                    }
+                    else
                         throw new ValidationException(Arrays.asList(new ValidationError("Exception while surrender Cheque ",
                                 "please select the Reason for Surrendering the cheque for selected  rows")));
+                
                 instrumentService.surrenderCheques(suurenderChequelist);
+               
                 if (button.equalsIgnoreCase("surrenderAndReassign") && containsRTGS == true)
                     throw new ValidationException(Arrays.asList(new ValidationError(
                             "Cannot reassign RTGS Numbers. Use RTGS Screen ",
                             "Cannot reassign RTGS Numbers. Use RTGS Screen")));
-                else if (button.equalsIgnoreCase("surrenderAndReassign") && containsRTGS == false) {
-
+                else if(button.equalsIgnoreCase("surrenderAndReassign") && containsPEX == true){
+                	throw new ValidationException(Arrays.asList(new ValidationError(
+                            "Cannot reassign PEX Numbers. Use PEX Screen ",
+                            "Cannot reassign PEX Numbers. Use PEX Screen")));
+                }
+                else if (button.equalsIgnoreCase("surrenderAndReassign") && containsRTGS == false && containsPEX == false) {
                     for (int i = 0; i < surrender.length; i++)
                         if (surrender[i] != null)
                             if (!isChequeNoGenerationAuto()) {
@@ -1995,8 +2190,7 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
     }
 
     public void validateDataForManual() throws ParseException {
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Starting validateDataForManual...");
+            LOGGER.info("Starting validateDataForManual...");
         int i = 0;
         final Map<String, String> chqNoMap = new HashMap<String, String>();
         if (paymentMode.equals(FinancialConstants.MODEOFPAYMENT_CHEQUE)) {
@@ -2045,7 +2239,7 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
         {
             // / Validations are done for RTGS payment mode
             String chequedt = null;
-            if (paymentMode.equalsIgnoreCase(FinancialConstants.MODEOFPAYMENT_RTGS))
+            if (paymentMode.equalsIgnoreCase(FinancialConstants.MODEOFPAYMENT_RTGS) || paymentMode.equalsIgnoreCase(FinancialConstants.MODEOFPAYMENT_PEX))
                 return;
             chequedt = parameters.get("chequeDt")[0];
             if (StringUtils.isEmpty(parameters.get("inFavourOf")[0]))
@@ -2053,15 +2247,19 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
             if (StringUtils.isEmpty(parameters.get("chequeNo")[0]))
                 addFieldError("chequeNo", getMessage("payment.chequeno.empty"));
             else {
-                for (int j = 0; j < chequeAssignmentList.size(); j++)
-                    if (parameters.get("chequeAssignmentList[" + j + "].isSelected") != null
-                            && parameters.get("chequeAssignmentList[" + j + "].isSelected")[0].equals("true")) {
-                        final String paymentdt = parameters.get("chequeAssignmentList[" + j + "].tempPaymentDate")[0];
-
-                        if (formatter.parse(chequedt).compareTo(formatter.parse(paymentdt)) < 0)
-                            addFieldError("Cheque date cannot be less than paymnet date",
-                                    getMessage("payment.chequedate.invalid"));
-                    }
+            	System.out.println("size ::: "+chequeAssignmentList.size());
+            	System.out.println("");
+				/*
+				 * for (int j = 0; j < chequeAssignmentList.size(); j++) if
+				 * (parameters.get("chequeAssignmentList[" + j + "].isSelected") != null &&
+				 * parameters.get("chequeAssignmentList[" + j +
+				 * "].isSelected")[0].equals("true")) { final String paymentdt =
+				 * parameters.get("chequeAssignmentList[" + j + "].tempPaymentDate")[0];
+				 * 
+				 * if (formatter.parse(chequedt).compareTo(formatter.parse(paymentdt)) < 0)
+				 * addFieldError("Cheque date cannot be less than paymnet date",
+				 * getMessage("payment.chequedate.invalid")); }
+				 */
                 if (reassignSurrenderChq) {
                     if (!instrumentService.isReassigningChequeNumberValid(parameters.get("chequeNo")[0], bankaccount.longValue(),
                             voucherHeader.getVouchermis().getDepartmentcode(), parameters.get("serialNo")[0]))
@@ -2073,8 +2271,7 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
             if (null == getChequeDt())
                 addFieldError("chequeDt", getMessage("payment.chequedate.empty"));
         }
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Completed validateDataForManual.");
+            LOGGER.info("Completed validateDataForManual.");
     }
 
     @SkipValidation
@@ -2788,6 +2985,389 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
 
     public void setTempInstrumentHeaderList(List<InstrumentHeader> tempInstrumentHeaderList) {
         this.tempInstrumentHeaderList = tempInstrumentHeaderList;
+    }
+    @SkipValidation
+    @Action(value = "/payment/chequeAssignment-beforePexSearch")
+    public String beforePexSearch() {
+        paymentMode = FinancialConstants.MODEOFPAYMENT_PEX;
+        //rtgsContractorAssignment = true;
+        return "pexSearch";
+    }
+    
+    @ValidationErrorPage(value = "pexSearch")
+    @SkipValidation
+    @Action(value = "/payment/chequeAssignment-searchPEX")
+    public String searchPEX() throws ApplicationException, ParseException {
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Starting searchRTGS...");
+        List<ChequeAssignment> pexChequeAssignmentList;
+        List<ChequeAssignment> dbpPexAssignmentList;
+        List<ChequeAssignment> pexEntry;
+        List<ChequeAssignment> bankToBankTransAssignmentList;
+        //rtgsContractorAssignment = true;
+        boolean addList = false;
+        Bankaccount bnkAcc;
+        Bankaccount selBnkAcc = new Bankaccount();
+        pexChequeAssignmentList = paymentService.getPaymentVoucherForRTGSInstrument(parameters, voucherHeader);
+        System.out.println("paymentService.getPaymentVoucherForRTGSInstrument(parameters, voucherHeader)" +pexChequeAssignmentList.size());
+        dbpPexAssignmentList = paymentService.getDirectBankPaymentVoucherForRTGSInstrument(parameters, voucherHeader);
+        System.out.println("paymentService.getPaymentVoucherForRTGSInstrument(parameters, voucherHeader)" +dbpPexAssignmentList.size());
+        pexChequeAssignmentList.addAll(dbpPexAssignmentList);
+       bankToBankTransAssignmentList = paymentService.getBankToBankTransVoucherForRTGSInstrument(parameters, voucherHeader);
+       pexChequeAssignmentList.addAll(bankToBankTransAssignmentList);
+        if (!paymentMode.equals(FinancialConstants.MODEOFPAYMENT_CHEQUE)) {
+            final List<AppConfigValues> appList = appConfigValuesService.getConfigValuesByModuleAndKey(Constants.EGF,
+                    "cheque.assignment.infavourof");
+            inFavourOf = appList.get(0).getValue();
+        }
+        chequeDt = new Date();
+        for (final ChequeAssignment chqAssgn : pexChequeAssignmentList)
+            // to set date
+            if (accountNoAndPexEntryMap.isEmpty()) {
+                pexEntry = new ArrayList<>();
+                bnkAcc = (Bankaccount) persistenceService.find("from Bankaccount where id=?",
+                        Long.parseLong(chqAssgn.getBankAccountId().toString()));
+                selBnkAcc = bnkAcc;
+                pexEntry.add(chqAssgn);
+                accountNoAndPexEntryMap.put(bnkAcc, pexEntry);
+                pexdateMap.put(bnkAcc.getId().toString(), formatter.format(currentDate));
+            } else {
+                final Set<Bankaccount> bankAccntSet = accountNoAndPexEntryMap.keySet();
+                final java.util.Iterator ir = bankAccntSet.iterator();
+                while (ir.hasNext()) {
+                    final Bankaccount bk = (Bankaccount) ir.next();
+                    if (bk.getId().compareTo(chqAssgn.getBankAccountId()) == 0) {
+                        selBnkAcc = bk;
+                        addList = false;
+                        break;
+                    } else
+                        addList = true;
+                }
+                if (!addList) {
+                    accountNoAndPexEntryMap.get(selBnkAcc).add(chqAssgn);
+                    selBnkAcc = null;
+                } else {
+                    pexEntry = new ArrayList<>();
+                    bnkAcc = (Bankaccount) persistenceService.find("from Bankaccount where id=?",
+                            Long.parseLong(chqAssgn.getBankAccountId().toString()));
+                    selBnkAcc = bnkAcc;
+                    pexEntry.add(chqAssgn);
+                    accountNoAndPexEntryMap.put(selBnkAcc, pexEntry);
+                    pexdateMap.put(bnkAcc.getId().toString(), formatter.format(currentDate));
+                    selBnkAcc = null;
+                }
+
+            }
+        getSession().put(ACCOUNT_NO_AND_PEX_ENTRY_MAP, accountNoAndPexEntryMap);
+        assignmentType = BILL_PAYMENT;
+        return "searchPexResult";
+    }
+    
+    @ValidationErrorPage(value = "searchPexResult")
+    @SkipValidation
+    @Action(value = "/payment/chequeAssignment-updatePex")
+    public String updatePex() throws ApplicationException, ParseException {
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Start createInstrumentForPex");
+        Map<String, List<ChequeAssignment>> resultMap;
+        instHeaderList = new ArrayList<>();
+        try {
+            resultMap = prepareMapForPEX();
+            if (!getFieldErrors().isEmpty()) {
+                accountNoAndPexEntryMap = (Map<Bankaccount, List<ChequeAssignment>>) getSession().get(
+                		ACCOUNT_NO_AND_PEX_ENTRY_MAP);
+                return "searchPexResult";
+            }
+            createPexAssignment(resultMap);
+        } catch (final ValidationException e) {
+            searchPEX();
+            LOGGER.error("Validation Error", e);
+            final List<ValidationError> errors = new ArrayList<>();
+            errors.add(new ValidationError("exp", e.getMessage()));
+            throw new ValidationException(e.getErrors());
+        } catch (final Exception e) {
+            LOGGER.error("Error while searching rtgs", e);
+            final List<ValidationError> errors = new ArrayList<>();
+            errors.add(new ValidationError("exp", e.getMessage()));
+            throw new ValidationException(errors);
+        }
+        addActionMessage(getMessage(RTGS_TRANSACTION_SUCCESS));
+
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Completed createInstrument.");
+
+        return "viewPex";
+    }
+    
+    private void createPexAssignment(final Map<String, List<ChequeAssignment>> resultMap) throws Exception {
+        instVoucherList = new ArrayList<>();
+        instVoucherDisplayList = new ArrayList<>();
+        for (final Entry<String, List<ChequeAssignment>> row : resultMap.entrySet())
+            if (row.getKey() != null && getPexSeceltedAccMap().get(row.getKey()) != null && getPexSeceltedAccMap().get(row.getKey())) {
+                if (isPexNoGenerationAuto()) {
+                    final String[] dateArray = new String[]{getPexdateMap().get(String.valueOf(Long.valueOf(row.getKey())))};
+                    System.out.println("dateArray:: " +dateArray.length + dateArray);
+                    Date pexdate = null;
+                    final Date autoNoCutOffDate = FinancialConstants.RTGS_FINYEAR_WISE_ROLLING_SEQ_CUTOFF_DATE;
+                    String pexNo;
+                    if (dateArray[0] != null) {
+                        final String date = dateArray[0];
+                        pexdate = formatter.parse(date);
+                        System.out.println("pexdate:: " +pexdate);
+                    }
+                    final String finYearRange = financialYearDAO.getFinancialYearByDate(pexdate).getFinYearRange();
+
+                    PexNumberGenerator pexNumberGenerator = beanResolver.getAutoNumberServiceFor(PexNumberGenerator.class);
+                    if (pexdate != null && pexdate.after(autoNoCutOffDate)) {
+                        pexNo = pexNumberGenerator.getNextNumber("RTGS_RefNumber_" + finYearRange.replace('-', '_'));
+
+                        pexNo = new StringBuilder().append(pexNo).append("/").append(finYearRange).toString();
+                    } else
+                        pexNo = pexNumberGenerator.getNextNumber("RTGS_RefNumber");
+                    
+                    System.out.println("pexNo:: " +pexNo);
+
+                    final String[] refNoArray = new String[]{pexNo};
+                    parameters.put("pexRefNo", refNoArray);
+                    System.out.println("refNoArray1:: " +refNoArray);
+                } else {
+                    final String[] refNoArray = new String[]{getPexRefNoMap().get(row.getKey())};
+                    parameters.put("pexRefNo", refNoArray);
+                    System.out.println("refNoArray2:: " +refNoArray);
+                }
+                
+                final String[] dateArray = new String[]{getPexdateMap().get(row.getKey())};
+                parameters.put("pexDate", dateArray);
+                chequeAssignmentList = resultMap.get(row.getKey());
+                bankaccount = Integer.parseInt(row.getKey());
+
+                paymentService.createInstrument(chequeAssignmentList, paymentMode, bankaccount, parameters, voucherHeader
+                        .getVouchermis().getDepartmentcode());
+                instVoucherList.addAll(paymentService.getInstVoucherList());
+                List<InstrumentVoucher> tempInstVoucherList = new ArrayList<>();
+                for (InstrumentVoucher iv : instVoucherList) {
+                    Paymentheader payment = paymentService.getPaymentHeaderByVoucherHeaderId(iv.getVoucherHeaderId().getId());
+                    iv.setPaymentAmount(payment.getPaymentAmount().setScale(2, BigDecimal.ROUND_HALF_EVEN));
+
+                    tempInstVoucherList.add(iv);
+                }
+                instVoucherList = new ArrayList<>();
+                instVoucherList = tempInstVoucherList;
+            }
+    }
+
+    private Map<String, List<ChequeAssignment>> prepareMapForPEX() throws ParseException {
+        ArrayList<ChequeAssignment> pexEntry;
+        final List<ChequeAssignment> contractorbillList = new ArrayList<>();
+        new ArrayList<>();
+        new ArrayList<>();
+        Date pexdate = null;
+
+        final Map<String, List<ChequeAssignment>> resultMap = new HashMap<>();
+        new ArrayList<>();
+        for (final ChequeAssignment chqAssgn : pexList)
+            if (resultMap.isEmpty()) {
+                pexEntry = new ArrayList<>();
+                pexEntry.add(chqAssgn);
+                if (chqAssgn.getBankAccountId() != null)
+                    resultMap.put(String.valueOf(chqAssgn.getBankAccountId().longValue()), pexEntry);
+                if (chqAssgn.getIsSelected()) {
+                    pexSeceltedAccMap.put(String.valueOf(chqAssgn.getBankAccountId().longValue()), true);
+                    if (chqAssgn.getExpenditureType() != null && !"".equals(chqAssgn.getExpenditureType()))
+                        if (chqAssgn.getExpenditureType().equalsIgnoreCase("Works"))
+                        contractorbillList.add(chqAssgn);
+                    pexdate = Constants.DDMMYYYYFORMAT2.parse(getPexdateMap().get(String.valueOf(chqAssgn.getBankAccountId().longValue())));
+                    if (chqAssgn.getVoucherDate().compareTo(pexdate) > 0)
+                        addFieldError(RTGS_DATE_LESS_THAN_PAYMENT_DATE,
+                                " PEX Date cannot be less than Payment Date." + chqAssgn.getVoucherNumber());
+                }
+            } else if (resultMap.containsKey(String.valueOf(chqAssgn.getBankAccountId().longValue()))) {
+                resultMap.get(String.valueOf(chqAssgn.getBankAccountId().longValue())).add(chqAssgn);
+                if (chqAssgn.getIsSelected()) {
+                    pexSeceltedAccMap.put(String.valueOf(chqAssgn.getBankAccountId().longValue()), true);
+                    if (chqAssgn.getExpenditureType() != null && !"".equals(chqAssgn.getExpenditureType()))
+                        if (chqAssgn.getExpenditureType().equalsIgnoreCase("Works"))
+                        contractorbillList.add(chqAssgn);
+                    pexdate = Constants.DDMMYYYYFORMAT2.parse(getPexdateMap().get(String.valueOf(chqAssgn.getBankAccountId().longValue())));
+                    if (chqAssgn.getVoucherDate().compareTo(pexdate) > 0)
+                        addFieldError(RTGS_DATE_LESS_THAN_PAYMENT_DATE,
+                                "PEX Date cannot be less than Payment Date." + chqAssgn.getVoucherNumber());
+                }
+            } else {
+                pexEntry = new ArrayList<>();
+                pexEntry.add(chqAssgn);
+                resultMap.put(String.valueOf(chqAssgn.getBankAccountId().longValue()), pexEntry);
+                if (chqAssgn.getIsSelected()) {
+                    pexSeceltedAccMap.put(String.valueOf(chqAssgn.getBankAccountId().longValue()), true);
+                    if (chqAssgn.getExpenditureType() != null && !"".equals(chqAssgn.getExpenditureType()))
+                        if (chqAssgn.getExpenditureType().equalsIgnoreCase("Works"))
+                        contractorbillList.add(chqAssgn);
+                    pexdate = Constants.DDMMYYYYFORMAT2.parse(getPexdateMap().get(String.valueOf(chqAssgn.getBankAccountId().longValue())));
+                    if (chqAssgn.getVoucherDate().compareTo(pexdate) > 0)
+                        addFieldError(RTGS_DATE_LESS_THAN_PAYMENT_DATE,
+                                "PEX Date cannot be less than Payment Date." + chqAssgn.getVoucherNumber());
+                }
+            }
+        try {
+            paymentService.validatePaymentForRTGSAssignment(contractorbillList, "Contractor");
+        } catch (final ValidationException e) {
+            accountNoAndPexEntryMap = (Map<Bankaccount, List<ChequeAssignment>>) getSession().get("accountNoAndPexEntryMap");
+            addFieldError("pex.payment.mandatory.details.missing", e.getErrors().get(0).getMessage());
+        } catch (final ApplicationException e) {
+        	accountNoAndPexEntryMap = (Map<Bankaccount, List<ChequeAssignment>>) getSession().get("accountNoAndPexEntryMap");
+            addFieldError("pex.payment.mandatory.details.missing", e.getMessage());
+        }
+        return resultMap;
+    }
+    
+    @SkipValidation
+    @Action(value = "/payment/chequeAssignment-beforeSearchForPEXSurrender")
+    public String beforeSearchForPEXSurrender() {
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Starting beforeSearchForSurrender...");
+        addDropdownData(BANKACCOUNT_LIST, Collections.emptyList());
+        loadBankAndAccounForRTGSSurender();
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Completed beforeSearchForSurrender.");
+        return SURRENDERPEXSEARCH;
+    }
+    
+	public Map<Bankaccount, List<ChequeAssignment>> getAccountNoAndPexEntryMap() {
+		return accountNoAndPexEntryMap;
+	}
+
+	public void setAccountNoAndPexEntryMap(Map<Bankaccount, List<ChequeAssignment>> accountNoAndPexEntryMap) {
+		this.accountNoAndPexEntryMap = accountNoAndPexEntryMap;
+	}
+
+	public Map<String, String> getPexdateMap() {
+		return pexdateMap;
+	}
+
+	public void setPexdateMap(Map<String, String> pexdateMap) {
+		this.pexdateMap = pexdateMap;
+	}
+
+	public boolean isPexNoGenerationAuto() {
+		return pexNoGenerationAuto;
+	}
+
+	public void setPexNoGenerationAuto(boolean pexNoGenerationAuto) {
+		this.pexNoGenerationAuto = pexNoGenerationAuto;
+	}
+
+	public List<ChequeAssignment> getPexList() {
+		return pexList;
+	}
+
+	public void setPexList(List<ChequeAssignment> pexList) {
+		this.pexList = pexList;
+	}
+
+	public Map<String, Boolean> getPexSeceltedAccMap() {
+		return pexSeceltedAccMap;
+	}
+
+	public void setPexSeceltedAccMap(Map<String, Boolean> pexSeceltedAccMap) {
+		this.pexSeceltedAccMap = pexSeceltedAccMap;
+	}
+
+	public Map<String, String> getPexRefNoMap() {
+		return pexRefNoMap;
+	}
+
+	public void setPexRefNoMap(Map<String, String> pexRefNoMap) {
+		this.pexRefNoMap = pexRefNoMap;
+	}
+
+	public boolean isContainsPEX() {
+		return containsPEX;
+	}
+
+	public void setContainsPEX(boolean containsPEX) {
+		this.containsPEX = containsPEX;
+	}
+	
+	
+	
+    @SkipValidation
+    @Action(value = "/payment/chequeAssignment-stopPayment")
+    public String stopPayment() {
+    	addDropdownData(DROPDOWN_DATA_BANKBRANCH_LIST, bankBranchHibernateDAO.getAllBankBranchs());
+        addDropdownData(DROPDOWN_DATA_ACCOUNT_NO_LIST, Collections.EMPTY_LIST);
+        addDropdownData(DROPDOWN_DATA_DISHONOR_REASONS_LIST, persistenceService.getSession()
+                .createSQLQuery("select * from egf_instrument_dishonor_reason").list());
+        instrumentModesMap = INSTRUMENT_MODES_MAP;
+        return SEARCH;
+    }
+
+	public Map getInstrumentModesMap() {
+		return instrumentModesMap;
+	}
+
+	public void setInstrumentModesMap(Map instrumentModesMap) {
+		this.instrumentModesMap = instrumentModesMap;
+	}
+	
+	@Action(value = "/payment/stopPayment-list")
+    public String list() throws Exception {
+        //setPageSize(30);
+        //super.search();
+        //prepareResults();
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("DishonoredChequeAction | list | End");
+        return SEARCH;
+    }
+	
+	@Action(value = "/receipts/dishonoredCheque-process")
+    public String process() throws Exception {
+        //getReversalGlCodes();
+        return "process";
+    }
+
+	public Map<BankAccountRemittanceCOA, List<ChequeAssignment>> getAccountNoAndRemittancePexEntryMap() {
+		return accountNoAndRemittancePexEntryMap;
+	}
+
+	public void setAccountNoAndRemittancePexEntryMap(
+			Map<BankAccountRemittanceCOA, List<ChequeAssignment>> accountNoAndRemittancePexEntryMap) {
+		this.accountNoAndRemittancePexEntryMap = accountNoAndRemittancePexEntryMap;
+	}
+	
+	private void loadReasonsForSurrendaringPEX() {
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Starting loadReasonsForSurrendaring...");
+
+        List<AppConfigValues> appConfigValuesList;
+        surrendarReasonMap = new LinkedHashMap<String, String>();
+        appConfigValuesList = appConfigValuesService.getConfigValuesByModuleAndKey("EGF", "Reason For PEX Surrendaring");
+        for (final AppConfigValues app : appConfigValuesList) {
+            final String value = app.getValue();
+            if (app.getValue().indexOf('|') != -1)
+                surrendarReasonMap.put(app.getValue(), value.substring(0, app.getValue().indexOf('|')));
+            else
+                surrendarReasonMap.put(app.getValue(), app.getValue());
+        }
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Completed loadReasonsForSurrendaring.");
+    }
+    
+    private void loadReasonsForSurrendaringRTGS() {
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Starting loadReasonsForSurrendaring...");
+
+        List<AppConfigValues> appConfigValuesList;
+        surrendarReasonMap = new LinkedHashMap<String, String>();
+        appConfigValuesList = appConfigValuesService.getConfigValuesByModuleAndKey("EGF", "Reason For RTGS Surrendaring");
+        for (final AppConfigValues app : appConfigValuesList) {
+            final String value = app.getValue();
+            if (app.getValue().indexOf('|') != -1)
+                surrendarReasonMap.put(app.getValue(), value.substring(0, app.getValue().indexOf('|')));
+            else
+                surrendarReasonMap.put(app.getValue(), app.getValue());
+        }
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Completed loadReasonsForSurrendaring.");
     }
 
 }

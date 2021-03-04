@@ -603,18 +603,22 @@ td.bluebox2 {
 }
 
 div.billhead {
-	background: #FFFFCC;
+	background: #265988;
+	color: white;
+	font-weight:bold;
 	padding: 8px;
 	border-top-width: 1px;
 	border-bottom-width: 1px;
 	border-top-style: solid;
 	border-bottom-style: solid;
-	border-top-color: #DFDFDF;
-	border-bottom-color: #DFDFDF;
+	border-top-color: #FFFFFF;
+	border-bottom-color: #FFFFFF;
 }
 
 div.billhead2 {
-	background: #FFFFCC;
+	background: #265988;
+	color: white;
+	font-weight:bold;
 	padding: 8px;
 	border-top-width: 1px;
 	border-bottom-width: 1px;

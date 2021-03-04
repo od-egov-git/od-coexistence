@@ -4,6 +4,7 @@ import java.net.URLDecoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -15,7 +16,6 @@ import org.egov.billsaccounting.services.CreateVoucher;
 import org.egov.billsaccounting.services.VoucherConstant;
 import org.egov.commons.CVoucherHeader;
 import org.egov.commons.EgModules;
-import org.egov.commons.service.ChartOfAccountDetailService;
 import org.egov.egf.contract.model.AccountDetailContract;
 import org.egov.egf.contract.model.SubledgerDetailContract;
 import org.egov.egf.contract.model.Voucher;
@@ -24,14 +24,11 @@ import org.egov.egf.contract.model.VoucherResponse;
 import org.egov.egf.contract.model.VoucherSearchRequest;
 import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.exception.ApplicationRuntimeException;
-import org.egov.infra.microservice.models.VoucherSearchCriteria;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.validation.exception.ValidationException;
 import org.egov.services.voucher.VoucherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -45,12 +42,10 @@ public class VoucherController {
 	private CreateVoucher createVoucher;
 	@Autowired
 	private VoucherService voucherService;
-	@Autowired
-	private ChartOfAccountDetailService chartOfAccountDetailService;
 
 	@PostMapping(value = "/rest/voucher/_search")
 	@ResponseBody
-	public VoucherResponse search(@RequestBody VoucherSearchRequest voucherSearchRequest) {
+	public VoucherResponse create(@RequestBody VoucherSearchRequest voucherSearchRequest) {
 		try {
 			VoucherResponse response = voucherService.findVouchers(voucherSearchRequest);
 			response.setResponseInfo(MicroserviceUtils.getResponseInfo(voucherSearchRequest.getRequestInfo(),
@@ -110,6 +105,7 @@ public class VoucherController {
 				headerDetails.put(VoucherConstant.MODULEID, voucher.getModuleId());
 				String source = voucher.getSource();
 				headerDetails.put(VoucherConstant.SOURCEPATH, source);
+				headerDetails.put(VoucherConstant.RECEIPTNUMBER, voucher.getReceiptNumber());
 //				String receiptNumber = !source.isEmpty() & source != null ? source.indexOf("?selectedReceipts=") != -1 ? source.substring(source.indexOf("?selectedReceipts=")).split("=")[1]: "" : "";
 				if(voucher.getReferenceDocument() != null && !voucher.getReferenceDocument().isEmpty()){
 				    headerDetails.put(VoucherConstant.REFERENCEDOC, voucher.getReferenceDocument());
@@ -149,10 +145,7 @@ public class VoucherController {
 						subledgertDetailMap.put(VoucherConstant.DETAILAMOUNT, sl.getAmount());
 						subledgertDetailMap.put(VoucherConstant.DETAIL_TYPE_ID, sl.getAccountDetailType().getId());
 						subledgertDetailMap.put(VoucherConstant.DETAIL_KEY_ID, sl.getAccountDetailKey().getId());
-						if (chartOfAccountDetailService.getByGlcodeAndDetailTypeId(ac.getGlcode().toString(),
-								Integer.valueOf(sl.getAccountDetailType().getId().intValue())) != null) {
-							subledgerDetails.add(subledgertDetailMap);
-						}
+						subledgerDetails.add(subledgertDetailMap);
 					}
 				}
 				CVoucherHeader voucherHeader = createVoucher.createVoucher(headerDetails, accountdetails,
@@ -210,21 +203,6 @@ public class VoucherController {
                         LOGGER.error(e.getMessage(), e);
                         throw new ApplicationRuntimeException(e.getMessage());
                 }
-        }
-	
-	@PostMapping(value = "/rest/voucher/v2/_search")
-        public  @ResponseBody ResponseEntity<VoucherResponse>  search(@ModelAttribute VoucherSearchCriteria criteria, @RequestBody VoucherSearchRequest voucherSearchRequest) {
-                try {
-                        VoucherResponse response = voucherService.findVouchersByCriteria(criteria, voucherSearchRequest);
-                        response.setResponseInfo(MicroserviceUtils.getResponseInfo(voucherSearchRequest.getRequestInfo(),
-                                        HttpStatus.SC_OK, null));
-                        
-                        return new ResponseEntity<>(response, org.springframework.http.HttpStatus.OK);
-                } catch (Exception e) {
-                        LOGGER.error(e.getMessage(), e);
-                        throw new ApplicationRuntimeException(e.getMessage());
-                }
-
         }
 
 }

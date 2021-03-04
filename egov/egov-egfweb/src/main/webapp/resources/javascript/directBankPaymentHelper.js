@@ -136,14 +136,6 @@ var callback = {
 	}
 }
 
-var postTypeFrom = {
-	success : function(o) {
-		document.getElementById('accnumnar').value = o.responseText;
-	},
-	failure : function(o) {
-		bootbox.alert('failure');
-	}
-}
 
 var documentNoAndDateTypeFrom = {
 	success : function(o) {
@@ -239,3 +231,11 @@ function openViewVouchers() {
 
 	}
 }
+var postTypeFrom = {
+		success : function(o) {
+			//document.getElementById('accnumnar').value = o.responseText;
+		},
+		failure : function(o) {
+			bootbox.alert('failure');
+		}
+	}

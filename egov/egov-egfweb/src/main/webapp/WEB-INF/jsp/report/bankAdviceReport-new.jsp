@@ -90,6 +90,7 @@ table.its th {
 <body>
 	<s:form action="bankAdviceReport" name="bankAdviceReport"
 		theme="simple" method="post" onsubmit="javascript:doAfterSubmit()">
+		<s:hidden id="instrumentType" name="instrumentType" />
 		<span class="mandatory1"> <s:actionerror /> <s:fielderror /> <s:actionmessage />
 		</span>
 		<font style='color: red; font-weight: bold'>
@@ -97,57 +98,57 @@ table.its th {
 		</font>
 		<div class="formmainbox">
 			<div class="subheadnew">
-				<s:text name="bank.advice.report" />
+				<s:text name="bank.advice.report.title" />
 			</div>
 
 			<table align="center" width="100%" cellpadding="0" cellspacing="0">
 				<tr>
-					<td class="bluebox" width="10%"><s:text name="lbl.bank.name" />:<span
+					<td class="bluebox" width="10%">Bank Name:<span
 						class="bluebox"><span class="mandatory"></span></span></td>
 					<td class="bluebox"><s:select name="bank.id" id="bank.id"
 							list="dropdownData.bankList" listKey="id" listValue="name"
-							headerKey="-1" headerValue="%{getText('lbl.choose.options')}"
+							headerKey="-1" headerValue="----Choose----"
 							onChange="populateBankBranch(this);" /></td>
 					<egov:ajaxdropdown id="bankbranch" fields="['Text','Value']"
 						dropdownId="bankbranch"
 						url="voucher/common-ajaxLoadBankBranchFromBank.action" />
-					<td class="bluebox" width="10%"><s:text name="bankbranch" />:<span
+					<td class="bluebox" width="10%">Bank Branch:<span
 						class="bluebox"><span class="mandatory"></span></span></td>
 					<td class="bluebox"><s:select name="bankbranch.id"
 							id="bankbranch" list="dropdownData.bankBranchList" listKey="id"
 							listValue="branchname" headerKey="-1"
-							headerValue="%{getText('lbl.choose.options')}"
+							headerValue="----Choose----"
 							onChange="populateBankAccount(this);" /></td>
 					<egov:ajaxdropdown id="bankaccount" fields="['Text','Value']"
 						dropdownId="bankaccount"
 						url="voucher/common-ajaxLoadBankAccFromBranch.action" />
 				</tr>
 				<tr>
-					<td class="bluebox" width="10%"><s:text name="lbl.account.number" />:<span
+					<td class="bluebox" width="10%">Account Number:<span
 						class="bluebox"><span class="mandatory"></span></span></td>
 					<td class="bluebox"><s:select name="bankaccount.id"
 							id="bankaccount" list="dropdownData.bankAccountList" listKey="id"
 							listValue="accountnumber" headerKey="-1"
-							headerValue="%{getText('lbl.choose.options')}"
+							headerValue="----Choose----"
 							onChange="populateInstrumentNumber(this);" /></td>
 					<egov:ajaxdropdown id="instrumentnumber" fields="['Text','Value']"
 						dropdownId="instrumentnumber"
-						url="voucher/common-ajaxLoadRTGSChequeFromBankAcc.action" />
-					<td class="bluebox" width="10%"><s:text name="report.rtgsnumber" />:<span
+						url="voucher/common-ajaxLoadRTGSPEXChequeFromBankAcc.action" />
+					<td class="bluebox" width="10%">RTGS/PEX Number:<span
 						class="bluebox"><span class="mandatory"></span></span></td>
 					<td class="bluebox"><s:select name="instrumentnumber.id"
 							id="instrumentnumber" list="dropdownData.chequeNumberList"
 							listKey="id" listValue="transactionNumber" headerKey="-1"
-							headerValue="%{getText('lbl.choose.options')}" /></td>
+							headerValue="----Choose----" /></td>
 				</tr>
 				<tr>
 
 				</tr>
 			</table>
 			<div class="buttonbottom">
-				<s:submit  key="lbl.search" cssClass="buttonsubmit"
+				<s:submit method="search" value="Search" cssClass="buttonsubmit"
 					onclick="return validate();" />
-				<input type="button" value="<s:text name='lbl.close'/>"
+				<input type="button" value="Close"
 					onclick="javascript:window.parent.postMessage('close','*');" class="button" />
 
 			</div>
@@ -194,8 +195,18 @@ table.its th {
 							</tr>
 							<tr>
 								<td align="center"><input type="button"
-									class="buttonsubmit" value="EXPORT PDF" id="exportpdf"
-									name="exportpdf" onclick="exportPDF();" /> <input
+									class="buttonsubmit" value="EXPORT PAGE 1" id="exportpdf"
+									name="exportpdf" onclick="exportPDF();" />
+									<input type="button"
+									class="buttonsubmit" value="EXPORT PAGE 2" id="exportpdf1"
+									name="exportpdf1" onclick="exportPDF1();" />
+									<input type="button"
+									class="buttonsubmit" value="EXPORT PAGE 3" id="exportpdf3"
+									name="exportpdf3" onclick="exportPDF3();" />
+									<input type="button"
+									class="buttonsubmit" value="EXPORT PAGE 4" id="exportpdf4"
+									name="exportpdf4	" onclick="exportPDF4();" />
+									 <input
 									type="button" class="buttonsubmit" value="EXPORT EXCEL"
 									id="exportpdf" name="exportpdf" onclick="exportExcel();" /> <!-- 	<input type="button" class="buttonsubmit" value="EXPORT HTM" id="exporthtml" name="exportpdf" onclick="exportHtml();"/>-->
 								</td>
@@ -229,13 +240,118 @@ table.its th {
 			var bankbranch = document.getElementById("bankbranch").value;
 			var bankaccount = document.getElementById("bankaccount").value;
 			var instrumentnumber = document.getElementById("instrumentnumber").value;
-			var url = "${pageContext.request.contextPath}/report/bankAdviceReport-exportPDF.action?bank.id="
+			var url ="";
+			if (document.getElementById("instrumentType").value == 'pex')
+				{
+				url = "${pageContext.request.contextPath}/report/bankAdviceReport-exportPDFPex.action?bank.id="
 					+ bank
 					+ "&bankbranch.id="
 					+ bankbranch
 					+ "&bankaccount.id="
 					+ bankaccount
 					+ "&instrumentnumber.id=" + instrumentnumber;
+				}
+			else
+				{
+				url = "${pageContext.request.contextPath}/report/bankAdviceReport-exportPDF.action?bank.id="
+					+ bank
+					+ "&bankbranch.id="
+					+ bankbranch
+					+ "&bankaccount.id="
+					+ bankaccount
+					+ "&instrumentnumber.id=" + instrumentnumber;
+				}
+			
+			//window.open(url, '','height=650,width=980,scrollbars=yes,left=0,top=0,status=yes');
+			window.location.href = url;
+		}
+		function exportPDF1() {
+			var bank = document.getElementById("bank.id").value;
+			var bankbranch = document.getElementById("bankbranch").value;
+			var bankaccount = document.getElementById("bankaccount").value;
+			var instrumentnumber = document.getElementById("instrumentnumber").value;
+			var url ="";
+			if (document.getElementById("instrumentType").value == 'pex')
+				{
+				url = "${pageContext.request.contextPath}/report/bankAdviceReport-exportPDFPex1.action?bank.id="
+					+ bank
+					+ "&bankbranch.id="
+					+ bankbranch
+					+ "&bankaccount.id="
+					+ bankaccount
+					+ "&instrumentnumber.id=" + instrumentnumber;
+				}
+			else
+				{
+				url = "${pageContext.request.contextPath}/report/bankAdviceReport-exportPDF.action?bank.id="
+					+ bank
+					+ "&bankbranch.id="
+					+ bankbranch
+					+ "&bankaccount.id="
+					+ bankaccount
+					+ "&instrumentnumber.id=" + instrumentnumber;
+				}
+			
+			//window.open(url, '','height=650,width=980,scrollbars=yes,left=0,top=0,status=yes');
+			window.location.href = url;
+		}
+		function exportPDF3() {
+			var bank = document.getElementById("bank.id").value;
+			var bankbranch = document.getElementById("bankbranch").value;
+			var bankaccount = document.getElementById("bankaccount").value;
+			var instrumentnumber = document.getElementById("instrumentnumber").value;
+			var url ="";
+			if (document.getElementById("instrumentType").value == 'pex')
+				{
+				url = "${pageContext.request.contextPath}/report/bankAdviceReport-exportPDFPex3.action?bank.id="
+					+ bank
+					+ "&bankbranch.id="
+					+ bankbranch
+					+ "&bankaccount.id="
+					+ bankaccount
+					+ "&instrumentnumber.id=" + instrumentnumber;
+				}
+			else
+				{
+				url = "${pageContext.request.contextPath}/report/bankAdviceReport-exportPDF.action?bank.id="
+					+ bank
+					+ "&bankbranch.id="
+					+ bankbranch
+					+ "&bankaccount.id="
+					+ bankaccount
+					+ "&instrumentnumber.id=" + instrumentnumber;
+				}
+			
+			//window.open(url, '','height=650,width=980,scrollbars=yes,left=0,top=0,status=yes');
+			window.location.href = url;
+		}
+		function exportPDF4() {
+			var bank = document.getElementById("bank.id").value;
+			var bankbranch = document.getElementById("bankbranch").value;
+			var bankaccount = document.getElementById("bankaccount").value;
+			var instrumentnumber = document.getElementById("instrumentnumber").value;
+			var url ="";
+			if (document.getElementById("instrumentType").value == 'pex')
+				{
+				url = "${pageContext.request.contextPath}/report/bankAdviceReport-exportPDFPex4.action?bank.id="
+					+ bank
+					+ "&bankbranch.id="
+					+ bankbranch
+					+ "&bankaccount.id="
+					+ bankaccount
+					+ "&instrumentnumber.id=" + instrumentnumber;
+				}
+			else
+				{
+				url = "${pageContext.request.contextPath}/report/bankAdviceReport-exportPDF.action?bank.id="
+					+ bank
+					+ "&bankbranch.id="
+					+ bankbranch
+					+ "&bankaccount.id="
+					+ bankaccount
+					+ "&instrumentnumber.id=" + instrumentnumber;
+				}
+			
 			//window.open(url, '','height=650,width=980,scrollbars=yes,left=0,top=0,status=yes');
 			window.location.href = url;
 		}
@@ -244,13 +360,28 @@ table.its th {
 			var bankbranch = document.getElementById("bankbranch").value;
 			var bankaccount = document.getElementById("bankaccount").value;
 			var instrumentnumber = document.getElementById("instrumentnumber").value;
-			var url = "${pageContext.request.contextPath}/report/bankAdviceReport-exportExcel.action?bank.id="
+			var url = "";
+			if(document.getElementById("instrumentType").value == 'pex')
+				{
+				 url = "${pageContext.request.contextPath}/report/bankAdviceReport-exportExcelPex.action?bank.id="
 					+ bank
 					+ "&bankbranch.id="
 					+ bankbranch
 					+ "&bankaccount.id="
 					+ bankaccount
 					+ "&instrumentnumber.id=" + instrumentnumber;
+				}
+			else
+				{
+				 url = "${pageContext.request.contextPath}/report/bankAdviceReport-exportExcel.action?bank.id="
+					+ bank
+					+ "&bankbranch.id="
+					+ bankbranch
+					+ "&bankaccount.id="
+					+ bankaccount
+					+ "&instrumentnumber.id=" + instrumentnumber;
+				}
+			
 			// window.open(url, '','height=650,width=980,scrollbars=yes,left=0,top=0,status=yes');
 			window.location.href = url;
 		}

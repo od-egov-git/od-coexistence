@@ -68,14 +68,17 @@ import org.egov.commons.CFiscalPeriod;
 import org.egov.commons.CGeneralLedger;
 import org.egov.commons.CGeneralLedgerDetail;
 import org.egov.commons.CVoucherHeader;
+import org.egov.commons.DocumentUploads;
 import org.egov.commons.EgModules;
 import org.egov.commons.EgfRecordStatus;
 import org.egov.commons.EgwStatus;
+import org.egov.commons.Vouchermis;
 import org.egov.commons.dao.AccountdetailtypeHibernateDAO;
 import org.egov.commons.dao.ChartOfAccountsDAO;
 import org.egov.commons.dao.FinancialYearHibernateDAO;
 import org.egov.commons.dao.FunctionDAO;
 import org.egov.commons.dao.VouchermisHibernateDAO;
+import org.egov.commons.repository.CommonDocumentUploadRepository;
 import org.egov.commons.service.ChartOfAccountDetailService;
 import org.egov.commons.service.EgModulesService;
 import org.egov.commons.utils.EntityType;
@@ -89,6 +92,7 @@ import org.egov.egf.contract.model.VoucherResponse;
 import org.egov.egf.contract.model.VoucherSearchRequest;
 import org.egov.egf.dashboard.event.FinanceEventType;
 import org.egov.egf.dashboard.event.listener.FinanceDashboardService;
+import org.egov.egf.utils.FinancialUtils;
 import org.egov.eis.entity.Assignment;
 import org.egov.eis.entity.Employee;
 import org.egov.eis.entity.EmployeeView;
@@ -103,7 +107,6 @@ import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.exception.ApplicationException;
 import org.egov.infra.exception.ApplicationRuntimeException;
-import org.egov.infra.microservice.models.VoucherSearchCriteria;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.persistence.utils.Page;
 import org.egov.infra.script.entity.Script;
@@ -131,10 +134,8 @@ import org.egov.services.bills.EgBillRegisterService;
 import org.egov.utils.Constants;
 import org.egov.utils.FinancialConstants;
 import org.egov.utils.VoucherHelper;
-import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -148,7 +149,6 @@ import com.exilant.eGov.src.transactions.VoucherTypeForULB;
 @Service
 public class VoucherService extends PersistenceService<CVoucherHeader, Long> {
 	private static final Logger LOGGER = Logger.getLogger(VoucherService.class);
-    private static final Integer DEAFULT_PAGE_SIZE = 10;
 	@Autowired
 	@Qualifier("persistenceService")
 	protected PersistenceService persistenceService;
@@ -219,6 +219,9 @@ public class VoucherService extends PersistenceService<CVoucherHeader, Long> {
 	@Autowired
         FinanceDashboardService finDashboardService;
 
+	  @Autowired
+	    private CommonDocumentUploadRepository documentUploadRepository;
+
 	public VoucherService(final Class<CVoucherHeader> voucherHeader) {
 		super(voucherHeader);
 	}
@@ -275,6 +278,7 @@ public class VoucherService extends PersistenceService<CVoucherHeader, Long> {
 		CChartOfAccounts coa = null;
 		boolean result = false;
 		paramMap.put("asondate", billregister.getBilldate());
+		paramMap.put("paymentBillDate", billregister.getBilldate());
 		if (billregister.getEgBillregistermis().getScheme() != null)
 			paramMap.put("schemeid", billregister.getEgBillregistermis().getScheme().getId());
 		if (billregister.getEgBillregistermis().getSubScheme() != null)
@@ -304,7 +308,7 @@ public class VoucherService extends PersistenceService<CVoucherHeader, Long> {
 			}
 
 			if (!result)
-				throw new ValidationException("", "Budget Check failed for " + coa.getGlcode());
+				throw new ValidationException("", "Quarterly budget exceeded for " + coa.getGlcode());
 		}
 		return result;
 	}
@@ -544,6 +548,7 @@ public class VoucherService extends PersistenceService<CVoucherHeader, Long> {
 			applyAuditing(existingVH);
 			update(existingVH);
 		} catch (final HibernateException e) {
+			e.printStackTrace();
 			LOGGER.error(e);
 			throw new HibernateException("Exception occured in voucher service while updating voucher header" + e);
 		} catch (final ApplicationRuntimeException e) {
@@ -709,8 +714,8 @@ public class VoucherService extends PersistenceService<CVoucherHeader, Long> {
 				transaction.setVoucherHeaderId(voucherHeader.getId().toString());
 				transaction.setCrAmount(accountDetails.getCreditAmountDetail().toString());
 				transaction.setDrAmount(accountDetails.getDebitAmountDetail().toString());
-				if (null != accountDetails.getFunctionIdDetail())
-					transaction.setFunctionId(accountDetails.getFunctionIdDetail().toString());
+				if (null != voucherHeader.getVouchermis().getFunction())
+					transaction.setFunctionId(voucherHeader.getVouchermis().getFunction().getId().toString());
 				/*
 				 * if(null!=voucherHeader.getIsRestrictedtoOneFunctionCenter()
 				 * && voucherHeader.getIsRestrictedtoOneFunctionCenter()){
@@ -1201,6 +1206,8 @@ public class VoucherService extends PersistenceService<CVoucherHeader, Long> {
 			egBilldetailes = prepareBillDetails(egBillregister, billDetailslist, subLedgerlist, voucherHeader,
 					egBilldetailes);
 			egBillregister.setEgBilldetailes(egBilldetailes);
+			
+		
 			egBillRegisterService.applyAuditing(egBillregister);
 			egBillRegisterService.persist(egBillregister);
 
@@ -1225,6 +1232,17 @@ public class VoucherService extends PersistenceService<CVoucherHeader, Long> {
 		return egBillregister;
 
 	}
+
+	   public void persistDocuments(final List<DocumentUploads> documentDetailsList) {
+	        if (documentDetailsList != null && !documentDetailsList.isEmpty())
+	            for (final DocumentUploads doc : documentDetailsList)
+	                documentUploadRepository.save(doc);
+	    }
+
+	    public List<DocumentUploads> findByObjectIdAndObjectType(final Long objectId, final String objectType) {
+	        return documentUploadRepository.findByObjectIdAndObjectType(objectId, objectType);
+	    }
+	    
 
 	/**
 	 * @description - update the bill register objects in the JV modify screen
@@ -1529,47 +1547,25 @@ public class VoucherService extends PersistenceService<CVoucherHeader, Long> {
 	public List<CVoucherHeader> getVoucherByServiceNameAndReferenceDocument( String serviceName, String referenceDocument) {
             return vmisHibernateDao.getRecentVoucherByServiceNameAndReferenceDoc(serviceName, referenceDocument);
         }
-
-    public VoucherResponse findVouchersByCriteria(VoucherSearchCriteria criteria, VoucherSearchRequest voucherSearchRequest) {
-        Criteria createCriteria = persistenceService.getSession().createCriteria(CVoucherHeader.class, "voucherHeader")
-                .createAlias("voucherHeader.fundId", "fund")
-                .createAlias("voucherHeader.vouchermis", "voucherMis");
-        if(criteria.getIds() != null && !criteria.getIds().isEmpty()){
-            createCriteria.add(Restrictions.in("voucherHeader.id", criteria.getIds()));
-        }
-        if(criteria.getVoucherNumbers() != null && !criteria.getVoucherNumbers().isEmpty()){
-            createCriteria.add(Restrictions.in("voucherHeader.voucherNumber", criteria.getVoucherNumbers()));
-        }
-        if(criteria.getVoucherFromDate() != null && criteria.getVoucherFromDate() != 0){
-            createCriteria.add(Restrictions.ge("voucherHeader.voucherDate", criteria.getVoucherFromDate()));
-        }
-        if(criteria.getVoucherToDate() != null && criteria.getVoucherToDate() != 0){
-            createCriteria.add(Restrictions.le("voucherHeader.voucherDate", criteria.getVoucherToDate()));
-        }
-        if(StringUtils.isNotBlank(criteria.getVoucherName())){
-            createCriteria.add(Restrictions.eq("voucherHeader.name", criteria.getVoucherName()));
-        }
-        if(StringUtils.isNotBlank(criteria.getVoucherType())){
-            createCriteria.add(Restrictions.eq("voucherHeader.type", criteria.getVoucherType()));
-        }
-        if(StringUtils.isNotBlank(criteria.getFundId())){
-            createCriteria.add(Restrictions.eq("fund.code", criteria.getFundId()));
-        }
-        if(StringUtils.isNotBlank(criteria.getDeptCode())){
-            createCriteria.add(Restrictions.eq("voucherMis.departmentcode", criteria.getDeptCode()));
-        }
-        
-        createCriteria.setMaxResults(criteria.getPageSize() != null && criteria.getPageSize() != 0 ? criteria.getPageSize() : DEAFULT_PAGE_SIZE);
-        List<CVoucherHeader> list = createCriteria.list();
-        List<Voucher> returnList = new ArrayList<>();
-        for(CVoucherHeader header : list){
-            Voucher voucher = new Voucher(header);
-            voucher.setTenantId(voucherSearchRequest.getTenantId());
-            returnList.add(voucher);
-        }
-        VoucherResponse voucherResponse = new VoucherResponse();
-        voucherResponse.setVouchers(returnList);
-        return voucherResponse;
-    }
+	
+	    //Impplemented By Prasanta
+	 public Vouchermis getVouchermisByReceiptNumber(String recieptNumber) {
+		 System.out.println("Inside Service>>"+recieptNumber);
+		 Vouchermis vmis = new Vouchermis();
+		 try {
+		 vmis = vmisHibernateDao.getVouchermisByReceiptNumber(recieptNumber);
+		 }catch(NullPointerException e) {
+			 e.printStackTrace();
+		 }
+		 System.out.println(vmis.toString());
+		 return vmis;
+	 }
+	 
+	 public void updateSourcePathForGJV(CVoucherHeader voucherHeader)
+     {
+         voucherHeader.getVouchermis().setSourcePath(
+                 "/services/EGF/voucher/journalVoucherModify-beforeModify.action?voucherHeader.id=" + voucherHeader.getId());
+         update(voucherHeader);
+     }
 
 }

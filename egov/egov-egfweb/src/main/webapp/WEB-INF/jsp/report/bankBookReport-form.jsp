@@ -94,7 +94,7 @@ function getMiscData(){
 	var fund,department,functionary,field,scheme,subscheme,data,function1="";
 	fund = document.getElementById('fundId').value;
 	//fund1 = document.getElementById('fund').value;
-	
+	scheme=document.getElementById('schemeId').value;
 	department = document.getElementById('vouchermis.departmentid').value;
 	
 	function1=document.getElementById('vouchermis.function').value;
@@ -278,6 +278,17 @@ function showChequeDetails(voucherId){
 							onkeyup="DateFormat(this,this.value,event,false,'3')"
 							placeholder="DD/MM/YYYY" cssClass="form-control datepicker"
 							data-inputmask="'mask': 'd/m/y'" /></td>
+				</tr>
+				<tr>
+					<td style="width: 5%"></td>
+					<td class="greybox" width="10%"><s:text name="scheme" /></td>
+					<td class="greybox"><s:select 
+						name="schemeId" id="schemeId"	list="dropdownData.schemeList" listKey="id" listValue="name" onchange="getval(this);"
+								headerKey="-1" headerValue="%{getText('lbl.choose.options')}" /></td>
+					<td class="greybox" width="10%"><s:text name="subscheme" /></td>
+					<td class="greybox"><select id="subschemeId" name="subschemeId" >	
+								<option value=""> ----Choose----</option>
+						</select></td>
 				</tr>
 			</table>
 			<br />

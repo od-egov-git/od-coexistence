@@ -4,11 +4,13 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.log4j.Logger;
 import org.egov.infra.microservice.models.Department;
 import org.egov.infra.microservice.models.Designation;
 import org.egov.infra.microservice.models.EmployeeInfo;
 import org.egov.infra.microservice.models.RequestInfoWrapper;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
+import org.egov.infra.web.filter.RestServiceAuthFilter;
 import org.egov.infra.web.support.ui.Inbox;
 import org.egov.infra.workflow.entity.StateAware;
 import org.egov.infra.workflow.inbox.InboxRenderServiceDelegate;
@@ -17,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.session.data.redis.RedisOperationsSessionRepository;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,6 +32,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 
 @Controller
 public class MSCommController {
+	
+	private static final Logger LOGGER = Logger.getLogger(MSCommController.class);
 
     @Autowired
     MicroserviceUtils microserviceUtils;
@@ -68,28 +73,25 @@ public class MSCommController {
         return approvers;
     }
 
-    @RequestMapping(value = "/rest/ClearToken", method = RequestMethod.POST)
+	@RequestMapping(value = "/rest/ClearToken", method = RequestMethod.POST)
     @ResponseBody
+    @CrossOrigin(origins = {"https://digitod-dev.ddns.net"}, allowedHeaders = "*")	
     private ResponseEntity logout(@RequestBody RequestInfoWrapper request,HttpServletRequest httpReq) {
-        try {
+    	try {
+    		LOGGER.info("logout method of clear token ");
             String access_token = request.getRequestInfo().getAuthToken();
-            String sessionId = httpReq.getSession().getId();
-//            String sessionId =(String) microserviceUtils.readSesionIdByAuthToken(access_token);
-            if(sessionId!=null && !sessionId.equalsIgnoreCase("null")){
-                System.out.println("********* Retrieved session::authtoken******** "+sessionId+"::"+access_token);
-                if(redisRepository!=null){
-                 System.out.println("*********** Deleting the session for redisrepository "+ sessionId);   
-//                    redisRepository.delete(sessionId);
-                    microserviceUtils.removeSessionFromRedis(access_token, sessionId);
-                }
-                
+            LOGGER.info("*********** access_token : logout::: "+ access_token);   
+        	if(redisRepository!=null){
+        		String sessionId = (String)microserviceUtils.readFromRedis(access_token, access_token);
+        		if(sessionId != null) {
+        			LOGGER.info("*********** Deleting the session for redisrepository : logout:::"+ sessionId);
+	                //microserviceUtils.removeSessionFromRedis(access_token, sessionId);
+	             	microserviceUtils.removeSession(access_token, sessionId);
+	             	LOGGER.info("*********** removeSession Completed "+ sessionId); 
+        		}
             }
-
-//            if (null != access_token) {
-//                microserviceUtils.removeSessionFromRedis(access_token);
-//            }
         } catch (Exception ex) {
-
+        	ex.printStackTrace();
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(HttpStatus.OK);

@@ -264,20 +264,34 @@ public class ChartOfAccountsAction extends BaseFormAction {
     }
 
     @Action(value = "/masters/chartOfAccounts-update")
-    public String update() throws Exception {
-        setPurposeOnCoa();
-        updateOnly = true;
-        populateAccountDetailType();
-        model.setIsActiveForPosting(activeForPosting);
-        model.setFunctionReqd(functionRequired);
-        model.setBudgetCheckReq(budgetCheckRequired);
-        dropdownData.put("mappedAccountDetailTypeList", accountDetailType);
-        chartOfAccountsService.persist(model);
-        saveCoaDetails(model);
-        populateAccountDetailTypeList();
-        addActionMessage(getText("chartOfAccount.modified.successfully"));
-        clearCache();
-        coaId = model.getId();
+    public String update()  {
+    	System.out.println("1");
+    	try {
+    		setPurposeOnCoa();
+    		System.out.println("1");
+            updateOnly = true;
+            populateAccountDetailType();
+            System.out.println("2");
+            model.setIsActiveForPosting(activeForPosting);
+            model.setFunctionReqd(functionRequired);
+            model.setBudgetCheckReq(budgetCheckRequired);
+            System.out.println("3");
+            dropdownData.put("mappedAccountDetailTypeList", accountDetailType);
+            chartOfAccountsService.persist(model);
+            System.out.println("4");
+            saveCoaDetails(model);
+            System.out.println("5");
+            populateAccountDetailTypeList();
+            System.out.println("6");
+            addActionMessage(getText("chartOfAccount.modified.successfully"));
+            System.out.println("7");
+            clearCache();
+            coaId = model.getId();
+    	}catch (Exception e) {
+			System.out.println("issue :: "+e.getMessage());
+			e.printStackTrace();
+		}
+    	System.out.println("8");
         return Constants.VIEW_MODIFY_COA;
     }
 

@@ -75,6 +75,7 @@ import org.egov.utils.Constants;
 import org.egov.utils.ReportHelper;
 import org.hibernate.FlushMode;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.BigDecimalType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,13 +98,20 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Results(value = { @Result(name = "search", location = "rtgsIssueRegisterReport-search.jsp"),
+        @Result(name = "searchPex", location = "pexIssueRegisterReport-search.jsp"),
 		@Result(name = "PDF", type = "stream", location = "inputStream", params = { "inputName", "inputStream",
 				"contentType", "application/pdf", "contentDisposition",
 				"no-cache;filename=RtgsIssueRegisterReport.pdf" }),
 		@Result(name = "XLS", type = "stream", location = "inputStream", params = { "inputName", "inputStream",
 				"contentType", "application/xls", "contentDisposition",
 				"no-cache;filename=RtgsIssueRegisterReport.xls" }),
-		@Result(name = "HTML", type = "stream", location = "inputStream", params = { "inputName", "inputStream",
+		@Result(name = "HTML", type = "stream", location = "inputStream", params = { "inputName", "inputStream", "contentType",
+        "text/html" }),
+@Result(name = "PDF_PEX", type = "stream", location = "inputStream", params = { "inputName", "inputStream", "contentType",
+        "application/pdf", "contentDisposition", "no-cache;filename=PexIssueRegisterReport.pdf" }),
+@Result(name = "XLS_PEX", type = "stream", location = "inputStream", params = { "inputName", "inputStream", "contentType",
+        "application/xls", "contentDisposition", "no-cache;filename=PexIssueRegisterReport.xls" }),
+		@Result(name = "HTML_PEX", type = "stream", location = "inputStream", params = { "inputName", "inputStream",
 				"contentType", "text/html" }) })
 @ParentPackage("egov")
 public class RtgsIssueRegisterReportAction extends ReportAction {
@@ -121,6 +129,7 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
 	private InputStream inputStream;
 	private ReportHelper reportHelper;
 	String jasperpath = "/reports/templates/rtgsIssueRegisterReportAction.jasper";
+	String jasperpathPEX = "/reports/templates/rtgsIssueRegisterReportActionPEX.jasper";
 	private StringBuffer header = new StringBuffer();
 	List<BankAdviceReportInfo> rtgsDisplayList = new ArrayList<BankAdviceReportInfo>();
 	List<Object> rtgsReportList = new ArrayList<Object>();
@@ -245,6 +254,42 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
 		paramMap.put("rtgsReportList", rtgsReportList);
 		return paramMap;
 	}
+	
+	protected Map<String, Object> getParamMapPex() {
+
+		String fundAndBankHeading = "";
+		String dateRange = "";
+		final DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		final Date date = new Date();
+		String newFromDate = "";
+		String newToDate = "";
+		String reportRundate = "";
+		fundAndBankHeading = "PEX Register for " + persistenceService
+				.find("select name from Fund where id = ?", Integer.parseInt(parameters.get("fundId")[0])).toString();
+
+		if (null != parameters.get("rtgsAssignedFromDate")[0]
+				&& !parameters.get("rtgsAssignedFromDate")[0].isEmpty())
+			dateRange = "from " + parameters.get("rtgsAssignedFromDate")[0];
+		else {
+			newFromDate = dateFormat.format(fromDate);
+			dateRange = "from " + newFromDate;
+		}
+		if (null != parameters.get("rtgsAssignedToDate")[0]
+				&& !parameters.get("rtgsAssignedToDate")[0].isEmpty())
+			dateRange = dateRange + " to " + parameters.get("rtgsAssignedToDate")[0];
+		else {
+			newToDate = dateFormat.format(toDate);
+			dateRange = dateRange + " to " + newToDate;
+		}
+		reportRundate = dateFormat.format(date);
+		paramMap.put("fundAndBankHeading", fundAndBankHeading);
+		paramMap.put("dateRange", dateRange);
+		paramMap.put("reportRundate", reportRundate);
+		paramMap.put("ulbName", getUlbName());
+		paramMap.put("rtgsDetailsList", rtgsDisplayList);
+		paramMap.put("rtgsReportList", rtgsReportList);
+		return paramMap;
+	}
 
 	public void finYearDate() {
 		if (LOGGER.isDebugEnabled())
@@ -282,6 +327,77 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
 		query.setResultTransformer(Transformers.aliasToBean(BankAdviceReportInfo.class));
 		rtgsDisplayList = query.list();
 		populateSubLedgerDetails();
+		LOGGER.info("start party number");
+		populatePartyNames(rtgsDisplayList);
+		this.populateDepartmentsName();
+		rtgsReportList.addAll(rtgsDisplayList);
+		return "search";
+	}
+	
+	private void populatePartyNames(List<BankAdviceReportInfo> rtgsDisplayList2) {
+		for(BankAdviceReportInfo row : rtgsDisplayList2)
+		{
+			if (row.getStatus().equalsIgnoreCase("new"))
+			{
+				row.setStatus("Assigned");
+			}	
+			System.out.println("payment Number :: "+row.getPaymentNumber());
+			String partyName=getPartyName(row.getPaymentNumber());
+			row.setPartyName(partyName);
+		}
+	}
+
+	private String getPartyName(String paymentNumber) {
+		SQLQuery query =  null;
+    	List<Object[]> rows = null;
+    	String partyName="";
+    	try
+    	{
+    		 query = this.persistenceService.getSession().createSQLQuery("select a.id,a.detailname from voucherheader v ,generalledger g ,generalledgerdetail g2 ,accountdetailkey a where v.id=g.voucherheaderid and g.id=g2.generalledgerid and g2.detailkeyid=a.detailkey and g2.detailtypeid=a.detailtypeid and v.vouchernumber =:paymentNumber");
+    	    query.setString("paymentNumber", paymentNumber);
+    	    rows = query.list();
+    	    
+    	    if(rows != null && !rows.isEmpty())
+    	    {
+    	    	for(Object[] element : rows)
+    	    	{
+    	    		partyName= element[1].toString();
+    	    	}
+    	    }
+    	}catch (Exception e) {
+			e.printStackTrace();
+		}
+    	return partyName;
+	}
+
+	@SuppressWarnings("unchecked")
+	@ValidationErrorPage(NEW)
+	@ReadOnly
+	@Action(value = "/report/pexIssueRegisterReport-searchPex")
+	public String searchPex() {
+		searchResult = Boolean.TRUE;
+		if (LOGGER.isDebugEnabled())
+			LOGGER.debug(" Seraching PEX result for given criteria ");
+		System.out.println("SEARCH PEX 1");
+		final Query query = persistenceService.getSession().createSQLQuery(getQueryStringPex().toString())
+				.addScalar("ihId", BigDecimalType.INSTANCE).addScalar("rtgsNumber").addScalar("rtgsDate")
+				.addScalar("vhId", BigDecimalType.INSTANCE).addScalar("paymentNumber").addScalar("paymentDate")
+				.addScalar("paymentAmount").addScalar("department").addScalar("status").addScalar("bank")
+				.addScalar("bankBranch").addScalar("dtId", BigDecimalType.INSTANCE)
+				.addScalar("dkId", BigDecimalType.INSTANCE).addScalar("accountNumber");
+		System.out.println("SEARCH PEX 2");
+		if (null == parameters.get("rtgsAssignedFromDate")[0]
+				|| parameters.get("rtgsAssignedFromDate")[0].isEmpty())
+			query.setDate("finStartDate", new java.sql.Date(fromDate.getTime()));
+		if (LOGGER.isInfoEnabled())
+			LOGGER.info("Search Query ------------>" + query);
+		System.out.println("Query Search : "+query);
+		query.setResultTransformer(Transformers.aliasToBean(BankAdviceReportInfo.class));
+		rtgsDisplayList = query.list();
+		System.out.println("List size : "+rtgsDisplayList.size());
+		//populateSubLedgerDetails();
+		LOGGER.info("start party number");
+		populatePartyNames(rtgsDisplayList);
 		this.populateDepartmentsName();
 		rtgsReportList.addAll(rtgsDisplayList);
 		return "search";
@@ -315,6 +431,16 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
 		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 		final DateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy");
 		StringBuffer instrumentHeaderQry = new StringBuffer("");
+		if(parameters.get("departmentcode")[0] != null)
+		{
+			LOGGER.info("department : "+parameters.get("departmentcode")[0]);
+		}
+		else
+		{
+			LOGGER.info("department : "+null);
+		}
+		
+		
 		try {
 			if (null != parameters.get("departmentcode")[0]
 					&& !parameters.get("departmentcode")[0].equalsIgnoreCase("-1"))
@@ -365,6 +491,71 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
 		}
 		return queryString;
 	}
+    
+    private StringBuffer getQueryStringPex() {
+    	System.out.println("QUERY 1");
+		StringBuffer queryString = new StringBuffer();
+		String deptQry = "";
+		String fundQry = "";
+		String phQry = "";
+		StringBuffer bankQry = new StringBuffer("");
+		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+		final DateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy");
+		StringBuffer instrumentHeaderQry = new StringBuffer("");
+		try {
+			if (null != parameters.get("departmentid") && null != parameters.get("departmentid")[0]
+					&& !parameters.get("departmentid")[0].equalsIgnoreCase("-1"))
+				deptQry = " AND vmis.departmentcode ='" + parameters.get("departmentid")[0] + "'";
+			if (null != parameters.get("rtgsAssignedFromDate") && null != parameters.get("rtgsAssignedFromDate")[0]
+					&& !parameters.get("rtgsAssignedFromDate")[0].isEmpty())
+
+				instrumentHeaderQry = instrumentHeaderQry.append(" and ih.transactiondate >='"
+						+ dateFormat.format(formatter.parse(parameters.get("rtgsAssignedFromDate")[0])) + "'");
+			else
+				instrumentHeaderQry = instrumentHeaderQry.append(" and ih.transactiondate >=:finStartDate");
+			if (null != parameters.get("rtgsAssignedToDate") && null != parameters.get("rtgsAssignedToDate")[0] && !parameters.get("rtgsAssignedToDate")[0].isEmpty())
+				instrumentHeaderQry = instrumentHeaderQry.append(" and ih.transactiondate  <='"
+						+ dateFormat.format(formatter.parse(parameters.get("rtgsAssignedToDate")[0])) + "'");
+			if (null != parameters.get("bank") && null != parameters.get("bank")[0] && !parameters.get("bank")[0].equals("-1")
+					&& !parameters.get("bank")[0].isEmpty())
+				bankQry = bankQry.append(" AND b.id = " + parameters.get("bank")[0]);
+			if (null != parameters.get("bankbranch.id") && null != parameters.get("bankbranch.id")[0] && !parameters.get("bankbranch.id")[0].equals("-1")
+					&& !parameters.get("bankbranch.id")[0].isEmpty())
+				bankQry = bankQry.append(" AND branch.id=" + parameters.get("bankbranch.id")[0]);
+			if (null != parameters.get("bankaccount.id") && null != parameters.get("bankaccount.id")[0] && !parameters.get("bankaccount.id")[0].equals("-1")
+					&& !parameters.get("bankaccount.id")[0].isEmpty()) {
+				phQry = " AND ph.bankaccountnumberid=" + parameters.get("bankaccount.id")[0];
+				instrumentHeaderQry = instrumentHeaderQry
+						.append(" and ih.bankaccountid =" + parameters.get("bankaccount.id")[0]);
+			}
+			if (null != parameters.get("instrumentnumber") && null != parameters.get("instrumentnumber")[0] && !parameters.get("instrumentnumber")[0].isEmpty())
+				instrumentHeaderQry = instrumentHeaderQry
+						.append(" and   ih.transactionnumber ='" + parameters.get("instrumentnumber")[0] + "'");
+			if (null != parameters.get("fundId") && null != parameters.get("fundId")[0] && !parameters.get("fundId")[0].isEmpty())
+				fundQry = " AND vh.fundId =" + parameters.get("fundId")[0];
+
+			queryString = queryString
+					.append(" SELECT ih.id as ihId,ih.transactionnumber as rtgsNumber, ih.transactiondate as rtgsDate, vh.id as vhId, vh.vouchernumber as paymentNumber,"
+							+ " to_char(vh.voucherdate,'dd/mm/yyyy') as paymentDate,   gld.detailtypeid as dtId,  gld.detailkeyid as dkId,   gld.amount as paymentAmount,"
+							+ " vmis.departmentcode as department, stat.description as status,b.name as bank,branch.branchname as bankBranch, ba.accountnumber as accountNumber FROM Paymentheader ph, voucherheader vh,vouchermis vmis,bankaccount ba,bankbranch branch,bank b,generalledger gl,generalledgerdetail gld,"
+							+ " egf_instrumentvoucher iv,  egf_instrumentheader ih, egw_status stat WHERE "
+							+ " ph.voucherheaderid = vh.id AND vmis.voucherheaderid = vh.id " + bankQry.toString()
+							+ " AND ih.bankaccountid = ba.id and branch.id = ba.branchid and branch.bankid = b.id and vh.status = 0 "
+							+ fundQry + phQry + " and stat.id= ih.id_status " + deptQry
+							+ "  and lower(ph.type)=lower('pex') " + instrumentHeaderQry.toString()
+							+ " AND IV.VOUCHERHEADERID IS NOT NULL AND iv.voucherheaderid = vh.id AND ih.instrumentnumber IS NULL "
+							+ " AND ih.id = iv.instrumentheaderid "
+							+ " AND vh.type = 'Payment' and gl.voucherheaderid = vh.id and gld.generalledgerid = gl.id GROUP BY ih.id,ih.transactionnumber,"
+							+ " ih.transactiondate, vh.id, vh.vouchernumber,vh.voucherDate, vmis.departmentcode, b.name,branch.branchname,ba.accountnumber,stat.description,gld.detailtypeid,gld.detailkeyid,gld.amount ORDER BY b.name,branch.branchname,ba.accountnumber,ih.transactiondate,ih.transactionnumber");
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return queryString;
+	}
+
 
 	private void populateSubLedgerDetails() {
 
@@ -529,5 +720,65 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
 	public void setSearchResult(final Boolean searchResult) {
 		this.searchResult = searchResult;
 	}
+	
+	@ValidationErrorPage("searchPex")
+    @Action(value = "/report/pexIssueRegisterReport-newForm")
+    public String newFormPex() {
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info(fromDate);
+            LOGGER.info(toDate);
+        }
+        return "searchPex";
+    }
+	
+    @SkipValidation
+    @Action(value = "/report/pexIssueRegisterReport-exportPdf")
+    public String exportPdfPex() throws JRException, IOException {
+    	System.out.println("PDF 1");
+    	searchPex();
+    	System.out.println("PDF 2");
+        if (rtgsDisplayList.size() > 0) {
+            inputStream = reportHelper.exportPdf(inputStream, jasperpathPEX, getParamMapPex(), rtgsReportList);
+            return "PDF_PEX";
+        }
+        prepare();
+        System.out.println("PDF 3");
+        return newFormPex();
+    }
+
+    @SkipValidation
+    @Action(value = "/report/pexIssueRegisterReport-exportHtml")
+    public String exportHtmlPex() {
+    	System.out.println("HTML 1");
+        searchPex();
+        System.out.println("HTML 2");
+        if (rtgsDisplayList.size() > 0) {
+            inputStream = reportHelper.exportHtml(inputStream, jasperpathPEX, getParamMapPex(), rtgsReportList,
+                    JRHtmlExporterParameter.SIZE_UNIT_POINT);
+            return "HTML_PEX";
+        }
+        addActionMessage("No data found ");
+        prepare();
+        System.out.println("HTML 3");
+        return "searchPex";
+    }
+
+    @SkipValidation
+    @Action(value = "/report/pexIssueRegisterReport-exportXls")
+    public String exportXlsPex() throws JRException, IOException {
+    	System.out.println("XLS 1");
+    	searchPex();
+    	System.out.println("XLS 2");
+        if (rtgsDisplayList.size() > 0) {
+            inputStream = reportHelper.exportXls(inputStream, jasperpath, getParamMapPex(), rtgsReportList);
+            return "XLS_PEX";
+        }
+        prepare();
+        System.out.println("XLS 3");
+        return newFormPex();
+
+    }
+
+        
 
 }

@@ -415,7 +415,7 @@ public class ContractorBillService {
             egBillregister.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
                     .withComments(approvalComent)
                     .withStateValue(stateValue).withDateInfo(currentDate.toDate())
-                    .withOwner(wfInitiator.getPosition())
+                    .withOwner(wfInitiator.getPosition()).withOwnerName((wfInitiator.getPosition().getId() != null && wfInitiator.getPosition().getId() > 0L) ? getEmployeeName(wfInitiator.getPosition().getId()):"")
                     .withNextAction("")
                     .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_WORKS_BILL_DISPLAYNAME);
         } else {
@@ -450,7 +450,7 @@ public class ContractorBillService {
 
                 egBillregister.transition().start().withSenderName(user.getUsername() + "::" + user.getName())
                         .withComments(approvalComent)
-                        .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos)
+                        .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
                         .withNextAction(wfmatrix.getNextAction())
                         .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_WORKS_BILL_DISPLAYNAME)
                         .withCreatedBy(user.getId())
@@ -487,7 +487,7 @@ public class ContractorBillService {
 
                 egBillregister.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
                         .withComments(approvalComent)
-                        .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos)
+                        .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
                         .withNextAction(wfmatrix.getNextAction())
                         .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_WORKS_BILL_DISPLAYNAME);
             }
@@ -689,4 +689,8 @@ public class ContractorBillService {
         List<Designation> desgnList = microServiceUtil.getDesignation(desgnCode);
         return desgnList.get(0);
     }
+    public String getEmployeeName(Long empId){
+        
+        return microServiceUtil.getEmployee(empId, null, null, null).get(0).getUser().getName();
+     }
 }

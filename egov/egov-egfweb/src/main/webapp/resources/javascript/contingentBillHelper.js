@@ -157,7 +157,7 @@ for(var i=0;i<allRecords.getLength();i++){
 	table_name.updateCell(table_name.getRecord(i),table_name.getColumn('SlNo'),""+(i+1));
 
 }
-
+calculateNet(0);
 }
 else{
 bootbox.alert("This row cannot be deleted");
@@ -603,6 +603,55 @@ function calculateNet(obj)
 	var i=0;
 	for(i=0;i<25;i++)
 	{
+		if(document.getElementById("billDetailsTable["+i+"].debitAmountDetail")==null && document.getElementById("billDetailsTable["+i+"].rateDetail")==null)
+		{
+			i++;continue;
+		}
+		if(document.getElementById("billDetailsTable["+i+"].debitAmountDetail").value.trim()!="")
+		{
+			debit=debit+parseFloat(eval(document.getElementById("billDetailsTable["+i+"].debitAmountDetail").value));
+		}
+	}
+	for(i=0;i<25;i++)
+	{
+		if(document.getElementById("billDetailsTableCredit["+i+"].deductionRateDetail")==null)
+		{
+			i++;continue;
+		}
+		else if(document.getElementById("billDetailsTableCredit["+i+"].deductionRateDetail").value.trim()!="")
+		{
+			var amt=parseFloat(eval(((document.getElementById("billDetailsTableCredit["+i+"].deductionRateDetail").value)*debit)/100));
+			document.getElementById("billDetailsTableCredit["+i+"].debitAmountDetail").value=amt;
+			credit=credit+amt;
+		}
+		else
+		{
+			credit=credit+document.getElementById("billDetailsTableCredit["+i+"].debitAmountDetail").value;
+		}
+	}
+	var resultNum = parseFloat(debit-credit);
+	document.getElementById("billDetailsTableNet[0].debitAmountDetail").value = resultNum.toFixed(2);
+
+}
+
+function calculateRateNet(obj)
+{
+	var amountshouldbenumeric="Amount should be numeric";
+
+	if(isNaN(obj.value))
+	{
+		bootbox.alert(amountshouldbenumeric);
+		obj.value="";
+		return false;
+	}
+	var debitLen=billDetailsTable.getRecordSet().getLength();
+	var creditLen=billDetailsTableCredit.getRecordSet().getLength();
+	var debit=0;
+	var credit=0;
+	var deducAmt=0;
+	var i=0;
+	for(i=0;i<25;i++)
+	{
 		if(document.getElementById("billDetailsTable["+i+"].debitAmountDetail")==null)
 		{
 			i++;continue;
@@ -612,6 +661,7 @@ function calculateNet(obj)
 			debit=debit+parseFloat(eval(document.getElementById("billDetailsTable["+i+"].debitAmountDetail").value));
 		}
 	}
+	deducAmt=deducAmt+parseFloat(eval((obj.value * debit)/100));
 	for(i=0;i<25;i++)
 	{
 		if(document.getElementById("billDetailsTableCredit["+i+"].debitAmountDetail")==null)
@@ -623,6 +673,7 @@ function calculateNet(obj)
 			credit=credit+parseFloat(eval(document.getElementById("billDetailsTableCredit["+i+"].debitAmountDetail").value));
 		}
 	}
+	credit=credit+deducAmt;
 	var resultNum = parseFloat(debit-credit);
 	document.getElementById("billDetailsTableNet[0].debitAmountDetail").value = resultNum.toFixed(2);
 

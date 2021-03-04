@@ -53,6 +53,7 @@ import java.util.List;
 
 import org.egov.commons.Accountdetailtype;
 import org.egov.commons.CChartOfAccountDetail;
+import org.egov.commons.dao.FunctionDAO;
 import org.egov.commons.service.AccountdetailtypeService;
 import org.egov.commons.service.ChartOfAccountsService;
 import org.egov.commons.utils.EntityType;
@@ -100,6 +101,8 @@ public abstract class BaseBillController extends BaseVoucherController {
     private PersistenceService persistenceService;
 
     protected boolean isBillDateDefaultValue;
+    @Autowired
+	private FunctionDAO functionDAO;
 
     public BaseBillController(final AppConfigValueService appConfigValuesService) {
         super(appConfigValuesService);
@@ -111,6 +114,7 @@ public abstract class BaseBillController extends BaseVoucherController {
         model.addAttribute("billNumberGenerationAuto", expenseBillService.isBillNumberGenerationAuto());
         model.addAttribute("billSubTypes", getBillSubTypes());
         model.addAttribute("subLedgerTypes", accountdetailtypeService.findAll());
+        model.addAttribute("cFunctions", functionDAO.getAllActiveFunctions());
         isBillDateDefaultValue = expenseBillService.isDefaultAutoPopulateCurrDateEnable();
     }
 
@@ -204,9 +208,9 @@ public abstract class BaseBillController extends BaseVoucherController {
                     for (final CChartOfAccountDetail coaDetails : details.getChartOfAccounts().getChartOfAccountDetails())
                         if (payeeDetails.getAccountDetailTypeId() == coaDetails.getDetailTypeId().getId())
                             check = true;
-                    if (!check)
-                        resultBinder.reject("msg.expense.bill.subledger.mismatch",
-                                new String[] { details.getChartOfAccounts().getGlcode() }, null);
+                    //if (!check)
+                      //  resultBinder.reject("msg.expense.bill.subledger.mismatch",
+                        //        new String[] { details.getChartOfAccounts().getGlcode() }, null);
 
                 }
 

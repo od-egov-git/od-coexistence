@@ -54,7 +54,6 @@
 	cssClass="form-horizontal form-groups-bordered"
 	enctype="multipart/form-data">
 	<div class="main-content">
-	<c:if test="${mode ne 'reopen'}">
 		<td colspan="5" align="right">
 			<div align="right">
 				<button type='button' class='btn btn-primary' id="addnewcloseperiod">
@@ -63,12 +62,11 @@
 				</button>
 			</div>
 		</td>
-		</c:if>
 		<div class="row">
 			<div class="col-md-12">
 				<div class="panel panel-primary" data-collapsed="0">
 					<div class="panel-heading">
-						<div class="panel-title"><spring:message code='lbl.search.closed.period' /></div>
+						<div class="panel-title">Search Closed Period</div>
 					</div>
 					<div class="form-group">
 						<label class="col-sm-3 control-label text-right"><spring:message
@@ -79,7 +77,7 @@
 								<form:option value="">
 									<spring:message code="lbl.select" />
 								</form:option>
-								<form:options items="${cFinancialYears}" itemValue="id" 
+								<form:options items="${cFinancialYears}" itemValue="id"
 									itemLabel="finYearRange" />
 							</form:select>
 							<form:errors path="financialYear" cssClass="error-msg" />
@@ -107,7 +105,8 @@
 	</div>
 </form:form>
 <div class="row display-hide report-section">
-	<div class="col-md-12 table-header text-left"><spring:message code="lbl.closed.period.search.result" /></div>
+	<div class="col-md-12 table-header text-left">Closed Period
+		Search Result</div>
 	<div class="col-md-12 form-group report-table-container">
 		<table class="table table-bordered table-hover multiheadertbl"
 			id="resultTable">
@@ -130,35 +129,30 @@
 		}
 	});
 </script>
-<script
-        src="<cdn:url value='/resources/app/js/i18n/jquery.i18n.properties.js?rnd=${app_release_no}' context='/services/EGF'/>"></script>
+<link rel="stylesheet"
+	href="<cdn:url value='/resources/global/css/font-icons/entypo/css/entypo.css' context='/services/egi'/>" />
+<link rel="stylesheet"
+	href="<cdn:url value='/resources/global/css/bootstrap/bootstrap-datepicker.css' context='/services/egi'/>" />
 <link rel="stylesheet"
 	href="<cdn:url value='/resources/global/css/jquery/plugins/datatables/jquery.dataTables.min.css' context='/services/egi'/>" />
 <link rel="stylesheet"
 	href="<cdn:url value='/resources/global/css/jquery/plugins/datatables/dataTables.bootstrap.min.css' context='/services/egi'/>">
-<link rel="stylesheet"
-	href="<cdn:url value='/resources/global/css/jquery/plugins/datatables/buttons.bootstrap.min.css' context='/services/egi'/>">
 <script type="text/javascript"
 	src="<cdn:url value='/resources/global/js/jquery/plugins/datatables/jquery.dataTables.min.js' context='/services/egi'/>"></script>
 <script type="text/javascript"
 	src="<cdn:url value='/resources/global/js/jquery/plugins/datatables/dataTables.bootstrap.js' context='/services/egi'/>"></script>
 <script type="text/javascript"
-	src="<cdn:url value='/resources/global/js/jquery/plugins/datatables/extensions/buttons/dataTables.buttons.min.js' context='/services/egi'/>"></script>
+	src="<cdn:url value='/resources/global/js/jquery/plugins/datatables/dataTables.tableTools.js' context='/services/egi'/>"></script>
 <script type="text/javascript"
-	src="<cdn:url value='/resources/global/js/jquery/plugins/datatables/extensions/buttons/buttons.bootstrap.min.js' context='/services/egi'/>"></script>
+	src="<cdn:url value='/resources/global/js/jquery/plugins/datatables/TableTools.min.js' context='/services/egi'/>"></script>
 <script type="text/javascript"
-	src="<cdn:url value='/resources/global/js/jquery/plugins/datatables/extensions/buttons/buttons.flash.min.js' context='/services/egi'/>"></script>
-<script type="text/javascript"
-	src="<cdn:url value='/resources/global/js/jquery/plugins/datatables/extensions/buttons/jszip.min.js' context='/services/egi'/>"></script>
-<script type="text/javascript"
-	src="<cdn:url value='/resources/global/js/jquery/plugins/datatables/extensions/buttons/pdfmake.min.js' context='/services/egi'/>"></script>
-<script type="text/javascript"
-	src="<cdn:url value='/resources/global/js/jquery/plugins/datatables/extensions/buttons/vfs_fonts.js' context='/services/egi'/>"></script>
-<script type="text/javascript"
-	src="<cdn:url value='/resources/global/js/jquery/plugins/datatables/extensions/buttons/buttons.html5.min.js' context='/services/egi'/>"></script>
-<script type="text/javascript"
-	src="<cdn:url value='/resources/global/js/jquery/plugins/datatables/extensions/buttons/buttons.print.min.js' context='/services/egi'/>"></script>
+	src="<cdn:url value='/resources/global/js/bootstrap/typeahead.bundle.js' context='/services/egi'/>"></script>
+<script
+	src="<cdn:url value='/resources/global/js/jquery/plugins/jquery.inputmask.bundle.min.js' context='/services/egi'/>"></script>
 <script type="text/javascript"
 	src="<cdn:url value='/resources/global/js/jquery/plugins/jquery.validate.min.js' context='/services/egi'/>"></script>
+<script
+	src="<cdn:url value='/resources/global/js/bootstrap/bootstrap-datepicker.js' context='/services/egi'/>"
+	type="text/javascript"></script>
 <script type="text/javascript"
 	src="<cdn:url value='/resources/app/js/closedPeriodHelper.js?rnd=${app_release_no}' />"></script>

@@ -51,6 +51,7 @@ package org.egov.payment.services;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -66,19 +67,21 @@ import org.egov.commons.Bankaccount;
 import org.egov.commons.CFinancialYear;
 import org.egov.commons.CFunction;
 import org.egov.commons.CVoucherHeader;
+import org.egov.commons.dao.EgwStatusHibernateDAO;
 import org.egov.commons.dao.FinancialYearHibernateDAO;
 import org.egov.deduction.model.EgRemittance;
 import org.egov.deduction.model.EgRemittanceDetail;
 import org.egov.deduction.model.EgRemittanceGl;
 import org.egov.deduction.model.EgRemittanceGldtl;
-import org.egov.egf.dashboard.event.FinanceEventType;
 import org.egov.egf.dashboard.event.listener.FinanceDashboardService;
+import org.egov.egf.expensebill.service.ExpenseBillService;
 import org.egov.eis.entity.Assignment;
 import org.egov.eis.service.AssignmentService;
 import org.egov.eis.service.PositionMasterService;
 import org.egov.infra.admin.master.entity.User;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.exception.ApplicationRuntimeException;
+import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.security.utils.SecurityUtils;
 import org.egov.infra.validation.exception.ValidationError;
 import org.egov.infra.validation.exception.ValidationException;
@@ -87,6 +90,7 @@ import org.egov.infra.workflow.matrix.entity.WorkFlowMatrix;
 import org.egov.infra.workflow.service.SimpleWorkflowService;
 import org.egov.infstr.services.PersistenceService;
 import org.egov.model.advance.EgAdvanceRequisition;
+import org.egov.model.bills.DeducVoucherMpng;
 import org.egov.model.bills.EgBillregister;
 import org.egov.model.bills.Miscbilldetail;
 import org.egov.model.deduction.RemittanceBean;
@@ -148,28 +152,48 @@ public class PaymentActionHelper {
     PositionMasterService positionMasterService;
     @Autowired
     FinanceDashboardService finDashboardService;
+    @Autowired
+    private ExpenseBillService expenseBillService;
+    @Autowired
+    private EgwStatusHibernateDAO egwStatusDAO;
+    
+	@Autowired
+	protected MicroserviceUtils microserviceUtils;
+    
+    //@Autowired
+	//private DeducVoucherMpngRepository deducVoucherMpngRepository;
 
     @Transactional
     public Paymentheader createDirectBankPayment(Paymentheader paymentheader, CVoucherHeader voucherHeader,
             CVoucherHeader billVhId, CommonBean commonBean,
-            List<VoucherDetails> billDetailslist, List<VoucherDetails> subLedgerlist, WorkflowBean workflowBean)
+            List<VoucherDetails> billDetailslist, List<VoucherDetails> subLedgerlist, WorkflowBean workflowBean,String firstsignatory,String secondsignatory)
     {
         try {
+        	System.out.println("Part 1");
+        	voucherHeader.setFirstsignatory(firstsignatory);
+        	voucherHeader.setSecondsignatory(secondsignatory);
             voucherHeader = createVoucherAndledger(voucherHeader, commonBean, billDetailslist, subLedgerlist);
+            System.out.println("Part 2");
             paymentheader = paymentService.createPaymentHeader(voucherHeader,
                     Integer.valueOf(commonBean.getAccountNumberId()), commonBean
                             .getModeOfPayment(), commonBean.getAmount());
+            System.out.println("Part 3");
             if (commonBean.getDocumentId() != null)
                 billVhId = (CVoucherHeader) persistenceService.getSession().load(CVoucherHeader.class,
                         commonBean.getDocumentId());
+            System.out.println("Part 4");
             createMiscBillDetail(billVhId, commonBean, voucherHeader);
+            System.out.println("Part 5");
             paymentheader = sendForApproval(paymentheader, workflowBean);
+            System.out.println("Part 6");
         } catch (final ValidationException e) {
             LOGGER.error(e.getMessage(), e);
+            e.printStackTrace();
             final List<ValidationError> errors = new ArrayList<ValidationError>();
             errors.add(new ValidationError("exp", e.getErrors().get(0).getMessage()));
             throw new ValidationException(errors);
         } catch (final Exception e) {
+        	e.printStackTrace();
             final List<ValidationError> errors = new ArrayList<ValidationError>();
             errors.add(new ValidationError("exp", e.getMessage()));
             throw new ValidationException(errors);
@@ -188,7 +212,7 @@ public class PaymentActionHelper {
             paymentheader = paymentService.createPaymentHeader(voucherHeader, accountNumberId,
                     modeOfPayment, totalAmount);
             updateEgRemittanceglDtl(paymentheader.getVoucherheader(), listRemitBean, recovery);
-            createMiscBillDetail(paymentheader.getVoucherheader(), remittanceBean, remittedTo);
+            createMiscBillDetail(paymentheader.getVoucherheader(), remittanceBean, remittedTo,listRemitBean);
             paymentheader = sendForApproval(paymentheader, workflowBean);
         } catch (final ValidationException e) {
             LOGGER.error(e.getMessage(), e);
@@ -285,6 +309,7 @@ public class PaymentActionHelper {
 
     @Transactional
     public Paymentheader sendForApproval(Paymentheader paymentheader, WorkflowBean workflowBean){
+    	EgBillregister expenseBill = null;
 
         if (FinancialConstants.CREATEANDAPPROVE.equalsIgnoreCase(workflowBean.getWorkFlowAction())
                 && paymentheader.getState() == null)
@@ -297,8 +322,44 @@ public class PaymentActionHelper {
             paymentService.transitionWorkFlow(paymentheader, workflowBean);
             paymentService.applyAuditing(paymentheader.getState());
         }
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        Date currentDate = calendar.getTime(); 
+        CVoucherHeader voucherHeader =null;
+        if(workflowBean.getWorkFlowAction().equals("Approve"))
+        {
+        	voucherHeader = paymentheader.getVoucherheader();
+        	if(voucherHeader!= null && voucherHeader.getBackdateentry() != null && voucherHeader.getBackdateentry().equalsIgnoreCase("N"))
+        	{
+        		voucherHeader.setVoucherDate(currentDate);
+        		paymentheader.setVoucherheader(voucherHeader);
+        	}
+        }
         paymentService.persist(paymentheader);
+        if(workflowBean.getWorkFlowAction().equals("Approve"))
+        {
+        	List<Miscbilldetail> miscBillList = miscbilldetailService.findAllBy(
+                    " from Miscbilldetail where payVoucherHeader.id = ? ",
+                    paymentheader.getVoucherheader().getId());
+        	
+        	if(miscBillList !=null && !miscBillList.isEmpty())
+        	{
+        		for(Miscbilldetail row : miscBillList)
+        		{
+        			 expenseBill = expenseBillService.getByBillnumber(row.getBillnumber());
+        			 if(expenseBill != null)
+        			 {
+        				 expenseBill.setStatus(egwStatusDAO.getStatusByModuleAndCode("EXPENSEBILL", "Bill Payment Approved"));
+                		 expenseBillService.create(expenseBill);
+        			 }
+        		}
+        	}
+        }
         paymentService.getSession().flush();
+        persistenceService.getSession().flush();
         finDashboardService.billPaymentUpdatedAction(paymentheader);
         return paymentheader;
     }
@@ -311,6 +372,8 @@ public class PaymentActionHelper {
     @Transactional
     public EgBillregister setbillRegisterFunction(EgBillregister bill, CFunction function)
     {
+        LOGGER.info("populate EgBillregister mis"+bill.getEgBillregistermis());
+        LOGGER.info("populate cFunctionobj"+function.getName()); 
         bill.getEgBillregistermis().setFunction(function);
         return bill;
     }
@@ -396,8 +459,27 @@ public class PaymentActionHelper {
     }
 
     @Transactional
-    private void createMiscBillDetail(CVoucherHeader voucherHeader, RemittanceBean remittanceBean, String remittedTo) {
-        final Miscbilldetail miscbillDetail = new Miscbilldetail();
+    private void createMiscBillDetail(CVoucherHeader voucherHeader, RemittanceBean remittanceBean, String remittedTo, List<RemittanceBean> listRemitBean) {
+    	DeducVoucherMpng deducVoucher = null;
+    	CVoucherHeader vh = null;
+    	try
+    	{
+    	if(listRemitBean != null && !listRemitBean.isEmpty())
+    	{
+    		for(RemittanceBean row : listRemitBean)
+    		{
+    			deducVoucher= new DeducVoucherMpng();
+    			vh=(CVoucherHeader) persistenceService.find("from CVoucherHeader vh where vh.voucherNumber=?",row.getVoucherNumber());
+    			deducVoucher.setVh_id(vh.getId());
+    			deducVoucher.setPh_id(voucherHeader.getId());
+    			persistenceService.persist(deducVoucher);
+    		}
+    	}
+    	}catch (Exception e) {
+			e.printStackTrace();
+		}
+    	
+    	final Miscbilldetail miscbillDetail = new Miscbilldetail();
         // miscbillDetail.setBillnumber(commonBean.getDocumentNumber());
         // miscbillDetail.setBilldate(commonBean.getDocumentDate());
         miscbillDetail.setBillamount(remittanceBean.getTotalAmount());
@@ -429,7 +511,7 @@ public class PaymentActionHelper {
             } else {
                 final String stateValue = FinancialConstants.WORKFLOW_STATE_REJECTED;
                 paymentheader.transition().progressWithStateCopy().withSenderName(user.getName()).withComments(workflowBean.getApproverComments())
-                        .withStateValue(stateValue).withDateInfo(currentDate.toDate())
+                        .withStateValue(stateValue).withDateInfo(currentDate.toDate()).withOwnerName((wfInitiator.getPosition().getId() != null && wfInitiator.getPosition().getId() > 0L) ? getEmployeeName(wfInitiator.getPosition().getId()):"")
                         .withOwner(wfInitiator.getPosition()).withNextAction(FinancialConstants.WF_STATE_EOA_Approval_Pending);
             }
 
@@ -450,7 +532,7 @@ public class PaymentActionHelper {
                         null, null, workflowBean.getCurrentState(), null);
                 paymentheader.transition().start().withSenderName(user.getName())
                         .withComments(workflowBean.getApproverComments())
-                        .withStateValue(wfmatrix.getNextState()).withDateInfo(currentDate.toDate()).withOwner(pos)
+                        .withStateValue(wfmatrix.getNextState()).withDateInfo(currentDate.toDate()).withOwner(pos).withOwnerName((pos.getId() != null && pos.getId() > 0L) ? getEmployeeName(pos.getId()):"")
                         .withNextAction(wfmatrix.getNextAction());
             } else if (paymentheader.getCurrentState().getNextAction().equalsIgnoreCase("END"))
                 paymentheader.transition().end().withSenderName(user.getName())
@@ -460,7 +542,7 @@ public class PaymentActionHelper {
                 final WorkFlowMatrix wfmatrix = paymentHeaderWorkflowService.getWfMatrix(paymentheader.getStateType(), null,
                         null, null, paymentheader.getCurrentState().getValue(), null);
                 paymentheader.transition().progressWithStateCopy().withSenderName(user.getName()).withComments(workflowBean.getApproverComments())
-                        .withStateValue(wfmatrix.getNextState()).withDateInfo(currentDate.toDate()).withOwner(pos)
+                        .withStateValue(wfmatrix.getNextState()).withDateInfo(currentDate.toDate()).withOwner(pos).withOwnerName((pos.getId() != null && pos.getId() > 0L) ? getEmployeeName(pos.getId()):"")
                         .withNextAction(wfmatrix.getNextAction());
             }
         }
@@ -568,7 +650,18 @@ public class PaymentActionHelper {
         headerdetails.put(VoucherConstant.VOUCHERNUMBER, voucherHeader.getVoucherNumber());
         headerdetails.put(VoucherConstant.VOUCHERDATE, voucherHeader.getVoucherDate());
         headerdetails.put(VoucherConstant.DESCRIPTION, voucherHeader.getDescription());
-
+        if(voucherHeader.getFirstsignatory() != null && !voucherHeader.getFirstsignatory().isEmpty() && !voucherHeader.getFirstsignatory().equalsIgnoreCase("-1"))
+        {
+        	headerdetails.put("firstsignatory", voucherHeader.getFirstsignatory());
+        }
+        if(voucherHeader.getSecondsignatory() != null && !voucherHeader.getSecondsignatory().isEmpty() && !voucherHeader.getSecondsignatory().equalsIgnoreCase("-1"))
+        {
+        	headerdetails.put("secondsignatory", voucherHeader.getSecondsignatory());
+        }
+        if(voucherHeader.getBackdateentry() != null && !voucherHeader.getBackdateentry().isEmpty() && !voucherHeader.getBackdateentry().equalsIgnoreCase("-1"))
+        {
+        	headerdetails.put("backdateentry", voucherHeader.getBackdateentry());
+        }
         if (voucherHeader.getVouchermis().getDepartmentcode() != null)
             headerdetails.put(VoucherConstant.DEPARTMENTCODE,voucherHeader.getVouchermis().getDepartmentcode());
         if (voucherHeader.getFundId() != null)
@@ -602,4 +695,9 @@ public class PaymentActionHelper {
         miscbilldetailService.persist(miscbillDetail);
 
     }
+    
+    public String getEmployeeName(Long empId){
+        
+        return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+     }
 }

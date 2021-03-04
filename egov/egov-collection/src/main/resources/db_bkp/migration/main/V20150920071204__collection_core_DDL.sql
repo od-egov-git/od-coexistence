@@ -125,7 +125,6 @@ CREATE TABLE egcl_collectionheader
   lastmodifieddate timestamp without time zone,
   CONSTRAINT pk_egcl_collectionheader PRIMARY KEY (id),
   CONSTRAINT fk_collhead_chid FOREIGN KEY (reference_ch_id) REFERENCES egcl_collectionheader (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT fk_collhead_location FOREIGN KEY (location) REFERENCES eg_location (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_collhead_service FOREIGN KEY (servicedetails) REFERENCES egcl_servicedetails (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_collhead_state FOREIGN KEY (state_id) REFERENCES eg_wf_states (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_collhead_status FOREIGN KEY (status) REFERENCES egw_status (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION,

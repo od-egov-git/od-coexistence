@@ -49,281 +49,462 @@
 
 <%@ taglib prefix="s" uri="/WEB-INF/tags/struts-tags.tld"%>
 <%@ taglib prefix="egov" tagdir="/WEB-INF/tags"%>
-<link href="<egov:url path='/resources/css/displaytagFormatted.css?rnd=${app_release_no}'/>"
-	rel="stylesheet" type="text/css" />
 <html>
 <head>
-<link rel="stylesheet" type="text/css" href="/services/EGF/resources/css/ccMenu.css?rnd=${app_release_no}" />
-<title><s:text
-		name="rtgs.assignment.remittance.pay.search.heading" /></title>
+<link rel="stylesheet" type="text/css"
+	href="/services/EGF/resources/css/ccMenu.css?rnd=${app_release_no}" />
+<title><s:text name="rtgs.assignment.heading.search" /></title>
 <meta http-equiv="Content-Type"
 	content="text/html; charset=windows-1252">
 </head>
-
 <body>
-	<script>
-		
-	</script>
-	<s:form action="chequeAssignment" theme="simple">
+	<s:form action="chequeAssignment" theme="simple"
+		name="chequeAssignment" id="chequeAssignment">
 		<jsp:include page="../budget/budgetHeader.jsp">
-			<jsp:param name="heading"
-				value="RTGS Ref. No Assignment Search for Auto Remittance Payment" />
+			<jsp:param name="heading" value="RTGS Assignment Search" />
 		</jsp:include>
 		<span class="error-msg"> <s:actionerror /> <s:fielderror /> <s:actionmessage />
 		</span>
 		<div class="formmainbox">
 			<div class="subheadnew">
-				RTGS Ref.No Assignment Search for Auto Remittance Payment
-				<s:if test="%{(drawingOfficerCode!=null)}"> for the drawingofficer - <s:property
-						value="drawingOfficerCode" />
-				</s:if>
+				<s:text name="rtgs.assignment.heading.search" />
 			</div>
 			<table align="center" width="100%" cellpadding="0" cellspacing="0"
 				id="paymentTable">
 				<tr>
 					<th class="bluebgheadtdnew"><s:text
-							name="chq.assignment.select" />
-						<s:checkbox id="selectall" name="selectall"
-							onclick="checkAll(this)" /></th>
+							name="chq.assignment.select" /> <s:checkbox id="selectall"
+							name="selectall" onclick="checkAll(this)" /></th>
 					<th class="bluebgheadtdnew"><s:text name="Sl No" /></th>
 
-					<th class="bluebgheadtdnew"><s:text
-							name="chq.assignment.department.name" /></th>
-					<s:if test="%{(drawingOfficerCode == null)}">
+					<s:if test="%{paymentMode=='cheque'}">
 						<th class="bluebgheadtdnew"><s:text
-								name="chq.assignment.drawingofficer.name.tan" /></th>
+								name="chq.assignment.partycode" /></th>
+
 					</s:if>
 					<th class="bluebgheadtdnew"><s:text
 							name="chq.assignment.payment.voucherno" /></th>
 					<th class="bluebgheadtdnew"><s:text
 							name="chq.assignment.payment.voucherdate" /></th>
 					<th class="bluebgheadtdnew"><s:text
-							name="chq.assignment.partycode" /></th>
-					<th class="bluebgheadtdnew"><s:text
 							name="chq.assignment.payment.amount" /></th>
-					<s:if test="%{nonSubledger == true}">
+
+					<s:if test="%{reassignSurrenderChq && paymentMode=='cheque'}">
 						<th class="bluebgheadtdnew"><s:text
-								name="chq.assignment.voucher.details" /></th>
+								name="chq.assignment.instrument.serialno" /></th>
+						<th class="bluebgheadtdnew" width="10%"><s:text
+								name="chq.assignment.instrument.no" /><span class="mandatory"></span></th>
+						<th class="bluebgheadtdnew"><s:text
+								name="chq.assignment.instrument.date" /><span class="mandatory"></span><br>(dd/mm/yyyy)</th>
 					</s:if>
-
+					<s:elseif
+						test="%{!isChequeNoGenerationAuto() && paymentMode=='cheque'}">
+						<th class="bluebgheadtdnew"><s:text
+								name="chq.assignment.instrument.serialno" /></th>
+						<th class="bluebgheadtdnew" width="10%"><s:text
+								name="chq.assignment.instrument.no" /><span class="mandatory"></span></th>
+						<th class="bluebgheadtdnew"><s:text
+								name="chq.assignment.instrument.date" /><span class="mandatory"></span><br>(dd/mm/yyyy)</th>
+					</s:elseif>
 				</tr>
-				<s:set var="counter" value="0" />
-				<s:iterator value="accountNoAndRemittanceRtgsEntryMap" status="stat">
+				<s:iterator var="p" value="chequeAssignmentList" status="s">
 					<tr>
-						<td class="greybox"><s:property
-								value="key.bankAccount.bankbranch.bank.name" /> - <s:property
-								value="key.bankAccount.bankbranch.branchname" /></td>
-						<td class="greybox"><s:property
-								value="key.bankAccount.accountnumber" /></td>
-						<td class="greybox"><s:property
-								value="key.remittanceCOA.glcode" /></td>
-						<td class="greybox"><s:property
-								value="key.remittanceCOA.name" /> <s:set var="count"
-								value="key.bankAccount.id" /></td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<s:if test="%{nonSubledger == true}">
-							<td></td>
+						<td style="text-align: center" class="blueborderfortdnew"><s:hidden
+								id="voucherHeaderId"
+								name="chequeAssignmentList[%{#s.index}].voucherHeaderId"
+								value="%{voucherHeaderId}" /> <s:checkbox
+								name="chequeAssignmentList[%{#s.index}].isSelected"
+								id="isSelected%{#s.index}" onclick="update(this)" /></td>
+						<td align="left" style="text-align: center"
+							class="blueborderfortdnew" />
+						<s:property value="#s.index+1" />
+						</td>
+						<s:if test="%{paymentMode=='cheque'}">
+							<td style="text-align: center" class="blueborderfortdnew"><s:hidden
+									id="paidTo" name="chequeAssignmentList[%{#s.index}].paidTo"
+									value="%{paidTo}" /> <s:property value="%{paidTo}" /></td>
 						</s:if>
-					</tr>
-					<tr>
+						<td style="text-align: center" class="blueborderfortdnew"><s:hidden
+								id="voucherNumber"
+								name="chequeAssignmentList[%{#s.index}].voucherNumber"
+								value="%{voucherNumber}" /> <s:hidden id="detailtypeid"
+								name="chequeAssignmentList[%{#s.index}].detailtypeid"
+								value="%{detailtypeid}" /> <s:hidden id="detailkeyid"
+								name="chequeAssignmentList[%{#s.index}].detailkeyid"
+								value="%{detailkeyid}" /> <s:property value="%{voucherNumber}" /></td>
+						<td style="text-align: center" class="blueborderfortdnew"><s:hidden
+								id="voucherDate"
+								name="chequeAssignmentList[%{#s.index}].voucherDate"
+								value="%{voucherDate}" /> <s:date name="%{voucherDate}"
+								var="tempPaymentDate" format="dd/MM/yyyy" /> <s:date
+								name="%{voucherDate}" format="dd/MM/yyyy" /> <s:hidden
+								name="chequeAssignmentList[%{#s.index}].tempPaymentDate"
+								value="%{tempPaymentDate}"></s:hidden></td>
+						<td style="text-align: right" class="blueborderfortdnew"><s:hidden
+								id="paidAmount"
+								name="chequeAssignmentList[%{#s.index}].paidAmount"
+								value="%{paidAmount}" /> <s:text name="format.number">
+								<s:param value="%{paidAmount}" />
+							</s:text></td>
 
-						<s:iterator value="value" status="s">
-
-							<td style="text-align: center" class="blueborderfortdnew"><s:hidden
-									id="voucherHeaderId"
-									name="rtgsList[%{#counter}].voucherHeaderId"
-									value="%{voucherHeaderId}" /> <s:checkbox
-									name="rtgsList[%{#counter}].isSelected"
-									id="isSelected%{#counter}" onclick="update(this)" /></td>
-							<td align="left" style="text-align: center"
-								class="blueborderfortdnew"><s:property value="#s.index+1" />
-							</td>
-							<td style="text-align: center" class="blueborderfortdnew"><s:hidden
-									id="departmentName" name="rtgsList[%{#counter}].departmentName"
-									value="%{departmentName}" />
-								<s:property value="%{departmentName}" /></td>
-							<s:if test="%{(drawingOfficerCode == null)}">
-								<td style="text-align: center" class="blueborderfortdnew">
-									<s:hidden id="drawingOfficerNameTAN"
-										name="rtgsList[%{#counter}].drawingOfficerNameTAN"
-										value="%{drawingOfficerNameTAN}" /> <s:property
-										value="%{drawingOfficerNameTAN}" />
-								</td>
-							</s:if>
-							<td style="text-align: center" class="blueborderfortdnew"><s:hidden
-									id="voucherNumber" name="rtgsList[%{#counter}].voucherNumber"
-									value="%{voucherNumber}" /><a href="javascript:void(0);"
-								onclick='viewVoucher(<s:property value="voucherHeaderId"/>);'><s:property
-										value="%{voucherNumber}" /></a>&nbsp;</td>
-							<td style="text-align: center" class="blueborderfortdnew"><s:hidden
-									id="voucherDate" name="rtgsList[%{#counter}].voucherDate"
-									value="%{voucherDate}" />
-								<s:date name="%{voucherDate}" var="tempPaymentDate"
-									format="dd/MM/yyyy" />
-								<s:date name="%{voucherDate}" format="dd/MM/yyyy" /> <s:hidden
-									name="rtgsList[%{#counter}].tempPaymentDate"
-									value="%{tempPaymentDate}"></s:hidden></td>
-							<td style="text-align: center" class="blueborderfortdnew"><s:hidden
-									id="paidTo" name="rtgsList[%{#counter}].paidTo"
-									value="%{paidTo}" />
-								<s:property value="%{paidTo}" /></td>
-							<td style="text-align: right" class="blueborderfortdnew"><s:hidden
-									id="paidAmount" name="rtgsList[%{#counter}].paidAmount"
-									value="%{paidAmount}" />
-								<s:text name="format.number">
-									<s:param value="%{paidAmount}" />
-								</s:text></td>
-							<s:hidden id="bankAccountId"
-								name="rtgsList[%{#counter}].bankAccountId"
-								value="%{bankAccountId}" />
-							<s:set var="counter" value="%{#counter+1}" />
-							<s:if test="%{nonSubledger == true}">
-								<td style="text-align: center" class="blueborderfortdnew"><a
-									href="javascript:void(0);"
-									onclick='viewReceiptDetails(<s:property value="voucherHeaderId"/>);'><s:text
-											name="chq.assignment.voucher.details" /></a>&nbsp;</td>
-							</s:if>
-						</s:iterator>
-					<tr>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<s:if test="%{ paymentMode=='rtgs'}">
-							<td class="greybox"><s:text name="chq.assignment.rtgs.date" /><span
-								class="mandatory">*</span> <s:textfield
-									id="rtgsdateMap[%{#count}]" name="rtgsdateMap[%{#count}]"
-									value="%{rtgsdateMap[#count]}" onchange="updateDate(this)"
-									onkeyup="DateFormat(this,this.value,event,false,'3')" /></td>
+						<s:if test="%{reassignSurrenderChq && paymentMode=='cheque'}">
+							<td style="text-align: right" class="blueborderfortdnew"><s:select
+									name="chequeAssignmentList[%{#s.index}].serialNo"
+									id="chequeAssignmentList[%{#s.index}].serialNo"
+									list="chequeSlNoMap"
+									value='%{chequeAssignmentList[%{#s.index}].serialNo}' /></td>
+							<td style="text-align: center" class="blueborderfortdnew"><s:textfield
+									id="chequeNumber%{#s.index}"
+									name="chequeAssignmentList[%{#s.index}].chequeNumber"
+									value="%{chequeNumber}"
+									onchange="validateReassignSurrenderChequeNumber(this)"
+									size="10" /></td>
+							<td style="text-align: center" class="blueborderfortdnew"><s:date
+									name="chequeDate" var="tempChequeDate" format="dd/MM/yyyy" />
+								<s:textfield id="chequeDate%{#s.index}"
+									name="chequeAssignmentList[%{#s.index}].chequeDate"
+									value="%{tempChequeDate}" size="10" /><a
+								href="javascript:show_calendar('forms[0].chequeDate<s:property value="#s.index"/>');"
+								style="text-decoration: none">&nbsp;<img
+									src="/services/egi/resources/erp2/images/calendaricon.gif" border="0" /></a></td>
 						</s:if>
+						<s:elseif
+							test="%{!isChequeNoGenerationAuto() && paymentMode=='cheque'}">
+							<td style="text-align: right" class="blueborderfortdnew"><s:select
+									name="chequeAssignmentList[%{#s.index}].serialNo"
+									id="chequeAssignmentList[%{#s.index}].serialNo"
+									list="chequeSlNoMap"
+									value='%{chequeAssignmentList[%{#s.index}].serialNo}' /></td>
+							<td style="text-align: center" class="blueborderfortdnew"><s:textfield
+									id="chequeNumber%{#s.index}"
+									name="chequeAssignmentList[%{#s.index}].chequeNumber"
+									value="%{chequeNumber}" onchange="validateChequeNumber(this)"
+									size="10" /></td>
+							<td style="text-align: center" class="blueborderfortdnew"><s:date
+									name="chequeDate" var="tempChequeDate" format="dd/MM/yyyy" />
+								<s:textfield id="chequeDate%{#s.index}"
+									name="chequeAssignmentList[%{#s.index}].chequeDate"
+									value="%{tempChequeDate}" size="10" /><a
+								href="javascript:show_calendar('forms[0].chequeDate<s:property value="#s.index"/>');"
+								style="text-decoration: none">&nbsp;<img
+									src="/services/egi/resources/erp2/images/calendaricon.gif" border="0" /></a></td>
+						</s:elseif>
 					</tr>
 				</s:iterator>
-				</tr>
 			</table>
 			<div class="subheadsmallnew" id="noRecordsDiv"
-				style="visibility: hidden">No Records Found</div>
+				style="visibility: hidden"><s:text name="msg.no.record.found"/> </div>
 			<br />
+			<div id="departmentDiv" style="visibility: visible">
+				<s:hidden name="reassignSurrenderChq" />
+				<table align="center" width="100%" cellspacing="0">
+					<tr>
+						<td class="greybox"><s:text name="rtgs.assignment.department" /><span
+							class="mandatory"></span> <s:select
+								name="vouchermis.departmentcode" id="departmentid"
+								list="dropdownData.departmentList" listKey="code" listValue="name"
+								headerKey="-1" headerValue="%{getText('lbl.choose.options')}"
+								value="%{voucherHeader.vouchermis.departmentid.id}" /></td>
 
+							<!-- <td class="greybox"><s:text
+									name="chq.assignment.instrument.no" /><span class="mandatory"></span>
+								<s:textfield id="chequeNumber0" name="chequeNo" maxlength="6"
+									size="6" value="%{chequeNo}"
+									onchange="validateChequeNumber(this)" /></td> -->
+
+							<td class="greybox"><s:text
+									name="rtgs.assignment.instrumnt.date" /><span
+								class="mandatory1">*</span>(dd/mm/yyyy) <s:date name="chequeDt"
+									var="tempChequeDate" format="dd/MM/yyyy" /> <s:textfield
+									id="chequeDt" name="chequeDt" value="%{tempChequeDate}"
+									data-date-end-date="0d"
+									onkeyup="DateFormat(this,this.value,event,false,'3')"
+									placeholder="DD/MM/YYYY" class="form-control datepicker"
+									data-inputmask="'mask': 'd/m/y'" /></td>
+						
+					</tr>
+				</table>
+			</div>
 			<div class="buttonbottom">
 				<s:hidden id="selectedRows" name="selectedRows"
 					value="%{selectedRows}" />
-				<s:hidden id="rtgsContractorAssignment"
-					name="rtgsContractorAssignment" value="%{rtgsContractorAssignment}" />
 				<s:hidden id="paymentMode" name="paymentMode" value="%{paymentMode}" />
-
-
-				<s:submit id="assignChequeBtn" method="update" value="Assign Cheque"
-					cssClass="buttonsubmit" onclick="return validate();" />
-				<input type="button" value="Close"
+				<s:hidden id="bankaccount" name="bankaccount" value="%{bankaccount}" />
+				<s:hidden id="selectedRowsId" name="selectedRowsId"
+					value="%{selectedRowsId}" />
+				<input type="button" id="assignChequeBtn" method="create" value='<s:text name="lbl.assign.rtgs"></s:text>'
+					class="buttonsubmit" onclick="return validate()" />
+				<input type="button" value='<s:text name="lbl.close"/>'
 					onclick="javascript:window.close()" class="button" />
 			</div>
 		</div>
 		<s:token />
 	</s:form>
 	<script>
+		var selectedRowsId=new Array();
 			function update(obj)
 			{
-				if(obj.checked){
+				if(obj.checked)
 					document.getElementById('selectedRows').value=parseInt(document.getElementById('selectedRows').value)+1;
-				}
-				else{
+				else
 					document.getElementById('selectedRows').value=parseInt(document.getElementById('selectedRows').value)-1;
-				}
-			}
-			function updateDate(obj)
-			{
-				//bootbox.alert("Before"+obj); 
-				//bootbox.alert("obj.name"+obj.name);
-				//bootbox.alert("obj.value"+obj.value); 
-				document.getElementById(obj).value=obj.value;         
-			//	bootbox.alert("After"+obj);            
-				//bootbox.alert("obj.name"+obj.name);          
-			//	bootbox.alert("obj.value"+obj.value);         
 			}
 			function validate()
 			{
-				var result=true;
 				
-				if(document.getElementById('selectedRows').value=='' || document.getElementById('selectedRows').value==0)
+				if(dom.get('departmentid') && dom.get('departmentid').options[dom.get('departmentid').selectedIndex].value==-1)
 				{
-					bootbox.alert('Please select the payment voucher');
+					bootbox.alert('<s:text name="chq.assignment.department.mandatory"/>');
 					return false;
 				}
+				if(document.getElementById('selectedRows').value=='' || document.getElementById('selectedRows').value==0)
+				{
+					bootbox.alert('<s:text name="msg.please.select.the.payment.voucher"/>');
+					return false;
+				}
+				if(document.getElementById('chequeDt')==null || document.getElementById('chequeDt').value=="")
+				{
+					bootbox.alert('<s:text name="msg.please.enter.cheque.date"/>');
+					return false;
+				}
+				dom.get('departmentid').disabled=false;
+					resetSelectedRowsId();
+					document.chequeAssignment.action= "/services/EGF/payment/chequeAssignment-create.action";
+					document.chequeAssignment.submit();
+					return true;
 				
-				<s:if test="%{paymentMode=='rtgs'}">
-					//result= validateForRtgsMode();  
-				</s:if>    
 				
-								 
-				return true;                   
-			}
-		function validateForRtgsMode(){
+			}             
+			function validateChequeDateForNonChequeMode(){
+				   
 				var noOfSelectedRows=document.getElementById('selectedRows').value;
-				//bootbox.alert("sizseled"+noOfSelectedRows);      
-				var chkCount=0;     
-				var index;
+				var chkCount=0;
 				var isSelected=0;
-				<s:set var="listCount" value="0"/>
-				var chequeSize='<s:property value ="%{accountNoAndRtgsEntryMap.size()}"/>';
+				var chequeSize='<s:property value ="%{chequeAssignmentList.size()}"/>';
+				var chequeDate=document.getElementById('chequeDt').value;
+				var chequeNo=document.getElementById('chequeNumber0').value;
 				
-					<s:iterator value="accountNoAndRtgsEntryMap" status="stat">
-					<s:set var="accountId" value="key.bankAccount.id"/>
+				if(chequeNo==null || chequeNo==''){
+						bootbox.alert('<s:text name="msg.please.enter.valid.cheque.number"/>');  
+							return false;
+				}else{
+				for(var index=0;index<chequeSize;index++){
+					var paymentDate= document.getElementsByName("chequeAssignmentList["+index+"].tempPaymentDate")[0].value; 
+					if(document.getElementById('isSelected'+index).checked){
+						chkCount++;
+					
+					if( compareDate(paymentDate,chequeDate) == -1){               
+						bootbox.alert('<s:text name="msg.cheque.date.cant.be.less.than.payment.date"/>');
+						return false;
+					}
+					if(chkCount==noOfSelectedRows){
+						break;
+					}
+					}
+				}
+				return true;
+				}
 				
-					<s:iterator value="value" status="s">
-					index='<s:property value="%{#listCount}"/>';       
-					chequeDate='<s:property value="%{rtgsdateMap[#accountId]}"/>';     
-					var paymentDate= document.getElementsByName("value["+index+"].tempPaymentDate")[0].value; 
-						if(document.getElementById('isSelected'+index).checked){
-							chkCount++;                 
-							bootbox.alert("cheque Date"+chequeDate +"paymentDate"+paymentDate) ;   
-							bootbox.alert(compareDate(paymentDate,chequeDate))  ;     
-							if( compareDate(paymentDate,chequeDate) == -1){     
-								bootbox.alert('Cheque Date cannot be less than  payment Date');
-								return false;           
-							 } 
-							if(chkCount==noOfSelectedRows){ 
-								//bootbox.alert("hi"); 
-								return true;}                      
-						}                               
-					<s:set var="listCount" value="%{#listCount+1}"/>                      
-					</s:iterator>          
-				</s:iterator>
-				return true;           
 			}
-		
-			                
+			function validateChequeNumber(obj)
+			{
+				if(isNaN(obj.value))
+				{
+					bootbox.alert('<s:text name="msg.cheque.number.contains.alpha.char"/>');
+					obj.value='';
+					return false;
+				}
+				if(obj.value.length!=6)
+				{
+					bootbox.alert("<s:text name='msg.cheque.number.must.be.six.digit.long'/>");
+					obj.value='';
+					return false;
+				}
+				//Cheque number might contain . or - which is not handled by isNaN
+				var pattPeriod=/\./i;
+				var pattNegative=/-/i;
+				if(obj.value.match(pattPeriod)!=null || obj.value.match(pattNegative)!=null )
+				{
+					bootbox.alert('<s:text name="msg.cheque.num.should.contaain.only.number"/>');
+					obj.value='';
+					return false;
+				}
+				var index = obj.id.substring(12,obj.id.length);
+				if(obj.value=='')
+					return true;
+					
+				if(dom.get('departmentid') && dom.get('departmentid').options[dom.get('departmentid').selectedIndex].value==-1)
+				{
+					bootbox.alert('<s:text name="chq.assignment.department.mandatory"/>');
+					obj.value='';
+					return false;
+				}
+				var name=obj.name;
+				name=name.replace("chequeNo","serialNo");
+				var dept = dom.get('departmentid').options[dom.get('departmentid').selectedIndex].value;
+				var slNo = dom.get(name).options[dom.get(name).selectedIndex].value;
+				var url = '${pageContext.request.contextPath}/voucher/common-ajaxValidateChequeNumber.action?bankaccountId='+document.getElementById('bankaccount').value+'&chequeNumber='+obj.value+'&index='+index+'&departmentId='+dept+"&serialNo="+slNo;
+				var transaction = YAHOO.util.Connect.asyncRequest('POST', url,callback , null);
+			}
+			
+			function validateReassignSurrenderChequeNumber(obj)
+			{
+				if(isNaN(obj.value))
+				{
+					bootbox.alert('<s:text name="msg.cheque.number.contains.alpha.char"/>');
+					obj.value='';
+					return false;
+				}
+				if(obj.value.length!=6)
+				{
+					bootbox.alert("<s:text name='msg.cheque.number.must.be.six.digit.long'/>");
+					obj.value='';
+					return false;
+				}
+				//Cheque number might contain . or - which is not handled by isNaN
+				var pattPeriod=/\./i;
+				var pattNegative=/-/i;
+				if(obj.value.match(pattPeriod)!=null || obj.value.match(pattNegative)!=null )
+				{
+					bootbox.alert('<s:text name="msg.cheque.num.should.contaain.only.number"/>');
+					obj.value='';
+					return false;
+				}
+				var index = obj.id.substring(12,obj.id.length);
+				if(obj.value=='')
+					return true;
+					
+				if(dom.get('departmentid') && dom.get('departmentid').options[dom.get('departmentid').selectedIndex].value==-1)
+				{
+					bootbox.alert('<s:text name="chq.assignment.department.mandatory"/>');
+					obj.value='';
+					return false;
+				}
+				var name=obj.name;
+				if(name=='chequeNo')
+				{
+				//name and Id will be same or made same .....
+				name=name.replace("chequeNo","serialNo");
+				}
+				if(name.indexOf('chequeNumber')!=-1)
+				{
+				name=name.replace("chequeNumber","serialNo");
+				}
+				var slNo = dom.get(name).options[dom.get(name).selectedIndex].value;
+				
+				var dept = dom.get('departmentid').options[dom.get('departmentid').selectedIndex].value;
+				var url = '${pageContext.request.contextPath}/voucher/common-ajaxValidateReassignSurrenderChequeNumber.action?bankaccountId='+document.getElementById('bankaccount').value+'&chequeNumber='+obj.value+'&index='+index+'&departmentId='+dept+"&serialNo="+slNo;
+				var transaction = YAHOO.util.Connect.asyncRequest('POST', url, callbackReassign, null);
+			}
+			var callback = {
+				success: function(o) {
+					var res=o.responseText;
+					res = res.split('~');
+					if(res[1]=='false')
+					{
+						bootbox.alert('<s:text name="msg.enter.valid.cheque.number.or.cheque.already.used"/>');
+						document.getElementById('chequeNumber'+parseInt(res[0])).value='';
+					}
+			    },
+			    failure: function(o) {
+			    	bootbox.alert('failure');
+			    }
+			}
+				var callbackReassign = {
+				success: function(o) {
+					var res=o.responseText;
+					res = res.split('~');
+					if(res[1]=='false')
+					{
+						bootbox.alert('<s:text name="msg.cheque.num.not.exist.in.surrendered.list"/>');     
+						document.getElementById('chequeNumber'+parseInt(res[0])).value='';
+					}
+			    },
+			    failure: function(o) {
+			    	bootbox.alert('failure');
+			    }
+			}
+			function validateChequeDate(obj){
+
+				var index = obj.name.substring(21,22);                
+				var paymentDate= document.getElementsByName("chequeAssignmentList["+index+"].tempPaymentDate")[0].value; 
+				
+				 var chkDate =  Date.parse(obj.value);
+				 if(isNaN(chkDate))  {                
+					bootbox.alert("<s:text name='msg.please.enter.valid.cheque.date'/>")
+					return false;
+				 }
+				 var chequeDate=obj.value;
+				 if( compareDate(paymentDate,chequeDate) == -1){               
+						bootbox.alert('<s:text name="msg.cheque.date.cant.be.less.than.payment.date"/>');
+						obj.value='';
+					    obj.focus();
+						return false;
+					}
+			}
+			
+			function nextChqNo(obj) 
+			{
+				var index = obj.id.substring(11,obj.id.length);
+				var sRtn = showModalDialog("../HTML/SearchNextChqNo.html?accntNoId="+document.getElementById('bankaccount').value, "","dialogLeft=300;dialogTop=210;dialogWidth=305pt;dialogHeight=300pt;status=no;");
+				if (sRtn != undefined)
+					document.getElementById("chequeNumber"+index).value = sRtn;
+			}
+			
 			function checkAll(obj)
-			{        
-				var listSize='<s:property value ="%{#counter}"/>';                              
+			{
+				var t = document.getElementById('paymentTable').rows;
 				if(obj.checked)
-				{                     
-					for(var j=0;j<listSize;j++)  {     
-						document.getElementById("isSelected"+j).checked=true;     
-					} document.getElementById('selectedRows').value=listSize;                       
+				{
+					for(var i=0;i<t.length-1;i++)
+						document.getElementById('isSelected'+i).checked=true;
+					document.getElementById('selectedRows').value=t.length-1;
 				}
 				else
-				{ 
-					for(var i=0;i<listSize;i++){      
+				{
+					for(var i=0;i<t.length-1;i++)
 						document.getElementById('isSelected'+i).checked=false;
-					}document.getElementById('selectedRows').value=0;
-				}     
+					document.getElementById('selectedRows').value=0;
+				}
+				resetSelectedRowsId();
 			}
-			function viewVoucher(vid){
-				var url = '../voucher/preApprovedVoucher!loadvoucherview.action?vhid='+vid;
-				window.open(url,'Search','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700');
+			
+			function resetSelectedRowsId(){
+				var chequeSize='<s:property value ="%{chequeAssignmentList.size()}"/>';
+				   selectedRowsId = new Array();
+					for(var index=0;index<chequeSize;index++){
+						var obj = document.getElementById('isSelected'+index);
+						if(obj.checked == false){
+							 
+							if(document.getElementsByName("chequeAssignmentList["+index+"].voucherHeaderId")[0])
+								document.getElementsByName("chequeAssignmentList["+index+"].voucherHeaderId")[0].disabled=true;
+							
+							 
+							if(document.getElementsByName("chequeAssignmentList["+index+"].voucherNumber")[0])
+								 document.getElementsByName("chequeAssignmentList["+index+"].voucherNumber")[0].disabled=true;
+							 
+								 
+							if(document.getElementsByName("chequeAssignmentList["+index+"].voucherDate")[0])
+								 document.getElementsByName("chequeAssignmentList["+index+"].voucherDate")[0].disabled=true;
+							 
+							if(document.getElementsByName("chequeAssignmentList["+index+"].paidAmount")[0])
+								paidAmount = document.getElementsByName("chequeAssignmentList["+index+"].paidAmount")[0].disabled=true;
+							 
+							
+						}
+					}
 			}
-			function viewReceiptDetails(phId){
-				var url = '../payment/chequeAssignment!getReceiptDetails.action?paymentId='+phId;
-				window.open(url,'Search','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700');
-			}
-			                
+			
+			 
 		</script>
-
-
+	
+	<s:if
+		test="chequeAssignmentList == null || chequeAssignmentList.size==0">
+		<script>
+				document.getElementById('noRecordsDiv').style.visibility='visible';
+				document.getElementById('departmentDiv').style.visibility='hidden';
+				document.getElementById('assignChequeBtn').style.display='none';
+			</script>
+	</s:if>
 </body>
 </html>

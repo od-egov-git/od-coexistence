@@ -276,4 +276,14 @@ public class CChartOfAccounts extends AbstractAuditable {
         this.id = id;
     }
 
+	@Override
+	public String toString() {
+		return "CChartOfAccounts [id=" + id + ", glcode=" + glcode + ", name=" + name + ", purposeId=" + purposeId
+				+ ", desc=" + desc + ", isActiveForPosting=" + isActiveForPosting + ", parentId=" + parentId
+				+ ", schedule=" + schedule + ", operation=" + operation + ", type=" + type + ", classification="
+				+ classification + ", functionReqd=" + functionReqd + ", budgetCheckReq=" + budgetCheckReq
+				+ ", majorCode=" + majorCode + ", myClass=" + myClass + ", isSubLedger=" + isSubLedger
+				+ ", chartOfAccountDetails=" + chartOfAccountDetails + "]";
+	}
+
 }

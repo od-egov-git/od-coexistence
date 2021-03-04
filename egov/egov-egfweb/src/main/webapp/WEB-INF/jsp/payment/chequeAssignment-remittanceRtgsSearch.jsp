@@ -51,87 +51,78 @@
 <%@ taglib prefix="egov" tagdir="/WEB-INF/tags"%>
 <html>
 <head>
-<link rel="stylesheet" type="text/css" href="/services/EGF/resources/css/ccMenu.css?rnd=${app_release_no}" />
-<title><s:text
-		name="rtgs.assignment.remittance.pay.search.heading" /></title>
+<link rel="stylesheet" type="text/css"
+	href="/services/EGF/resources/css/ccMenu.css?rnd=${app_release_no}" />
+<title><s:text name="rtgs.assignment.heading.search" /></title>
 </head>
-<body onload="onload()">
-	<s:form action="chequeAssignment" theme="simple">
+<body>
+	<s:form action="chequeAssignment" theme="simple"
+		name="chequeAssignment" id="chequeAssignment">
 		<jsp:include page="../budget/budgetHeader.jsp">
-			<jsp:param name="heading"
-				value="RTGS Ref.No Assignment Search for Auto Remittance Payment" />
+			<jsp:param name="heading" value="RTGS Assignment Search" />
 		</jsp:include>
-		<span id="errorSpan"> <s:actionerror /> <s:fielderror /> <s:actionmessage />
+		<span class="error-msg" id="errorSpan"> <s:actionerror /> <s:fielderror />
+			<s:actionmessage />
 		</span>
 		<div class="formmainbox">
 			<div class="subheadnew">
-				<s:text name="chq.rtgs.assignment.search.heading" />
+				<s:text name="rtgs.assignment.heading.search" />
 			</div>
 			<table align="center" width="100%" cellpadding="0" cellspacing="0">
 				<tr>
-					<td class="bluebox" width="30%"><s:text
+					<td class="greybox"></td>
+					<td class="greybox"><s:text
 							name="chq.assignment.paymentvoucherdatefrom" /></td>
-					<td class="bluebox"><s:textfield name="fromDate" id="fromDate"
+					<td class="greybox"><s:textfield name="fromDate" id="fromDate"
 							maxlength="20" value="%{fromDate}"
-							onkeyup="DateFormat(this,this.value,event,false,'3')" /><a
-						href="javascript:show_calendar('forms[0].fromDate');"
-						style="text-decoration: none">&nbsp;<img
-							src="/services/egi/resources/erp2/images/calendaricon.gif" border="0" /></a><br />(dd/mm/yyyy)</td>
-					<td class="bluebox" width="30%"><s:text
+							onkeyup="DateFormat(this,this.value,event,false,'3')" 
+							placeholder="DD/MM/YYYY" cssClass="form-control datepicker"
+								data-inputmask="'mask': 'd/m/y'"  autocomplete="off" /></td>
+					<td class="greybox"><s:text
 							name="chq.assignment.paymentvoucherdateto" /></td>
-					<td class="bluebox"><s:textfield name="toDate" id="toDate"
+					<td class="greybox"><s:textfield name="toDate" id="toDate"
 							maxlength="20" value="%{toDate}"
-							onkeyup="DateFormat(this,this.value,event,false,'3')" /><a
-						href="javascript:show_calendar('forms[0].toDate');"
-						style="text-decoration: none">&nbsp;<img
-							src="/services/egi/resources/erp2/images/calendaricon.gif" border="0" /></a>(dd/mm/yyyy)</td>
+							onkeyup="DateFormat(this,this.value,event,false,'3')" 
+							placeholder="DD/MM/YYYY" cssClass="form-control datepicker"
+								data-inputmask="'mask': 'd/m/y'"  autocomplete="off"/></td>
 				</tr>
 				<tr>
-					<td class="greybox"><s:text name="payment.mode" /><span
+					<td class="greybox"></td>
+					<td class="bluebox"><s:text name="payment.mode" /><span
 						class="mandatory"></span></td>
-					<td class="greybox"><s:radio id="paymentMode"
-							name="paymentMode" list="#{'rtgs':'RTGS'}"
-							onchange="enableOrDisableBillType(this)" value="%{paymentMode}" /></td>
-					<td class="greybox"><s:text
+					<td class="bluebox"><s:radio id="paymentMode"
+							name="paymentMode" list="%{modeOfPaymentMap}"
+							value="%{paymentMode}" /></td>
+					<td class="bluebox"><s:text
 							name="chq.assignment.paymentvoucherno" /></td>
-					<td class="greybox"><s:textfield name="voucherNumber"
+					<td class="bluebox"><s:textfield name="voucherNumber"
 							id="voucherNumber" value="%{voucherNumber}" /></td>
 				</tr>
 				<tr>
-					<td class="bluebox"><s:text name="chq.assignment.billtype" />
-					</td>
-					<td class="bluebox"><s:select name="billType" id="billType"
-							list="billTypeMap" headerKey="-1" headerValue="%{getText('lbl.choose.options')}"
-							value="%{billType}" /></td>
-				</tr>
-				<tr>
-					<td class="greybox"><s:text name="voucher.fund" /></td>
-					<td class="greybox"><s:select name="fundId" id="fundId"
-							list="dropdownData.fundList" listKey="id" listValue="name"
-							headerKey="-1" headerValue="%{getText('lbl.choose.options')}"
-							onChange="loadBank(this);" value="%{fundId.id}" /></td>
+					<td class="greybox"></td>
+					<td class="greybox"><s:text name="recovery.code" /></td>
+					<td class="greybox"><s:select name="recoveryId"
+							id="recoveryId" list="dropdownData.recoveryList" listKey="id"
+							listValue="type+'-'+recoveryName" headerKey="" headerValue="%{getText('lbl.choose.options')}" /></td>
 
-					<td class="greybox" id="deptLabel"><s:text
-							name="voucher.department" /></td>
-					<td class="greybox"><s:select name="vouchermis.departmentid"
-							id="vouchermis.departmentid" list="dropdownData.departmentList"
-							listKey="id" listValue="name" headerKey="-1"
-							headerValue="%{getText('lbl.choose.options')}"
-							value="voucherHeader.vouchermis.departmentid.id" /></td>
 				</tr>
+				<jsp:include page="../voucher/vouchertrans-filter.jsp" />
 				<tr>
+					<td class="greybox"></td>
 					<egov:ajaxdropdown id="bank_branch" fields="['Text','Value']"
 						dropdownId="bank_branch"
-						url="voucher/common-ajaxLoadBanksWithPayGenAndRTGSNotAssigned.action" />
-					<td class="greybox"><s:text name="chq.assignment.bank" /></td>
+						url="voucher/common-ajaxLoadBanksWithApprovedRemittances.action" />
+					<td class="greybox"><s:text name="chq.assignment.bank" /><span
+						class="mandatory"></span></td>
 					<td class="greybox"><s:select name="bank_branch"
 							id="bank_branch" list="bankBranchMap" headerKey="-1"
 							headerValue="%{getText('lbl.choose.options')}" onchange="loadBankAccount(this)"
 							value="%{bank_branch}" /></td>
 					<egov:ajaxdropdown id="bankaccount" fields="['Text','Value']"
 						dropdownId="bankaccount"
-						url="voucher/common-ajaxLoadBankAccountsWithPayGenAndRTGSNotAssigned.action" />
-					<td class="greybox"><s:text name="chq.assignment.bankaccount" /></td>
+						url="voucher/common-ajaxLoadBankAccountsWithApprovedRemittances.action" />
+					<td class="greybox"><s:text name="chq.assignment.bankaccount" /><span
+						class="mandatory"></span></td>
 					<td class="greybox" colspan="2"><s:select name="bankaccount"
 							id="bankaccount" list="dropdownData.bankaccountList" listKey="id"
 							listValue="chartofaccounts.glcode+'--'+accountnumber+'---'+accounttype"
@@ -139,87 +130,61 @@
 							value="%{bankaccount}" /></td>
 				</tr>
 				<tr>
-					<td class="bluebox"><s:text
-							name="rtgs.assignment.remittance.pay.do" /></td>
-					<td class="bluebox"><s:select id="drawingOfficerId"
-							name="drawingOfficerId" cssClass="selectwk"
-							list="dropdownData.drawingofficerList" listKey="id"
-							listValue="name" headerValue="%{getText('lbl.choose.options')}" headerKey="0"
-							value="%{drawingOfficer.id}" /></td>
-					<td class="bluebox"><s:text
-							name="rtgs.assignment.remittance.pay.coa" /></td>
-					<td class="bluebox"><s:select name="recoveryId"
-							id="recoveryId" list="dropdownData.recoveryList" listKey="id"
-							listValue="type" headerKey="" headerValue="%{getText('lbl.choose.options')}"
-							onchange="setRecoveryCode();" /></td>
-
-					</td>
+					<td class="greybox"></td>
+					<td class="bluebox"></td class="bluebox">
+					<td class="bluebox"></td class="bluebox">
 				</tr>
-
 			</table>
 			<div class="buttonbottom">
 				<s:submit method="searchRemittanceRTGS" key="lbl.search"
-					id="searchBtn" cssClass="buttonsubmit" />
+					id="searchBtn" cssClass="buttonsubmit" onclick="submitForm()" />
 				<input type="button" value='<s:text name="lbl.close"/>'
 					onclick="javascript:window.close()" class="button" />
 			</div>
 		</div>
-		<table align="center" width="100%" cellpadding="0" cellspacing="0">
-			</tr>
-			<td style="text-align: left" class="bluebox"><font color="red">*<s:text name="msg.please.select.service.tax.coa.in.search.criteria"/> </font></td>
-			<tr>
-		</table>
 		<s:hidden name="bankbranch" id="bankbranch" />
-		<s:hidden name="rtgsContractorAssignment"
-			id="rtgsContractorAssignment" />
-		<s:hidden name="serviceTexCOA" id="serviceTexCOA" />
-		<s:hidden name="recoveryCode" id="recoveryCode" />
 	</s:form>
 	<script>
-				var date='<s:date name="currentDate" format="dd/MM/yyyy"/>';
-				function onload()
-				{
-					populatebank_branch(); 
-				}
-							
-				function loadBank(obj)
-				{
-					var vTypeOfAccount = '<s:property value="%{typeOfAccount}"/>';
-					
-					if(obj.options[obj.selectedIndex].value!=-1){
-						populatebank_branch({fundId:obj.options[obj.selectedIndex].value+'&asOnDate='+date});              
-					}else{
-						populatebank_branch();                         
-					}
-				}
-				function loadBankAccount(obj)
-				{
-					var vTypeOfAccount = '<s:property value="%{typeOfAccount}"/>';
-					var fund = document.getElementById('fundId');
-					if(obj.options[obj.selectedIndex].value!=-1)
-					{
-						var x=	obj.options[obj.selectedIndex].value.split("-");
-						//bootbox.alert("heelo"+x);                            
-						document.getElementById("bankbranch").value=x[1];
-						populatebankaccount({branchId:x[1]+'&asOnDate='+date,fundId:fund.options[fund.selectedIndex].value});
-					}
-					
-				}
-				function setRecoveryCode()
-				{
+		function submitForm() {
 
-					//bootbox.alert(jQuery('#recoveryId option:selected').text());
-				if(jQuery('#recoveryId option:selected').text()=="350200301" || jQuery('#recoveryId option:selected').text()=="350200302")
-					{
-					document.getElementById("recoveryCode").value=jQuery('#recoveryId option:selected').text();
-					}
+			document.chequeAssignment.action = "/services/EGF/payment/chequeAssignment-searchRemittanceRTGS.action";
+			document.chequeAssignment.submit();
+		}
+		var date = '<s:date name="currentDate" format="dd/MM/yyyy"/>';
+		function loadBank(obj) {
+			if (document.getElementById("recoveryId").value == "") {
+				var revocery = 0;
+			}else{
+				var revocery = document.getElementById("recoveryId").value;
+			}
+			var vTypeOfAccount = '<s:property value="%{typeOfAccount}"/>';
+			
+			if (obj.options[obj.selectedIndex].value != -1)
+				populatebank_branch({
+					fundId : obj.options[obj.selectedIndex].value
+							+ '&asOnDate=' + date + '&recoveryId=' + revocery
+				});
+		}
+		function loadBankAccount(obj) {
+			var vTypeOfAccount = '<s:property value="%{typeOfAccount}"/>';
+			var fund = document.getElementById('fundId');
+			if (obj.options[obj.selectedIndex].value != -1) {
+				var x = obj.options[obj.selectedIndex].value.split("-");
+				document.getElementById("bankbranch").value = x[1];
+				if (document.getElementById("recoveryId").value == "") {
+					var revocery = 0;
+				}else{
+					var revocery = document.getElementById("recoveryId").value;
 				}
-			</script>
-	<s:if test="%{!validateUser('chequeassignment')}">
-		<script>
-					document.getElementById('searchBtn').disabled=true;
-					document.getElementById('errorSpan').innerHTML='<s:text name="chq.assignment.invalid.user"/>'
-				</script>
-	</s:if>
+				populatebankaccount({
+					branchId : x[1] + '&asOnDate=' + date,
+					fundId : fund.options[fund.selectedIndex].value
+							+ '&recoveryId=' + revocery
+				});
+			}
+
+		}
+	</script>
+	
 </body>
 </html>

@@ -107,11 +107,11 @@
 				<td class="bluebox"><s:text name="bill.expenditure.type" /></td>
 				<td class="bluebox"><s:select name="exptype" id="exptype"
 						list="dropdownData.expenditureList" headerKey=""
-						headerValue="%{getText('lbl.choose.options')}" /></td>
+						headerValue="----Choose----" /></td>
 				<td class="bluebox"><s:text name="bill.type" /></td>
 				<td class="bluebox"><s:select name="billType" id="billType"
 						list="dropdownData.billTypeList" headerKey=""
-						headerValue="%{getText('lbl.choose.options')}" /></td>
+						headerValue="----Choose----" /></td>
 			</tr>
 			<tr>
 			<td style="width: 5%"></td>
@@ -128,10 +128,10 @@
 		</div>
 		
 		<div class="buttonbottom">
-			<s:submit method="billSearch" key="lbl.search" cssClass="buttonsubmit"
+			<s:submit method="billSearch" value="Search" cssClass="buttonsubmit"
 				onclick="return validate();" />
-			<s:submit method="searchform" key="lbl.reset" cssClass="button" onclick="return resetAndSubmit();"/>
-			<input type="button" value="<s:text name='lbl.close'/>"
+			<s:submit method="searchform" value="Reset" cssClass="button" onclick="return resetAndSubmit();"/>
+			<input type="button" value="Close"
 				onclick="javascript:window.parent.postMessage('close','*');" class="button" />
 
 		</div>
@@ -157,13 +157,13 @@
 									value="%{#attr.currentRowObject_rowNum+ (page-1)*pageSize}" />
 							</display:column>
 
-							<display:column title="Bill Number"
+							<display:column title="Bill Number" 
 								style="width:10%;text-align:center" property="billNumber" />
 							<display:column title="Bill Date"
 								style="width:8%;text-align:center" property="billDate"
 								sortProperty="billdate" sortable="true" />
-							<display:column title="Voucher number"
-								style="width:11%;text-align:center" property="voucherNumber" />
+							<display:column title="Voucher number" href="javascript:openVoucher('${currentRowObject.vhId}');"
+								style="width:11%;text-align:center" property="voucherNumber" sortProperty="vouchernumber" sortable="true"/>
 							<display:column title="Party Name"
 								style="width:5%;text-align:center" property="partyName" />
 							<display:column title="  Gross Amount"
@@ -174,17 +174,18 @@
 								style="width:7%;text-align:right" property="netAmount" />
 							<display:column title="Paid Amount"
 								style="width:7%;text-align:right" property="paidAmount" />
-							<display:column title="Payment voucher number "
+							<display:column title="Payment voucher number " href="javascript:openVoucher('${currentRowObject.phId}');"
 								style="width:11%;text-align:center"
-								property="paymentVoucherNumber" />
-							<display:column title="Cheque No and Date"
-								style="width:11%;text-align:center" property="chequeNumAndDate" />
-						  <%--  <display:column title="Remittance Payment voucher number"
-								style="width:11%;text-align:center" 	
-								property="remittanceVoucherNumber" />
-						 	<display:column title="Remittance Cheque No and Date"
+								property="paymentVoucherNumber" sortProperty="vouchernumber" sortable="true"/>
+							<display:column title="Payment Pex number " 
 								style="width:11%;text-align:center"
-								property="remittanceChequeNumberAndDate" /> --%>
+								property="pexNo" />
+							<display:column title="Deduction voucher number " href="javascript:openVoucher('${currentRowObject.deducVhId}');"
+								style="width:11%;text-align:center"
+								property="deducVoucherNumber" />
+							<display:column title="Deduction Pex number "
+								style="width:11%;text-align:center"
+								property="deducPexNo" />
 							<display:column title="Status"
 								style="width:10%;text-align:center" property="status" />
 							<display:caption media="pdf">
@@ -297,7 +298,16 @@
 		
 
 		}
-
+	
+		function openVoucher(vid)
+		{
+			var url = "/services/EGF/voucher/preApprovedVoucher-loadvoucherview.action?vhid="+ vid;
+			window.open(url,'','width=900, height=700');
+		}
+		function test()
+		{
+			alert('Test in UAT');
+		}
 	</script>
 </body>
 </html>

@@ -48,7 +48,9 @@
 
 package org.egov.infra.web.utils;
 
+import org.apache.log4j.Logger;
 import org.egov.infra.admin.master.entity.User;
+import org.egov.infra.config.security.repository.ApplicationSecurityRepository;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
@@ -64,6 +66,7 @@ import java.util.Locale;
 
 public final class WebUtils {
 
+	private static final Logger LOGGER = Logger.getLogger(WebUtils.class);
     private static final char QUESTION_MARK = '?';
     private static final char FORWARD_SLASH = '/';
     private static final String SCHEME_DOMAIN_SEPARATOR = "://";
@@ -102,7 +105,12 @@ public final class WebUtils {
      **/
     public static String extractRequestDomainURL(HttpServletRequest httpRequest, boolean withContext) {
         StringBuilder url = new StringBuilder(httpRequest.getRequestURL());
+        LOGGER.info("In WebUtils : url = " + url);
         String uri = httpRequest.getRequestURI();
+        LOGGER.info("In WebUtils : uri = " + uri);
+        LOGGER.info("In WebUtils : withContext = " + withContext);
+        LOGGER.info("In WebUtils : if withContext is false = " + url.substring(0, url.length() - uri.length()));
+        LOGGER.info("In WebUtils : if withContext is true = " + url.substring(0, url.length() - uri.length() + httpRequest.getContextPath().length()) + FORWARD_SLASH);
         return withContext ? url.substring(0, url.length() - uri.length() + httpRequest.getContextPath().length()) + FORWARD_SLASH
                 : url.substring(0, url.length() - uri.length());
     }

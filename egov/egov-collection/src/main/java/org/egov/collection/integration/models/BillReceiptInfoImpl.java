@@ -49,9 +49,13 @@ package org.egov.collection.integration.models;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.egov.collection.constants.CollectionConstants;
@@ -64,8 +68,11 @@ import org.egov.commons.EgwStatus;
 import org.egov.commons.dao.ChartOfAccountsHibernateDAO;
 import org.egov.egf.commons.EgovCommon;
 import org.egov.infra.admin.master.entity.Location;
+import org.egov.infra.microservice.models.BusinessService;
+import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infstr.services.PersistenceService;
 import org.egov.model.instrument.InstrumentHeader;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.opensymphony.xwork2.util.reflection.ReflectionExceptionHandler;
 
@@ -74,6 +81,11 @@ import com.opensymphony.xwork2.util.reflection.ReflectionExceptionHandler;
  */
 
 public class BillReceiptInfoImpl implements BillReceiptInfo {
+	
+	Map<String, String> serviceCategoryNames = new HashMap<String, String>();
+	Map<String, Map<String, String>> serviceTypeMap = new HashMap<>();
+	@Autowired
+    public MicroserviceUtils microserviceUtils;
     /**
      * The private receipt header object. This is used by the getters to provide bill receipt information
      */
@@ -310,6 +322,16 @@ public class BillReceiptInfoImpl implements BillReceiptInfo {
      */
     @Override
     public String getServiceName() {
+    	String serviceDetails=receiptHeader.getService();
+    	String details[]=serviceDetails.split("\\.");
+    	if(details.length == 1)
+    	{
+    		
+    	}
+    	else if (details.length == 2)
+    	{
+    		
+    	}
         return receiptHeader.getService();
     }
 
@@ -487,4 +509,57 @@ public class BillReceiptInfoImpl implements BillReceiptInfo {
     public  String getCreatedUser(){
         return receiptHeader.getCreatedUser() == null?"":receiptHeader.getCreatedUser();
     }
+
+	public Map<String, String> getServiceCategoryNames() {
+		return serviceCategoryNames;
+	}
+
+	public void setServiceCategoryNames(Map<String, String> serviceCategoryNames) {
+		this.serviceCategoryNames = serviceCategoryNames;
+	}
+
+	public Map<String, Map<String, String>> getServiceTypeMap() {
+		return serviceTypeMap;
+	}
+
+	public void setServiceTypeMap(Map<String, Map<String, String>> serviceTypeMap) {
+		this.serviceTypeMap = serviceTypeMap;
+	}
+	
+	private void getServiceCategoryList() {
+		List<BusinessService> businessService = microserviceUtils.getBusinessService(null);
+		for (BusinessService bs : businessService) {
+			String[] splitServName = bs.getBusinessService().split(Pattern.quote("."));
+			String[] splitSerCode = bs.getCode().split(Pattern.quote("."));
+			if (splitServName.length == 2 && splitSerCode.length == 2) {
+				if (!serviceCategoryNames.containsKey(splitSerCode[0])) {
+					serviceCategoryNames.put(splitSerCode[0], splitServName[0]);
+				}
+				if (serviceTypeMap.containsKey(splitSerCode[0])) {
+					Map<String, String> map = serviceTypeMap.get(splitSerCode[0]);
+					map.put(splitSerCode[1], splitServName[1]);
+					serviceTypeMap.put(splitSerCode[0], map);
+				} else {
+					Map<String, String> map = new HashMap<>();
+					map.put(splitSerCode[1], splitServName[1]);
+					serviceTypeMap.put(splitSerCode[0], map);
+				}
+			} else {
+				serviceCategoryNames.put(splitSerCode[0], splitServName[0]);
+			}
+		}
+	}
+
+	@Override
+	public String getSubdivison() {
+		System.out.println("during report :: "+receiptHeader.getSubdivison());
+		return receiptHeader.getSubdivison();
+	}
+
+	@Override
+	public String getGstno() {
+		// TODO Auto-generated method stub
+		return receiptHeader.getGstno();
+	}
+
 }

@@ -231,7 +231,7 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
     public BudgetDetail createBudgetDetail(final BudgetDetail detail, final Position position,
             final PersistenceService service) {
         try {
-            setRelatedEntitesOn(detail);
+            setRelatedEntitesOn(detail,true);
 
             return detail;
         } catch (final ConstraintViolationException e) {
@@ -259,6 +259,7 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
     public List<BudgetDetail> searchByCriteriaWithTypeAndFY(final Long financialYear, final String type,
             final BudgetDetail detail) {
         if (detail.getBudget() != null && detail.getBudget().getId() != 0l) {
+        	System.out.println("aa1");
             final Map<String, Object> map = new HashMap<String, Object>();
             addCriteriaExcludingBudget(detail, map);
             final Criteria criteria = getSession().createCriteria(BudgetDetail.class);
@@ -268,6 +269,7 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
             return criteria.createCriteria(Constants.BUDGET).add(Restrictions.eq("financialYear.id", financialYear))
                     .add(Restrictions.eq("isbere", type)).list();
         } else{
+        	System.out.println("aa2");
             Criteria constructCriteria = constructCriteria(detail);
             constructCriteria.add(Restrictions.eq("executingDepartment", detail.getExecutingDepartment()));
             return constructCriteria.createCriteria(Constants.BUDGET)
@@ -579,9 +581,16 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
 
     }
 
-    public BudgetDetail setRelatedEntitesOn(final BudgetDetail detail) {
-
-        detail.setStatus(egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "Approved"));
+    public BudgetDetail setRelatedEntitesOn(final BudgetDetail detail,boolean status) {
+    	if(status)
+    	{
+    		detail.setStatus(egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "REAPP CAO"));
+    	}
+    	else
+    	{
+    		detail.setStatus(egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "Approved"));
+    	}
+        
         if (detail.getBudget() != null) {
             detail.setBudget(persistenceService.getSession().load(Budget.class, detail.getBudget().getId()));
             addMaterializedPath(detail);
@@ -1765,19 +1774,20 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
                     deptSet.add(dept.getCode());
 
                 deptList.addAll(deptSet);
-                final EgwStatus budgetStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGET", "Created");
+                final EgwStatus budgetStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGET", "CAO Verify");
                 createRootBudget(RE, beFYear, reFYear, deptList, budgetStatus);
 
                 createRootBudget(BE, beFYear, reFYear, deptList, budgetStatus);
 
             }
-            final EgwStatus budgetDetailStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "Created");
+            final EgwStatus budgetDetailStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "CAO Verify");
 
             budgetUploadList = createBudgetDetails(RE, budgetUploadList, reFYear, budgetDetailStatus);
 
             budgetUploadList = createBudgetDetails(BE, budgetUploadList, beFYear, budgetDetailStatus);
 
         } catch (final ValidationException e) {
+        	System.out.println("issue V4 :"+e.getMessage());
             throw new ValidationException(Arrays
                     .asList(new ValidationError(e.getErrors().get(0).getMessage(), e.getErrors().get(0).getMessage())));
         } catch (final Exception e) {
@@ -1791,15 +1801,18 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
             final CFinancialYear fyear, final EgwStatus status) {
         final List<BudgetUpload> tempList = new ArrayList<BudgetUpload>();
         try {
-
+        	System.out.println("bbbbbb");
             for (final BudgetUpload budgetUpload : budgetUploadList) {
+            	System.out.println("cccccc");
                 BudgetDetail budgetDetail = new BudgetDetail();
                 final BudgetDetail temp = getBudgetDetail(budgetUpload.getFund().getId(),
                         budgetUpload.getFunction().getId(), budgetUpload.getDeptCode(),
                         budgetUpload.getCoa().getId(), fyear, budgetType);
 
                 if (temp != null) {
-                    if (temp.getStatus().getCode().equalsIgnoreCase("Created")) {
+                	System.out.println("ddddd");
+                    if (temp.getStatus().getCode().equalsIgnoreCase("CAO Verify")) {
+                    	System.out.println("ffff");
                         BigDecimal amount;
                         if (budgetType.equalsIgnoreCase(RE))
                             amount = budgetUpload.getReAmount();
@@ -1821,17 +1834,27 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
                             tempList.add(budgetUpload);
                         }
                     } else {
+                    	System.out.println("ggggg");
                         budgetUpload.setFinalStatus("Already budget is defined for this combination and Approved");
                         tempList.add(budgetUpload);
                     }
 
                 } else if (temp == null) {
-
+                	System.out.println("eeee");
                     budgetDetail.setFund(budgetUpload.getFund());
                     budgetDetail.setFunction(budgetUpload.getFunction());
                     budgetDetail.setExecutingDepartment(budgetUpload.getDeptCode());
                     budgetDetail.setAnticipatoryAmount(BigDecimal.ZERO);
                     budgetDetail.setPlanningPercent(BigDecimal.valueOf(budgetUpload.getPlanningPercentage()));
+                  //  budgetDetail.setQuarterpercent(BigDecimal.valueOf(budgetUpload.getQuarterpercent()));
+                    
+                    //Author - Bhushan >set four  quater to budget details
+                    budgetDetail.setQuarterpercent(BigDecimal.valueOf(budgetUpload.getQuarterOnepercent()));
+                    budgetDetail.setQuartertwopercent(BigDecimal.valueOf(budgetUpload.getQuarterTwopercent()));
+                    budgetDetail.setQuarterthreepercent(BigDecimal.valueOf(budgetUpload.getQuarterThreepercent()));
+                    budgetDetail.setQuarterfourpercent(BigDecimal.valueOf(budgetUpload.getQuarterFourpercent()));
+                    
+                    
                     if (budgetType.equalsIgnoreCase(RE)) {
                         budgetDetail.setOriginalAmount(budgetUpload.getReAmount());
                         budgetDetail.setApprovedAmount(budgetUpload.getReAmount());
@@ -1859,9 +1882,11 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
                 }
             }
         } catch (final ValidationException e) {
+        	System.out.println("issue V8 :"+e.getMessage());
             throw new ValidationException(Arrays
                     .asList(new ValidationError(e.getErrors().get(0).getMessage(), e.getErrors().get(0).getMessage())));
         } catch (final Exception e) {
+        	System.out.println("issue E8 :"+e.getMessage());
             throw new ValidationException(Arrays.asList(new ValidationError(e.getMessage(), e.getMessage())));
         }
         return tempList;
@@ -1891,39 +1916,48 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
 
     @Transactional
     public BudgetGroup createBudgetGroup(CChartOfAccounts coa) {
+    	System.out.println("coa.getId() ::"+coa.getId());
         BudgetGroup budgetGroup = budgetGroupService.getBudgetGroup(coa.getId());
+        System.out.println("gr1");
         try {
             Serializable sequenceNumber = null;
             try {
                 sequenceNumber = databaseSequenceProvider.getNextSequence("seq_egf_budgetgroup");
             } catch (final SQLGrammarException e) {
             }
-
+            System.out.println("gr2");
             Long.valueOf(sequenceNumber.toString());
-
+            System.out.println("gr3");
             if (budgetGroup == null) {
+            	System.out.println("gr4");
                 budgetGroup = new BudgetGroup();
                 budgetGroup.setName(coa.getGlcode() + "-" + coa.getName());
                 budgetGroup.setDescription(coa.getName());
                 budgetGroup.setIsActive(true);
                 if (coa.getType().compareTo('E') == 0) {
+                	System.out.println("gr5");
                     budgetGroup.setAccountType(BudgetAccountType.REVENUE_EXPENDITURE);
                     budgetGroup.setBudgetingType(BudgetingType.DEBIT);
                 } else if (coa.getType().compareTo('A') == 0) {
+                	System.out.println("gr6");
                     budgetGroup.setAccountType(BudgetAccountType.CAPITAL_EXPENDITURE);
                     budgetGroup.setBudgetingType(BudgetingType.DEBIT);
                 } else if (coa.getType().compareTo('L') == 0) {
+                	System.out.println("gr7");
                     budgetGroup.setAccountType(BudgetAccountType.CAPITAL_RECEIPTS);
                     budgetGroup.setBudgetingType(BudgetingType.CREDIT);
                 } else if (coa.getType().compareTo('I') == 0) {
+                	System.out.println("gr8");
                     budgetGroup.setAccountType(BudgetAccountType.REVENUE_RECEIPTS);
                     budgetGroup.setBudgetingType(BudgetingType.CREDIT);
                 }
                 if (coa.getClassification().compareTo(1l) == 0 || coa.getClassification().compareTo(2l) == 0
                         || coa.getClassification().compareTo(4l) == 0) {
+                	System.out.println("gr9");
                     budgetGroup.setMinCode(coa);
                     budgetGroup.setMaxCode(coa);
                 }
+                System.out.println("gr10");
                 budgetGroup.setMajorCode(null);
                 budgetGroupService.applyAuditing(budgetGroup);
                 budgetGroup = budgetGroupService.persist(budgetGroup);
@@ -1934,9 +1968,13 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
             }
 
         } catch (final ValidationException e) {
+        System.out.println("xxcdbc :"+e.getMessage());
+        e.printStackTrace();
             throw new ValidationException(Arrays
                     .asList(new ValidationError(e.getErrors().get(0).getMessage(), e.getErrors().get(0).getMessage())));
         } catch (final Exception e) {
+        	System.out.println("xxcdbd :"+e.getMessage());
+            e.printStackTrace();
             throw new ValidationException(Arrays.asList(new ValidationError(e.getMessage(), e.getMessage())));
         }
         return budgetGroup;
@@ -1997,9 +2035,11 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
                     status);
 
         } catch (final ValidationException e) {
+        	System.out.println("issue V6 :"+e.getMessage());
             throw new ValidationException(Arrays
                     .asList(new ValidationError(e.getErrors().get(0).getMessage(), e.getErrors().get(0).getMessage())));
         } catch (final Exception e) {
+        	System.out.println("issue E6 :"+e.getMessage());
             throw new ValidationException(Arrays.asList(new ValidationError(e.getMessage(), e.getMessage())));
         }
     }
@@ -2247,7 +2287,7 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
                 final String stateValue = FinancialConstants.WORKFLOW_STATE_REJECTED;
                 budgetDetail.transition().progressWithStateCopy().withSenderName(user.getName())
                         .withComments(workflowBean.getApproverComments()).withStateValue(stateValue)
-                        .withDateInfo(new Date()).withOwner(wfInitiator.getPosition())
+                        .withDateInfo(new Date()).withOwner(wfInitiator.getPosition()).withOwnerName((wfInitiator.getPosition().getId() != null && wfInitiator.getPosition().getId() > 0L) ? getEmployeeName(wfInitiator.getPosition().getId()):"")
                         .withNextAction(FinancialConstants.WF_STATE_EOA_Approval_Pending);
             }
 
@@ -2255,7 +2295,7 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
             budgetDetail.transition().progressWithStateCopy().withSenderName(user.getName())
                     .withComments(workflowBean.getApproverComments())
                     .withStateValue(" Approved").withDateInfo(new Date())
-                    .withOwner(pos);
+                    .withOwner(pos).withOwnerName((pos.getId() != null && pos.getId() > 0L) ? getEmployeeName(pos.getId()):"");
             budgetDetail.transition().end().withSenderName(user.getName())
                     .withComments(workflowBean.getApproverComments()).withDateInfo(new Date());
             budgetDetail.setStatus(egwStatusHibernateDAO.getStatusByModuleAndCode(FinancialConstants.BUDGETDETAIL,
@@ -2270,7 +2310,7 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
             if (budgetDetail.getState() == null) {
                 budgetDetail.transition().start().withSenderName(user.getName())
                         .withComments(workflowBean.getApproverComments()).withStateValue(FinancialConstants.WORKFLOW_STATE_NEW)
-                        .withDateInfo(new Date()).withOwner(userAssignment.getPosition());
+                        .withDateInfo(new Date()).withOwner(userAssignment.getPosition()).withOwnerName((userAssignment.getPosition().getId() != null && userAssignment.getPosition().getId() > 0L) ? getEmployeeName(userAssignment.getPosition().getId()):"");
                 budgetDetail.setStatus(egwStatusHibernateDAO.getStatusByModuleAndCode(FinancialConstants.BUDGETDETAIL,
                         FinancialConstants.WORKFLOW_STATE_NEW));
             }
@@ -2282,7 +2322,7 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
                 budgetDetail.transition().start().withSenderName(user.getName())
                         .withComments(workflowBean.getApproverComments())
                         .withStateValue(FinancialConstants.BUDGETDETAIL_CREATED_STATUS)
-                        .withDateInfo(new Date()).withOwner(pos);
+                        .withDateInfo(new Date()).withOwner(pos).withOwnerName((pos.getId() != null && pos.getId() > 0L) ? getEmployeeName(pos.getId()):"");
                 budgetDetail.setStatus(egwStatusHibernateDAO.getStatusByModuleAndCode(FinancialConstants.BUDGETDETAIL,
                         FinancialConstants.BUDGETDETAIL_CREATED_STATUS));
             } else if (budgetDetail.getCurrentState().getNextAction() != null
@@ -2293,7 +2333,7 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
                 budgetDetail.transition().progressWithStateCopy().withSenderName(user.getName())
                         .withComments(workflowBean.getApproverComments())
                         .withStateValue(FinancialConstants.BUDGETDETAIL_CREATED_STATUS)
-                        .withDateInfo(new Date()).withOwner(pos);
+                        .withDateInfo(new Date()).withOwner(pos).withOwnerName((pos.getId() != null && pos.getId() > 0L) ? getEmployeeName(pos.getId()):"");
         }
         return budgetDetail;
     }
@@ -2308,7 +2348,7 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
         final String stateValue = FinancialConstants.WORKFLOW_STATE_REJECTED;
         budgetDetail.transition().progressWithStateCopy().withSenderName(user.getName())
                 .withStateValue(stateValue).withComments(comment)
-                .withDateInfo(currentDate.toDate()).withOwner(wfInitiator.getPosition())
+                .withDateInfo(currentDate.toDate()).withOwner(wfInitiator.getPosition()).withOwnerName((wfInitiator.getPosition().getId() != null && wfInitiator.getPosition().getId() > 0L) ? getEmployeeName(wfInitiator.getPosition().getId()):"")
                 .withNextAction(FinancialConstants.WF_STATE_EOA_Approval_Pending);
         applyAuditing(budgetDetail.getState());
         return budgetDetail;
@@ -2413,5 +2453,160 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
     public BudgetDetail getBudgetDetailByReferencceBudget(final String uniqueNo, final Long budgetId) {
         return budgetDetailRepository.findByReferenceBudget(uniqueNo, budgetId);
     }
+    
+    public List<BudgetDetail> getBudgetDetailsForUploadReportCAO() {
+        return findAllBy("select bd from BudgetDetail bd where bd.status.code = 'CAO Verify'");
+    }
+    
+    public List<BudgetDetail> getBudgetDetailsForUploadReportSO() {
+        return findAllBy("select bd from BudgetDetail bd where bd.status.code = 'CAO REJECTED'");
+    }
+    
+    public List<BudgetDetail> getBudgetDetailsForUploadReportACMC() {
+        return findAllBy("select bd from BudgetDetail bd where bd.status.code = 'ACMC Verify'");
+    }
+    
+    public List<BudgetDetail> getBudgetDetailsForUploadReport() {
+        return findAllBy("select bd from BudgetDetail bd where bd.status.code = 'Created'");
+    }
+    
+    @Transactional
+    public void updateByMaterializedPathCAO(final String materializedPath) {
+        final EgwStatus approvedStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "ACMC Verify");
+        final EgwStatus createdStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "CAO Verify");
+        persistenceService.getSession()
+                .createSQLQuery(
+                        "update egf_budgetdetail  set status = :approvedStatus where status =:createdStatus and  materializedPath like'"
+                                + materializedPath + "%'")
+                .setLong("approvedStatus", approvedStatus.getId()).setLong("createdStatus", createdStatus.getId())
+                .executeUpdate();
+    }
+    
+    @Transactional
+    public void updateByMaterializedPathSO(final String materializedPath) {
+        final EgwStatus approvedStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "CAO REJECTED");
+        final EgwStatus createdStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "CAO Verify");
+        persistenceService.getSession()
+                .createSQLQuery(
+                        "update egf_budgetdetail  set status = :approvedStatus where status =:createdStatus and  materializedPath like'"
+                                + materializedPath + "%'")
+                .setLong("approvedStatus", approvedStatus.getId()).setLong("createdStatus", createdStatus.getId())
+                .executeUpdate();
+               
+    }
+    
+    @Transactional
+    public void updateByMaterializedPathReturnByACMC(final String materializedPath) {
+    	 EgwStatus approvedStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "CAO REJECTED");
+          EgwStatus createdStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "ACMC Verify");
+        persistenceService
+                .getSession()
+                .createSQLQuery(
+                        "update egf_budgetdetail set status = :approvedStatus where status =:createdStatus and  materializedPath like'"
+                                + materializedPath + "%'").setLong("approvedStatus", approvedStatus.getId())
+                .setLong("createdStatus", createdStatus.getId()).executeUpdate();
+    }
+    
+    @Transactional
+    public void updateByMaterializedPathReturnByMC(final String materializedPath) {
+    	 EgwStatus approvedStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "CAO REJECTED");
+          EgwStatus createdStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "Created");
+        persistenceService
+                .getSession()
+                .createSQLQuery(
+                        "update egf_budgetdetail set status = :approvedStatus where status =:createdStatus and  materializedPath like'"
+                                + materializedPath + "%'").setLong("approvedStatus", approvedStatus.getId())
+                .setLong("createdStatus", createdStatus.getId()).executeUpdate();
+    }
+    
+    @Transactional
+    public void updateByMaterializedPathSTATUSCancelBySO(final String materializedPath) {
+        EgwStatus approvedStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "CANCEL");
+        EgwStatus createdStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "CAO REJECTED");
+        persistenceService
+                .getSession()
+                .createSQLQuery(
+                		"update egf_budgetdetail set status = :approvedStatus where status =:createdStatus and  materializedPath like'"
+                                + materializedPath + "%'").setLong("approvedStatus", approvedStatus.getId())
+                .setLong("createdStatus", createdStatus.getId()).executeUpdate();
+    }
+    
+    @Transactional
+    public void updateByMaterializedPathSTATUSCancelByCAO(final String materializedPath) {
+        EgwStatus approvedStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "CANCEL");
+        EgwStatus createdStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "CAO Verify");
+        persistenceService
+                .getSession()
+                .createSQLQuery(
+                		"update egf_budgetdetail set status = :approvedStatus where status =:createdStatus and  materializedPath like'"
+                                + materializedPath + "%'").setLong("approvedStatus", approvedStatus.getId())
+                .setLong("createdStatus", createdStatus.getId()).executeUpdate();
+    }
+    
+    @Transactional
+    public void updateByMaterializedPathSTATUSCancelByACMC(final String materializedPath) {
+        EgwStatus approvedStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "CANCEL");
+        EgwStatus createdStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "ACMC Verify");
+        persistenceService
+                .getSession()
+                .createSQLQuery(
+                		"update egf_budgetdetail set status = :approvedStatus where status =:createdStatus and  materializedPath like'"
+                                + materializedPath + "%'").setLong("approvedStatus", approvedStatus.getId())
+                .setLong("createdStatus", createdStatus.getId()).executeUpdate();
+    }
+    
+    @Transactional
+    public void updateByMaterializedPathSTATUSCancelByMC(final String materializedPath) {
+        EgwStatus approvedStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "CANCEL");
+        EgwStatus createdStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "Created");
+        persistenceService
+                .getSession()
+                .createSQLQuery(
+                		"update egf_budgetdetail set status = :approvedStatus where status =:createdStatus and  materializedPath like'"
+                                + materializedPath + "%'").setLong("approvedStatus", approvedStatus.getId())
+                .setLong("createdStatus", createdStatus.getId()).executeUpdate();
+    }
+    
+    
+    @Transactional
+    public void updateByMaterializedPathForReVerify(final String materializedPath) {
+    	 EgwStatus approvedStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "CAO Verify");
+         EgwStatus createdStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "CAO REJECTED");
+        persistenceService.getSession()
+                .createSQLQuery(
+                        "update egf_budgetdetail  set status = :approvedStatus where status =:createdStatus and  materializedPath like'"
+                                + materializedPath + "%'")
+                .setLong("approvedStatus", approvedStatus.getId()).setLong("createdStatus", createdStatus.getId())
+                .executeUpdate();
+    }
+    
+    @Transactional
+    public void updateByMaterializedPathACMC(final String materializedPath) {
+        final EgwStatus approvedStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "Created");
+        final EgwStatus createdStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "ACMC Verify");
+        persistenceService.getSession()
+                .createSQLQuery(
+                        "update egf_budgetdetail  set status = :approvedStatus where status =:createdStatus and  materializedPath like'"
+                                + materializedPath + "%'")
+                .setLong("approvedStatus", approvedStatus.getId()).setLong("createdStatus", createdStatus.getId())
+                .executeUpdate();
+    }
+    
+    public List<BudgetDetail> getBudgetDetailsForReAppCao() {
+        return findAllBy("select bd from BudgetDetail bd where bd.status.code = 'REAPP CAO'");
+    }
+    
+    public List<BudgetDetail> getBudgetDetailsForReAppAcmc() {
+        return findAllBy("select bd from BudgetDetail bd where bd.status.code = 'REAPP ACMC'");
+    }
+    
+    public List<BudgetDetail> getBudgetDetailsForReAppMc() {
+        return findAllBy("select bd from BudgetDetail bd where bd.status.code = 'REAPP MC'");
+    }
+
+    public String getEmployeeName(Long empId){
+        
+        return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+     }
 
 }

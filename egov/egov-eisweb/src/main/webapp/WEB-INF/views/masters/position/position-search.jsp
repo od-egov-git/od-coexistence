@@ -57,7 +57,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <meta name="description" content="eGov Urban Portal"/>
+    <meta name="description" content=""/>
     <meta name="author" content=""/>
 
     <title>Search Position</title>
@@ -102,9 +102,7 @@
                 <div class="nav-right-menu col-md-2 col-xs-2">
                     <ul class="hr-menu text-right">
                         <li class="ico-menu">
-                            <a href="javascript:void(0);">
-                                <img src="<cdn:url value='/resources/global/images/logo@2x.png' context='/services/egi'/>" title="Powered by eGovernments" height="20px">
-                            </a>
+                            
                         </li>
 
                     </ul>
@@ -225,8 +223,7 @@
     </div>
     <footer class="main">
 
-        Powered by <a href="http://eGovernments.org" target="_blank">eGovernments Foundation</a>
-
+       
     </footer>
 </div>
 

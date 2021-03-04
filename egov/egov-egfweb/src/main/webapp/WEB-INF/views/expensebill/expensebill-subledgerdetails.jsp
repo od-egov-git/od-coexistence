@@ -46,50 +46,75 @@
   ~
   --%>
 
-<%@ page contentType="text/html;charset=UTF-8" language="java"%>
-<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
-<div class="panel panel-primary" data-collapsed="0">
-	<div class="panel-heading custom_form_panel_heading">
-		<div class="panel-title"><spring:message  code="lbl.subledger.details" text="SubLedger Details"/></div>
+<%@ taglib uri="/WEB-INF/tags/cdn.tld" prefix="cdn" %>
+<style>
+  span { cursor: pointer; }
+  :focus { outline: 1px dashed green; }
+</style>
+<div class="panel-heading">
+	<div class="panel-title">
+		<spring:message  code="lbl.subledger.details" text="SubLedger Details"/>
 	</div>
-	<div  style="padding: 0 15px;">
-		<div class="form-group">
-			<label class="col-sm-3 control-label text-right">
-				<spring:message code="lbl.subledgertype" text="SubLedger Type"/>
-			</label>
-			<div class="col-sm-3 add-margin">
-				<select name="subLedgerType" data-first-option="false" id="subLedgerType" class="form-control" >
+</div>
+<div class="panel-body">
+	<table class="table table-bordered" id="tblSubledgerAdd">
+		<thead>
+			<tr>
+				<th><spring:message code="lbl.subledgertype" text="SubLedger Type"/></th>
+				<th><spring:message code="lbl.subledgeraccount.code" text="Account Code"/></th>
+				<th><spring:message code="lbl.subledgercode" text="Account Code" /></th>
+				<th><spring:message code="lbl.payto" text="Party Name"/></th>
+				<th><spring:message code="lbl.amount" text="Amount"/></th>
+				<th><spring:message code="lbl.action" text="Action"/></th> 					
+			</tr>
+		</thead>
+		<tbody>
+			<tr id="subledgerdetailsrow">
+				<td>
+					<select name="tempSubLedger[0].subLedgerType" data-first-option="false" id="tempSubLedger[0].subLedgerType" data-idx="0" class="form-control subledgerGlType subledgerGl_code" >
 					<option value=""><spring:message code="lbl.select" text="Select"/></option>
 					<c:forEach items="${subLedgerTypes}" var="subLedgerType">
 						<option value="${subLedgerType.id }">${subLedgerType.name}</option>
 					</c:forEach>
 				</select>
-			</div>
-			<div id="subLedgerCodeSection" class="display-hide">
-				<label class="col-sm-2 control-label text-right" id="subLedgerNameLabel">
-					<spring:message code="lbl.code" text="Code" />
-				</label>
-				<div class="col-sm-3 add-margin">
-					<input type="hidden" name="detailkeyId" id="detailkeyId">
-					<input type="text" name="subLedgerCode" id="subLedgerCode" class="form-control" placeholder="Type first 3 letters of SubLedger name"  />
-				</div>
-			</div>
-		</div>
-		
-		<div class="form-group">
-			<label class="col-sm-3 control-label text-right">
-				<spring:message code="lbl.payto" text="Pay To"/> <span class="mandatory"></span>
-			</label>
-			<div class="col-sm-3 add-margin">
-				<form:input class="form-control" id="payTo" path="egBillregistermis.payto" maxlength="350" required="required" />
-				<form:errors path="egBillregistermis.payto" cssClass="add-margin error-msg" />
-			</div>
-			<label class="col-sm-2 control-label text-right">
-			</label>
-			<div class="col-sm-3 add-margin">
-			</div>
-		</div>
-	</div>
+				</td>
+				
+				
+				<td>
+					<input type="hidden" name="tempSubLedger[0].detailkeyId" id="tempSubLedger[0].detailkeyId" class="debitDetailKeyId">
+					<input type="text" name="tempSubLedger[0].subLedgerCode" id="tempSubLedger[0].subLedgerCode" data-idx="0" class="form-control subledger_code subLedgerCodeOT" placeholder="Type any letters of SubLedger name"  />
+				
+					</td>
+				<td>
+					<form:hidden path="" name="tempSubLedger[0].netPayableAccountId" id="tempSubLedger[0].netPayableAccountId" value="${netPayableAccountId}"/>
+					<form:hidden path="" name="tempSubLedger[0].netPayableAccountCodeId" id="tempSubLedger[0].netPayableAccountCodeId" value="${netPayableAccountCodeId}"/>
+					<form:hidden path="" name="tempSubLedger[0].netPayableGlcode" id="tempSubLedger[0].netPayableGlcode" />
+					<form:hidden path="" name="tempSubLedger[0].netPayableAccountHead" id="tempSubLedger[0].netPayableAccountHead" />
+					<form:hidden path="" name="tempSubLedger[0].netPayableIsSubLedger" id="tempSubLedger[0].netPayableIsSubLedger" />
+					<form:hidden path="" name="tempSubLedger[0].netPayableDetailTypeId" id="tempSubLedger[0].netPayableDetailTypeId" />
+					<form:hidden path="" name="tempSubLedger[0].netPayableDetailKeyId" id="tempSubLedger[0].netPayableDetailKeyId" />
+					<form:hidden path="" name="tempSubLedger[0].netPayableDetailTypeName" id="tempSubLedger[0].netPayableDetailTypeName" />
+					<form:hidden path="" name="tempSubLedger[0].netPayableDetailKeyName" id="tempSubLedger[0].netPayableDetailKeyName" />
+					<form:select path="" data-first-option="false" name="tempSubLedger[0].netPayableAccountCode" id="tempSubLedger[0].netPayableAccountCode" data-idx="0" class="form-control netPayableAccount_Code"  >
+						<form:option value=""> <spring:message code="lbl.select" text="Select"/> </form:option>
+					</form:select>
+				</td>
+				
+				
+					
+				<td>
+				<form:input class="form-control subledger_Payto" id="tempSubLedger[0].payTo" path="egBillregistermis.payto" data-idx="0" maxlength="350" />
+				
+				</td>
+				<td>
+				<input type="text" id="tempSubLedger[0].expense-netPayableAmount" name="tempSubLedger[0].netPayableAmount"  data-idx="0" class="form-control text-right netPayable_Amount" onkeyup="decimalvalue(this);" data-pattern="decimalvalue"> 
+				</td> 
+				<td class="text-center"><span style="cursor:pointer;" onclick="addSubledgerRow(this);" tabindex="0" id="tempSubLedger[0].addButton" data-toggle="tooltip" title="" data-original-title="" aria-hidden="true"><i class="fa fa-plus"></i></span>
+				 <span class="add-padding subledge-delete-row" onclick="deleteSubledgerRow(this);"><i class="fa fa-trash"  aria-hidden="true" data-toggle="tooltip" title="" data-original-title="Delete!"></i></span> </td>
+			</tr>
+		</tbody>
+	</table>
 </div>

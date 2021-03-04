@@ -47,10 +47,7 @@
  */
 package org.egov.model.masters;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -62,8 +59,6 @@ import javax.persistence.Table;
 import org.egov.commons.Bank;
 import org.egov.commons.EgwStatus;
 import org.egov.commons.utils.EntityType;
-import org.egov.enums.ContractorTypeEnum;
-import org.egov.enums.SupplierTypeEnum;
 import org.egov.infra.persistence.entity.AbstractAuditable;
 import org.egov.infra.persistence.validator.annotation.OptionalPattern;
 import org.egov.infra.persistence.validator.annotation.Required;
@@ -157,10 +152,6 @@ public class Supplier extends AbstractAuditable implements EntityType {
 
     @Length(max = 250, message = "Maximum of 250 Characters allowed for GST Registered State")
     private String gstRegisteredState;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "suppliertype")
-    private SupplierTypeEnum supplierType;
 
     @Override
     public String getCode() {
@@ -372,11 +363,4 @@ public class Supplier extends AbstractAuditable implements EntityType {
         this.gstRegisteredState = gstRegisteredState;
     }
 
-    public SupplierTypeEnum getSupplierType() {
-        return supplierType;
-    }
-
-    public void setSupplierType(SupplierTypeEnum supplierType) {
-        this.supplierType = supplierType;
-    }
 }

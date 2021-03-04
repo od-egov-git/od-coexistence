@@ -178,12 +178,12 @@
 						class="mandatory1">*</span></td>
 					<td class="bluebox"><s:select name="fundId" id="fundId"
 							list="dropdownData.fundList" listKey="id" listValue="name"
-							headerKey="-1" headerValue="%{getText('lbl.choose.options')}" 
+							headerKey="-1" headerValue="----Choose----"
 							onChange="loadBank(this);" value="%{fundId.id}" /></td>
 					<td class="bluebox"><s:text name="voucher.department" />
 					<td class="bluebox"><s:select name="departmentcode"
 							id="departmentcode" list="dropdownData.departmentList" listKey="code"
-							listValue="name" headerKey="-1" headerValue="%{getText('lbl.choose.options')}" 
+							listValue="name" headerKey="-1" headerValue="----Choose----"
 							onChange="alertWhileSelectingDepartment(this);"
 							value="%{departmentcode}" /></td>
 				</tr>
@@ -214,7 +214,7 @@
 					<td class="bluebox"><s:text name="bank" />:</td>
 					<td class="bluebox"><s:select name="bank" id="bank"
 							list="dropdownData.bankList" listKey="id" listValue="name"
-							headerKey="-1" headerValue="%{getText('lbl.choose.options')}" 
+							headerKey="-1" headerValue="----Choose----"
 							onclick="validateFund()" onChange="populateBankBranch(this);" /></td>
 					<egov:ajaxdropdown id="bankbranch" fields="['Text','Value']"
 						dropdownId="bankbranch"
@@ -223,7 +223,7 @@
 					<td class="bluebox"><s:select name="bankbranch.id"
 							id="bankbranch" list="dropdownData.bankBranchList" listKey="id"
 							listValue="branchname" headerKey="-1"
-							headerValue="%{getText('lbl.choose.options')}" 
+							headerValue="----Choose----"
 							onChange="populateBankAccount(this);" /></td>
 				</tr>
 				<tr>
@@ -235,7 +235,7 @@
 					<td class="greybox"><s:select name="bankaccount.id"
 							id="bankaccount" list="dropdownData.accNumList" listKey="id"
 							listValue="accountnumber" headerKey="-1"
-							headerValue="%{getText('lbl.choose.options')}"  /></td>
+							headerValue="----Choose----" /></td>
 					<td class="greybox"><s:text name="report.rtgsnumber" />:</td>
 					<td class="greybox"><input type="text" name="instrumentnumber"
 						id="instrumentnumber" autocomplete="off"
@@ -244,13 +244,13 @@
 				</tr>
 			</table>
 			<div class="buttonbottom">
-				<s:submit method="exportHtml" key="lbl.search" cssClass="buttonsubmit"
+				<s:submit method="exportHtml" value="Search" cssClass="buttonsubmit"
 					onclick="return submitForm('exportHtml')" />
-				<s:submit key="lbl.save.as.pdf" 
+				<s:submit method="exportPdf" value="Save As Pdf"
 					cssClass="buttonsubmit" onclick="return submitForm('exportPdf')" />
-				<s:submit key="lbl.save.as.excel" 
+				<s:submit method="exportXls" value="Save As Xls"
 					cssClass="buttonsubmit" onclick="return submitForm('exportXls')" />
-				<input type="button" value="<s:text name='lbl.close'/>"
+				<input type="button" value="Close"
 					onclick="javascript:window.parent.postMessage('close','*');" class="button" />
 
 			</div>

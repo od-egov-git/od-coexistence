@@ -108,7 +108,7 @@ function onSubmit()
 </head>
 
 <body onload="refreshInbox()">
-	<s:form action="preApprovedVoucher" theme="simple">
+	<s:form action="preApprovedVoucher" theme="simple" enctype = "multipart/form-data">
 		<jsp:include page="../budget/budgetHeader.jsp">
 			<jsp:param name="heading" value="PJV-Approval" />
 		</jsp:include>
@@ -161,6 +161,13 @@ function onSubmit()
 					<table>
 						<tr class="bluebox">
 							<a href="#" onclick=" return openSource();">Source</a>
+						</tr>
+						
+					</table>
+					<table>
+						
+						<tr class="bluebox">
+							<a href="#" onclick="openBudget()">Budget Details</a>
 						</tr>
 					</table>
 
@@ -239,6 +246,12 @@ function onSubmit()
 						</s:iterator>
 					</table>
 				</div>
+				<s:if test="%{voucherHeader.documentMode=='ADDVIEW'}">
+		      <div  align="center">
+				<jsp:include page="common-documentsView.jsp" />
+				<jsp:include page="common-documentsUpload.jsp" />
+				</div>
+			</s:if>
 				<s:if test="%{!finanicalYearAndClosedPeriodCheckIsClosed}">
 				<div id="wfHistoryDiv">
 					<jsp:include page="../workflow/workflowHistory.jsp" />

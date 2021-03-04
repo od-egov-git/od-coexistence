@@ -63,12 +63,52 @@
 	#bankcodescontainer li.yui-ac-highlight {background:#ff0;}
 	#bankcodescontainer li.yui-ac-prehighlight {background:#FFFFCC;}
 </style>
+<style type="text/css">
+	
+.modal {
+  display: none; 
+  position: fixed;
+  z-index: 9999; 
+  left: 0;
+  top: 0;
+  width: 100%; 
+  height: 100%;
+  overflow: auto;
+  background-color: rgb(0,0,0); 
+  background-color: rgba(0,0,0,0.4);
+}
+.modal-content {
+
+  margin: 15% auto; 
+  width: 80%;  
+}
+.close {
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+.modal-header {
+    padding: 9px;
+}
+.modal in{
+	padding-left: 8px;
+    display: none;
+}
+
+</style>
 <script type="text/javascript">
 
 jQuery.noConflict();
 
 var isDatepickerOpened=false;
 jQuery(document).ready(function() {
+  	 
   	 
      jQuery(" form ").submit(function( event ) {
     	 doLoadingMask();
@@ -115,6 +155,22 @@ jQuery(document).ready(function() {
 jQuery(window).load(function () {
 	undoLoadingMask();
 });
+
+/* Modal Hide */
+ jQuery("#myModal").modal({backdrop: false});
+jQuery('#myModal').modal('hide');  
+
+jQuery(".showModal").click(function(){
+	
+	  jQuery("#myModal").modal('show');
+	
+	});
+jQuery(document).ready(function($) {
+	jQuery("#myModal").modal({
+		backdrop : false
+	});
+	jQuery('#myModal').modal('hide');  
+}); 
 
 
 function onChangeBankAccount(branchId) {
@@ -273,6 +329,9 @@ function validate()
 	var instrTypeCheque = document.getElementById("chequeradiobutton").checked;
 	var instrTypeDD = document.getElementById("ddradiobutton").checked;
 	var instrTypeCard = document.getElementById("cardradiobutton").checked;
+	var instrTypePosmohbd = document.getElementById("posmohbdradiobutton").checked;
+	var instrTypePosmohcattle = document.getElementById("posmohcattleradiobutton").checked;
+	var instrTypePosmohslh = document.getElementById("posmohslhradiobutton").checked;
 	var instrTypeBank = document.getElementById("bankradiobutton").checked;
 	var instrTypeOnline = document.getElementById("onlineradiobutton").checked;
 	var chequetable=document.getElementById('chequegrid');
@@ -302,7 +361,7 @@ function validate()
 		}
 	}
 	//if mode of payment is card
-	if(instrTypeCard){
+	if(instrTypeCard || instrTypePosmohbd || instrTypePosmohcattle || instrTypePosmohslh){
 		if(document.getElementById("instrHeaderCard.transactionNumber")!=null){
 
 	    	var transNo=document.getElementById("instrHeaderCard.transactionNumber").value;
@@ -344,7 +403,24 @@ function validate()
 				collectiontotal=collectiontotal+cardamount;
 			}
 		}
-		document.getElementById('instrumentTypeCashOrCard').value="card";
+		if(instrTypeCard)
+			{
+			document.getElementById('instrumentTypeCashOrCard').value="card";
+			}
+		else if(instrTypePosmohbd)
+			{
+			document.getElementById('instrumentTypeCashOrCard').value="posmohbd";
+			}
+		else if(instrTypePosmohcattle)
+		{
+		document.getElementById('instrumentTypeCashOrCard').value="posmohcattle";
+		}
+		else if(instrTypePosmohslh)
+		{
+		document.getElementById('instrumentTypeCashOrCard').value="posmohslh";
+		}
+		
+		
 	}
 	
 	//if mode of payment is bank
@@ -520,6 +596,13 @@ function validate()
    		document.getElementById("receipt_error_area").innerHTML+='<s:text name="billreceipt.missingpayeename.errormessage" /> ' + '<br>';
 		validation = false;
    	}
+   	
+	var subdivison=document.getElementById("subdivison").value;
+	subdivison = trimAll(subdivison);
+	if(subdivison.length == 0 || subdivison==""){
+		document.getElementById("receipt_error_area").innerHTML+='<s:text name="billreceipt.missingsubdivison.errormessage" /> ' + '<br>';
+	validation = false;
+	}
 	
    	<s:if test="%{!isBillSourcemisc()}"> 
 	 if(eval(document.getElementById("totalamountdisplay").value)>eval(document.getElementById("totalamounttobepaid").value)){
@@ -541,6 +624,7 @@ function validate()
 	}
 	console.log('validation : ',validation);
 	if(validation==false){
+		
 		return false;
 	}
 	else {
@@ -549,6 +633,7 @@ function validate()
 		return validation;
 	}
 }//end of function 'validate'
+
 
 function verifyChequeDetails(table,len1)
 {
@@ -595,13 +680,7 @@ function verifyChequeDetails(table,len1)
 	    if(getControlInBranch(table.rows[j],'instrumentIfscCode')!=null ){
 	    	var ifscCode=getControlInBranch(table.rows[j],'instrumentIfscCode').value;
 	    	var bankName=getControlInBranch(table.rows[j],'bankName').value;
-	    	if(ifscCode==null || ifscCode==""){
-	    		if(bankNameErrMsg==""){
-	    		    bankNameErrMsg='<s:text name="billreceipt.missingifsc.code.errormessage" />' + '<br>';
-	    			document.getElementById("receipt_error_area").innerHTML+=bankNameErrMsg;
-	    		}
-	    		check=false;
-	    	}else if(bankName==null || bankName==""){
+	    	 if(bankName==null || bankName==""){
 	    		if(bankNameErrMsg==""){
 	    		    bankNameErrMsg='<s:text name="billreceipt.invalidifsc.code.errormessage" />' + '<br>';
 	    			document.getElementById("receipt_error_area").innerHTML+=bankNameErrMsg;
@@ -1059,6 +1138,13 @@ function showHideMandataryMark(obj){
 		
 	}
 }
+
+jQuery(document).keypress(
+		  function(event){
+		    if (event.which == '13') {
+		      event.preventDefault();
+		    }
+		});
 </script>
 
 	<title><s:text name="billreceipt.pagetitle"/></title>
@@ -1138,6 +1224,9 @@ function showHideMandataryMark(obj){
 		<s:hidden label="minimumAmount" id="minimumAmount" value="%{minimumAmount}" name="minimumAmount"/>
 		<s:hidden label="cashAllowed" id="cashAllowed" value="%{cashAllowed}" name="cashAllowed"/>
 		<s:hidden label="cardAllowed" id="cardAllowed" value="%{cardAllowed}" name="cardAllowed"/>
+		<s:hidden label="posmohbdAllowed" id="posmohbdAllowed" value="%{posmohbdAllowed}" name="posmohbdAllowed"/>
+		<s:hidden label="posmohcattleAllowed" id="posmohcattleAllowed" value="%{posmohcattleAllowed}" name="posmohcattleAllowed"/>
+		<s:hidden label="posmohslhAllowed" id="posmohslhAllowed" value="%{posmohslhAllowed}" name="posmohslhAllowed"/>
 		<s:hidden label="chequeAllowed" id="chequeAllowed" value="%{chequeAllowed}" name="chequeAllowed"/>
 		<s:hidden label="bankAllowed" id="bankAllowed" value="%{bankAllowed}" name="bankAllowed"/>
 		<s:hidden label="ddAllowed" id="ddAllowed" value="%{ddAllowed}" name="ddAllowed"/>
@@ -1172,10 +1261,10 @@ function showHideMandataryMark(obj){
 	    			<s:text name="billreceipt.payment.totalamt.tobereceived"/>
 	   				<span class="bold">
 	    			
-	   				<input style="border:0px;background-color:#FFFFCC;font-weight:bold;" type="text" name="totalamounttobepaid" id="totalamounttobepaid" readonly="readonly" value='<s:property value="%{totalAmntToBeCollected}" />' >
+	   				<input style="border:0px;background-color:#265988;font-weight:bold;" type="text" name="totalamounttobepaid" id="totalamounttobepaid" readonly="readonly" value='<s:property value="%{totalAmntToBeCollected}" />' >
 	   				</span>
 	   			</s:if>
-	   			<s:text name="billreceipt.payment.totalamt.received"/><span><input style="border:0px;background-color:#FFFFCC;font-weight:bold;" type="text" name="totalamountdisplay" id="totalamountdisplay" readonly="readonly" tabindex='-1'></span>
+	   			<s:text name="billreceipt.payment.totalamt.received"/><span><input style="border:0px;background-color:#265988;font-weight:bold;color:white" type="text" name="totalamountdisplay" id="totalamountdisplay" readonly="readonly" tabindex='-1'></span>
    			</div>
    			<s:hidden label="totalAmntToBeCollected" name="totalAmntToBeCollected" value="%{totalAmntToBeCollected}"/>
     	</td></tr>
@@ -1196,7 +1285,7 @@ function showHideMandataryMark(obj){
 		   <td class="bluebox"><s:textfield label="paidBy" id="paidBy" maxlength="150" name="paidBy" value="%{payeeName}" /></td>
 	    </tr>
 	    </s:if>
-		<table id="manualreceipt" >    
+		 <table id="manualreceipt" hidden="true" style="visibility:hidden;" >    
 		
 			<s:if test="%{manualReceiptNumberAndDateReq}">
 				<tr>
@@ -1233,11 +1322,13 @@ function showHideMandataryMark(obj){
 			 <div id="loadingMask" style="display:none;overflow:hidden;text-align: center"><img src="/services/collection/resources/images/bar_loader.gif"/> <span style="color: red">Please wait....</span></div>
 			<div align="left" class="mandatorycoll"><s:text name="common.mandatoryfields"/></div>
 			<div class="buttonbottom" align="center">
-			      <label><input align="center" type="submit" class="buttonsubmit" id="button2" value="<s:text name='lbl.pay'/>" onclick="return validate();"/></label>
+			     <%-- <label><input align="center" type="submit" class="buttonsubmit" id="button2" tabindex="-1" value="<s:text name='lbl.pay'/>" onclick="return validate();"/></label> --%>
+			      <%-- <label><input align="center" type="button" class="buttonsubmit showModal" id="buttonPay" tabindex="-1" value="<s:text name='lbl.pay'/>" onclick="return validate();" data-toggle='modal' data-target='#myModal'/></label> --%>
+			      <label><input align="center" type="button" class="buttonsubmit showModal" id="buttonPay" tabindex="-1" value="<s:text name='lbl.pay'/>" onclick="payCall();" data-toggle='modal'/></label> 
 			      &nbsp;
-			      <input name="button" type="button" class="button" id="button" value="<s:text name='lbl.reset'/>" onclick="checkreset();"/>
+			      <input name="button" type="button" class="button" id="button" tabindex="-1" value="<s:text name='lbl.reset'/>" onclick="checkreset();"/>
 			      &nbsp;
-			      <input name="button" type="button" class="button" id="buttonclose2" value="<s:text name='lbl.close'/>" onclick="window.close();" />
+			      <input name="button" type="button" class="button" id="buttonclose2" tabindex="-1" value="<s:text name='lbl.close'/>" onclick="window.close();" />
 				</div>
 
 <!-- <table width="100%" >
@@ -1273,14 +1364,56 @@ function showHideMandataryMark(obj){
 </table> -->
 
 
-
 </s:push>
 
 </s:form>
 
 </div>
 </s:else>
+
+
+<!-- Modal --> 
+	<div class="modal" id="myModal" role="dialog" style="display: none;">
+		<div class="modal-dialog" role="dailog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					
+					<h4 class="modal-title"><b>Payment Confirmation</b></h4>
+				</div>
+				<div class="modal-body">
+				<p>Do You Really Want To Pay?</p>
+					<!-- <font style="align: center;">Are You Sure To Delete Record?</font> -->
+					</div>
+				<div class="modal-footer">
+					<input  type="button" class="btn btn-danger" id="button2" value="<s:text name='lbl.pay'/>" onclick="document.collDetails.submit()" data-dismiss="modal" style="width: 100px;"/>
+					<!-- <button type="submit" class="btn btn-danger" onclick="return validate()" data-dismiss="modal" style="width: 100px;">Proceed</button> -->
+					<button type="button" class="btn btn-primary" data-dismiss="modal" style="width: 100px;">Cancel</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+
 <script type="text/javascript">
+
+
+ function payCall()
+{
+	console.log("inside CAll");
+	var result = validate();
+	console.log("result>>"+result);
+	if(result==true){
+	 	jQuery('#myModal').modal('show'); 
+	 }
+	 else{
+		jQuery('#myModal').modal('hide');
+	} 
+	 
+}  
+	
+	
 // MAIN FUNCTION: new switchcontent("class name", "[optional_element_type_to_scan_for]") REQUIRED
 // Call Instance.init() at the very end. REQUIRED
 var bobexample=new switchcontent("switchgroup1", "div") //Limit scanning of switch contents to just "div" elements
@@ -1291,4 +1424,6 @@ bobexample.init()
 <script>
 jQuery(":input").inputmask();
 </script>
+
+
 </body>

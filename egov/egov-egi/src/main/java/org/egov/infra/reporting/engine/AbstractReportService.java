@@ -165,9 +165,7 @@ public abstract class AbstractReportService<T> implements ReportService {
      * @return Report object for given template path.
      */
     protected T getTemplate(String templateName) {
-
         T reportTemplate = this.templateCache.get(ApplicationThreadLocals.getTenantID() + templateName);
-
         if (devMode || reportTemplate == null) {
             try {
                 reportTemplate = loadTemplate(ReportUtil.getTemplateAsStream(templateName + getTemplateExtension()));

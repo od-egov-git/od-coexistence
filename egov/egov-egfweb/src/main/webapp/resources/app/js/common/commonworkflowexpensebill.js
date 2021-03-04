@@ -48,9 +48,9 @@
 $(document).ready(function()
 {	
 	console.log("workflow file got updated................");
-/*	$('#approvalDepartment').change(function(){
+	$('#approvalDepartment').change(function(){
 		$.ajax({
-			url: "/eis/ajaxWorkFlow-getDesignationsForActiveAssignmentsByObjectType",     
+			url: "/services/eis/ajaxWorkFlow-getDesignationsByObjectType",     
 			type: "GET",
 			data: {
 				approvalDepartment : $('#approvalDepartment').val(),
@@ -67,19 +67,19 @@ $(document).ready(function()
 				$('#approvalDesignation').empty();
 				$('#approvalDesignation').append($("<option value=''>Select from below</option>"));
 				$.each(response, function(index, value) {
-					$('#approvalDesignation').append($('<option>').text(value.name).attr('value', value.id));
+					$('#approvalDesignation').append($('<option>').text(value.name).attr('value', value.code));
 				});
 				$('#approvalDesignation').val($('#approvalDesignationValue').val());
 				$('#approvalDesignation').trigger('change');
 			}, 
 			error: function (response) {
-				bootbox.alert('json fail');
+				//bootbox.alert('json fail');
 				console.log("failed");
 			}
 		});
-	});*/
+	});
 	
-	$('#approvalDepartment').change(function(){
+	/*$('#approvalDepartment').change(function(){
 		
 		$.ajax({
 			url: "/services/EGF/designations",     
@@ -101,7 +101,7 @@ $(document).ready(function()
 				console.log("failed");
 			}
 		});
-	});
+	});*/
 	
 
 	

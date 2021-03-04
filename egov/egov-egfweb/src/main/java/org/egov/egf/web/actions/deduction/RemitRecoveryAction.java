@@ -91,14 +91,18 @@ import org.egov.dao.voucher.VoucherHibernateDAO;
 import org.egov.deduction.model.EgRemittance;
 import org.egov.deduction.model.EgRemittanceDetail;
 import org.egov.egf.commons.EgovCommon;
+import org.egov.egf.model.TDSEntry;
 import org.egov.egf.web.actions.payment.BasePaymentAction;
 import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.entity.Boundary;
 import org.egov.infra.admin.master.entity.Department;
 import org.egov.infra.admin.master.service.DepartmentService;
+import org.egov.infra.config.persistence.datasource.routing.annotation.ReadOnly;
+import org.egov.infra.exception.ApplicationRuntimeException;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.script.entity.Script;
 import org.egov.infra.script.service.ScriptService;
+import org.egov.infra.utils.DateUtils;
 import org.egov.infra.validation.exception.ValidationError;
 import org.egov.infra.validation.exception.ValidationException;
 import org.egov.infra.web.struts.annotation.ValidationErrorPage;
@@ -123,6 +127,7 @@ import org.egov.services.payment.PaymentService;
 import org.egov.services.voucher.VoucherService;
 import org.egov.utils.Constants;
 import org.egov.utils.FinancialConstants;
+import org.hibernate.FlushMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -135,6 +140,9 @@ import com.opensymphony.xwork2.validator.annotations.Validation;
 @Results({ @Result(name = RemitRecoveryAction.NEW, location = "remitRecovery-" + RemitRecoveryAction.NEW + ".jsp"),
         @Result(name = "messages", location = "remitRecovery-messages.jsp"),
         @Result(name = "view", location = "remitRecovery-view.jsp"),
+        @Result(name = RemitRecoveryAction.SUMMARYFORM, location = "remitRecovery-summaryForm.jsp"),
+        //@Result(name = "edit", location = "remitRecovery-summaryForm.jsp"),
+        @Result(name = "summaryResults", location = "remitRecovery-summaryResults.jsp"),
         @Result(name = "remitDetail", location = "remitRecovery-remitDetail.jsp") })
 public class RemitRecoveryAction extends BasePaymentAction {
 
@@ -151,6 +159,7 @@ public class RemitRecoveryAction extends BasePaymentAction {
     private RemitRecoveryService remitRecoveryService;
     private VoucherService voucherService;
     private List<RemittanceBean> listRemitBean;
+    private String message = "";
     private String selectedRows;
     private Long functionId;
     @Autowired
@@ -217,6 +226,21 @@ public class RemitRecoveryAction extends BasePaymentAction {
     private Boolean isPartialPaymentEnabled = false;
     private boolean isNonControlledCodeTds = false;
     private String defaultPaymentMode = null;
+    private String mode = "";
+    private Recovery recoveryAssign = new Recovery();
+    private Fund fund = new Fund();
+    private Department department = new Department();
+    private Date asOnDate = new Date();
+    private Date fromDate = new Date();
+    private Integer detailKey;
+    private FinancialYearHibernateDAO financialYearDAO;
+    private String type = "";
+    private List<TDSEntry> remittedTDS = new ArrayList<TDSEntry>();
+    List<Long> remDtlIds;
+	List<String> remAssignNumbers;
+    
+	private String firstsignatory="-1";
+    private String secondsignatory="-1";
     
     public BigDecimal getBalance() {
         return balance;
@@ -245,7 +269,9 @@ public class RemitRecoveryAction extends BasePaymentAction {
 
     @Override
     public void prepare() {
+    	System.out.println("1");
         super.prepare();
+        System.out.println("2");
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Inside Prepare method");
         final List<Recovery> listRecovery = recoveryService.getAllActiveRecoverys();
@@ -257,9 +283,11 @@ public class RemitRecoveryAction extends BasePaymentAction {
         addDropdownData("recoveryList", listRecovery);
         addDropdownData("accNumList", Collections.EMPTY_LIST);
         modeOfCollectionMap.put(FinancialConstants.MODEOFPAYMENT_CASH, getText("cash.consolidated.cheque"));
-//        modeOfCollectionMap.put(FinancialConstants.MODEOFPAYMENT_RTGS, "RTGS");
+        modeOfCollectionMap.put(FinancialConstants.MODEOFPAYMENT_RTGS, "RTGS");
+        modeOfCollectionMap.put(FinancialConstants.MODEOFPAYMENT_PEX, "PEX");
         this.setPartialPayment("deduction");
-        setDefaultPaymentMode(FinancialConstants.MODEOFPAYMENT_CASH);
+        setDefaultPaymentMode(FinancialConstants.MODEOFPAYMENT_PEX);
+        System.out.println("3");
     }
 
     @Override
@@ -340,7 +368,7 @@ public class RemitRecoveryAction extends BasePaymentAction {
                 rbean.setPartialAmount(rbean.getAmount());
             if (LOGGER.isDebugEnabled())
                 LOGGER.debug("RemitRecoveryAction | remit | size after filter" + listRemitBean.size());
-            setModeOfPayment(FinancialConstants.MODEOFPAYMENT_CASH);
+            setModeOfPayment(modeOfPayment);
             if (LOGGER.isDebugEnabled())
                 LOGGER.debug("RemitRecoveryAction | remit | end");
             if (getBankBalanceCheck() == null || "".equals(getBankBalanceCheck()))
@@ -381,20 +409,41 @@ public class RemitRecoveryAction extends BasePaymentAction {
     @Action(value = "/deduction/remitRecovery-create")
     public String create() {
         try {
+        	
+        	String fSignatory =firstsignatory;
+        	String sSignatory = secondsignatory;
+        	
+        	System.out.println("In create Function....>>"+fSignatory+"..."+sSignatory);
+        	
             final String vdate = parameters.get("voucherDate")[0];
             final Date date1 = sdf1.parse(vdate);
             final String voucherDate = formatter1.format(date1);
             String cutOffDate1 = null;
             prepareListRemitBean(selectedRows);
+            if(listRemitBean != null && !listRemitBean.isEmpty())
+            {
+            	for(RemittanceBean row : listRemitBean)
+            	{
+            		System.out.println("voucher name :: "+row.getVoucherName());
+            		System.out.println("voucher number :: "+row.getVoucherNumber());
+            	}
+            }
             if(isPartialPaymentEnabled){
                 setPartialAmountForSelectedDeduction();
             }
+            System.out.println("Part 1");
             validateFields();
+            System.out.println("Part 2");
             voucherHeader.setType(FinancialConstants.STANDARD_VOUCHER_TYPE_PAYMENT);
             voucherHeader.setName(FinancialConstants.PAYMENTVOUCHER_NAME_REMITTANCE);
+            //added by prasanta for save signotory
+            voucherHeader.setFirstsignatory(fSignatory);
+            voucherHeader.setSecondsignatory(sSignatory);
+            
             final HashMap<String, Object> headerDetails = createHeaderAndMisDetails();
             recovery = (Recovery) persistenceService.find("from Recovery where id=?", remittanceBean.getRecoveryId());
             populateWorkflowBean();
+            System.out.println("Part 3");
             paymentheader = paymentActionHelper.createRemittancePayment(paymentheader, voucherHeader,
                     Integer.valueOf(commonBean.getAccountNumberId()), getModeOfPayment(),
                     remittanceBean.getTotalAmount(), listRemitBean, recovery, remittanceBean, remittedTo, workflowBean,
@@ -414,8 +463,9 @@ public class RemitRecoveryAction extends BasePaymentAction {
             else {
                 addActionMessage(getText("remittancepayment.transaction.success")
                         + paymentheader.getVoucherheader().getVoucherNumber());
-                addActionMessage(getText("payment.voucher.approved", new String[] {
-                        paymentService.getEmployeeNameForPositionId(paymentheader.getState().getOwnerPosition()) }));
+
+                addActionMessage(getText("payment.voucher.approved", new String[] {this.getEmployeeName(paymentheader.getState()
+                        .getOwnerPosition()) }));
             }
 
         } catch (final ValidationException e) {
@@ -527,11 +577,11 @@ public class RemitRecoveryAction extends BasePaymentAction {
         paymentheader = paymentActionHelper.sendForApproval(paymentheader, workflowBean);
 
         if (FinancialConstants.BUTTONREJECT.equalsIgnoreCase(workflowBean.getWorkFlowAction()))
-            addActionMessage(getText("payment.voucher.rejected", new String[] {
-                    paymentService.getEmployeeNameForPositionId(paymentheader.getState().getOwnerPosition()) }));
+            addActionMessage(getText("payment.voucher.rejected", new String[] {this.getEmployeeName(paymentheader.getState()
+                    .getInitiatorPosition())}));
         if (FinancialConstants.BUTTONFORWARD.equalsIgnoreCase(workflowBean.getWorkFlowAction()))
-            addActionMessage(getText("payment.voucher.approved", new String[] {
-                    paymentService.getEmployeeNameForPositionId(paymentheader.getState().getOwnerPosition()) }));
+            addActionMessage(getText("payment.voucher.approved", new String[] {this.getEmployeeName(paymentheader.getState()
+            		.getOwnerPosition()) }));
         if (FinancialConstants.BUTTONCANCEL.equalsIgnoreCase(workflowBean.getWorkFlowAction()))
             addActionMessage(getText("payment.voucher.cancelled"));
         else if (FinancialConstants.BUTTONAPPROVE.equalsIgnoreCase(workflowBean.getWorkFlowAction())) {
@@ -569,15 +619,15 @@ public class RemitRecoveryAction extends BasePaymentAction {
     /**
      * @return
      */
-    public String beforeEdit() {
+    /*public String beforeEdit() {
         showApprove = true;
         // voucherHeader.setId(paymentheader.getVoucherheader().getId());
         prepareForViewModifyReverse();
         // loadApproverUser(voucherHeader.getType());
         return EDIT;
-    }
+    }*/
 
-    @ValidationErrorPage(value = EDIT)
+    //@ValidationErrorPage(value = EDIT)
     @Action(value = "/deduction/remitRecovery-edit")
     public String edit() {
         try {
@@ -880,7 +930,7 @@ public class RemitRecoveryAction extends BasePaymentAction {
         if (cutOffDateconfigValue != null && !cutOffDateconfigValue.isEmpty()) {
             if (null == paymentheader || null == paymentheader.getId()
                     || paymentheader.getCurrentState().getValue().endsWith("NEW"))
-                validActions = Arrays.asList(FinancialConstants.BUTTONFORWARD, FinancialConstants.CREATEANDAPPROVE);
+                validActions = Arrays.asList(FinancialConstants.BUTTONFORWARD);
             else if (paymentheader.getCurrentState() != null)
                 validActions = customizedWorkFlowService.getNextValidActions(paymentheader.getStateType(),
                         getWorkFlowDepartment(), getAmountRule(), getAdditionalRule(),
@@ -1141,5 +1191,312 @@ public class RemitRecoveryAction extends BasePaymentAction {
     public void setDefaultPaymentMode(String defaultPaymentMode) {
         this.defaultPaymentMode = defaultPaymentMode;
     }
+    public String getEmployeeName(Long empId){
+        
+        return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+     }
+    
+    
+    @Action(value = "/deduction/remitRecovery-assignNumber")
+    public String assignNumber()  {
+    	System.out.println("YYYY");
+    	prepareAssign();
+    	System.out.println("XXXX");
+        return SUMMARYFORM;
+    }
+    
+    
+    public void prepareAssign()
+    {
+    	System.out.println("5");
+    	persistenceService.getSession().setDefaultReadOnly(true);
+        persistenceService.getSession().setFlushMode(FlushMode.MANUAL);
+        super.prepare();
+//        addDropdownData("departmentList", persistenceService.findAllBy("from Department order by name"));
+        addDropdownData("departmentList",this.masterDataCache.get("egi-department"));
+        addDropdownData("fundList", persistenceService.findAllBy(" from Fund where isactive=true and isnotleaf=false order by name"));  
+
+        addDropdownData("recoveryList",
+                persistenceService.findAllBy(" from Recovery where isactive=true order by chartofaccounts.glcode"));
+    }
+
+	public String getMode() {
+		return mode;
+	}
+
+	public void setMode(String mode) {
+		this.mode = mode;
+	}
+
+	public Recovery getRecoveryAssign() {
+		return recoveryAssign;
+	}
+
+	public void setRecoveryAssign(Recovery recoveryAssign) {
+		this.recoveryAssign = recoveryAssign;
+	}
+
+	public Fund getFund() {
+		return fund;
+	}
+
+	public void setFund(Fund fund) {
+		this.fund = fund;
+	}
+
+	public Department getDepartment() {
+		return department;
+	}
+
+	public void setDepartment(Department department) {
+		this.department = department;
+	}
+
+	public Date getAsOnDate() {
+		return asOnDate;
+	}
+
+	public void setAsOnDate(Date asOnDate) {
+		this.asOnDate = asOnDate;
+	}
+
+	public Date getFromDate() {
+		return fromDate;
+	}
+
+	public void setFromDate(Date fromDate) {
+		this.fromDate = fromDate;
+	}
+
+	public Integer getDetailKey() {
+		return detailKey;
+	}
+
+	public void setDetailKey(Integer detailKey) {
+		this.detailKey = detailKey;
+	}
+	
+	@Action(value = "/deduction/remitRecovery-ajaxLoadSummaryData")
+    public String ajaxLoadSummaryData() {
+		System.out.println("CCCCCC");
+		prepareAssign();
+        populateSummaryData();
+        System.out.println("AAAAAAA");
+        return "summaryResults";
+    }
+	
+	@ReadOnly
+    private void populateSummaryData() {
+		System.out.println("recoveryAssign.getId()--->"+recoveryAssign.getId());
+        recoveryAssign = (Recovery) persistenceService.find("from Recovery where id=?", recoveryAssign.getId());
+        System.out.println("recoveryAssign.getChartofaccounts().getId()-->"+recoveryAssign.getChartofaccounts().getId());
+        type = recoveryAssign.getType();
+        String deptQuery = "";
+        String partyNameQuery = "";
+        if (department.getCode() != null && !department.getCode().equals("-1"))
+            deptQuery = " and mis.departmentcode='" + department.getCode()+"'";
+        if (detailKey != null && detailKey != -1)
+            partyNameQuery = " and gld.detailkeyid=" + detailKey;
+        List<Object[]> result = new ArrayList<Object[]>();
+        List<Object[]> resultTolDeduction = new ArrayList<Object[]>();
+        try {
+            RemittanceBean remittanceBean = new RemittanceBean();
+            remittanceBean.setRecoveryId(recoveryAssign.getId());
+            if(remitRecoveryService.isNonControlledCodeTds(remittanceBean)){
+                final String qry = "select vh.name,erd.remittedamt,er.month ,erd.assign_number, erd.id "
+                        + "FROM eg_remittance_detail erd,voucherheader vh1 RIGHT OUTER JOIN eg_remittance er ON vh1.id=er.paymentvhid,"
+                        + "voucherheader vh,vouchermis mis,generalledger gl,fund f, eg_remittance_gl ergl WHERE erd.remittanceglid = ergl.id AND "
+                        + "erd.remittanceid=er.id  AND gl.glcodeid ="+recoveryAssign.getChartofaccounts().getId()+" AND vh.id =mis.voucherheaderid AND vh1.status =0  AND "
+                        + "gl.id = ergl.glid  AND gl.voucherheaderid     =vh.id  AND er.fundid =f.id AND f.id = "+fund.getId()+" AND vh.status =0 AND "
+                        + "vh.voucherDate <= to_date('"+Constants.DDMMYYYYFORMAT2.format(asOnDate)+"','dd/MM/yyyy') and  "
+                        + "vh.voucherDate >= to_date('"+Constants.DDMMYYYYFORMAT2.format(fromDate)+"','dd/MM/yyyy') "+ deptQuery
+                        + " order by er.month,vh.name";
+                if (LOGGER.isDebugEnabled())
+                    LOGGER.debug(qry);
+                result = persistenceService.getSession().createSQLQuery(qry).list();
+                
+             // Query to get total deduction
+                final String qryTolDeduction = "SELECT type,MONTH,glamt FROM (SELECT DISTINCT er.month AS MONTH,ergl.glamt AS glamt,ergl.glid as glid,vh.name AS type "
+                        + "FROM eg_remittance_detail erd,voucherheader vh1 RIGHT OUTER JOIN eg_remittance er ON vh1.id=er.paymentvhid,"
+                        + "voucherheader vh,vouchermis mis,generalledger gl,fund f, eg_remittance_gl ergl WHERE erd.remittanceglid = ergl.id AND "
+                        + "erd.remittanceid=er.id  AND gl.glcodeid = "+recoveryAssign.getChartofaccounts().getId()+" AND vh.id =mis.voucherheaderid AND vh1.status =0  AND "
+                        + "gl.id = ergl.glid  AND gl.voucherheaderid     =vh.id  AND er.fundid =f.id AND f.id = "+fund.getId()+" AND vh.status =0 AND "
+                        + "vh.voucherDate <= to_date('"+Constants.DDMMYYYYFORMAT2.format(asOnDate)+"','dd/MM/yyyy') and  "
+                        + "vh.voucherDate >= to_date('"+Constants.DDMMYYYYFORMAT2.format(fromDate)+"','dd/MM/yyyy')) "
+                        + "as temptable order by type,month";
+                resultTolDeduction = persistenceService.getSession().createSQLQuery(qryTolDeduction).list();
+            }else{
+                final String qry = "select vh.name,erd.remittedamt,er.month,erd.assign_number,erd.id  from eg_remittance_detail erd,"
+                        +
+                        " voucherheader vh1 right outer join eg_remittance er on vh1.id=er.paymentvhid,voucherheader vh,vouchermis mis,generalledger gl,generalledgerdetail gld,fund f,eg_remittance_gldtl ergl where "
+                        +
+                        " erd.remittancegldtlid= ergl.id and erd.remittanceid=er.id and gl.glcodeid="
+                        + recoveryAssign.getChartofaccounts().getId()
+                        + " and vh.id=mis.voucherheaderid and "
+                        +
+                        "  vh1.status=0 and ergl.gldtlid=gld.id and gl.id=gld.generalledgerid and gl.voucherheaderid=vh.id and er.fundid=f.id and f.id="
+                        + fund.getId() +
+                        " and vh.status=0 and vh.voucherDate <= to_date('" + Constants.DDMMYYYYFORMAT2.format(asOnDate)
+                        + "','dd/MM/yyyy') and " + "vh.voucherDate >= to_date('"
+                        + Constants.DDMMYYYYFORMAT2.format(fromDate)
+                        + "','dd/MM/yyyy') " + deptQuery + partyNameQuery + "  order by er.month,vh.name";
+                if (LOGGER.isDebugEnabled())
+                    LOGGER.debug(qry);
+                result = persistenceService.getSession().createSQLQuery(qry).list();
+                // Query to get total deduction
+                final String qryTolDeduction = "SELECT type,MONTH,gldtamt FROM (SELECT DISTINCT er.month AS MONTH,ergl.gldtlamt AS gldtamt,"
+                        +
+                        "ergl.gldtlid as gldtlid,vh.name AS type FROM eg_remittance_detail erd,voucherheader vh1 RIGHT OUTER JOIN eg_remittance er ON vh1.id=er.paymentvhid,"
+                        +
+                        "voucherheader vh,vouchermis mis,generalledger gl,generalledgerdetail gld,fund f, eg_remittance_gldtl ergl WHERE erd.remittancegldtlid= ergl.id"
+                        +
+                        " AND erd.remittanceid=er.id  AND gl.glcodeid ="
+                        + recoveryAssign.getChartofaccounts().getId()
+                        + " AND vh.id =mis.voucherheaderid AND vh1.status =0 "
+                        +
+                        " AND ergl.gldtlid =gld.id  AND gl.id = gld.generalledgerid  AND gl.voucherheaderid     =vh.id  AND er.fundid =f.id"
+                        +
+                        " AND f.id ="
+                        + fund.getId()
+                        + " AND vh.status =0 AND vh.voucherDate <= to_date('"
+                        + Constants.DDMMYYYYFORMAT2.format(asOnDate)
+                        + "','dd/MM/yyyy') and "
+                        + " vh.voucherDate >= to_date('"
+                        + Constants.DDMMYYYYFORMAT2.format(fromDate)
+                        + "','dd/MM/yyyy') " + deptQuery + partyNameQuery + ") as temptable order by type,month";
+                resultTolDeduction = persistenceService.getSession().createSQLQuery(qryTolDeduction).list();
+            }
+        } catch (final ApplicationRuntimeException e) {
+        	e.printStackTrace();
+        	message = e.getMessage();
+            return;
+        } catch (final Exception e) {
+        	e.printStackTrace();
+        	message = e.getMessage();
+            return;
+        }
+        for (final Object[] entry : result)
+            for (final Object[] dedentry : resultTolDeduction) {
+                final TDSEntry tds = new TDSEntry();
+                final String monthChk = DateUtils.getAllMonthsWithFullNames().get(Integer.valueOf(entry[2].toString()) + 1);
+                if (monthChk.equalsIgnoreCase(DateUtils.getAllMonthsWithFullNames().get(
+                        Integer.valueOf(dedentry[1].toString()) + 1))
+                        && dedentry[0].toString().equalsIgnoreCase(entry[0].toString()) && dedentry[2].toString().equalsIgnoreCase(entry[1].toString())) {
+                    tds.setNatureOfDeduction(entry[0].toString());
+                    tds.setTotalRemitted(new BigDecimal(entry[1].toString()));
+                    tds.setMonth(DateUtils.getAllMonthsWithFullNames().get(Integer.valueOf(entry[2].toString()) + 1));
+                    if(entry[3] != null)
+                    {
+                    	tds.setAutoAssignNumber(entry[3].toString());
+                    }
+                    else
+                    {
+                    	tds.setAutoAssignNumber(null);
+                    }
+                    
+                    final BigDecimal totDeduction = new BigDecimal(dedentry[2].toString());
+                    tds.setTotalDeduction(totDeduction);
+                    tds.setRemDtlId(Long.valueOf(entry[4].toString()));
+                    remittedTDS.add(tds);
+                }
+            }
+    }
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public List<TDSEntry> getRemittedTDS() {
+		return remittedTDS;
+	}
+
+	public void setRemittedTDS(List<TDSEntry> remittedTDS) {
+		this.remittedTDS = remittedTDS;
+	}
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
+	}
+	
+	public String getFormattedDate(final Date date) {
+        return Constants.DDMMYYYYFORMAT2.format(date);
+    }
+
+	public List<Long> getRemDtlIds() {
+		return remDtlIds;
+	}
+
+	public void setRemDtlIds(List<Long> remDtlIds) {
+		this.remDtlIds = remDtlIds;
+	}
+
+	public List<String> getRemAssignNumbers() {
+		return remAssignNumbers;
+	}
+
+	public void setRemAssignNumbers(List<String> remAssignNumbers) {
+		this.remAssignNumbers = remAssignNumbers;
+	}
+	
+	public void prepareSaveAssignNumbers() {
+		prepareAssign();
+    }
+	
+	@ValidationErrorPage(value = RemitRecoveryAction.SUMMARYFORM)
+	@Action(value = "/deduction/remitRecovery-saveAssignNumbers")
+    public String saveAssignNumbers() {
+		System.out.println("Enter");
+		prepareAssign();
+		int i=0;
+		try
+		{
+			for(String number:remAssignNumbers)
+			{
+				if(number != null && !number.isEmpty())
+				{
+					persistenceService.getSession()
+	                .createSQLQuery(
+	                        "update eg_remittance_detail  set assign_number = :assignNumber where id =:dtlId ")
+	                .setLong("dtlId", remDtlIds.get(i)).setString("assignNumber", number)
+	                .executeUpdate();
+				}
+				i++;
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		System.out.println("Done");
+		message="Acknowledge Number(s) has been saved successfully";
+        return assignNumber();
+    }
+
+	public String getFirstsignatory() {
+		return firstsignatory;
+	}
+
+	public void setFirstsignatory(String firstsignatory) {
+		this.firstsignatory = firstsignatory;
+	}
+
+	public String getSecondsignatory() {
+		return secondsignatory;
+	}
+
+	public void setSecondsignatory(String secondsignatory) {
+		this.secondsignatory = secondsignatory;
+	}
+
+	
+	
+	
+	
     
 }

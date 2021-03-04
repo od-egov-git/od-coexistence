@@ -77,6 +77,7 @@ import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -114,6 +115,10 @@ public class BudgetDetail extends StateAware {
 
     @Transient
     private BigDecimal nextYrapprovedAmount = new BigDecimal("0.0");
+    
+    @Transient
+    private String execDeptName ;
+    
     private BigDecimal budgetAvailable = new BigDecimal("0.0");
 
     @Column(name = "anticipatory_amount")
@@ -161,7 +166,16 @@ public class BudgetDetail extends StateAware {
 
     @Length(max = 32)
     private String uniqueNo;
+  
     private BigDecimal planningPercent;
+    
+    // //Author - Bhushan > Added four quater field
+    private BigDecimal quarterpercent;
+    private BigDecimal quartertwopercent;
+    private BigDecimal quarterthreepercent;
+    private BigDecimal quarterfourpercent;
+    
+    
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "status")
@@ -374,6 +388,31 @@ public class BudgetDetail extends StateAware {
         }
         return total;
     }
+    
+    public BigDecimal getApprovedReAppropriationsTotalReapp() {
+        BigDecimal total = BigDecimal.ZERO;
+        BudgetReAppropriation entry=null;
+        budgetReAppropriations = budgetReAppropriations == null
+                ? new HashSet<>()
+                : budgetReAppropriations;
+                List<BudgetReAppropriation> reAppList=new ArrayList<BudgetReAppropriation>();
+                reAppList.addAll(budgetReAppropriations);
+                Collections.sort(reAppList, Collections.reverseOrder());
+                if(reAppList != null && !reAppList.isEmpty())
+                {
+                	entry=reAppList.get(0);
+                }
+            if (entry != null && !entry.getStatus().getDescription()
+                    .equalsIgnoreCase("Cancelled")){
+            	if ((entry.getAdditionAmount() != null)
+                        && BigDecimal.ZERO
+                        .compareTo(entry.getAdditionAmount()) != 0)
+                    total = total.add(entry.getAdditionAmount());
+                else
+                    total = total.subtract(entry.getDeductionAmount());
+            }
+        return total;
+    }
 
     public BigDecimal getApprovedReAppropriationsTotalAsOnDate(
             final Date asOnDate) {
@@ -494,4 +533,47 @@ public class BudgetDetail extends StateAware {
         this.status = status;
     }
 
+	public String getExecDeptName() {
+		return execDeptName;
+	}
+
+	public void setExecDeptName(String execDeptName) {
+		this.execDeptName = execDeptName;
+	}
+
+	
+
+	public BigDecimal getQuartertwopercent() {
+		return quartertwopercent;
+	}
+
+	public void setQuartertwopercent(BigDecimal quartertwopercent) {
+		this.quartertwopercent = quartertwopercent;
+	}
+
+	public BigDecimal getQuarterthreepercent() {
+		return quarterthreepercent;
+	}
+
+	public void setQuarterthreepercent(BigDecimal quarterthreepercent) {
+		this.quarterthreepercent = quarterthreepercent;
+	}
+
+	public BigDecimal getQuarterfourpercent() {
+		return quarterfourpercent;
+	}
+
+	public void setQuarterfourpercent(BigDecimal quarterfourpercent) {
+		this.quarterfourpercent = quarterfourpercent;
+	}
+
+	public BigDecimal getQuarterpercent() {
+		return quarterpercent;
+	}
+
+	public void setQuarterpercent(BigDecimal quarterpercent) {
+		this.quarterpercent = quarterpercent;
+	}
+
+	
 }

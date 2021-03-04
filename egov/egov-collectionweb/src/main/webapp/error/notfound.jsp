@@ -49,7 +49,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <html>
 	<head>
-		<title>eGov - Not Found!</title>
+		<title>MCC - Not Found!</title>
 	</head>
 <body bgcolor="#FFFFFF">
   <table border=1 class="tableStyle" width="754" summary>

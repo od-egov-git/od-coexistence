@@ -58,6 +58,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.annotation.PreDestroy;
 import javax.naming.Context;
@@ -66,12 +67,16 @@ import javax.naming.NamingException;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.exception.ApplicationRuntimeException;
 import org.egov.infra.exception.MicroServiceInvalidTokenException;
 import org.egov.infra.exception.MicroServiceNotAuthroizedException;
 import org.egov.infra.microservice.models.Department;
+import org.egov.infra.microservice.models.Designation;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
+import org.egov.infra.utils.ApplicationConstant;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.infinispan.manager.EmbeddedCacheManager;
@@ -88,6 +93,7 @@ public class EgovMasterDataCaching {
     private static final String SQL_QUERY_TYPE = "sql";
     private static final String HQL_QUERY_TYPE = "hql";
     private static final String PATH_DELIM = "/";
+    private static final String PATH_HYPHEN = "-";
     private static final String SQL_TAG_PREFIX = "sql.";
     private static final String CONFIG_FILE_SUFFIX = "_sqlconfig.xml";
     private static EmbeddedCacheManager CACHE_MANAGER;
@@ -115,6 +121,18 @@ public class EgovMasterDataCaching {
      */
 
     public List get(final String sqlTagName) throws ApplicationRuntimeException {
+        return get(sqlTagName, ApplicationConstant.MODULE_FINANCE);
+    }
+    
+    /**
+     * This method load the data for given sqlTagName and puts it in Cache.
+     * @param sqlTagName the sql tag name
+     * @param module
+     * @return List
+     * @throws ApplicationRuntimeException the eGOV runtime exception
+     */
+
+    public List get(final String sqlTagName, final String module) throws ApplicationRuntimeException {
         final String temp[] = sqlTagName.split("-");
         final String domainName = ApplicationThreadLocals.getDomainName();
         final String applName = temp[0];
@@ -122,50 +140,54 @@ public class EgovMasterDataCaching {
         HashMap<String, Object> cacheValuesHashMap = new HashMap<String, Object>();
 
         try {
-            cacheValuesHashMap = (HashMap<String, Object>) CACHE_MANAGER.getCache()
+        	cacheValuesHashMap = (HashMap<String, Object>) CACHE_MANAGER.getCache()
                     .get(applName + PATH_DELIM + domainName + PATH_DELIM + sqlTagName);
+            
             if (cacheValuesHashMap != null)
-                dataList = (List<Object>) cacheValuesHashMap.get(sqlTagName);
+            	dataList = (List<Object>) cacheValuesHashMap.get(sqlTagName+ PATH_HYPHEN + module);
 
             if (dataList == null || dataList.isEmpty()) {
-            	if(sqlTagName.equalsIgnoreCase("egi-department")){
-            		dataList = this.loadFromMicroService();
+            	if(sqlTagName.equalsIgnoreCase(ApplicationConstant.DEPARTMENT_CACHE_NAME)){
+            		dataList = this.loadDepartmentFromMicroService(module);
             	}else{
-            	final String type = EGovConfig
-                        .getProperty(applName + CONFIG_FILE_SUFFIX, "type", EMPTY, SQL_TAG_PREFIX + sqlTagName).trim();
-                if (type.equalsIgnoreCase("java")) {
-                    final String className = EGovConfig.getProperty(applName + CONFIG_FILE_SUFFIX, "class", EMPTY,
-                            SQL_TAG_PREFIX + sqlTagName);
-                    final String methodName = EGovConfig.getProperty(applName + CONFIG_FILE_SUFFIX, "method", EMPTY,
-                            SQL_TAG_PREFIX + sqlTagName);
-                    final String parametertype = EGovConfig.getProperty(applName + CONFIG_FILE_SUFFIX, "parametertype", EMPTY,
-                            SQL_TAG_PREFIX + sqlTagName);
-                    final String parametervalue = EGovConfig.getProperty(applName + CONFIG_FILE_SUFFIX, "parametervalue", EMPTY,
-                            SQL_TAG_PREFIX + sqlTagName);
-                    if (isNotBlank(className) && isNotBlank(methodName))
-                        dataList = loadJavaAPIMasterDataList(className, methodName, parametertype.split(","),
-                                parametervalue.split(","));
-                    else
-                        throw new ApplicationRuntimeException("ClassName and MethodName should be mentioned for " + type + " in "
-                                + applName + CONFIG_FILE_SUFFIX);
-                } else if (type.equalsIgnoreCase(HQL_QUERY_TYPE) || type.equalsIgnoreCase(SQL_QUERY_TYPE)) {
-                    final String query = EGovConfig.getProperty(applName + CONFIG_FILE_SUFFIX, "query", EMPTY,
-                            SQL_TAG_PREFIX + sqlTagName);
-                    if (!query.equalsIgnoreCase(EMPTY))
-                        dataList = loadQLMasterData(query, type);
-                    else
-                        throw new ApplicationRuntimeException(
-                                "Query should be mentioned for " + type + " in " + applName + CONFIG_FILE_SUFFIX);
-                } else
-                    throw new ApplicationRuntimeException("This type (" + type + ") is not supported for " + sqlTagName);
+	            	final String type = EGovConfig
+	                        .getProperty(applName + CONFIG_FILE_SUFFIX, "type", EMPTY, SQL_TAG_PREFIX + sqlTagName).trim();
+	                if (type.equalsIgnoreCase("java")) {
+	                    final String className = EGovConfig.getProperty(applName + CONFIG_FILE_SUFFIX, "class", EMPTY,
+	                            SQL_TAG_PREFIX + sqlTagName);
+	                    final String methodName = EGovConfig.getProperty(applName + CONFIG_FILE_SUFFIX, "method", EMPTY,
+	                            SQL_TAG_PREFIX + sqlTagName);
+	                    final String parametertype = EGovConfig.getProperty(applName + CONFIG_FILE_SUFFIX, "parametertype", EMPTY,
+	                            SQL_TAG_PREFIX + sqlTagName);
+	                    final String parametervalue = EGovConfig.getProperty(applName + CONFIG_FILE_SUFFIX, "parametervalue", EMPTY,
+	                            SQL_TAG_PREFIX + sqlTagName);
+	                    if (isNotBlank(className) && isNotBlank(methodName))
+	                        dataList = loadJavaAPIMasterDataList(className, methodName, parametertype.split(","),
+	                                parametervalue.split(","));
+	                    else
+	                        throw new ApplicationRuntimeException("ClassName and MethodName should be mentioned for " + type + " in "
+	                                + applName + CONFIG_FILE_SUFFIX);
+	                } else if (type.equalsIgnoreCase(HQL_QUERY_TYPE) || type.equalsIgnoreCase(SQL_QUERY_TYPE)) {
+	                    final String query = EGovConfig.getProperty(applName + CONFIG_FILE_SUFFIX, "query", EMPTY,
+	                            SQL_TAG_PREFIX + sqlTagName);
+	                    if (!query.equalsIgnoreCase(EMPTY))
+	                        dataList = loadQLMasterData(query, type);
+	                    else
+	                        throw new ApplicationRuntimeException(
+	                                "Query should be mentioned for " + type + " in " + applName + CONFIG_FILE_SUFFIX);
+	                } else
+	                    throw new ApplicationRuntimeException("This type (" + type + ") is not supported for " + sqlTagName);
             	}
-                final HashMap<String, Object> hm = new HashMap<String, Object>();
-                hm.put(sqlTagName, dataList);
-                CACHE_MANAGER.getCache().put(applName + PATH_DELIM + domainName + PATH_DELIM + sqlTagName, hm);
+            	
+                //final HashMap<String, Object> hm = new HashMap<String, Object>();
+                //hm.put(sqlTagName+ PATH_HYPHEN + module, dataList);
+            	if(null == cacheValuesHashMap) {
+            		cacheValuesHashMap = new HashMap<String, Object>();
+            	}
+            	cacheValuesHashMap.put(sqlTagName+ PATH_HYPHEN + module, dataList);
+                CACHE_MANAGER.getCache().put(applName + PATH_DELIM + domainName + PATH_DELIM + sqlTagName, cacheValuesHashMap);
             } else
                 LOGGER.info("EgovMasterDataCaching: Got directly from cache, not from db");
-            
-
         } catch (final Exception e) {
             LOGGER.error("Error occurred in EgovMasterDataCaching", e);
             if(e instanceof MicroServiceInvalidTokenException || e instanceof MicroServiceNotAuthroizedException)
@@ -183,7 +205,7 @@ public class EgovMasterDataCaching {
      * @throws ApplicationRuntimeException the eGOV runtime exception
      */
 
-    public Map getMap(final String sqlTagName) throws ApplicationRuntimeException {
+    /* public Map getMap(final String sqlTagName) throws ApplicationRuntimeException {
         Map dataMap = new HashMap();
         final String temp[] = sqlTagName.split("-");
         final String applName = temp[0];
@@ -229,6 +251,28 @@ public class EgovMasterDataCaching {
             throw new ApplicationRuntimeException("Error occurred in EgovMasterDataCaching getMap", e);
         }
         return dataMap;
+    }*/
+    
+    /**
+     * This method load the department map for given sqlTagName and puts it in Cache.
+     * @param sqlTagName the sql tag name
+     * @param module
+     * @return Map
+     */
+
+    public Map<String, String> getDepartmentMapMS(final String sqlTagName, final String module) throws ApplicationRuntimeException {
+        Map<String, String> deptMap = new HashMap<String, String>();
+        
+        try {
+        	final List dataList = get(sqlTagName, module);
+        	if(!CollectionUtils.isEmpty(dataList)) {
+        		deptMap = (Map<String, String>) dataList.stream().collect(
+                        	Collectors.toMap(Department::getCode, Department::getName));
+        	}
+        } catch (final Exception e) {
+            LOGGER.error("Error occurred in EgovMasterDataCaching getMSDepartmentMap", e);
+        }
+        return deptMap;
     }
 
     public static EmbeddedCacheManager getCACHE_MANAGER() {
@@ -455,9 +499,81 @@ public class EgovMasterDataCaching {
         return list;
     }
 
-    private List loadFromMicroService(){
+    private List loadDepartmentFromMicroService(String module){
     	
-    	List<Department> deptList = this.microserviceUtils.getDepartments();
+    	List<Department> deptList = this.microserviceUtils.getDepartments(null, module);
+    	return deptList;
+    }
+    
+    /**
+     * This method load the designation list for given sqlTagName and puts it in Cache.
+     * @param sqlTagName the sql tag name
+     * @param module
+     * @return List
+     * @throws ApplicationRuntimeException the eGOV runtime exception
+     */
+
+    public List getDesignationListMS(final String sqlTagName, String module) throws ApplicationRuntimeException {
+        final String temp[] = sqlTagName.split("-");
+        final String domainName = ApplicationThreadLocals.getDomainName();
+        final String applName = temp[0];
+        List<Object> dataList = null;
+        HashMap<String, Object> cacheValuesHashMap = new HashMap<String, Object>();
+
+        try {
+            cacheValuesHashMap = (HashMap<String, Object>) CACHE_MANAGER.getCache()
+                    .get(applName + PATH_DELIM + domainName + PATH_DELIM + sqlTagName);
+            if (cacheValuesHashMap != null)
+                dataList = (List<Object>) cacheValuesHashMap.get(sqlTagName+ PATH_HYPHEN + module);
+
+            if (dataList == null || dataList.isEmpty()) {
+            	if(sqlTagName.equalsIgnoreCase(ApplicationConstant.DESIGNATION_CACHE_NAME)){
+            		dataList = this.loadDesignationFromMicroService(module);
+            	}
+                //final HashMap<String, Object> hm = new HashMap<String, Object>();
+                //hm.put(sqlTagName+ PATH_HYPHEN + module, dataList);
+            	if(null == cacheValuesHashMap) {
+            		cacheValuesHashMap = new HashMap<String, Object>();
+            	}
+            	cacheValuesHashMap.put(sqlTagName+ PATH_HYPHEN + module, dataList);
+                CACHE_MANAGER.getCache().put(applName + PATH_DELIM + domainName + PATH_DELIM + sqlTagName, cacheValuesHashMap);
+            } else
+                LOGGER.info("EgovMasterDataCaching getDesignationMapMS: Got directly from cache, not from db");
+        } catch (final Exception e) {
+            LOGGER.error("Error occurred in EgovMasterDataCaching getDesignationMapMS", e);
+            if(e instanceof MicroServiceInvalidTokenException || e instanceof MicroServiceNotAuthroizedException)
+                throw e;
+            else
+                throw new ApplicationRuntimeException("Error occurred in EgovMasterDataCaching getDesignationMapMS", e);
+        }
+        return dataList;
+    }
+    
+    /**
+     * This method load the department map for given sqlTagName and puts it in Cache.
+     * @param sqlTagName the sql tag name
+     * @param module
+     * @return Map
+     */
+
+    public Map<String, String> getDesignationMapMS(final String sqlTagName, final String module) throws ApplicationRuntimeException {
+        Map<String, String> desgMap = new HashMap<String, String>();
+        
+        try {
+        	final List dataList = getDesignationListMS(sqlTagName, module);
+        	if(!CollectionUtils.isEmpty(dataList)) {
+        		desgMap = (Map<String, String>) dataList.stream().collect(
+                        	Collectors.toMap(Designation::getCode, Designation::getName));
+        	}
+        } catch (final Exception e) {
+            LOGGER.error("Error occurred in EgovMasterDataCaching getDesignationMapMS", e);
+        }
+        return desgMap;
+    }
+    
+    private List loadDesignationFromMicroService(String module){
+    	
+    	List<Designation> deptList = this.microserviceUtils.getDesignation(null, module);
     	return deptList;
     }
     

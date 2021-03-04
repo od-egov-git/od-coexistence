@@ -80,7 +80,7 @@
 	<s:form name="collDetails" action="collection" theme="simple"
 		method="post">
 
-		<s:set name="defaultxml">
+		<s:set name="defaultxml" var="">
 			<bill-collect> <serviceCode>PT</serviceCode> <fundCode>01</fundCode>
 			<functionaryCode>999</functionaryCode> <fundSourceCode>01</fundSourceCode>
 			<departmentCode>REV</departmentCode> <displayMessage>HELLO

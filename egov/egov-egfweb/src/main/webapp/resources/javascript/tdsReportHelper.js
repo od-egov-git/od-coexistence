@@ -67,6 +67,70 @@ function validateData(){
 	}
 	return true;	
 }
+
+function validateDeductionData(){
+	if(document.getElementById('fromDate').value ==''){
+		bootbox.alert("Please enter a valid from date")
+		return false;
+	}
+	var fromDate =  Date.parse(document.getElementById('fromDate').value);
+	if(fromDate == ''){
+		bootbox.alert("Please enter a valid from date")
+		return false;
+	}
+	if(document.getElementById('asOnDate').value ==''){
+		bootbox.alert("Please enter a valid As on date")
+		return false;
+	}
+	var asOnDate =  Date.parse(document.getElementById('asOnDate').value);
+	if(asOnDate == ''){
+		bootbox.alert("Please enter a valid As on date")
+		return false;
+	}
+	var recovery =  document.getElementById('recovery').value;
+	if(recovery == -1){
+		bootbox.alert("Please select a Recovery Code")
+		return false;
+	}
+	var fund =  document.getElementById('fund').value;
+	if(fund == -1){
+		bootbox.alert("Please select a Fund")
+		return false;
+	}
+	return true;	
+}
+
+function validateDataAssign(){
+	if(document.getElementById('fromDate').value ==''){
+		bootbox.alert("Please enter a valid date")
+		return false;
+	}
+	var asOnDate =  Date.parse(document.getElementById('fromDate').value);
+	if(asOnDate == ''){
+		bootbox.alert("Please enter a valid date")
+		return false;
+	}
+	if(document.getElementById('asOnDate').value ==''){
+		bootbox.alert("Please enter a valid date")
+		return false;
+	}
+	var asOnDate =  Date.parse(document.getElementById('asOnDate').value);
+	if(asOnDate == ''){
+		bootbox.alert("Please enter a valid date")
+		return false;
+	}
+	var recovery =  document.getElementById('recoveryAssign').value;
+	if(recovery == -1){
+		bootbox.alert("Please select a Recovery Code")
+		return false;
+	}
+	var fund =  document.getElementById('fund').value;
+	if(fund == -1){
+		bootbox.alert("Please select a Fund")
+		return false;
+	}
+	return true;	
+}
 var entitiesArray;
 var entities;
 function loadEntities(){

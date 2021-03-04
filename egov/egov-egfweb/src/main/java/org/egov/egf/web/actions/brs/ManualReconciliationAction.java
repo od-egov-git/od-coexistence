@@ -47,6 +47,14 @@
  */
 package org.egov.egf.web.actions.brs;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.ParentPackage;
 import org.apache.struts2.convention.annotation.Result;
@@ -60,11 +68,6 @@ import org.egov.egf.model.ReconcileBean;
 import org.egov.infra.web.struts.actions.BaseFormAction;
 import org.egov.infra.web.struts.annotation.ValidationErrorPage;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 @ParentPackage("egov")
 @Results({
@@ -145,6 +148,12 @@ public class ManualReconciliationAction extends BaseFormAction {
 	public String search()
 	{
 		unReconciledCheques = manualReconcileHelper.getUnReconciledCheques(reconcileBean);
+		
+		Collections.sort(unReconciledCheques, new Comparator<ReconcileBean>() {
+		    public int compare(ReconcileBean m1, ReconcileBean m2) {
+		        return (getDate(m1.getChequeDate())).compareTo(getDate(m2.getChequeDate()));
+		    }
+		});
 		return "search";
 	}
 
@@ -240,6 +249,16 @@ public class ManualReconciliationAction extends BaseFormAction {
 		this.unReconciledDrCr = unReconciledDrCr;
 	}
 
+	private  Date getDate(String date)  {  
+		Date result=null;
+	    try {
+	    	result= new SimpleDateFormat("dd/MM/yyyy").parse(date);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	    return result;
+	} 
 
 
 

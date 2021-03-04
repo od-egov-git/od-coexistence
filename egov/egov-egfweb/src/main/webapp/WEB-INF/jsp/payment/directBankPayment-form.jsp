@@ -82,8 +82,8 @@
 			listValue="accountnumber+'-'+accounttype" headerKey=""
 			headerValue="%{getText('lbl.choose.options')}"
 			onChange="populateNarration(this);populateAvailableBalance(this);" />
-		<s:textfield name="accnumnar" id="accnumnar"
-			value="%{commonBean.accnumnar}" readonly="true" tabindex="-1" /></td>
+		<!--<s:textfield name="accnumnar" id="accnumnar"
+			value="%{commonBean.accnumnar}" readonly="true" tabindex="-1" /></td>-->
 	<egov:updatevalues id="availableBalance" fields="['Text']"
 		url="/payment/payment-ajaxGetAccountBalance.action" />
 	<td class="bluebox" id="balanceText"><s:text
@@ -158,15 +158,41 @@
 </s:if>
 <tr>
 	<td class="bluebox"></td>
-	<td class="bluebox"><s:text name="voucher.narration" /></td>
+	<td class="bluebox"><s:text name="voucher.narration" /><span class="mandatory1">*</span></td>
 	<td class="bluebox" colspan="3"><s:textarea name="description"
-			id="description" style="width:580px" /></td>
+			id="description" style="width:95%" /></td>
+</tr>
+<tr>
+	<td class="greybox"></td>
+	<td class="greybox"><s:text name="payment.firstsignatory" /><span
+		class="greybox"><span class="mandatory1">*</span></span></td>
+	<td class="greybox"><s:select name="firstsignatory" headerKey="-1"
+			headerValue="Select First Signatory" value="%{firstsignatory}"
+			list="#{'Additional Commissioner':'Additional Commissioner' ,'Chief Accounts Officer':'Chief Accounts Officer' ,'Assistant Controller (F and A)':'Assistant Controller (F and A)'}"
+			id="firstsignatory" /></td>
+	<td class="greybox"><s:text name="payment.secondsignatory" /><span
+		class="greybox"><span class="mandatory1">*</span></span></td>
+	<td class="greybox"><s:select name="secondsignatory" headerKey="-1"
+			headerValue="Select Second Signatory"
+			list="#{'Chief Accounts Officer':'Chief Accounts Officer' ,'Assistant Controller (F and A)':'Assistant Controller (F and A)' ,'Section Officer':'Section Officer'}"
+			id="secondsignatory" /></td>
+</tr>
+<tr>
+	<td class="greybox"></td>
+	<td class="greybox"><s:text name="backlog.entry" /><span
+		class="greybox"><span class="mandatory1">*</span></span></td>
+	<td class="greybox"><s:select name="backlogEntry" headerKey="-1"
+			headerValue="Select" value="%{backlogEntry}"
+			list="#{'Y':'Yes' ,'N':'No'}" id="backlogEntry" /></td>
+	<td class="greybox"><s:text name="budget.link" /><span
+								class="mandatory1">*</span></td>
+	<td class="greybox"><a href="#" onClick="populateBudgetLink()">Click</a></td>
 </tr>
 </table>
 <div id="budgetSearchGrid">
 	<div align="center">
 		<br>
-		<table cellspacing="0" cellpadding="0" border="0" width="100%"
+		<table cellspacing="0" cellpadding="0" border="0" width="95%"
 			style="border-right: 0px solid rgb(197, 197, 197);"
 			class="tablebottom">
 			<tbody>
@@ -182,7 +208,69 @@
 						</div> <script>
 							makeVoucherDetailTable();
 							document.getElementById('billDetailTable')
-									.getElementsByTagName('table')[0].width = "100%";
+									.getElementsByTagName('table')[0].width = "95%";
+							
+							
+							function populateBudgetLink()
+							{
+
+								var dept=document.getElementById('vouchermis.departmentid');
+								var fund=document.getElementById('fundId');
+								var func=document.getElementById('vouchermis.function');
+								var status=false;
+								var accCode;
+								if(fund == null || fund.value == -1 || fund.value == '-1')
+									{
+									bootbox.alert("Select Fund to view Budget Details");
+									status=true;
+									}
+								else if(dept == null || dept.value == -1 || dept.value == '-1')
+								{
+									bootbox.alert("Select Department to view Budget Details");
+									status=true;
+								}
+								else if(func == null || func.value == -1 || func.value == '-1')
+								{
+									bootbox.alert("Select Function to view Budget Details");
+									status=true;
+								}
+								var accStatus=false;
+								if(status == false)
+									{
+									for(i=0;i<=25;i++)
+									{
+										if(document.getElementById('billDetailslist['+i+'].debitAmountDetail') != null && (document.getElementById('billDetailslist['+i+'].debitAmountDetail').value == '0' ||document.getElementById('billDetailslist['+i+'].debitAmountDetail').value == '0.00'))
+										{
+											accStatus = false;
+										}
+										else if(document.getElementById('billDetailslist['+i+'].debitAmountDetail') != null && (document.getElementById('billDetailslist['+i+'].debitAmountDetail').value != '0' && document.getElementById('billDetailslist['+i+'].debitAmountDetail').value != '0.00'))
+										{
+											
+											if(document.getElementById('billDetailslist['+i+'].glcodeDetail') != null && document.getElementById('billDetailslist['+i+'].glcodeDetail').value != '')
+												{
+													accStatus = true;
+													 accCode = document.getElementById('billDetailslist['+i+'].glcodeDetail').value;
+													 break;
+												}
+										}
+									
+									}
+									}
+								
+								if(accStatus == false)
+									{
+									bootbox.alert("Select Account Code and debit amout to view Budget Details");
+									}
+								if(status == false && accStatus == true)
+									{
+									var today = new Date();
+									var date = today.getDate()+'/'+(today.getMonth()+1)+'/'+today.getFullYear();
+									var url1 = '/services/EGF/report/budgetVarianceReport-loadData.action?asOnDate='+date+'&dept='+dept.value+'&funds='+fund.value+'&func='+func.value+'&accCode='+accCode+'&vtype=jv';
+									window.open(url1,'Source','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700')
+									}
+								
+								
+							}
 						</script>
 					</td>
 				</tr>
@@ -197,7 +285,7 @@
 	<div id="budgetSearchGrid">
 		<div align="center">
 			<br>
-			<table cellspacing="0" cellpadding="0" border="0" width="100%"
+			<table cellspacing="0" cellpadding="0" border="0" width="95%"
 				style="border-right: 0px solid rgb(197, 197, 197);"
 				class="tablebottom">
 				<tbody>
@@ -215,7 +303,7 @@
 								<script>
 									makeSubLedgerTable();
 									document.getElementById('subLedgerTable')
-											.getElementsByTagName('table')[0].width = "100%"
+											.getElementsByTagName('table')[0].width = "95%"
 								</script>
 						</td>
 					</tr>

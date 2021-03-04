@@ -60,10 +60,17 @@
 <script>
 	function checkBillIdBillview(){
 		if(document.getElementById('id').value!=''){
- 			document.getElementById('aa_approve').disabled=true;
+			if(document.getElementById('aa_approve') != null)
+				{
+				document.getElementById('aa_approve').disabled=true;
+				}
+			
 		}else{
- 			document.getElementById('aa_approve').disabled=false;
- 		}
+			if(document.getElementById('aa_approve') != null)
+			{
+			document.getElementById('aa_approve').disabled=false;
+			}
+		}
 		if('<s:property value="voucherHeader.id"/>' ==''){
 			document.getElementById('print').disabled=true;
 		}else{
@@ -97,6 +104,18 @@ function openSource(){
 	}
 	window.open(url,'Source','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700')
 }
+
+function openBudgetVoucher()
+{
+	var url = '<s:property value='%{getSourcePath()}' />';
+	var pId =url.substring((url.lastIndexOf('/'))+1);
+	var today = new Date();
+	var date = today.getDate()+'/'+(today.getMonth()+1)+'/'+today.getFullYear();
+	var url1 = '/services/EGF/report/budgetVarianceReport-loadData.action?asOnDate='+date+'&vtype=pv&vhId='+pId;
+	window.open(url1,'Source','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700')
+	
+	
+	}
 function validateCutOff()
 {
 	console.log(document.getElementById("cutOffDate"));
@@ -160,7 +179,7 @@ function onSubmit()
 									<div name="daterow">
 										<s:date name="voucherDate" var="voucherDateId"
 											format="dd/MM/yyyy" />
-										<s:textfield id="voucherDate" name="voucherDate"
+										<s:textfield id="voucherDate" name="voucherDate" readonly="true" value="%{voucherDateId}"
 											class="form-control datepicker" data-date-end-date="0d" />
 									</div>
 								</td>
@@ -179,6 +198,11 @@ function onSubmit()
 				<table align="center">
 					<tr class="bluebox">
 						<td><a href="#" onclick=" return openSource()"><s:text name="lbl.source"/> </a></td>
+					</tr>
+				</table>
+				<table align="center">
+					<tr class="bluebox">
+						<td><a href="#" onclick="openBudgetVoucher()">Budget Details </a></td>
 					</tr>
 				</table>
 

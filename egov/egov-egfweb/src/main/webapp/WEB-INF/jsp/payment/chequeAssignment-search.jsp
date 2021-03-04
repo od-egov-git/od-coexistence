@@ -78,8 +78,8 @@
 				<tr>
 					<td class="greybox"></td>
 					<td class="greybox"><s:text name="payment.mode" /><span class="mandatory"></span></td>
-					<td class="greybox"><s:radio id="paymentMode" name="paymentMode" list="#{'cheque':'Cheque','cash':'Consolidated Cheque'}" onchange="enableOrDisableBillType(this)" value="%{paymentMode}" /></td>
-					<!-- td class="greybox"><s:radio id="paymentMode" name="paymentMode" list="#{'cheque':'Cheque'}" onchange="enableOrDisableBillType(this)" value="%{paymentMode}" /></td> -->
+					<!-- <td class="greybox"><s:radio id="paymentMode" name="paymentMode" list="#{'cheque':'Cheque','cash':'Consolidated Cheque'}" onchange="enableOrDisableBillType(this)" value="%{paymentMode}" /></td>-->
+					<td class="greybox"><s:radio id="paymentMode" name="paymentMode" list="#{'cheque':'Cheque'}" onchange="enableOrDisableBillType(this)" value="%{paymentMode}" /></td> 
 					<td class="greybox"><s:text name="chq.assignment.paymentvoucherno" /></td>
 					<td class="greybox"><s:textfield name="voucherNumber" id="voucherNumber" value="%{voucherNumber}" /></td>
 				</tr>
@@ -160,7 +160,7 @@
 		function validateSearch() {
 
 			document.forms[0].action = '/services/EGF/payment/chequeAssignment-search.action';
-			//document.forms[0].submit();
+			document.forms[0].submit();
 
 			return true;
 		}

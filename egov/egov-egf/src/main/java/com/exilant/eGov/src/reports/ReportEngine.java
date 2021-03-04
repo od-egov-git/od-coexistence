@@ -218,6 +218,9 @@ public class ReportEngine {
     }
 
     public ReportEngineBean populateReportEngineBean(final GeneralLedgerReportBean reportBean) {
+    
+    	System.out.println("reportBean.getFunctionaryId()   ::::::"+reportBean.getFunctionaryId());
+    	System.out.println("reportBean.getSchemeId()   ::::::"+reportBean.getSchemeId());
         final ReportEngineBean reBean = new ReportEngineBean();
         reBean.setDepartmentId(reportBean.getDepartmentCode());
         reBean.setDivisionId(reportBean.getFieldId());
@@ -229,10 +232,10 @@ public class ReportEngine {
         reBean.setFromDate(reportBean.getStartDate());
         reBean.setFromVoucherNumber(null);
         reBean.setFunctionId(reportBean.getFunctionCodeId());
-        reBean.setSchemeId(null);
         reBean.setSubSchemeId(null);
         reBean.setToDate(reportBean.getEndDate());
         reBean.setToVoucherNumber(null);
+        reBean.setSchemeId(reportBean.getSchemeId());
         return reBean;
     }
 

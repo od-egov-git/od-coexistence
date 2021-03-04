@@ -60,9 +60,9 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <meta name="description" content="eGov Urban Portal"/>
+    <meta name="description" content=""/>
     <meta name="author" content="eGovernments Foundation"/>
-    <title>eGov Urban Portal Login</title>
+    <title></title>
     <link rel="icon" href="<cdn:url value='/resources/global/images/favicon.png' context='/services/egi'/>" sizes="32x32">
     <link rel="stylesheet" href="<cdn:url value='/resources/global/css/bootstrap/bootstrap.css' context='/services/egi'/>">
     <link rel="stylesheet" href="<cdn:url value='/resources/global/css/font-icons/font-awesome/css/font-awesome.min.css' context='/services/egi'/>">
@@ -91,9 +91,7 @@
                 <div class="nav-right-menu col-md-2 col-xs-2">
                     <ul class="hr-menu text-right">
                         <li class="ico-menu">
-                            <a href="http://www.egovernments.org" data-strwindname="egovsite" class="open-popup">
-                                <img src="<cdn:url value='/resources/global/images/egov_logo_tr_h.png'/>" title="Powered by eGovernments" height="37" alt="">
-                            </a>
+                            
                         </li>
                     </ul>
                 </div>
@@ -283,7 +281,7 @@
         </div>
     </div>
     <footer class="main">
-        Powered by <a href="http://eGovernments.org" target="_blank">eGovernments Foundation</a>
+        
     </footer>
 </div>
 <div class="modal fade" id="fpassword" tabindex="-1" role="dialog"

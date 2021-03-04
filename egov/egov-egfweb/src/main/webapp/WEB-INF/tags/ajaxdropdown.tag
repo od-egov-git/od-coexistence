@@ -87,7 +87,7 @@ ${id}SuccessHandler=function(req,res){
   <%}%>
 }
 ${id}FailureHandler=function(){
-  alert('Unable to load ${dropdownId}');
+  alert('Session Expired! Please re-login');
 }
 
 function populate${dropdownId}(params){

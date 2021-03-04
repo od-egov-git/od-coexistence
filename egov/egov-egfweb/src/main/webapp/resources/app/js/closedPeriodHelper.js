@@ -46,38 +46,6 @@
  *
  */
 
-
-
-
-$(document).ready(function(){
-	console.log("Browser Language ",navigator.language);
-	$.i18n.properties({ 
-		name: 'message', 
-		path: '/services/EGF/resources/app/messages/', 
-		mode: 'both',
-		async: true,
-	    cache: true,
-		language: getLocale("locale"),
-		callback: function() {
-			console.log('File loaded successfully');
-		}
-	});
-	
-});
-	
-
-
-function getCookie(name){
-	let cookies = document.cookie;
-	if(cookies.search(name) != -1){
-		var keyValue = cookies.match('(^|;) ?' + name + '=([^;]*)(;|$)');
-	    return keyValue ? keyValue[2] : null;
-	}
-}
-
-function getLocale(paramName){
-	return getCookie(paramName) ? getCookie(paramName) : navigator.language;
-}
 jQuery('#btnsearch').click(function(e) {
 
 	callAjaxSearch();
@@ -114,22 +82,12 @@ function callAjaxSearch() {
 							});
 				},
 				"bDestroy" : true,
-				dom: "<'row'<'col-xs-12 pull-right'f>r>t<'row buttons-margin'<'col-md-3 col-xs-6'i><'col-md-3  col-xs-6'l><'col-md-3 col-xs-6'B><'col-md-3 col-xs-6 text-right'p>>",
-				buttons: [
-						  {
-						    extend: 'print',
-						    title: 'Closed Period',
-						    filename: 'Closed Period'
-						},{
-						    extend: 'pdf',
-						    title: 'Closed Period',
-						    filename: 'Closed Period'
-						},{
-						    extend: 'excel',
-						    message : 'Closed Period',
-						    filename: 'Closed Period'
-						}
-						],
+				"sDom" : "<'row'<'col-xs-12 hidden col-right'f>r>t<'row'<'col-xs-3'i><'col-xs-3 col-right'l><'col-xs-3 col-right'<'export-data'T>><'col-xs-3 text-right'p>>",
+				"aLengthMenu" : [ [ 10, 25, 50, -1 ], [ 10, 25, 50, "All" ] ],
+				"oTableTools" : {
+					"sSwfPath" : "../../../../../../egi/resources/global/swf/copy_csv_xls_pdf.swf",
+					"aButtons" : [ "xls", "pdf", "print" ]
+				},
 				aaSorting : [],
 				columns : [ {
 					"data" : "Financial Year",
@@ -183,21 +141,18 @@ function validateEndDate(event) {
 	var endofmonth= 3;
 	if(fromdate <= endofmonth ){
 		if(fromdate > todate){
-			//bootbox.alert("From period should be prior or same as that of till period.");
-			bootbox.alert($.i18n.prop('msg.from.period.should.be.prior.or.same'));
+			bootbox.alert("From period should be prior or same as that of till period.");
 			document.getElementById('startingDate').value=0;
 			document.getElementById('endingDate').value=0;
 		}else if(todate>endofmonth){
-			//bootbox.alert(" From period should be prior or same as that of till period.");
-			bootbox.alert($.i18n.prop('msg.from.period.should.be.prior.or.same'));
+			bootbox.alert(" From period should be prior or same as that of till period.");
 			document.getElementById('startingDate').value=0;
 			document.getElementById('endingDate').value=0;
 
 		}
 	}else{
 		if(endofmonth < todate && todate < fromdate){
-			//bootbox.alert("From period should be prior or same as that of till period.");
-			bootbox.alert($.i18n.prop('msg.from.period.should.be.prior.or.same'));
+			bootbox.alert("From period should be prior or same as that of till period.");
 			document.getElementById('startingDate').value=0;
 			document.getElementById('endingDate').value=0;
 		}
@@ -231,14 +186,12 @@ function validate(){
 	var todate = parseInt(document.getElementById('endingDate').value);
 
 	if(fromdate == 0 ){
-		//bootbox.alert("Please select From Month");
-		bootbox.alert($.i18n.prop('msg.please.select.from.month'));
+		bootbox.alert("Please select From Month");
 		return false;
 	}
 	
 	if(todate == 0 ){
-		//bootbox.alert("Please select Till Month");
-		bootbox.alert($.i18n.prop('msg.please.select.till.month'));
+		bootbox.alert("Please select Till Month");
 		return false;
 	}
 	

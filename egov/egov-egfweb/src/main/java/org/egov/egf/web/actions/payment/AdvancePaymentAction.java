@@ -212,7 +212,7 @@ public class AdvancePaymentAction extends BasePaymentAction {
                     advanceRequisition.getAdvanceRequisitionAmount());
 
             createMiscBill();
-            paymentheader.transition().start().withOwner(paymentService.getPosition());
+            paymentheader.transition().start().withOwner(paymentService.getPosition()).withOwnerName((paymentService.getPosition().getId() != null && paymentService.getPosition().getId() > 0L) ? getEmployeeName(paymentService.getPosition().getId()):"");
             advanceRequisition.getEgAdvanceReqMises().setVoucherheader(paymentheader.getVoucherheader());
             sendForApproval();
             addActionMessage(getText("arf.payment.transaction.success") + " " + voucherHeader.getVoucherNumber());
@@ -774,5 +774,10 @@ public class AdvancePaymentAction extends BasePaymentAction {
     public void setScriptService(final ScriptService scriptService) {
         this.scriptService = scriptService;
     }
+    
+    public String getEmployeeName(Long empId){
+        
+        return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+     }
 
 }

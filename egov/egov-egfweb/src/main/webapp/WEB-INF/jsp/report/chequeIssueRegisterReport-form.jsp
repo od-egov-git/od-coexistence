@@ -167,19 +167,15 @@ function getVoucherNumber(vhid){
 
 function printCheque(id)
 {
-	var chequeFormat=document.getElementById('chequeFormatId').value;
-	if(chequeFormat == "" || chequeFormat == null){
-		bootbox.alert("This bank account is not attached to any cheque formats");
-		return false;
-	} 
-	window.open('/EGF/payment/chequeAssignmentPrint-generateChequeFormat.action?instrumentHeader='+id,'Search','resizable=yes,scrollbars=yes,left=300,top=40,width=900, height=700');
+	
+	window.open('/services/EGF/payment/chequeAssignmentPrint-generateChequeFormat.action?instrumentHeader='+id,'Search','resizable=yes,scrollbars=yes,left=300,top=40,width=900, height=700');
 }
 
 </script>
 <body>
 	<div class="formmainbox">
 		<div class="formheading"></div>
-		<div class="subheadnew"><s:text name="lbl.cheque.issue.register.report" /></div>
+		<div class="subheadnew">Cheque Issue Register Report</div>
 		<br/>
 		<br/>
 
@@ -189,27 +185,27 @@ function printCheque(id)
 			<table width="100%" cellpadding="0" cellspacing="0" border="0">
 				<tr>
 					<td width="10%">&nbsp;</td>
-					<td class="bluebox" width="10%"><s:text name="lbl.bank.branch.name" />:<span
+					<td class="bluebox" width="10%">Bank Name:<span
 						class="bluebox"><span class="mandatory1">*</span></span></td>
 					<td class="bluebox"><s:select name="bank" id="bank"
 							list="dropdownData.bankList" listKey="bankBranchId"
 							listValue="bankBranchName" headerKey="-1"
-							headerValue="%{getText('lbl.choose.options')}" onChange="populateAccNum(this);" />
+							headerValue="----Choose----" onChange="populateAccNum(this);" />
 					</td>
 					<td width="10%">&nbsp;</td>
 					<egov:ajaxdropdown id="accountNumber" fields="['Text','Value']"
 						dropdownId="accountNumber"
 						url="voucher/common-ajaxLoadAccNum.action" />
-					<td class="bluebox" width="10%"><s:text name="lbl.account.number" />:<span
+					<td class="bluebox" width="10%">Account Number:<span
 						class="bluebox"><span class="mandatory1">*</span></span></td>
 					<td class="bluebox"><s:select name="bankAccount"
 							id="accountNumber" list="dropdownData.bankAccountList"
 							listKey="id" listValue="accountnumber" headerKey="-1"
-							headerValue="%{getText('lbl.choose.options')}" /></td>
+							headerValue="----Choose----" /></td>
 				</tr>
 				<tr>
 					<td class="greybox" width="10%">&nbsp;</td>
-					<td class="greybox" width="10%"><s:text name="lbl.cheque.from.date" />:<span
+					<td class="greybox" width="10%">Cheque From Date:<span
 						class="mandatory1">*</span></td>
 
 					<td class="greybox"><s:date name="fromDate" var="fromDate"
@@ -221,7 +217,7 @@ function printCheque(id)
 
 
 					<td width="10%">&nbsp;</td>
-					<td class="greybox" width="10%"><s:text name="lbl.cheque.to.date" />:<span
+					<td class="greybox" width="10%">Cheque To Date:<span
 						class="mandatory1">*</span></td>
 
 					<td class="greybox"><s:date name="toDate" var="toDate"
@@ -238,22 +234,21 @@ function printCheque(id)
 					<td width="22%" class="bluebox"><s:select
 							list="dropdownData.executingDepartmentList" listKey="code"
 							listValue="name" name="deptImpl.code" headerKey="0"
-							headerValue="%{getText('lbl.select')}" value="%{deptImpl.code}"
+							headerValue="--- Select ---" value="%{deptImpl.code}"
 							id="department"></s:select></td>
 				</tr>
 			</table>
 			<br />
 			<br />
 			<div class="subheadsmallnew"></div>
-			
-			<div align="left" class="mandatory1">* <s:text name="default.message.mandatory" /></div>
+			<div align="left" class="mandatory1">* Mandatory Fields</div>
 
 			<div class="buttonbottom">
-				<input type="button" value="<s:text name='lbl.submit'/>" class="buttonsubmit"
+				<input type="button" value="Submit" class="buttonsubmit"
 					onclick="return generateReport()" /> &nbsp;
 				<s:reset name="button" type="submit" cssClass="button" id="button"
-					key="lbl.reset" />
-				<input type="button" value="<s:text name='lbl.close'/>"
+					value="Reset" />
+				<input type="button" value="Close"
 					onclick="javascript:window.parent.postMessage('close','*');" class="button" />
 			</div>
 			<input type="hidden" name="accountNumber.id" id="accountNumber.id" />

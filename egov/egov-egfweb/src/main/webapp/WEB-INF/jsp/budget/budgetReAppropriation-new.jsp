@@ -67,7 +67,7 @@
 	<%@ include file='common-includes.jsp'%>
 	<jsp:include page="budgetHeader.jsp" />
 	<%@ include file='budgetReAppropriationSetUp.jsp'%>
-	<%@ include file='addReAppropriationSetUp.jsp'%>
+	 <%@ include file='addReAppropriationSetUp.jsp'%> 
 	<script>
 					
 	function populateSubSchemes(scheme){
@@ -412,16 +412,16 @@
 										name="budgetReAppropriation.asOnDate" /></td>
 								<td class="greybox"><input type="text" id="date"
 									name="appropriationMisc.reAppropriationDate"
-									style="width: 100px"
-									value='<s:date name="appropriationMisc.reAppropriationDate" format="dd/MM/yyyy"/>' /><a
+									style="width: 200px; height:34px;"
+									value='<s:date name="appropriationMisc.reAppropriationDate" format="dd/MM/yyyy" />' /><a
 									href="javascript:show_calendar('budgetDetailForm.date');"
 									style="text-decoration: none">&nbsp;<img
-										src="/services/egi/resources/erp2/images/calendaricon.gif" border="0" /></a>(dd/mm/yyyy)</td>
+										src="/services/egi/resources/erp2/images/calendaricon.gif" border="0" /></a></td>
 								<td class="greybox"><s:text
 										name="budgetReAppropriation.comments" /></td>
 								<td class="greybox"><s:textarea
 										id="appropriationMisc.remarks"
-										name="appropriationMisc.remarks" cols="50" /></td>
+										name="appropriationMisc.remarks" cols="50" rows="3" style="width: 200px;"/></td>
 								<td class="greybox"></td>
 							</tr>
 						</table> <br />
@@ -498,15 +498,11 @@
 						<tr>
 							<td>
 								<div class="buttonbottom" style="padding-bottom: 10px;">
-									<input type="submit" value="<s:text name='lbl.save'/>"
+									<input type="submit" value="Forward to CAO"
 										id="budgetReAppropriation__create" name="method:create"
 										onClick="javascript: return validate(false,'create');"
 										class="buttonsubmit" />
-									<!-- <input type="submit" value="Forward"
-													id="budgetReAppropriation__createAndForward"
-													name="method:createAndForward"
-													onClick="javascript: return validate(true,'createAndForward');"
-													class="buttonsubmit" /> -->
+									
 									<s:submit onclick="javascript: self.close()" key="lbl.close"
 										cssClass="button" />
 								</div>
@@ -514,22 +510,7 @@
 						</tr>
 					</table>
 				</div>
-				<%-- <div class="tabbertab" style="height: 430px;">
-									<h2>Approval Details</h2>
-									<div class="buttonbottom" style="padding-bottom: 10px;">
-										<input type="submit" value="Save"
-											id="budgetReAppropriation__create" name="method:create"
-											onClick="javascript: return validate(false,'create');"
-											class="buttonsubmit" />
-										<!-- <input type="submit" value="Forward"
-											id="budgetReAppropriation__createAndForward"
-											name="method:createAndForward"
-											onClick="javascript: return validate(true,'createAndForward');"
-											class="buttonsubmit" /> -->
-										<s:submit value="Close" onclick="javascript: self.close()"
-											cssClass="button" />
-									</div>
-								</div> --%>
+				
 				<!-- Individual tab -->
 
 			</div>

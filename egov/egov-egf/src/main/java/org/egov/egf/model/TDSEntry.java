@@ -67,6 +67,8 @@ public class TDSEntry {
     private BigDecimal totalRemitted = BigDecimal.ZERO;
     private Integer egRemittanceGlDtlId;
     private Integer egRemittanceGlId;
+    private String autoAssignNumber;
+    private Long remDtlId;
 
     public Integer getEgRemittanceGlDtlId() {
         return egRemittanceGlDtlId;
@@ -203,5 +205,21 @@ public class TDSEntry {
     public void setEgRemittanceGlId(Integer egRemittanceGlId) {
         this.egRemittanceGlId = egRemittanceGlId;
     }
+
+	public String getAutoAssignNumber() {
+		return autoAssignNumber;
+	}
+
+	public void setAutoAssignNumber(String autoAssignNumber) {
+		this.autoAssignNumber = autoAssignNumber;
+	}
+
+	public Long getRemDtlId() {
+		return remDtlId;
+	}
+
+	public void setRemDtlId(Long remDtlId) {
+		this.remDtlId = remDtlId;
+	}
     
 }

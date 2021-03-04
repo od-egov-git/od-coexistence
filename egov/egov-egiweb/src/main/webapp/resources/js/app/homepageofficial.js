@@ -144,7 +144,7 @@ $(document).ready(function () {
                 "sInfo": ""
             },
             "ajax": {
-                "url": "inbox/history?stateId=" + tableContainer1.dataTable().fnGetData($(this).parent().parent(), 7),
+                "url": "/services/egi/inbox/history?stateId=" + tableContainer1.dataTable().fnGetData($(this).parent().parent(), 7),
                 "dataSrc": ""
             },
             "columns": [
@@ -559,7 +559,7 @@ function drafts() {
         "aaSorting": [],
         "autoWidth": false,
         "ajax": {
-            "url": "inbox/draft",
+            "url": "/services/egi/inbox/draft",
             "dataSrc": ""
         },
         "deferRender": true,

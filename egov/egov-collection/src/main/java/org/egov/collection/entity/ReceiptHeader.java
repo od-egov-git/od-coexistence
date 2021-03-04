@@ -73,6 +73,12 @@ public class ReceiptHeader extends StateAware implements Auditable {
     private Set<ReceiptHeader> receiptHeaders = new HashSet<>();
 
     private String referencenumber;
+    private Long dateOfDeposit;
+    private String depositAmount;
+    private String bankAccountNumber;
+    private BigDecimal totalreciptAmount;
+    private BigDecimal totalDepositAmount;
+    private String payerAddress;
     private Date referencedate;
     private String consumerCode;
     /* The details of associated bill that billing application has sent */
@@ -101,6 +107,8 @@ public class ReceiptHeader extends StateAware implements Auditable {
     private String collModesNotAllwd;
     private String displayMsg;
     private BigDecimal totalAmount;
+    private BigDecimal principalAmount;
+    private BigDecimal gstAmount;
     private BigDecimal minimumAmount;
     private BigDecimal totalAmountToBeCollected;
     private Date voucherDate;
@@ -126,6 +134,11 @@ public class ReceiptHeader extends StateAware implements Auditable {
     private String serviceIdText;
     private String g8data;
     private String paymentId;
+    private String ifsc;
+    private String rDate;
+    private Date rrDate;
+    private String subdivison;
+    private String gstno;
     public ReceiptHeader() {
     }
 
@@ -847,5 +860,111 @@ public class ReceiptHeader extends StateAware implements Auditable {
     public void setPaymentId(String paymentId) {
         this.paymentId = paymentId;
     }
+
+	public String getIfsc() {
+		return ifsc;
+	}
+
+	public void setIfsc(String ifsc) {
+		this.ifsc = ifsc;
+	}
+	
+	public Long getDateOfDeposit() {
+		return dateOfDeposit;
+	}
+
+	public void setDateOfDeposit(Long dateOfDeposit) {
+		this.dateOfDeposit = dateOfDeposit;
+	}
+
+	public String getDepositAmount() {
+		return depositAmount;
+	}
+
+	public void setDepositAmount(String depositAmount) {
+		this.depositAmount = depositAmount;
+	}
+
+	public String getBankAccountNumber() {
+		return bankAccountNumber;
+	}
+
+	public void setBankAccountNumber(String bankAccountNumber) {
+		this.bankAccountNumber = bankAccountNumber;
+	}
+
+	public BigDecimal getTotalreciptAmount() {
+		return totalreciptAmount;
+	}
+
+	public void setTotalreciptAmount(BigDecimal totalreciptAmount) {
+		this.totalreciptAmount = totalreciptAmount;
+	}
+
+	public BigDecimal getTotalDepositAmount() {
+		return totalDepositAmount;
+	}
+
+	public void setTotalDepositAmount(BigDecimal totalDepositAmount) {
+		this.totalDepositAmount = totalDepositAmount;
+	}
+	
+	public String getPayerAddress() {
+		return payerAddress;
+	}
+	
+	public void setPayerAddress(String payerAddress) {
+		this.payerAddress = payerAddress;
+	}
+
+	public String getrDate() {
+		return rDate;
+	}
+
+	public void setrDate(String rDate) {
+		this.rDate = rDate;
+	}
+
+	public Date getRrDate() {
+		return rrDate;
+	}
+
+	public void setRrDate(Date rrDate) {
+		this.rrDate = rrDate;
+	}
+
+	public BigDecimal getPrincipalAmount() {
+		return principalAmount;
+	}
+
+	public void setPrincipalAmount(BigDecimal principalAmount) {
+		this.principalAmount = principalAmount;
+	}
+
+	public BigDecimal getGstAmount() {
+		return gstAmount;
+	}
+
+	public void setGstAmount(BigDecimal gstAmount) {
+		this.gstAmount = gstAmount;
+	}
+
+	public String getSubdivison() {
+		return subdivison;
+	}
+
+	public void setSubdivison(String subdivison) {
+		this.subdivison = subdivison;
+	}
+
+	public String getGstno() {
+		return gstno;
+	}
+
+	public void setGstno(String gstno) {
+		this.gstno = gstno;
+	}
+
+	
 
 }

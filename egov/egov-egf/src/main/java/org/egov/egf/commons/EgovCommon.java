@@ -84,6 +84,7 @@ import org.egov.model.bills.EgBillregister;
 import org.egov.model.budget.BudgetUsage;
 import org.egov.model.instrument.InstrumentHeader;
 import org.egov.model.masters.AccountCodePurpose;
+import org.egov.model.masters.OtherParty;
 import org.egov.pims.service.EmployeeServiceOld;
 import org.egov.services.report.FundFlowService;
 import org.egov.utils.Constants;
@@ -520,8 +521,7 @@ public class EgovCommon {
     @SuppressWarnings("unchecked")
     public BigDecimal getAccountBalance(final Date VoucherDate,
             final Long bankId, final BigDecimal amount, final Long paymentId, final Long accGlcodeId) {
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("EgovCommon | getCashBalance");
+            LOGGER.info("EgovCommon | getCashBalance");
         LOGGER
         .info("--------------------------------------------------------------------------------getAccountBalance-----------------");
 
@@ -544,6 +544,7 @@ public class EgovCommon {
             .info("-------------------------------------------------------------------------------------bankBalance"
                     + bankBalance);
         } catch (final ValidationException e) {
+        	e.printStackTrace();
             LOGGER.error("Balance Check Failed" + e.getMessage(), e);
             throw e;
         }
@@ -637,8 +638,7 @@ public class EgovCommon {
     @SuppressWarnings("unchecked")
     public BigDecimal getAccountBalanceFromLedger(final Date VoucherDate,
             final Integer bankId, final BigDecimal amount, final Long paymentId) {
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("EgovCommon | getCashBalance");
+          LOGGER.info("EgovCommon | getCashBalance");
         BigDecimal opeAvailable = BigDecimal.ZERO;
         BigDecimal bankBalance = BigDecimal.ZERO;
         try {
@@ -659,8 +659,7 @@ public class EgovCommon {
                     .findAllBy(opBalncQuery1.toString(), bankId.longValue());
             opeAvailable = BigDecimal.valueOf(Double.parseDouble(tsummarylist.get(0).toString()));
 
-            if (LOGGER.isDebugEnabled())
-                LOGGER.debug("opeAvailable :" + opeAvailable);
+                LOGGER.info("opeAvailable :" + opeAvailable);
 
             final StringBuffer opBalncQuery2 = new StringBuffer(300);
             List<Object> list = getPersistenceService()
@@ -692,9 +691,11 @@ public class EgovCommon {
                     "from CChartOfAccounts where id=?", Long.valueOf(glcodeid));
             list = getPersistenceService().findAllBy(
                     opBalncQuery2.toString(), coa);
+            LOGGER.info("query fetch 1");
             bankBalance = BigDecimal.valueOf(Double.parseDouble(list.get(0).toString()));
+            LOGGER.info(" bankBalance 1 ::::"+bankBalance);
             bankBalance = opeAvailable.add(bankBalance);
-
+            LOGGER.info(" bankBalance 2::::"+bankBalance);
             // get the preapproved voucher amount also, if payment workflow
             // status in FMU level.... and subtract the amount from the balance
             // .
@@ -746,8 +747,10 @@ public class EgovCommon {
                                                 .append(paymentWFStatus).append(") )");
                 list = getPersistenceService().findAllBy(
                         paymentQuery.toString(), coa);
+                LOGGER.info("query fetch 2");
                 bankBalance = bankBalance.subtract(BigDecimal.valueOf(Math
                         .abs((Double) list.get(0))));
+                LOGGER.info(" bankBalance 3 ::::"+bankBalance);
                 final Integer voucherStatus = (Integer) persistenceService
                         .find(
                                 "select status from CVoucherHeader where id in (select voucherheader.id from Paymentheader where id=?)",
@@ -760,13 +763,14 @@ public class EgovCommon {
                 // transaction amount to it.
                 if (amountTobeInclude)
                     bankBalance = bankBalance.add(amount);
+                
+                LOGGER.info(" bankBalance 4 ::::"+bankBalance);
 
             }
-            if (LOGGER.isDebugEnabled())
-                LOGGER.debug("bankBalance :" + bankBalance);
+                LOGGER.info("bankBalance 5 :" + bankBalance);
         } catch (final Exception e) {
-            if (LOGGER.isDebugEnabled())
-                LOGGER.debug("exception occuered while geeting cash balance"
+        	e.printStackTrace();
+                LOGGER.info("exception occuered while geeting cash balance"
                         + e.getMessage(), e);
             throw new HibernateException(e);
         }
@@ -801,6 +805,18 @@ public class EgovCommon {
                 employee.setName(detailNames[1]);
                 
                 entity = (EntityType) employee;
+            }else if(aClass.equals(OtherParty.class)){
+                Accountdetailkey accdetailKey = (Accountdetailkey) persistenceService.find("from Accountdetailkey where detailkey=? and detailtypeid =?",(Integer)detailkey,accountdetailtype.getId());
+                if(null==accdetailKey || accdetailKey.getDetailname()==null){
+                    throw new Exception("OtherParty not found for "+ detailkey);
+                }
+                //String[] detailNames = accdetailKey.getDetailname().split("-");
+                OtherParty otherParty = new OtherParty();
+                //otherParty.setId(accdetailKey.getDetailkey().longValue());
+                otherParty.setCode(accdetailKey.getDetailname());
+                otherParty.setName(accdetailKey.getDetailname());
+                
+                entity = (EntityType) otherParty;
             }else{
             final java.lang.reflect.Method method = aClass.getMethod("getId");
             final String dataType = method.getReturnType().getSimpleName();
@@ -861,7 +877,7 @@ public class EgovCommon {
         if (null != listBndryLvl && !listBndryLvl.isEmpty()) {
             final Boundary boundary = listBndryLvl.get(0);
             final Long boundaryId = boundary.getId();
-            try {
+            /*try {
                 final Connection connection = null;
 
                 final String bndQry = "SELECT glcode AS chequeinhand,id FROM CHARTOFACCOUNTS where id = (SELECT chequeinhand FROM CODEMAPPING WHERE EG_BOUNDARYID=?)";
@@ -895,7 +911,7 @@ public class EgovCommon {
                 LOGGER.error("Exception occuerd while getting  "
                         + e.getMessage(), e);
                 throw new ApplicationRuntimeException(e.getMessage());
-            }
+            }*/
 
         } else {
             if (LOGGER.isDebugEnabled())

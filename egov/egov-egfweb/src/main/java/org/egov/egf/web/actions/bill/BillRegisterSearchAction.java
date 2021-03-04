@@ -51,6 +51,13 @@
 package org.egov.egf.web.actions.bill;
 
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.ParentPackage;
@@ -62,9 +69,9 @@ import org.egov.commons.Fund;
 import org.egov.commons.Fundsource;
 import org.egov.commons.Scheme;
 import org.egov.commons.SubScheme;
+import org.egov.egf.model.VoucherDetailMain;
 import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.entity.Boundary;
-import org.egov.infra.admin.master.entity.Department;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.web.struts.actions.BaseFormAction;
 import org.egov.infstr.services.PersistenceService;
@@ -74,14 +81,10 @@ import org.egov.model.bills.EgBillregistermis;
 import org.egov.utils.FinancialConstants;
 import org.egov.utils.VoucherHelper;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
+import org.python.icu.math.BigDecimal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author manoranjan
@@ -89,7 +92,8 @@ import java.util.Map;
  */
 @ParentPackage("egov")
 @Results({
-    @Result(name = BillRegisterSearchAction.NEW, location = "billRegisterSearch-" + BillRegisterSearchAction.NEW + ".jsp")
+    @Result(name = BillRegisterSearchAction.NEW, location = "billRegisterSearch-" + BillRegisterSearchAction.NEW + ".jsp"),
+    @Result(name = BillRegisterSearchAction.POST, location = "billRegisterSearch-" + BillRegisterSearchAction.POST + ".jsp")
 })
 public class BillRegisterSearchAction extends BaseFormAction {
     private static final long serialVersionUID = 1L;
@@ -104,6 +108,9 @@ public class BillRegisterSearchAction extends BaseFormAction {
     private List<Map<String, Object>> billList;
     @Autowired
     private AppConfigValueService appConfigValueService;
+    private String amount;
+    private String partyName;
+    
    
  @Autowired
  @Qualifier("persistenceService")
@@ -169,11 +176,53 @@ public class BillRegisterSearchAction extends BaseFormAction {
             LOGGER.debug("BillRegisterSearchAction | newform | Start");
         return NEW;
     }
+    
+    @Action(value = "/bill/billRegisterSearch-postAudit")
+    public String postAudit() {
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("BillRegisterSearchAction | postAudit | Start");
+        return NEW;
+    }
 
     @Action(value = "/bill/billRegisterSearch-search")
     public String search() {
+    	LOGGER.info("prty :::"+partyName);
+    	LOGGER.info("amount :::"+amount);
+    	Map<String, List<VoucherDetailMain>> voucherDetailMiscMapping=new HashMap<String,List<VoucherDetailMain>>();
+        final StringBuffer query1 = new StringBuffer(500);
+    	
+    	List<Object[]> list1= null;
+    	SQLQuery queryMain =  null;
+    	query1
+        .append("select bp.billnumber ,bp.detailname from bill_party bp");
+    	LOGGER.info("Query 1 :: "+query1.toString());
+    	queryMain=this.persistenceService.getSession().createSQLQuery(query1.toString());
+    	list1 = queryMain.list();
+    	LOGGER.info("after execution");
+    	VoucherDetailMain voucherDetailMain=null;
+    	List<VoucherDetailMain> voucherDetailMainList=null;
+    	//voucher detail main mapping
+    	if (list1.size() != 0) {
+    		LOGGER.info("size ::: "+list1.size());
+    		for (final Object[] object : list1)
+    		{
 
-        if (LOGGER.isDebugEnabled())
+    			voucherDetailMain=new VoucherDetailMain();
+    			voucherDetailMain.setVoucherNumber(object[1].toString());
+    			
+    			if(voucherDetailMiscMapping.get(object[0].toString()) == null)
+    			{
+    				voucherDetailMainList=new ArrayList<VoucherDetailMain>();
+    				voucherDetailMainList.add(voucherDetailMain);
+    				voucherDetailMiscMapping.put(object[0].toString(),voucherDetailMainList);
+    			}
+    			else
+    			{
+    				voucherDetailMiscMapping.get(object[0].toString()).add(voucherDetailMain);
+    			}
+    		}
+    		
+    	}
             LOGGER.debug("BillRegisterSearchAction | search | Start");
         final StringBuffer query = new StringBuffer(500);
         query
@@ -198,8 +247,8 @@ public class BillRegisterSearchAction extends BaseFormAction {
             oWnerNamesList = getOwnersForWorkFlowState(stateIds);
 
         for (final Object[] owner : oWnerNamesList)
-            if (!stateIdAndOwnerNameMap.containsKey(getLongValue(owner[1])))
-                stateIdAndOwnerNameMap.put(getLongValue(owner[1]), getStringValue(owner[0]));
+            if (!stateIdAndOwnerNameMap.containsKey(getLongValue(owner[0])))
+                stateIdAndOwnerNameMap.put(getLongValue(owner[0]), this.getEmployeeName(getLongValue(owner[1])));
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Total number of bills found =: " + list.size());
 
@@ -217,6 +266,18 @@ public class BillRegisterSearchAction extends BaseFormAction {
                 billMap.put("billtype", billtype);
                 billMap.put("billnumber", object[2].toString());
                 billMap.put("billdate", object[3]);
+                if(partyName !=null && !partyName.isEmpty())
+                {
+                	if(!populateParty(voucherDetailMiscMapping,object[2].toString(),partyName))
+                	{
+                		continue;
+                	}
+                }
+                if(amount != null && !amount.isEmpty() && (!checkAmount(object[4].toString(),amount)))
+                {
+                	
+                	continue;
+                }
                 billMap.put("billamount", object[4]);
                 billMap.put("passedamount", object[5]);
                 billMap.put("billstatus", object[6].toString());
@@ -245,11 +306,40 @@ public class BillRegisterSearchAction extends BaseFormAction {
         return NEW;
     }
 
-    private List<Object[]> getOwnersForWorkFlowState(final List<Long> stateIds)
+    private boolean checkAmount(String amount, String amount2) {
+		BigDecimal a=new BigDecimal(amount);
+		BigDecimal b=new BigDecimal(amount2);
+		boolean status=false;
+		if(a.compareTo(b) == 0)
+		{
+			status=true;
+		}
+		return status;
+	}
+
+	private boolean populateParty(Map<String, List<VoucherDetailMain>> voucherDetailMiscMapping, String partyName2, String partyName3) {
+		boolean status=false;
+		
+		if(voucherDetailMiscMapping.get(partyName2) !=null && !voucherDetailMiscMapping.get(partyName2).isEmpty())
+		{
+			for(VoucherDetailMain row :voucherDetailMiscMapping.get(partyName2))
+			{
+				if(((row.getVoucherNumber()).toLowerCase()).contains((partyName3.toLowerCase())))
+				{
+					status=true;
+				}
+			}
+		}
+			
+		
+		
+		return status;
+	}
+
+	private List<Object[]> getOwnersForWorkFlowState(final List<Long> stateIds)
     {
         List<Object[]> ownerNamesList = new ArrayList<Object[]>();
-        final String ownerNamesQueryStr = "select a.employee.username,bill.state.id from Assignment a,State state, EgBillregister bill"
-                + " where  bill.state.id=state.id and a.position.id = state.ownerPosition.id and bill.state.id in (:IDS)";
+        final String ownerNamesQueryStr = "select es.id,es.ownerPosition from State es where es.id in (:IDS)";
         int size = stateIds.size();
         if (size > 999)
         {
@@ -370,4 +460,25 @@ public class BillRegisterSearchAction extends BaseFormAction {
     private String getStringValue(final Object object) {
         return object != null ? object.toString() : "";
     }
+    
+    public String getEmployeeName(Long empId){
+        
+        return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+     }
+
+	public String getAmount() {
+		return amount;
+	}
+
+	public void setAmount(String amount) {
+		this.amount = amount;
+	}
+
+	public String getPartyName() {
+		return partyName;
+	}
+
+	public void setPartyName(String partyName) {
+		this.partyName = partyName;
+	}
 }

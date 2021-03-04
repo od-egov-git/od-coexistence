@@ -245,7 +245,7 @@ function createAmountFieldFormatterRebate(prefix,suffix,onblurfunction,table){
 	}
 
 		var value = (YAHOO.lang.isValue(oData))?oData:"";
-		el.innerHTML = "<div style='display: inline-flex;'><span id='"+prefix+"["+rec+"]"+suffix+"amountTypeLabel'></span><input type='text' id='"+prefix+"["+rec+"]"+suffix+"' name='"+prefix+"["+rec+"]"+suffix+"' style='text-align:right;width:100px;height:auto' maxlength='10' class='form-control patternvalidation text-right' data-pattern='number' onblur='"+onblurfunction+";updatetotalAmounts()'/></div>";
+		el.innerHTML = "<div style='display: inline-flex;'><span id='"+prefix+"["+rec+"]"+suffix+"amountTypeLabel'></span><input type='text' id='"+prefix+"["+rec+"]"+suffix+"' name='"+prefix+"["+rec+"]"+suffix+"' style='text-align:right;width:100px;height:auto' maxlength='10' class='form-control patternvalidation text-right' data-pattern='number' onblur='"+onblurfunction+";updatetotalAmounts()' onfocus='if (this.value == 0){this.value=&#39;&#39;}' onfocusout='if (this.value==&#39;&#39){this.value=0}'/></div>";
 	}
 }
 
@@ -592,6 +592,10 @@ function fillNeibrAfterSplitGlcodeCredit(obj)
 		document.getElementById('billCreditDetailslist['+currRow+'].glcodeIdDetail').value=temp[2];
 		document.getElementById('billCreditDetailslist['+currRow+'].glcodeDetail').value=temp[1];
 		check();
+		/*if(obj.value.includes("GST"))
+		{
+		document.getElementById('billCreditDetailslist['+currRow+'].rateDetail').style.visibility="visible";
+		}*/
 	}
 	else if(glcodeId==null || glcodeId==""){
 		document.getElementById('billCreditDetailslist['+currRow+'].glcodeIdDetail').value="";
@@ -1128,8 +1132,17 @@ function updatetotalAmount(){
 
 function updatetotalAmounts(){
 	var totalamount = 0;
+	var inputAmount= 0;
 	for(var index=0;index<billDetailTableIndex;index++){
-		var inputAmount=Math.abs(parseFloat(document.getElementById('billCreditDetailslist['+index+'].creditAmountDetail').value));
+		if(document.getElementById('billCreditDetailslist['+index+'].creditAmountDetail') == null || document.getElementById('billCreditDetailslist['+index+'].creditAmountDetail').value == '' )
+			{
+			document.getElementById('billCreditDetailslist['+index+'].creditAmountDetail').value =0;
+			inputAmount=0;
+			}
+		else
+			{
+			inputAmount=Math.abs(parseFloat(document.getElementById('billCreditDetailslist['+index+'].creditAmountDetail').value));
+			}
 		if(document.getElementById('billCreditDetailslist['+index+'].amounttype') !=null){
 			var amountType = document.getElementById('billCreditDetailslist['+index+'].amounttype').innerText;
 			if(amountType.toLowerCase()=='credit'){
@@ -1501,8 +1514,10 @@ function checkLength(obj)
 function updateAccountTableIndex(){
 	
 	billDetailTableIndex = billDetailTableIndex +1 ;
+	
 	patternvalidation();
 }
+
 function updateSLTableIndex(){
 	
 	 slDetailTableIndex = slDetailTableIndex +1 ;
@@ -1679,3 +1694,43 @@ function validateTaxheadMasterEntry(){
 	}
 	return true;
 }
+
+function updatetotalAmountRate(){
+	var totalamount=0;
+	
+	for(i=0;i<=25;i++)
+		{
+			if(null != document.getElementById("billCreditDetailslist.["+i+"].rate") && document.getElementById("billCreditDetailslist.["+i+"].rate").value !=0)
+				{
+					var rate=document.getElementById("billCreditDetailslist.["+i+"].rate").value;
+					var amt=(rate*totalamount)/100;
+					document.getElementById("billCreditDetailslist.["+i+"].creditAmountDetail").value=parseFloat(amt);
+					totalamount+parseFloat(amt);
+				}
+			else
+				{
+					if(null != document.getElementById("billCreditDetailslist.["+i+"].creditAmountDetail"))
+						{
+						totalamount=totalamount+parseFloat(document.getElementById("billCreditDetailslist.["+i+"].creditAmountDetail").value);
+						}
+				}
+		}
+	 document.getElementById('totalcramount').value=totalamount;
+	 updatetotalAmount();
+}
+
+function createRateFieldFormatterRebate(prefix,suffix,onblurfunction,table){
+    return function(el, oRecord, oColumn, oData) {
+        var rec='';
+      
+   	if(table=='billCreditDetailsTable'){
+   		rec=billDetailTableIndex;
+   	}
+   	else{ 
+   		rec=rebateDetailTableIndex;
+   	}
+
+   		var value = (YAHOO.lang.isValue(oData))?oData:"";
+   		el.innerHTML ="<select id='"+prefix+"["+rec+"]"+suffix+"' name='"+prefix+"["+rec+"]"+suffix+"' onchange='updatetotalAmount()' style='text-align:right;width:80px; visibility:hiddens' class='form-control patternvalidation text-right' data-pattern='number' ><option value='0'>--Select--</option><option value='0.125'>0.125%</option><option value='0.25'>0.25%</option><option value='1.500'>1.500%</option><option value='1'>1%</option><option value='2'>2%</option><option value='2.50'>2.50%</option><option value='3'>3.00%</option><option value='5'>5%</option><option value='6'>6%</option><option value='9'>9%</option><option value='10'>10%</option><option value='12'>12%</option><option value='14'>14%</option><option value='15'>15%</option><option value='18'>18%</option><option value='20'>20%</option><option value='28'>28%</option><option value='30'>30%</option></select>";
+   	}
+   }

@@ -318,6 +318,9 @@ public class ReceiptHeaderService extends PersistenceService<ReceiptHeader, Long
         String fundsourceCode = null;
         String departmentCode = null;
         Boolean isVoucherApproved = Boolean.FALSE;
+        BusinessDetails bd = microserviceUtils.getBusinessDetailsByCode(receiptHeader.getService()).get(0);
+        if (bd.getIsVoucherApproved() != null)
+            isVoucherApproved = bd.getIsVoucherApproved();
 
         final ReceiptMisc receiptMisc = receiptHeader.getReceiptMisc();
         if (receiptMisc.getFund() != null)
@@ -753,6 +756,7 @@ public class ReceiptHeaderService extends PersistenceService<ReceiptHeader, Long
         final Integer validUpto = Integer.valueOf(collectionsUtil.getAppConfigValue(
                 CollectionConstants.MODULE_NAME_COLLECTIONS_CONFIG,
                 CollectionConstants.APPCONFIG_VALUE_CHALLANVALIDUPTO));
+        System.out.println("persistChallan starts");
         final Challan challan = receiptHeader.getChallan();
         DateTime date = new DateTime(challan.getChallanDate());
         date = date.plusDays(validUpto);
@@ -762,9 +766,17 @@ public class ReceiptHeaderService extends PersistenceService<ReceiptHeader, Long
 
         challan.setReceiptHeader(receiptHeader);
         receiptHeader.setChallan(challan);
-        super.persist(receiptHeader);
+        try {
+        	//persistenceService.applyAuditing(receiptHeader);
+        	super.persist(receiptHeader);
+        }catch (Exception e) {
+			System.out.println("Error : "+e.getMessage());
+			e.printStackTrace();
+		}
+        
         LOGGER.info("Persisting challan with challan number " + challan.getChallanNumber());
         challanService.workflowtransition(receiptHeader.getChallan(), position, actionName, approvalRemarks);
+        System.out.println("persistChallan ends");
         return receiptHeader;
     }
 
@@ -1196,7 +1208,14 @@ public class ReceiptHeaderService extends PersistenceService<ReceiptHeader, Long
         demand.setConsumerCode(consumerCode);
         demand.setConsumerType(CollectionConstants.MISCELLANEOUS_RECEIPT);
         demand.setBusinessService(receiptHeader.getService());
-        demand.setMinimumAmountPayable(receiptHeader.getTotalcramount());
+        if(receiptHeader.getTotalcramount() != null)
+        {
+        	demand.setMinimumAmountPayable(receiptHeader.getTotalcramount());
+        }
+        else
+        {
+        	demand.setMinimumAmountPayable(receiptHeader.getTotalAmount());
+        }
         demand.setDemandDetails(new ArrayList<>());
         TaxPeriod tp = microserviceUtils.getTaxPeriodsByService(receiptHeader.getService());
         if (tp != null) {
@@ -1213,6 +1232,19 @@ public class ReceiptHeaderService extends PersistenceService<ReceiptHeader, Long
                     dd.setTenantId(demand.getTenantId());
                     dd.setTaxHeadMasterCode(rd.getTaxheadCode());
                     demand.getDemandDetails().add(dd);
+                }
+                else if (rd.getAccounthead() != null)
+                {
+                	String taxHead=microserviceUtils.getTaxHeadCode(rd.getAccounthead().getGlcode());
+                	if(taxHead != null && !taxHead.isEmpty())
+                	{
+                		dd = new DemandDetail();
+                        dd.setTaxAmount(rd.getCramount());
+                        // dd.setCollectionAmount(rd.getCramount());
+                        dd.setTenantId(demand.getTenantId());
+                        dd.setTaxHeadMasterCode(taxHead);
+                        demand.getDemandDetails().add(dd);
+                	}
                 }
             }
 
@@ -1364,7 +1396,20 @@ public class ReceiptHeaderService extends PersistenceService<ReceiptHeader, Long
     }
 
     private String getConsumerCode(ReceiptHeader receiptHeader) {
-        return receiptHeader.getServiceCategory() + "-" + receiptHeader.getService() + "-" + String.valueOf(new Date().getTime());
+    	String category=null;
+    	if(receiptHeader.getServiceCategory() != null)
+    	{
+    		category= receiptHeader.getServiceCategory();
+    	}
+    	else if(receiptHeader.getService() != null)
+    	{
+    			String categoryList[]=receiptHeader.getService().split("\\.");
+    			if(categoryList.length >= 1)
+    			{
+    				category=categoryList[0];
+    			}
+    	}
+    	return category + "-" + receiptHeader.getService() + "-" + String.valueOf(new Date().getTime());
     }
 
     public Date getDataEntryCutOffDate() {
@@ -1644,6 +1689,10 @@ public class ReceiptHeaderService extends PersistenceService<ReceiptHeader, Long
                 .totalDue(receiptHeader.getTotalAmount())
                 .totalAmountPaid(receiptHeader.getTotalAmount())
                 .paidBy(receiptHeader.getPaidBy())
+                .gstno(receiptHeader.getGstno())
+                .subdivison(receiptHeader.getSubdivison())
+                .narration(receiptHeader.getReferenceDesc())
+                .payerAddress(receiptHeader.getPayeeAddress())
                 .paymentStatus(PaymentStatusEnum.NEW)
                 .build();
         this.prepareInstrumentsDetails(payment,receiptHeader);
@@ -1660,12 +1709,18 @@ public class ReceiptHeaderService extends PersistenceService<ReceiptHeader, Long
             Long transactionDate = instrumentHeader.getTransactionDate() != null ? instrumentHeader.getTransactionDate().getTime() : instrumentDate;
             String transactionNumber = instrumentHeader.getTransactionNumber() != null ? instrumentHeader.getTransactionNumber() : instrumentHeader.getInstrumentNumber();
             String ifscCode = instrumentHeader.getIfscCode();
+            String bankName=instrumentHeader.getBankId() != null ? instrumentHeader.getBankId().getName() : "";
+            String branchName=instrumentHeader.getBankBranchName() != null ? instrumentHeader.getBankBranchName() : "";
+            LOGGER.info("bankName :::"+bankName);
+            LOGGER.info("branchName :::"+branchName);
             payment.setInstrumentDate(instrumentDate);
             payment.setInstrumentNumber(instrumentNumber);
             payment.setInstrumentStatus(instrumentStatus);
             payment.setTransactionDate(transactionDate);
             payment.setTransactionNumber(transactionNumber);
             payment.setIfscCode(ifscCode);
+            payment.setBankBranch(branchName);
+            payment.setBankName(bankName);
         } catch (Exception e) {
             LOGGER.error("ERROR occurred while setting the instruments details",e);
         }
@@ -1673,6 +1728,7 @@ public class ReceiptHeaderService extends PersistenceService<ReceiptHeader, Long
 
     private PaymentModeEnum getPaymentModeEnum(String modeOfPayment){
         PaymentModeEnum payModeEnum = null;
+        LOGGER.info("modeOfPayment ::"+modeOfPayment);
         switch (modeOfPayment.toUpperCase()) {
         case "CASH":
             payModeEnum = PaymentModeEnum.CASH;
@@ -1688,6 +1744,15 @@ public class ReceiptHeaderService extends PersistenceService<ReceiptHeader, Long
             break;
         case "ONLINE":
             payModeEnum = PaymentModeEnum.ONLINE;
+            break;
+        case "POSMOHBD":
+            payModeEnum = PaymentModeEnum.POSMOHBD;
+            break;
+        case "POSMOHCATTLE":
+            payModeEnum = PaymentModeEnum.POSMOHCATTLE;
+            break;
+        case "POSMOHSLH":
+            payModeEnum = PaymentModeEnum.POSMOHSLH;
             break;
 
         default:

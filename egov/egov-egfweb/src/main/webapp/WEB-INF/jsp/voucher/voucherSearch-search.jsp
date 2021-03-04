@@ -101,7 +101,8 @@
 				</tr>
 				<tr>
 					<td style="width: 5%"></td>
-					<td class="bluebox"><s:text name="voucher.type" /></td>
+					<td class="bluebox"><s:text name="voucher.type" /><span
+						class="mandatory1" id="disableVoucherType">*</span></td>
 					<td class="bluebox"><s:select name="type" id="type"
 							list="dropdownData.typeList" headerKey="-1"
 							headerValue="%{getText('lbl.choose.options')}"
@@ -133,7 +134,18 @@
 							data-inputmask="'mask': 'd/m/y'" autocomplete="off"/>
 							
 							</td>
+							
 				</tr>
+				<tr>
+					<td style="width: 5%"></td>
+					<td class="bluebox">Amount</td>
+					<td class="bluebox"><s:textfield name="amount"
+							id="amount" maxlength="25" value="%{amount}" /></td>
+					<td class="bluebox">Party Name</td>
+					<td class="bluebox"><s:textfield name="partyName"
+							id="partyName" maxlength="25" value="%{partyName}" /></td>
+				</tr>
+				
 				<tr>
 					<jsp:include page="../voucher/voucher-filter.jsp" />
 				</tr>
@@ -158,12 +170,13 @@
 		</div>
 		<br />
 		<table width="100%" border="0" cellspacing="0" cellpadding="0">
-			<s:if test="%{pagedResults!=null}">
+			<s:if test="%{pagedResults!=null && pagedResults.list != null && pagedResults.list.size !=0}">
+			
 				<tr>
 					<td width="100%"><display:table name="pagedResults"	uid="currentRowObject" cellpadding="0" cellspacing="0"
 							requestURI="" class="its" style=" border-left: 1px solid #C5C5C5; border-top: 1px solid #C5C5C5;border-right: 1px solid #C5C5C5;border-bottom: 1px solid #C5C5C5;">
 							<display:column title=" Sl No" style="text-align:center;">
-								<s:property	value="%{#attr.currentRowObject_rowNum+ (page-1)*pageSize}" />
+								<s:property	value="%{#attr.currentRowObject_rowNum+ 1}" />
 							</display:column>
 							<display:column title="Voucher Number" style="text-align:center;">
 								<a href="#"	onclick="openVoucher('<s:property value='%{#attr.currentRowObject.id}'/>','<s:property value="%{#attr.currentRowObject.vouchernumber}" />','<s:date name="%{#attr.currentRowObject.voucherdate}" format="dd/MM/yyyy"/>');"><s:property
@@ -195,71 +208,19 @@
 							<display:column title="Status" style="text-align:center;">
 								<s:property value="%{#attr.currentRowObject.status}" />
 							</display:column>
+							<display:column title="Pending With" style="text-align:center;">
+								<s:property value="%{#attr.currentRowObject.pendingWith}" />
+							</display:column>
 
 						</display:table></td>
 				<tr>
 
 				</tr>
 			</s:if>
-			<s:elseif test="%{voucherList.size!=0 || voucherList!=null}">
-				<div id="listid" style="display: none">
-					<table width="100%" border="0" align="center" cellpadding="0"
-						cellspacing="0" class="tablebottom">
-						<tr>
-							<th class="bluebgheadtd"><s:text name="lbl.sr.no"/></th>
-							<th class="bluebgheadtd"><s:text name="lbl.voucher.number"/></th>
-							<th class="bluebgheadtd"><s:text name="lbl.type"/>Type</th>
-							<th class="bluebgheadtd"><s:text name="lbl.name"/></th>
-							<th class="bluebgheadtd"><s:text name="lbl.voucher.date"/></th>
-							<th class="bluebgheadtd"><s:text name="lbl.fund.name"/></th>
-							<th class="bluebgheadtd"><s:text name="lbl.department.name"/></th>
-							<th class="bluebgheadtd"><s:text name="lbl.amount"/></th>
-							<th class="bluebgheadtd"><s:text name="lbl.status"/></th>
-							<!-- <th class="bluebgheadtd">Source</th> -->
-						</tr>
-						<c:set var="trclass" value="greybox" />
-
-						<s:iterator var="p" value="voucherList" status="s">
-							<tr>
-								<td class="<c:out value="${trclass}"/>"><s:property
-										value="#s.index+1" /></td>
-								<td align="left" class="<c:out value="${trclass}"/>"><a
-									href="#"
-									onclick="openVoucher(<s:property value='%{id}'/>,'<s:text name="%{name}.%{showMode}" />','<s:property value="%{vouchernumber}" /> ' ,'<s:date name="%{voucherdate}" format="dd/MM/yyyy"/>');"><s:property
-											value="%{vouchernumber}" /> </a></td>
-								<td align="left" class="<c:out value="${trclass}"/>"><s:property
-										value="%{type}" /></td>
-								<td align="left" class="<c:out value="${trclass}"/>"><s:property
-										value="%{name}" /></td>
-								<td class="<c:out value="${trclass}"/>"><s:date
-										name="%{voucherdate}" format="dd/MM/yyyy" /></td>
-								<td align="left" class="<c:out value="${trclass}"/>"><s:property
-										value="%{fundname}" /></td>
-								<td align="left" class="<c:out value="${trclass}"/>"><s:property
-										value="%{deptName}" /></td>
-								<td style="text-align: right"
-									class="<c:out value="${trclass}"/>"><s:text
-										name="format.number">
-										<s:param value="%{amount}" />
-									</s:text></td>
-								<td class="<c:out value="${trclass}"/>"><s:text
-										name="%{status}" /></td>
-								<!-- <td class="<c:out value="${trclass}"/>"><s:text
-										name="%{source}" /></td> -->
-								<c:choose>
-									<c:when test="${trclass=='greybox'}">
-										<c:set var="trclass" value="bluebox" />
-									</c:when>
-									<c:when test="${trclass=='bluebox'}">
-										<c:set var="trclass" value="greybox" />
-									</c:when>
-								</c:choose>
-							</tr>
-						</s:iterator>
-						<s:hidden name="targetvalue" value="%{target}" id="targetvalue" />
-					</table>
-				</div>
-			</s:elseif>
+			<s:if test="%{pagedResults!=null && pagedResults.list != null && pagedResults.list.size ==0}">
+			No records found
+			
+			</s:if>
 		</table>
 		<br />
 		<br />
@@ -349,7 +310,14 @@
 			var toDate=document.getElementById('toDate').value;
 			var fundId=document.getElementById('fundId').value;
 			var voucherNumber=document.getElementById('voucherNumber').value;
+			var vType=document.getElementById('type').value;
 			console.log('fromDate : ',fromDate);
+			if(vType != null && vType == -1)
+				{
+				bootbox.alert("Please select voucher Type");
+				return false;
+				
+				}
 			if(!DateValidation(fromDate,toDate))
 				return false;
 			if(fromDate == "" && voucherNumber!=""){

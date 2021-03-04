@@ -91,10 +91,13 @@ public class IncomeExpenditureScheduleService extends ScheduleService {
     }
 
     public void populateDataForAllSchedules(final Statement statement) {
+    
         voucherStatusToExclude = getAppConfigValueFor("EGF", "statusexcludeReport");
         minorCodeLength = Integer.valueOf(incomeExpenditureService.getAppConfigValueFor(Constants.EGF, "coa_minorcode_length"));
+        
         final Date fromDate = incomeExpenditureService.getFromDate(statement);
         final Date toDate = incomeExpenditureService.getToDate(statement);
+        
         final List<Fund> fundList = statement.getFunds();
         populateCurrentYearAmountForAllSchedules(statement, fundList,
                 amountPerFundQueryForAllSchedules(incomeExpenditureService.getFilterQuery(statement), toDate, fromDate, IE));
@@ -102,6 +105,7 @@ public class IncomeExpenditureScheduleService extends ScheduleService {
         incomeExpenditureService.removeFundsWithNoData(statement);
         incomeExpenditureService.computeCurrentYearTotals(statement, Constants.LIABILITIES, Constants.ASSETS);
         computeAndAddTotals(statement);
+       
     }
 
     private Query populatePreviousYearTotals(final Statement statement, final Date toDate, final Date fromDate,
@@ -139,6 +143,7 @@ public class IncomeExpenditureScheduleService extends ScheduleService {
     }
 
     public void populateDetailcode(final Statement statement) {
+    	
         final Date fromDate = incomeExpenditureService.getFromDate(statement);
         final Date toDate = incomeExpenditureService.getToDate(statement);
         // List<Fund> fundList = statement.getFunds();
@@ -146,7 +151,6 @@ public class IncomeExpenditureScheduleService extends ScheduleService {
             LOGGER.debug("preparing list to load all detailcode");
         populateAmountForAllSchedules(statement, toDate, fromDate, "('I','E')");
         incomeExpenditureService.removeFundsWithNoDataIE(statement);
-
     }
 
     boolean isIEContainsScheduleEntry(final List<Object[]> accountCodeList, final String majorCode) {
@@ -483,9 +487,9 @@ public class IncomeExpenditureScheduleService extends ScheduleService {
         if ("Yearly".equalsIgnoreCase(statement.getPeriod()))
             formattedToDate = fromDate;
         else
-            formattedToDate = incomeExpenditureService.getPreviousYearFor(toDate);
+            formattedToDate = toDate;//incomeExpenditureService.getPreviousYearFor(toDate);
         final List<Object[]> resultMap = amountPerFundQueryForAllSchedules(filterQuery, formattedToDate,
-                incomeExpenditureService.getPreviousYearFor(fromDate), IE);
+               /* incomeExpenditureService.getPreviousYearFor(fromDate)*/fromDate, IE);
         final List<Object[]> allGlCodes = getAllGlCodesForAllSchedule(IE, "('I','E')");
         for (final Object[] obj : allGlCodes)
             for (final Object[] row : resultMap) {

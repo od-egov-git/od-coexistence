@@ -47,10 +47,11 @@
  */
 package org.egov.model.masters;
 
-import javax.persistence.Column;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -58,24 +59,24 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
 import org.egov.commons.Bank;
 import org.egov.commons.EgwStatus;
 import org.egov.commons.utils.EntityType;
-import org.egov.enums.ContractorTypeEnum;
 import org.egov.infra.persistence.entity.AbstractAuditable;
 import org.egov.infra.persistence.validator.annotation.OptionalPattern;
 import org.egov.infra.persistence.validator.annotation.Required;
 import org.egov.infra.persistence.validator.annotation.Unique;
 import org.egov.infra.validation.regex.Constants;
+import org.egov.model.bills.DocumentUpload;
 import org.egov.utils.FinancialConstants;
 import org.hibernate.validator.constraints.Length;
 
 @Entity
 @Table(name = "EGF_CONTRACTOR")
-@Unique(id = "id", tableName = "EGF_CONTRACTOR", columnName = { "code", "tinNumber" }, fields = { "code",
-        "tinNumber" }, enableDfltMsg = true)
+@Unique(fields = { "code", "registrationNumber" }, id = "id", tableName = "EGF_CONTRACTOR", enableDfltMsg = true)
 @SequenceGenerator(name = Contractor.SEQ_EGF_CONTRACTOR, sequenceName = Contractor.SEQ_EGF_CONTRACTOR, allocationSize = 1)
 public class Contractor extends AbstractAuditable implements EntityType {
 
@@ -115,6 +116,16 @@ public class Contractor extends AbstractAuditable implements EntityType {
     @Length(max = 1024, message = "Maximum of 1024 Characters allowed for Narration")
     @OptionalPattern(regex = FinancialConstants.ALPHANUMERICWITHALLSPECIALCHAR, message = "Special Characters are not allowed in narration")
     private String narration;
+    
+    @Length(max = 1024, message = "Maximum of 1024 Characters allowed for Vigilance")
+    @OptionalPattern(regex = FinancialConstants.ALPHANUMERICWITHALLSPECIALCHAR, message = "Special Characters are not allowed in narration")
+    private String vigilance;
+    
+    private String adharnumber;
+    
+    private Date blckListFromDate;
+    
+    private Date blckListToDate;
 
     @Length(max = 10, message = "PAN No Field length should be 10 and it should be in the format XXXXX1234X")
     @OptionalPattern(regex = Constants.PANNUMBER, message = "Enter the PAN No in correct format - XXXXX1234X")
@@ -152,17 +163,16 @@ public class Contractor extends AbstractAuditable implements EntityType {
     @OptionalPattern(regex = FinancialConstants.numericwithoutspecialchar, message = "Special Characters are not allowed in ESI No")
     private String esiNumber;
 
-    @NotNull
+    
     @Length(max = 250, message = "Maximum of 250 Characters allowed for GST Registered State")
     private String gstRegisteredState;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "contractortype")
-    private ContractorTypeEnum contractorType;
 
     @ManyToOne
     @JoinColumn(name = "status")
     private EgwStatus status;
+    
+    @Transient
+    private List<DocumentUpload> documentDetail = new ArrayList<>();
 
     @Override
     public String getCode() {
@@ -326,13 +336,11 @@ public class Contractor extends AbstractAuditable implements EntityType {
         this.mobileNumber = mobileNumber;
     }
 
-    @Override
     public Long getId() {
         return id;
     }
 
-    @Override
-    public void setId(final Long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -340,7 +348,7 @@ public class Contractor extends AbstractAuditable implements EntityType {
         return registrationNumber;
     }
 
-    public void setRegistrationNumber(final String registrationNumber) {
+    public void setRegistrationNumber(String registrationNumber) {
         this.registrationNumber = registrationNumber;
     }
 
@@ -348,7 +356,7 @@ public class Contractor extends AbstractAuditable implements EntityType {
         return status;
     }
 
-    public void setStatus(final EgwStatus status) {
+    public void setStatus(EgwStatus status) {
         this.status = status;
     }
 
@@ -356,7 +364,7 @@ public class Contractor extends AbstractAuditable implements EntityType {
         return epfNumber;
     }
 
-    public void setEpfNumber(final String epfNumber) {
+    public void setEpfNumber(String epfNumber) {
         this.epfNumber = epfNumber;
     }
 
@@ -364,7 +372,7 @@ public class Contractor extends AbstractAuditable implements EntityType {
         return esiNumber;
     }
 
-    public void setEsiNumber(final String esiNumber) {
+    public void setEsiNumber(String esiNumber) {
         this.esiNumber = esiNumber;
     }
 
@@ -372,15 +380,48 @@ public class Contractor extends AbstractAuditable implements EntityType {
         return gstRegisteredState;
     }
 
-    public void setGstRegisteredState(final String gstRegisteredState) {
+    public void setGstRegisteredState(String gstRegisteredState) {
         this.gstRegisteredState = gstRegisteredState;
     }
 
-    public ContractorTypeEnum getContractorType() {
-        return contractorType;
-    }
+	public String getVigilance() {
+		return vigilance;
+	}
 
-    public void setContractorType(ContractorTypeEnum contractorType) {
-        this.contractorType = contractorType;
-    }
+	public void setVigilance(String vigilance) {
+		this.vigilance = vigilance;
+	}
+
+	public Date getBlckListFromDate() {
+		return blckListFromDate;
+	}
+
+	public void setBlckListFromDate(Date blckListFromDate) {
+		this.blckListFromDate = blckListFromDate;
+	}
+
+	public Date getBlckListToDate() {
+		return blckListToDate;
+	}
+
+	public void setBlckListToDate(Date blckListToDate) {
+		this.blckListToDate = blckListToDate;
+	}
+
+	public String getAdharnumber() {
+		return adharnumber;
+	}
+
+	public void setAdharnumber(String adharnumber) {
+		this.adharnumber = adharnumber;
+	}
+
+	public List<DocumentUpload> getDocumentDetail() {
+		return documentDetail;
+	}
+
+	public void setDocumentDetail(List<DocumentUpload> documentDetail) {
+		this.documentDetail = documentDetail;
+	}
+
 }

@@ -65,15 +65,13 @@
 	src="<cdn:url value='/resources/global/js/egov/inbox.js?rnd=${app_release_no}' context='/services/egi'/>"> </script>
 <meta http-equiv="Content-Type"
 	content="text/html; charset=windows-1252" />
-<script type="text/javascript"
-	src="/services/EGF/resources/javascript/autocomplete-debug.js"></script>
 <title>Journal voucher Modify</title>
 </head>
 
 <body
 	onload="loadDropDownCodes();loadDropDownCodesFunction();onLoadTask()">
 
-	<s:form theme="simple" name="jvmodifyform">
+	<s:form theme="simple" name="jvmodifyform" enctype ="multipart/form-data">
 		<s:push value="model">
 			<div id="loading"
 				style="position: absolute; left: 25%; top: 70%; padding: 2px; z-index: 20001; height: auto; width: 500px; display: none;">
@@ -178,6 +176,12 @@
 			document.getElementById('subLedgerTable').getElementsByTagName('table')[0].width="90%"
 		</script>
 
+             	<s:if test="%{voucherHeader.documentMode=='ADDVIEW'}">
+		      <div  align="center">
+				<jsp:include page="common-documentsView.jsp"/>
+			    <jsp:include page="common-documentsUpload.jsp"/>
+				</div>
+			</s:if>
 					<br />
 					<div class="subheadsmallnew" /></div>
 					<div id="wfHistoryDiv">
@@ -238,21 +242,131 @@ function validateApproverUser(name,value){
 }
 function onSubmit()
 {
-	if(validateAndSubmitJV())
+	if(validateJV())
+		{
 		document.forms[0].action='${pageContext.request.contextPath}/voucher/journalVoucherModify-update.action';
 	document.forms[0].submit();
 			
+    	return true;
+		}else{
+			
+			return false;
 }
-function validateAndSubmitJV()
+			
+}
+/*function validateAndSubmitJV()
 {
 	if(validateJV()){
 		return true;
 		}else{
 			return false;
 			}
+}*/
+function inAccountCodeArray(accountCode, accountCodeArray) {
+    var length = accountCodeArray.length;
+    
+    for(var i = 0; i < length; i++) {
+    
+        if(accountCodeArray[i] == accountCode)
+        	{
+        	
+            return false;
+            break;
+        	}
+    }
+   
+    return true;
+}
+function validateAccDtls()
+{
+	var y =document.getElementById('billDetailTable').getElementsByTagName('tr');
+	var x =document.getElementById('subLedgerTable').getElementsByTagName('tr');
+	var totalDebitAmt= 0;
+	var totalCreditAmt = 0;
+	var accountCodeArray = new Array();		
+	var rowIndexLength = y.length - 2;
+	var rowIndexSubLedgLength = x.length - 2;
+	for (i = 0; i < rowIndexLength -1 ; i++) {
+	
+		  var debitAmt = document.getElementById('billDetailslist['+i+'].debitAmountDetail').value;
+		  var creditAmt = document.getElementById('billDetailslist['+i+'].creditAmountDetail').value;
+		  var accountCode = document.getElementById('billDetailslist['+i+'].glcodeDetail').value;
+		  if(debitAmt == '')
+			  {
+			  debitAmt = 0;
+			 
+			  }
+		  if(creditAmt == '')
+			  {
+				  creditAmt = 0;
+			 
+			  }
+		  debitAmt= parseFloat(debitAmt);
+		  creditAmt= parseFloat(creditAmt);
+		  if(accountCode == '')				  
+		    {
+			     document.getElementById('lblError').innerHTML ="Account code  is missing for credit or debit supplied field in account grid : "+(i+1);
+				return false;
+				
+		    }
+		  else
+		  {
+			  
+		 
+			  if(!inAccountCodeArray(accountCode,accountCodeArray))
+				  {
+				  document.getElementById('lblError').innerHTML ="Function is missing for the repeated account code,check account code : "+accountCode;
+					return false;
+				     
+				  }else{
+					 
+					  accountCodeArray.push(accountCode);
+				  }
+			 
+			  if(debitAmt > 0 && creditAmt >0)
+				  {
+				  				 
+				    document.getElementById('lblError').innerHTML = "One account can have only credit or debit for the account code :"+accountCode;
+					return false;
+				  }
+			  if(debitAmt == 0 && creditAmt == 0)
+				  {				 
+				    document.getElementById('lblError').innerHTML ="Enter debit/credit amount for the account code : "+accountCode;
+					return false;
+				  }
+			  if(debitAmt > 0 && creditAmt == 0)
+				  {
+					 
+					   totalDebitAmt = totalDebitAmt + debitAmt;						
+					  
+				  }
+			  if(creditAmt > 0 && debitAmt == 0)
+			      {
+				 
+				        totalCreditAmt = totalCreditAmt + creditAmt;		 
+			      
+				        
+			      }
+			 
+		  }
+		  
+
+		  
+		}
+
+	if(totalDebitAmt != totalCreditAmt)
+		{
+		document.getElementById('lblError').innerHTML = "Total Credit and Total Debit amount must be same";
+		alert("return false");
+		return false;
+		}
+				
+	
+	return true;
 }
 function validateJV()
 {
+	
 	document.getElementById('lblError').innerHTML ="";
 	//document.getElementById('saveMode').value=saveMode;
 	var cDate = new Date();
@@ -292,6 +406,17 @@ function validateJV()
 		
 	if(!validateMIS())	return false;
 	//if(!validateApproverUser(name,value)) return false;
+	
+            
+	if(!validateAccDtls())
+		{
+		
+		 return false;
+		
+		}
+	 
+				
+		
 	return true;
 }
 	function onLoadTask()

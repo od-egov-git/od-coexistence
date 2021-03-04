@@ -125,7 +125,7 @@ public class JournalBookReportAction extends BaseFormAction {
                 persistenceService.findAllBy(" from Fundsource where isactive=true order by name"));
         addDropdownData("departmentList", masterDataCache.get("egi-department"));
         addDropdownData("functionList", masterDataCache.get("egi-function"));
-
+        addDropdownData("schemeList",persistenceService.findAllBy(" from Scheme where isactive=true order by name"));
         addDropdownData("voucherNameList", VoucherHelper.VOUCHER_TYPE_NAMES.get(FinancialConstants.STANDARD_VOUCHER_TYPE_JOURNAL));
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Inside  Prepare ........");
@@ -216,9 +216,12 @@ public class JournalBookReportAction extends BaseFormAction {
         final SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         final SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
         String startDate = "", endDate = "";
+        String schemeId="";
         try {
             startDate = formatter.format(sdf.parse(journalBookReport.getStartDate()));
             endDate = formatter.format(sdf.parse(journalBookReport.getEndDate()));
+            schemeId=journalBookReport.getSchemeId();
+            System.out.println("scheme :::"+schemeId);
         } catch (ParseException e) {
 
         }
@@ -231,6 +234,12 @@ public class JournalBookReportAction extends BaseFormAction {
             subQuery = subQuery + " and vmis.departmentcode='" + journalBookReport.getDept_name() + "' ";
         if (journalBookReport.getFunctionId() != null && !journalBookReport.getFunctionId().equals(""))
             subQuery = subQuery + " and vmis.functionid  =" + journalBookReport.getFunctionId() + " ";
+        if (journalBookReport.getSchemeId() != null && !journalBookReport.getSchemeId().equals(""))
+            subQuery = subQuery + " and vmis.schemeid  =" + journalBookReport.getSchemeId() + " ";
+        if(journalBookReport.getNarrationText() != null && !journalBookReport.getNarrationText().isEmpty())
+        {
+        	subQuery = subQuery + " and vh.description like '%"+journalBookReport.getNarrationText()+"%' ";
+        }
         query = "SELECT TO_CHAR(vh.voucherdate,'dd-Mon-yyyy') AS voucherdate,vh.vouchernumber AS vouchernumber,f.name AS fund,gl.glcode AS code,coa.name AS accName,"
                 + "vh.description AS narration,vh.isconfirmed AS isconfirmed,gl.debitamount AS debitamount, gl.creditamount AS creditamount,vh.name AS voucherName,vh.id AS vhId "
                 + " FROM voucherheader vh, generalledger gl,fund f,function fn ,vouchermis vmis,chartofaccounts coa WHERE vh.id = gl.voucherheaderid AND gl.glcodeid = coa.id AND vh.fundid = f.id"

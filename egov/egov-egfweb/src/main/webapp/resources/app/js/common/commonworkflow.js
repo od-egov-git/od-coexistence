@@ -47,15 +47,20 @@
  */
 $(document).ready(function()
 {	
-/*	$('#approvalDepartment').change(function(){
+var currentstate="";
+if(!$('#currentState').val()=="SaveAsDraft")
+{
+	currentstate=$('#currentState').val();
+}
+	$('#approvalDepartment').change(function(){
 		$.ajax({
-			url: "/eis/ajaxWorkFlow-getDesignationsByObjectType",     
+			url: "/services//eis/ajaxWorkFlow-getDesignationsByObjectType",     
 			type: "GET",
 			data: {
 				approvalDepartment : $('#approvalDepartment').val(),
 				departmentRule : $('#approvalDepartment').find("option:selected").text(),
 				type : $('#stateType').val(),
-				currentState : $('#currentState').val(),
+				currentState : currentstate,
 				amountRule : $('#amountRule').val(),
 				additionalRule : $('#additionalRule').val(),
 				pendingAction : $('#pendingActions').val()
@@ -66,7 +71,7 @@ $(document).ready(function()
 				$('#approvalDesignation').empty();
 				$('#approvalDesignation').append($("<option value=''>Select from below</option>"));
 				$.each(response, function(index, value) {
-					$('#approvalDesignation').append($('<option>').text(value.name).attr('value', value.id));
+					$('#approvalDesignation').append($('<option>').text(value.name).attr('value', value.code));
 				});
 				$('#approvalDesignation').val($('#approvalDesignationValue').val());
 				$('#approvalDesignation').trigger('change');
@@ -76,10 +81,10 @@ $(document).ready(function()
 				console.log("failed");
 			}
 		});
-	});*/
+	});
 	
 	
-$('#approvalDepartment').change(function(){
+/*$('#approvalDepartment').change(function(){
 		
 		$.ajax({
 			url: "/services/EGF/designations",     
@@ -101,7 +106,7 @@ $('#approvalDepartment').change(function(){
 				console.log("failed");
 			}
 		});
-	});
+	});*/
 	
 $('#approvalDesignation').change(function(){
 	

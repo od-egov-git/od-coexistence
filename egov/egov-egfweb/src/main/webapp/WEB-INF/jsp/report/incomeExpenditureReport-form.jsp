@@ -88,11 +88,11 @@
 						<th class="bluebgheadtd"><s:text name="" /></th>
 						<th class="bluebgheadtd"><s:text name="" /></th>
 						<s:iterator value="incomeExpenditureStatement.funds" status="stat">
-							<th class="bluebgheadtd" width="15%" align="center" colspan="1"><s:text
-									name="report.currentTotals" /> <s:property
+							<th class="bluebgheadtd" width="15%" align="center" colspan="1"><%--<s:text
+									name="report.currentTotals" />--%> <s:property
 									value="currentYearToDate" /></th>
-							<th class="bluebgheadtd" width="15%" align="center" colspan="1"><s:text
-									name="report.previousTotals" /> <s:property
+							<th class="bluebgheadtd" width="15%" align="center" colspan="1"><%--<s:text
+									name="report.previousTotals" />--%> <s:property
 									value="previousYearToDate" /></th>
 						</s:iterator>
 					</tr>
@@ -142,16 +142,20 @@
 								<s:else>
 									<td class="blueborderfortd">
 										<div align="right">
-											<a href="javascript:void(0);"
+											<%--<a href="javascript:void(0);"
 												onclick='return showDetail(<s:property value="glCode"/>,"<s:property value="id"/>","<s:property value="currentYearToDate"/>","<s:property value="currentYearFromDate"/>")'><s:property
+													value="netAmount[name]" /></a>&nbsp;--%>
+											<a href="javascript:void(0);"
+												onclick='return showDetail(<s:property value="glCode"/>,"<s:property value="id"/>","<s:property value="currentYearToDateStr"/>","<s:property value="currentYearFromDate"/>")'><s:property
 													value="netAmount[name]" /></a>&nbsp;
 										</div>
 									</td>
 									<td class="blueborderfortd">
 										<div align="right">
 											<a href="javascript:void(0);"
-												onclick='return showDetail(<s:property value="glCode"/>,"<s:property value="id"/>","<s:property value="previousYearToDate"/>","<s:property value="previousYearFromDate"/>")'><s:property
+												onclick='return showDetail(<s:property value="glCode"/>,"<s:property value="id"/>","<s:property value="previousYearToDateStr"/>","<s:property value="previousYearFromDate"/>")'><s:property
 													value="previousYearAmount[name]" /></a>&nbsp;
+													
 										</div>
 									</td>
 								</s:else>

@@ -50,11 +50,32 @@
 <%@ taglib prefix="egov" tagdir="/WEB-INF/tags" %>
 <%@ taglib uri="http://www.opensymphony.com/sitemesh/decorator" prefix="decorator"%>
 <%@ taglib prefix="s" uri="/WEB-INF/taglib/struts-tags.tld" %>  
-
+<%@ include file="/includes/taglibs.jsp" %>
+<%@ taglib prefix="egov-authz" uri="/WEB-INF/taglib/egov-authz.tld" %> 
+<link rel="stylesheet" type="text/css" href="<egov:url path='/yui/assets/skins/sam/autocomplete.css'/>" />
 <head>
 	<title>Receipt</title>
+	
+<script>
+	
+function openSource(){
+	
+	//alert("openSource()");
+	var vouchermissourcepath=document.getElementById('vouchermissourcepath').value;
+	
+	if(vouchermissourcepath=="" || vouchermissourcepath=='null')
+		bootbox.alert('Source is not available');
+	else{
+		var url = '/services/collection/receipts/receipt-viewReceipts.action?selectedReceipts='+vouchermissourcepath+'&showMode=view';
+		window.open(url,'Source','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700')
+	}   
+}
+</script>
+	
+	
 </head>
 <body>
+<s:form theme="simple" name="searchReceiptForm" action="searchReceipt-search.action">
 <div class="subheadnew">
 </div>
 <span class="mandatory1"> 
@@ -65,5 +86,16 @@
 		<h1><s:property value="message"/></h1>
 	</font>
 </span>
+ <input name="selectedReceipts" type="hidden" id="selectedReceipts"
+				value="${reciptNumber}"/> 
+<%-- <input name="selectedReceipts" type="hidden" id="selectedReceipts"
+				value="${paymentId}"/>	 --%>			
+<input type="hidden" name="vouchermissourcepath" value="${vouchermissourcepath}" id="vouchermissourcepath">	
+				
+<div class="buttonbottom">
+  <input name="button32" type="button" class="buttonsubmit" id="button32" value="View" onclick="openSource()"/>
+  <input name="button32" type="button" class="buttonsubmit" id="button32" value="Print" onclick="openSource()"/> 
+</div>
+</s:form>
 </body>
 	

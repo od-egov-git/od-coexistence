@@ -47,15 +47,17 @@
  */
 package org.egov.services.instrument;
 
+import java.util.Date;
+
 import org.apache.log4j.Logger;
+import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.workflow.service.SimpleWorkflowService;
 import org.egov.infstr.services.PersistenceService;
 import org.egov.model.instrument.DishonorCheque;
 import org.egov.pims.commons.Position;
 import org.egov.pims.service.EisUtilService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Date;
 
 @Transactional(readOnly = true)
 public class DishonorChequeService extends PersistenceService<DishonorCheque, Long> {
@@ -65,6 +67,8 @@ public class DishonorChequeService extends PersistenceService<DishonorCheque, Lo
 
     private EisUtilService eisService;
     private FinancialIntegrationService financialIntegrationService;
+    @Autowired
+	protected MicroserviceUtils microserviceUtils;
 
     public DishonorChequeService() {
         super(DishonorCheque.class);
@@ -94,7 +98,7 @@ public class DishonorChequeService extends PersistenceService<DishonorCheque, Lo
                 financialIntegrationService.updateSourceInstrumentVoucher(
                         FinancialIntegrationService.EVENT_INSTRUMENT_DISHONOR_INITIATED, dishonorCheque.getInstrumentHeader()
                                 .getId());
-            dishonorCheque.transition().start().withOwner(pos).withComments("DishonorCheque Work flow started");
+            dishonorCheque.transition().start().withOwner(pos).withComments("DishonorCheque Work flow started").withOwnerName((pos.getId() != null && pos.getId() > 0L) ? getEmployeeName(pos.getId()):"");
             if (LOGGER.isDebugEnabled())
                 LOGGER.debug("---------" + dishonorCheque);
             dishonorChqWorkflowService.transition("forward", dishonorCheque, "Created by SM");
@@ -145,5 +149,10 @@ public class DishonorChequeService extends PersistenceService<DishonorCheque, Lo
             final FinancialIntegrationService financialIntegrationService) {
         this.financialIntegrationService = financialIntegrationService;
     }
+    
+    public String getEmployeeName(Long empId){
+        
+        return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+     }
 
 }

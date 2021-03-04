@@ -59,6 +59,7 @@ import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.convention.annotation.Results;
 import org.apache.struts2.interceptor.validation.SkipValidation;
 import org.egov.commons.Fund;
+import org.egov.commons.SubScheme;
 import org.egov.infra.config.persistence.datasource.routing.annotation.ReadOnly;
 import org.egov.infra.web.struts.actions.BaseFormAction;
 import org.egov.infra.web.struts.annotation.ValidationErrorPage;
@@ -104,6 +105,7 @@ public class DayBookReportAction extends BaseFormAction {
     private Date todayDate = new Date();
     private String currentDate;
     private String titleName = "";
+    private String scheme;
 
     public DayBookReportAction() {
         super();
@@ -117,9 +119,11 @@ public class DayBookReportAction extends BaseFormAction {
     public void prepareNewForm() {
         super.prepare();
         persistenceService.getSession().setDefaultReadOnly(true);
+        
         persistenceService.getSession().setFlushMode(FlushMode.MANUAL);
-        addDropdownData("fundList",
-                persistenceService.findAllBy(" from Fund where isactive=true and isnotleaf=false order by name"));
+        addDropdownData("fundList",persistenceService.findAllBy(" from Fund where isactive=true and isnotleaf=false order by name"));
+        addDropdownData("schemeList",persistenceService.findAllBy(" from Scheme where isactive=true order by name"));
+        
         currentDate = formatter.format(todayDate);
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Inside  Prepare ........");
@@ -155,10 +159,23 @@ public class DayBookReportAction extends BaseFormAction {
         return "result";
     }
 
+    @Action(value = "/report/daybookReport-subscheme-ajaxsearch")
+    public String subschemeSearch() throws TaskFailedException {  
+    	System.out.println("ajax ::::"+scheme);
+        //addDropdownData("subSchemeList",persistenceService.findAllBy(" from SubScheme where isactive=true and schemeid='"+id+"' order by name"));
+    	//persistenceService.getSession().setFlushMode(FlushMode.AUTO);
+    	return "result";
+    }
+    
     private String getQuery() {
         final SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy");
         String startDate = "", endDate = "", fundId = "";
         fundId = dayBookReport.getFundId();
+        String schemeId=dayBookReport.getSchemeId();
+    	System.out.println("scheme id"+dayBookReport.getSchemeId());
+    	String naration=dayBookReport.getNarration();
+    	System.out.println("naration ::: "+dayBookReport.getNarration());
+    	String oderBy=" ORDER BY vdate,vouchernumber";
         try {
             startDate = sdf.format(formatter.parse(dayBookReport.getStartDate()));
             endDate = sdf.format(formatter.parse(dayBookReport.getEndDate()));
@@ -167,12 +184,30 @@ public class DayBookReportAction extends BaseFormAction {
         }
         String query = "SELECT voucherdate as vdate, TO_CHAR(voucherdate, 'dd-Mon-yyyy')  AS  voucherdate, vouchernumber as vouchernumber , gd.glcode AS glcode,ca.name AS particulars ,vh.name ||' - '|| vh.TYPE AS type"
                 + ", CASE WHEN vh.description is null THEN ' ' ELSE vh.description END AS narration, CASE  WHEN status=0 THEN ( 'Approved') ELSE ( case WHEN status=1 THEN 'Reversed' else (case WHEN status=2 THEN 'Reversal' else ' ' END) END ) END as status , debitamount  , "
-                + " creditamount,vh.CGVN ,vh.isconfirmed as \"isconfirmed\",vh.id as vhId FROM voucherheader vh, generalledger gd, chartofaccounts ca WHERE vh.ID=gd.VOUCHERHEADERID "
+                + " creditamount,vh.CGVN ,vh.isconfirmed as \"isconfirmed\",vh.id as vhId FROM voucherheader vh,vouchermis vmis, generalledger gd, chartofaccounts ca WHERE vh.ID=gd.VOUCHERHEADERID AND vh.id=vmis.voucherheaderid"
                 + " AND ca.GLCODE=gd.GLCODE AND voucherdate >= '"
                 + startDate
                 + "' and voucherdate <= '"
                 + endDate
-                + "' and vh.status not in (4,5)  and vh.fundid = " + fundId + " ORDER BY vdate,vouchernumber";
+                + "' and vh.status not in (4,5)  and vh.fundid = " + fundId ;
+        
+        if(schemeId != null && !schemeId.isEmpty())
+        {
+        	if(naration != null && !naration.isEmpty())
+        	{
+        		query=query+" and vh.description like '%"+naration+"%' ";
+        	}
+        	query=query+" and vmis.schemeid = "+schemeId+ oderBy;
+        	
+        }
+        else
+        {
+        	if(naration != null && !naration.isEmpty())
+        	{
+        		query=query+" and vh.description like '%"+naration+"%' ";
+        	}
+        	query=query+oderBy;
+        }
         return query;
     }
 
@@ -301,5 +336,13 @@ public class DayBookReportAction extends BaseFormAction {
     public void setTitleName(String titleName) {
         this.titleName = titleName;
     }
+
+	public String getScheme() {
+		return scheme;
+	}
+
+	public void setScheme(String scheme) {
+		this.scheme = scheme;
+	}
     
 }

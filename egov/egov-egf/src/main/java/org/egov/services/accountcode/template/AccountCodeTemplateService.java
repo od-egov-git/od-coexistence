@@ -40,8 +40,8 @@ public class AccountCodeTemplateService {
     public List<AccountCodeTemplate> getAccountTemplate(String module, String billSubType, String accountDetailType, int detailTypeId) {
         List<AccountCodeTemplate> accountCodeTemplate = new ArrayList<>();
         try {
-            accountCodeTemplate = microserviceUtils.getAccountCodeTemplate(module, billSubType,
-                    accountDetailType);
+            accountCodeTemplate = null/*microserviceUtils.getAccountCodeTemplate(module, billSubType,
+                    accountDetailType)*/;
             if(accountDetailType == null){
                 accountCodeTemplate = accountCodeTemplate.stream().filter(act -> act.getSubledgerType() == null || act.getSubledgerType().isEmpty()).collect(Collectors.toList());
             }
@@ -73,7 +73,7 @@ public class AccountCodeTemplateService {
             allGlCodeSet.addAll(creditGlcodeSet);
 //            allGlCodeSet.addAll(netPayableGlcode);
             if (allGlCodeSet != null && !allGlCodeSet.isEmpty()) {
-                List<CChartOfAccounts> coaList = chartOfAccountsService.getSubledgerAccountCodesForAccountDetailTypeAndNonSubledgers(detailTypeId, allGlCodeSet);
+                List<CChartOfAccounts> coaList = null/*chartOfAccountsService.getSubledgerAccountCodesForAccountDetailTypeAndNonSubledgers(detailTypeId, allGlCodeSet)*/;
                 List<CChartOfAccounts> netPayableCodesByAccountDetailType = chartOfAccountsService.getNetPayableCodesByAccountDetailType(detailTypeId);
                 Map<String, CChartOfAccounts> glcodeMap = coaList.stream()
                         .collect(Collectors.toMap(CChartOfAccounts::getGlcode, Function.identity()));
@@ -83,7 +83,7 @@ public class AccountCodeTemplateService {
                         CChartOfAccounts cChartOfAccounts = netPayableAccCodeMap.get(temp.getNetPayable().getGlcode());
                         if(cChartOfAccounts != null){
                             temp.getNetPayable().setId(cChartOfAccounts.getId());
-                            temp.getNetPayable().setIsSubLedger(!cChartOfAccounts.getChartOfAccountDetails().isEmpty());
+                            //temp.getNetPayable().setIsSubLedger(!cChartOfAccounts.getChartOfAccountDetails().isEmpty());
                             temp.getNetPayable().setName(cChartOfAccounts.getName());                            
                         }else{
                             temp.setNetPayable(null);
@@ -111,7 +111,7 @@ public class AccountCodeTemplateService {
         allGlCodeSet.addAll(creditGlcodeSet);
         if (allGlCodeSet != null && !allGlCodeSet.isEmpty()) {
             
-            List<CChartOfAccounts> coaList = chartOfAccountsService.getSubledgerAccountCodesForAccountDetailTypeAndNonSubledgersWithContractors(allGlCodeSet);
+            List<CChartOfAccounts> coaList = null /*chartOfAccountsService.getSubledgerAccountCodesForAccountDetailTypeAndNonSubledgersWithContractors(allGlCodeSet)*/;
             List<CChartOfAccounts> netPayableCodesByAccountDetailType = chartOfAccountsService.getContractorNetPayableAccountCodes();
             Map<String, CChartOfAccounts> glcodeMap = coaList.stream()
                     .collect(Collectors.toMap(CChartOfAccounts::getGlcode, Function.identity()));
@@ -121,7 +121,7 @@ public class AccountCodeTemplateService {
                     CChartOfAccounts cChartOfAccounts = netPayableAccCodeMap.get(temp.getNetPayable().getGlcode());
                     if(cChartOfAccounts != null){
                         temp.getNetPayable().setId(cChartOfAccounts.getId());
-                        temp.getNetPayable().setIsSubLedger(!cChartOfAccounts.getChartOfAccountDetails().isEmpty());
+                        //temp.getNetPayable().setIsSubLedger(!cChartOfAccounts.getChartOfAccountDetails().isEmpty());
                         temp.getNetPayable().setName(cChartOfAccounts.getName());                            
                     }else{
                         temp.setNetPayable(null);
@@ -148,7 +148,7 @@ public class AccountCodeTemplateService {
         allGlCodeSet.addAll(creditGlcodeSet);
         if (allGlCodeSet != null && !allGlCodeSet.isEmpty()) {
             
-            List<CChartOfAccounts> coaList = chartOfAccountsService.getSubledgerAccountCodesForAccountDetailTypeAndNonSubledgersWithSupplier(allGlCodeSet);
+            List<CChartOfAccounts> coaList = null /*chartOfAccountsService.getSubledgerAccountCodesForAccountDetailTypeAndNonSubledgersWithSupplier(allGlCodeSet)*/;
             List<CChartOfAccounts> netPayableCodesByAccountDetailType = chartOfAccountsService.getSupplierNetPayableAccountCodes();
             Map<String, CChartOfAccounts> glcodeMap = coaList.stream()
                     .collect(Collectors.toMap(CChartOfAccounts::getGlcode, Function.identity()));
@@ -158,7 +158,7 @@ public class AccountCodeTemplateService {
                     CChartOfAccounts cChartOfAccounts = netPayableAccCodeMap.get(temp.getNetPayable().getGlcode());
                     if(cChartOfAccounts != null){
                         temp.getNetPayable().setId(cChartOfAccounts.getId());
-                        temp.getNetPayable().setIsSubLedger(!cChartOfAccounts.getChartOfAccountDetails().isEmpty());
+                        //temp.getNetPayable().setIsSubLedger(!cChartOfAccounts.getChartOfAccountDetails().isEmpty());
                         temp.getNetPayable().setName(cChartOfAccounts.getName());                            
                     }else{
                         temp.setNetPayable(null);
@@ -181,7 +181,7 @@ public class AccountCodeTemplateService {
             if(cChartOfAccounts != null){
                 coa.setId(cChartOfAccounts.getId());
                 coa.setName(cChartOfAccounts.getName());
-                coa.setIsSubLedger(!cChartOfAccounts.getChartOfAccountDetails().isEmpty());
+                //coa.setIsSubLedger(!cChartOfAccounts.getChartOfAccountDetails().isEmpty());
                 tempCoa.add(coa);
             }
         }

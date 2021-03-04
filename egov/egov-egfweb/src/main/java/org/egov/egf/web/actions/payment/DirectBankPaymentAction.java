@@ -153,6 +153,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
     private static final String MDP_CHEQUE = FinancialConstants.MODEOFPAYMENT_CHEQUE;
     private static final String MDP_RTGS = FinancialConstants.MODEOFPAYMENT_RTGS;
     private static final String MDP_CASH = FinancialConstants.MODEOFPAYMENT_CASH;
+    private static final String MDP_PEX = FinancialConstants.MODEOFPAYMENT_PEX;
     private String button;
     private VoucherService voucherService;
     private static final Logger LOGGER = Logger.getLogger(DirectBankPaymentAction.class);
@@ -183,6 +184,9 @@ public class DirectBankPaymentAction extends BasePaymentAction {
     DateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
     SimpleDateFormat formatter1 = new SimpleDateFormat("yyyy-MM-dd");
     Date date;
+    private String firstsignatory="-1";
+    private String secondsignatory="-1";
+    private String backlogEntry="";
 
     public BigDecimal getBalance() {
         return balance;
@@ -206,8 +210,9 @@ public class DirectBankPaymentAction extends BasePaymentAction {
         voucherHeader.setName(FinancialConstants.PAYMENTVOUCHER_NAME_DIRECTBANK);
         modeOfPaymentMap = new LinkedHashMap<String, String>();
         modeOfPaymentMap.put(MDP_CHEQUE, getText(MDP_CHEQUE));
-//        modeOfPaymentMap.put(MDP_CASH, getText(MDP_CASH));
+        modeOfPaymentMap.put(MDP_CASH, getText(MDP_CASH));
         modeOfPaymentMap.put(MDP_RTGS, getText(MDP_RTGS));
+        modeOfPaymentMap.put(MDP_PEX, getText(MDP_PEX));
 
         addDropdownData("designationList", Collections.EMPTY_LIST);
         addDropdownData("userList", Collections.EMPTY_LIST);
@@ -238,7 +243,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
             }
         voucherHeader.reset();
         commonBean.reset();
-        commonBean.setModeOfPayment(MDP_CHEQUE);
+        commonBean.setModeOfPayment(MDP_PEX);
         voucherHeader.setVouchermis(new Vouchermis());
         // voucherHeader.getVouchermis().setDepartmentid((Department)paymentService.getAssignment().getDeptId());
         billDetailslist = new ArrayList<VoucherDetails>();
@@ -256,6 +261,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
     }
 
     @Validations(requiredFields = { @RequiredFieldValidator(fieldName = "fundId", message = "", key = REQUIRED),
+    		@RequiredFieldValidator(fieldName = "vouchermis.function", message = "", key = REQUIRED),
             @RequiredFieldValidator(fieldName = "voucherNumber", message = "", key = REQUIRED),
             @RequiredFieldValidator(fieldName = "commonBean.bankId", message = "", key = REQUIRED),
             @RequiredFieldValidator(fieldName = "commonBean.accountNumberId", message = "", key = REQUIRED),
@@ -289,8 +295,9 @@ public class DirectBankPaymentAction extends BasePaymentAction {
                                 voucherHeader.getId());
                 voucherHeader.setId(null);
                 populateWorkflowBean();
+                voucherHeader.setBackdateentry(backlogEntry);
                 paymentheader = paymentActionHelper.createDirectBankPayment(paymentheader, voucherHeader, billVhId,
-                        commonBean, billDetailslist, subLedgerlist, workflowBean);
+                        commonBean, billDetailslist, subLedgerlist, workflowBean,firstsignatory,secondsignatory);
                 showMode = "create";
 
                 if (!cutOffDate.isEmpty() && cutOffDate != null)
@@ -319,8 +326,8 @@ public class DirectBankPaymentAction extends BasePaymentAction {
                                 + paymentheader.getVoucherheader().getVoucherNumber() + " and "
                                 + getText("budget.recheck.sucessful", new String[] {
                                         paymentheader.getVoucherheader().getVouchermis().getBudgetaryAppnumber() }));
-                    addActionMessage(getText("payment.voucher.approved", new String[] { paymentService
-                            .getEmployeeNameForPositionId(paymentheader.getState().getOwnerPosition()) }));
+                    addActionMessage(getText("payment.voucher.approved", new String[] {  this.getEmployeeName(paymentheader.getState()
+                            .getOwnerPosition())  }));
                 }
             } else
                 throw new ValidationException(
@@ -351,7 +358,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
     public void prepareNonBillPayment() {
         addDropdownData("bankList", Collections.EMPTY_LIST);
         addDropdownData("accNumList", Collections.EMPTY_LIST);
-        commonBean.setModeOfPayment(MDP_CHEQUE);
+        commonBean.setModeOfPayment(MDP_PEX);
     }
 
     @ValidationErrorPage(value = NEW)
@@ -507,10 +514,10 @@ public class DirectBankPaymentAction extends BasePaymentAction {
                         throw new ValidationException(errors);
                     }
                 }
-            else
-                throw new ValidationException(
+            ///else
+                /*throw new ValidationException(
                         Arrays.asList(new ValidationError("no.subledger.cannot.create.rtgs.payment",
-                                "There is no subledger selected cannot create RTGS Payment")));
+                                "There is no subledger selected cannot create RTGS Payment")));*/
         }
 
     }
@@ -561,14 +568,23 @@ public class DirectBankPaymentAction extends BasePaymentAction {
                 .append(" order by ih.id");
         voucherHeader = persistenceService.getSession().load(CVoucherHeader.class,
                 voucherHeader.getId());
+        
+        LOGGER.info("voucherHeader.getId()  ::"+voucherHeader.getId());
         paymentheader = (Paymentheader) persistenceService.find("from Paymentheader where voucherheader=?",
                 voucherHeader);
         commonBean.setAmount(paymentheader.getPaymentAmount());
         commonBean.setAccountNumberId(paymentheader.getBankaccount().getId().toString());
         commonBean.setAccnumnar(paymentheader.getBankaccount().getNarration());
-
+        
+        LOGGER.info("paymentheader.getPaymentAmount()  ::"+paymentheader.getPaymentAmount());
+        LOGGER.info("paymentheader.getBankaccount().getId().toString()  ::"+paymentheader.getBankaccount().getId().toString());
+        LOGGER.info("paymentheader.getBankaccount().getNarration()  ::"+paymentheader.getBankaccount().getNarration());
+        
+        
         final String bankBranchId = paymentheader.getBankaccount().getBankbranch().getBank().getId() + "-"
                 + paymentheader.getBankaccount().getBankbranch().getId();
+        
+        LOGGER.info("bankBranchId  ::"+bankBranchId);
         commonBean.setBankId(bankBranchId);
         commonBean.setModeOfPayment(paymentheader.getType());
         final Miscbilldetail miscbillDetail = (Miscbilldetail) persistenceService
@@ -582,6 +598,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
         }
 
         final String bankGlcode = paymentheader.getBankaccount().getChartofaccounts().getGlcode();
+        LOGGER.info("bankGlcode  ::"+bankGlcode);
         VoucherDetails bankdetail = null;
         final Map<String, Object> vhInfoMap = voucherService.getVoucherInfo(voucherHeader.getId());
 
@@ -882,6 +899,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
         if (paymentheader.getVoucherheader() != null)
             voucherHeader.setId(paymentheader.getVoucherheader().getId());
         prepareForViewModifyReverse();
+        System.out.println("END");
         return VIEW;
 
     }
@@ -890,19 +908,20 @@ public class DirectBankPaymentAction extends BasePaymentAction {
     @SkipValidation
     @Action(value = "/payment/directBankPayment-sendForApproval")
     public String sendForApproval() {
-
+    	LOGGER.info("send for approval");
         if (paymentheader.getId() == null)
             paymentheader = getPayment();
-
+        LOGGER.info("before populate work flow bean");
         populateWorkflowBean();
+        LOGGER.info("before send for approval");
         paymentheader = paymentActionHelper.sendForApproval(paymentheader, workflowBean);
 
         if (FinancialConstants.BUTTONREJECT.equalsIgnoreCase(workflowBean.getWorkFlowAction()))
-            addActionMessage(getText("payment.voucher.rejected", new String[] {
-                    paymentService.getEmployeeNameForPositionId(paymentheader.getState().getOwnerPosition()) }));
+            addActionMessage(getText("payment.voucher.rejected", new String[] { this.getEmployeeName(paymentheader.getState()
+                    .getInitiatorPosition()) }));
         if (FinancialConstants.BUTTONFORWARD.equalsIgnoreCase(workflowBean.getWorkFlowAction()))
-            addActionMessage(getText("payment.voucher.approved", new String[] {
-                    paymentService.getEmployeeNameForPositionId(paymentheader.getState().getOwnerPosition()) }));
+            addActionMessage(getText("payment.voucher.approved", new String[] { this.getEmployeeName(paymentheader.getState()
+                    .getOwnerPosition()) }));
         if (FinancialConstants.BUTTONCANCEL.equalsIgnoreCase(workflowBean.getWorkFlowAction()))
             addActionMessage(getText("payment.voucher.cancelled"));
         else if (FinancialConstants.BUTTONAPPROVE.equalsIgnoreCase(workflowBean.getWorkFlowAction())) {
@@ -922,7 +941,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
         if (cutOffDateconfigValue != null && !cutOffDateconfigValue.isEmpty()) {
             if (null == paymentheader || null == paymentheader.getId()
                     || paymentheader.getCurrentState().getValue().endsWith("NEW"))
-                validActions = Arrays.asList(FORWARD, FinancialConstants.CREATEANDAPPROVE);
+                validActions = Arrays.asList(FORWARD);
             else if (paymentheader.getCurrentState() != null)
                 validActions = customizedWorkFlowService.getNextValidActions(paymentheader.getStateType(),
                         getWorkFlowDepartment(), getAmountRule(), getAdditionalRule(),
@@ -1132,4 +1151,33 @@ public class DirectBankPaymentAction extends BasePaymentAction {
     public void setCutOffDate(final String cutOffDate) {
         this.cutOffDate = cutOffDate;
     }
+    
+    public String getEmployeeName(Long empId){
+        
+        return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+     }
+
+	public String getFirstsignatory() {
+		return firstsignatory;
+	}
+
+	public void setFirstsignatory(String firstsignatory) {
+		this.firstsignatory = firstsignatory;
+	}
+
+	public String getSecondsignatory() {
+		return secondsignatory;
+	}
+
+	public void setSecondsignatory(String secondsignatory) {
+		this.secondsignatory = secondsignatory;
+	}
+
+	public String getBacklogEntry() {
+		return backlogEntry;
+	}
+
+	public void setBacklogEntry(String backlogEntry) {
+		this.backlogEntry = backlogEntry;
+	}
 }

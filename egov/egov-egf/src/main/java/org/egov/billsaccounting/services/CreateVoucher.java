@@ -55,7 +55,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -461,6 +460,8 @@ public class CreateVoucher {
 			headerDetails.put(VoucherConstant.VOUCHERDATE, vdt);
 			if (egBillregister.getId() != null)
 				headerDetails.put("billid", egBillregister.getId());
+			if (egBillregister.getNarration() != null)
+				headerDetails.put(VoucherConstant.NARRATION, egBillregister.getNarration());
 			if (billMis.getSourcePath() != null)
 				headerDetails.put(VoucherConstant.SOURCEPATH, billMis.getSourcePath());
 			if (billMis.getDepartmentcode() != null) {
@@ -482,6 +483,8 @@ public class CreateVoucher {
 			// TODO- read the fnction from billdetails. We can remove this
 			if (billMis.getFunction() != null)
 				headerDetails.put(VoucherConstant.FUNCTIONCODE, billMis.getFunction().getCode());
+			if (billMis.getBudgetaryAppnumber() != null)
+				headerDetails.put(VoucherConstant.BUDGETARYAPPNUMBER, billMis.getBudgetaryAppnumber());
 
 			for (final EgBilldetails egBilldetails : billDetailslist) {
 
@@ -765,8 +768,9 @@ public class CreateVoucher {
 			// if u need workflow enable above lines and fix workflow
 		} catch (final ValidationException ve) {
 			LOGGER.error(ERR, ve);
+			ve.printStackTrace();
 			final List<ValidationError> errors = new ArrayList<ValidationError>();
-			errors.add(new ValidationError("exp", ve.getErrors().get(0).getMessage()));
+			//errors.add(new ValidationError("exp", ve.getErrors().get(0).getMessage()));
 			throw new ValidationException(errors);
 		} catch (final Exception e) {
 			LOGGER.error(ERR, e);
@@ -797,7 +801,7 @@ public class CreateVoucher {
 				final String billtype = egBillRegisterHibernateDAO.getBillTypeforVoucher(voucherheader);
 				if (billtype == null) {
 					applicationContext.getBean("voucherWorkflowService");
-					voucherheader.transition().start().withOwner(getPosition());
+					voucherheader.transition().start().withOwner(getPosition()).withOwnerName((getPosition().getId() != null && getPosition().getId() > 0L) ? getEmployeeName(getPosition().getId()):"");
 					// voucherWorkflowService.transition("aa_approve",
 					// voucherheader, "Created"); // action name need to pass
 					// Position position =
@@ -808,7 +812,7 @@ public class CreateVoucher {
 							.getBean("persistenceService");
 					final Position nextPosition = getNextPosition(voucherheader, vs, persistenceService, null);
 					voucherheader.transition().progressWithStateCopy().withStateValue("WORKFLOW INITIATED")
-							.withOwner(nextPosition).withComments("WORKFLOW STARTED");
+							.withOwner(nextPosition).withComments("WORKFLOW STARTED").withOwnerName((nextPosition.getId() != null && nextPosition.getId() > 0L) ? getEmployeeName(nextPosition.getId()):"");
 				}
 			}
 			/*
@@ -920,19 +924,19 @@ public class CreateVoucher {
 				applicationContext.getBean("voucherWorkflowService");
 				if (LOGGER.isDebugEnabled())
 					LOGGER.debug("completed voucherWorkflowService from application context.......");
-				cjv.getVoucherHeaderId().transition().start().withOwner(getPosition());
+				cjv.getVoucherHeaderId().transition().start().withOwner(getPosition()).withOwnerName((getPosition().getId() != null && getPosition().getId() > 0L) ? getEmployeeName(getPosition().getId()):"");
 				// voucherWorkflowService.transition("am_approve",
 				// cjv.getVoucherHeaderId(), "Created"); // action name need to
 				// pass
 				final Position position = eisCommonService.getPositionByUserId(ApplicationThreadLocals.getUserId());
 				cjv.transition().progressWithStateCopy().withStateValue("WORKFLOW INITIATED").withOwner(position)
-						.withComments("WORKFLOW STARTED");
+						.withComments("WORKFLOW STARTED").withOwnerName((position.getId() != null && position.getId() > 0L) ? getEmployeeName(position.getId()):"");
 				final VoucherService vs = (VoucherService) applicationContext.getBean("voucherService");
 				final PersistenceService persistenceService = (PersistenceService) applicationContext
 						.getBean("persistenceService");
 				final Position nextPosition = getNextPosition(cjv.getVoucherHeaderId(), vs, persistenceService, null);
 				cjv.transition().progressWithStateCopy().withStateValue("WORKFLOW INITIATED").withOwner(nextPosition)
-						.withComments("WORKFLOW STARTED");
+						.withComments("WORKFLOW STARTED").withOwnerName((nextPosition.getId() != null && nextPosition.getId() > 0L) ? getEmployeeName(nextPosition.getId()):"");
 			}
 		} catch (final Exception e) {
 			final List<ValidationError> errors = new ArrayList<ValidationError>();
@@ -967,13 +971,13 @@ public class CreateVoucher {
 			applicationContext.getBean("voucherWorkflowService");
 			if (LOGGER.isDebugEnabled())
 				LOGGER.debug("completed voucherWorkflowService from application context.......");
-			voucherHeader.transition().start().withOwner(getPosition());
+			voucherHeader.transition().start().withOwner(getPosition()).withOwnerName((getPosition().getId() != null && getPosition().getId() > 0L) ? getEmployeeName(getPosition().getId()):"");
 			final VoucherService vs = (VoucherService) applicationContext.getBean("voucherService");
 			final PersistenceService persistenceService = (PersistenceService) applicationContext
 					.getBean("persistenceService");
 			final Position nextPosition = getNextPosition(voucherHeader, vs, persistenceService, null);
 			voucherHeader.transition().progressWithStateCopy().withStateValue("Forwarded").withOwner(nextPosition)
-					.withComments("Forwarded");
+					.withComments("Forwarded").withOwnerName((nextPosition.getId() != null && nextPosition.getId() > 0L) ? getEmployeeName(nextPosition.getId()):"");
 
 		} catch (final Exception e) {
 			final List<ValidationError> errors = new ArrayList<ValidationError>();
@@ -1109,7 +1113,7 @@ public class CreateVoucher {
 	public CVoucherHeader createVoucher(final HashMap<String, Object> headerdetails,
 			final List<HashMap<String, Object>> accountcodedetails,
 			final List<HashMap<String, Object>> subledgerdetails) throws ApplicationRuntimeException {
-		CVoucherHeader vh;
+		CVoucherHeader vh = null;
 		Vouchermis mis;
 
 		if (LOGGER.isDebugEnabled())
@@ -1200,11 +1204,13 @@ public class CreateVoucher {
 
 		catch (final ValidationException ve) {
 			final List<ValidationError> errors = new ArrayList<ValidationError>();
-			errors.add(new ValidationError("exp", ve.getErrors().get(0).getMessage()));
+			//errors.add(new ValidationError("exp", ve.getErrors().get(0).getMessage()));
+			ve.printStackTrace();
 			throw new ValidationException(errors);
 		} catch (final Exception e) {
-			LOGGER.error(ERR, e);
-			throw new ApplicationRuntimeException(e.getMessage());
+			//LOGGER.error(ERR, e);
+			//throw new ApplicationRuntimeException(e.getMessage());
+			e.printStackTrace();
 		}
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("End | createVoucher API");
@@ -1449,14 +1455,14 @@ public class CreateVoucher {
 			LOGGER.debug("START | validateVoucherMIS");
 		// Validate Department.
 		if (headerdetails.containsKey(VoucherConstant.DEPARTMENTCODE)
-				&& null != headerdetails.get(VoucherConstant.DEPARTMENTCODE)) {
+				&& null != headerdetails.get(VoucherConstant.DEPARTMENTCODE) && !headerdetails.get(VoucherConstant.DEPARTMENTCODE).toString().isEmpty()) {
 			org.egov.infra.microservice.models.Department depList = microserviceUtils
 					.getDepartmentByCode(headerdetails.get(VoucherConstant.DEPARTMENTCODE).toString());
 			if (depList == null)
 				throw new ApplicationRuntimeException("not a valid Department");
 		}
 
-		if (null != headerdetails.get(VoucherConstant.FUNCTIONARYCODE)) {
+		if (null != headerdetails.get(VoucherConstant.FUNCTIONARYCODE) && !headerdetails.get(VoucherConstant.FUNCTIONARYCODE).toString().isEmpty()) {
 			final Functionary functionary = functionaryDAO.getFunctionaryByCode(
 					BigDecimal.valueOf(Long.valueOf(headerdetails.get(VoucherConstant.FUNCTIONARYCODE).toString())));
 			if (null == functionary)
@@ -1466,7 +1472,7 @@ public class CreateVoucher {
 		String fundCode = null;
 		Fund fund = null;
 		if (headerdetails.containsKey(VoucherConstant.FUNDCODE)
-				&& null != headerdetails.get(VoucherConstant.FUNDCODE)) {
+				&& null != headerdetails.get(VoucherConstant.FUNDCODE) && !headerdetails.get(VoucherConstant.FUNDCODE).toString().isEmpty()) {
 			fundCode = headerdetails.get(VoucherConstant.FUNDCODE).toString();
 			fund = fundDAO.fundByCode(fundCode);
 			if (null == fund)
@@ -1476,28 +1482,39 @@ public class CreateVoucher {
 		// validate Scheme
 		Scheme scheme = null;
 		if (headerdetails.containsKey(VoucherConstant.SCHEMECODE)
-				&& null != headerdetails.get(VoucherConstant.SCHEMECODE)) {
-			final String schemecode = headerdetails.get(VoucherConstant.SCHEMECODE).toString();
-			scheme = schemeDAO.getSchemeByCode(schemecode);
-			if (null == scheme)
-				throw new ApplicationRuntimeException("not a valid scheme");
-			if (!fund.getId().equals(scheme.getFund().getId()))
-				throw new ApplicationRuntimeException("This scheme does not belong to this fund");
+				&& null != headerdetails.get(VoucherConstant.SCHEMECODE) && !headerdetails.get(VoucherConstant.SCHEMECODE).toString().isEmpty()) {
+			 String schemecode = headerdetails.get(VoucherConstant.SCHEMECODE).toString();
+			schemecode=schemecode.replaceAll(" ", "");
+			System.out.println("scheme :"+schemecode+"X");
+			if(schemecode !=null && schemecode.length() > 0)
+			{
+				scheme = schemeDAO.getSchemeByCode(schemecode);
+				if (null == scheme)
+					throw new ApplicationRuntimeException("not a valid scheme");
+				if (!fund.getId().equals(scheme.getFund().getId()))
+					throw new ApplicationRuntimeException("This scheme does not belong to this fund");
+			}
+			
 		}
 		// validate subscheme
 		SubScheme subScheme = null;
 		if (headerdetails.containsKey(VoucherConstant.SUBSCHEMECODE)
-				&& null != headerdetails.get(VoucherConstant.SUBSCHEMECODE)) {
+				&& null != headerdetails.get(VoucherConstant.SUBSCHEMECODE) && !headerdetails.get(VoucherConstant.SUBSCHEMECODE).toString().isEmpty()) {
 			final String subSchemeCode = headerdetails.get(VoucherConstant.SUBSCHEMECODE).toString();
-			subScheme = subSchemeDAO.getSubSchemeByCode(subSchemeCode);
-			if (null == subScheme)
-				throw new ApplicationRuntimeException("not a valid subscheme");
-			if (!subScheme.getScheme().getId().equals(scheme.getId()))
-				throw new ApplicationRuntimeException("This subscheme does not belong to this scheme");
+			
+			if(subSchemeCode != null && !subSchemeCode.isEmpty())
+			{
+				subScheme = subSchemeDAO.getSubSchemeByCode(subSchemeCode);
+				if (null == subScheme)
+					throw new ApplicationRuntimeException("not a valid subscheme");
+				if (!subScheme.getScheme().getId().equals(scheme.getId()))
+					throw new ApplicationRuntimeException("This subscheme does not belong to this scheme");
+			}
+			
 		}
 		// validate fundsource
 		if (headerdetails.containsKey(VoucherConstant.FUNDSOURCECODE)
-				&& null != headerdetails.get(VoucherConstant.FUNDSOURCECODE)) {
+				&& null != headerdetails.get(VoucherConstant.FUNDSOURCECODE) && !headerdetails.get(VoucherConstant.FUNDSOURCECODE).toString().isEmpty()) {
 			final Fundsource fundsource = fundSourceDAO
 					.getFundSourceByCode(headerdetails.get(VoucherConstant.FUNDSOURCECODE).toString());
 			if (null == fundsource)
@@ -1505,7 +1522,7 @@ public class CreateVoucher {
 		}
 
 		if (headerdetails.containsKey(VoucherConstant.DIVISIONID)
-				&& null != headerdetails.get(VoucherConstant.DIVISIONID))
+				&& null != headerdetails.get(VoucherConstant.DIVISIONID) && !headerdetails.get(VoucherConstant.DIVISIONID).toString().isEmpty())
 			if (null == boundary
 					.getBoundaryById(Long.parseLong(headerdetails.get(VoucherConstant.DIVISIONID).toString())))
 				throw new ApplicationRuntimeException("not a valid divisionid");
@@ -1563,10 +1580,29 @@ public class CreateVoucher {
 		try {
 			// String voucherSubType="";
 			cVoucherHeader.setName(headerdetails.get(VoucherConstant.VOUCHERNAME).toString());
+			if(headerdetails.containsKey(VoucherConstant.NARRATION)
+					&& null != headerdetails.get(VoucherConstant.NARRATION)) {
+				final String narration = headerdetails.get(VoucherConstant.NARRATION).toString();
+				cVoucherHeader.setDescription(narration);
+			}
 			String voucherType = headerdetails.get(VoucherConstant.VOUCHERTYPE).toString();
 			cVoucherHeader.setType(headerdetails.get(VoucherConstant.VOUCHERTYPE).toString());
 			String vNumGenMode = null;
-
+			if(headerdetails.containsKey("firstsignatory")
+					&& null != headerdetails.get("firstsignatory"))
+			{
+				cVoucherHeader.setFirstsignatory(headerdetails.get("firstsignatory").toString());
+			}
+			if(headerdetails.containsKey("secondsignatory")
+					&& null != headerdetails.get("secondsignatory"))
+			{
+				cVoucherHeader.setSecondsignatory(headerdetails.get("secondsignatory").toString());
+			}
+			if(headerdetails.containsKey("backdateentry")
+					&& null != headerdetails.get("backdateentry"))
+			{
+				cVoucherHeader.setBackdateentry(headerdetails.get("backdateentry").toString());
+			}
 			// -- Voucher Type checking. --START
 			if (FinancialConstants.STANDARD_VOUCHER_TYPE_JOURNAL.equalsIgnoreCase(voucherType))
 				vNumGenMode = voucherTypeForULB.readVoucherTypes("Journal");
@@ -1851,6 +1887,11 @@ public class CreateVoucher {
 
 		if (null != headerdetails.get(VoucherConstant.SOURCEPATH))
 			vouchermis.setSourcePath(headerdetails.get(VoucherConstant.SOURCEPATH).toString());
+		
+		if (null != headerdetails.get(VoucherConstant.RECEIPTNUMBER))
+			vouchermis.setRecieptNumber(headerdetails.get(VoucherConstant.RECEIPTNUMBER).toString());
+		
+		
 		if (headerdetails.containsKey(VoucherConstant.DIVISIONID)
 				&& null != headerdetails.get(VoucherConstant.DIVISIONID))
 			vouchermis.setDivisionid(
@@ -1868,6 +1909,10 @@ public class CreateVoucher {
 		if(headerdetails.containsKey(VoucherConstant.SERVICE_NAME) && null != headerdetails.get(VoucherConstant.SERVICE_NAME)){
 		    final String serviceName = headerdetails.get(VoucherConstant.SERVICE_NAME).toString();
 		    vouchermis.setServiceName(serviceName);
+		}
+		if(headerdetails.containsKey(VoucherConstant.BUDGETARYAPPNUMBER) && null != headerdetails.get(VoucherConstant.BUDGETARYAPPNUMBER)){
+		    final String budgetAppNo = headerdetails.get(VoucherConstant.BUDGETARYAPPNUMBER).toString();
+		    vouchermis.setBudgetaryAppnumber(budgetAppNo);
 		}
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("END | createVouchermis");
@@ -1929,19 +1974,6 @@ public class CreateVoucher {
 				} else
 					accDetAmtMap.put(VoucherConstant.CREDIT + glcode, creditAmount);
 		}
-		List<String> glcodesList=new ArrayList<>();
-                Set<String> creditAndDebitGlcodesList=accDetAmtMap.keySet();
-                for(String glcodes:creditAndDebitGlcodesList)
-                if (glcodes.contains(VoucherConstant.DEBIT)) {
-                     glcodesList.add(glcodes.substring(5));
-                } else  if (glcodes.contains(VoucherConstant.CREDIT)) {
-                            glcodesList.add(glcodes.substring(6));
-                }
-                Set<String> duplicated =glcodesList.stream().filter(i -> Collections.frequency(glcodesList, i) > 1).collect(Collectors.toSet());
-                LOGGER.debug("duplicated glcodes  :" + duplicated);
-                if (!duplicated.isEmpty()) {
-                    throw new ApplicationRuntimeException("An account code can be used only one time in a voucher : " +  duplicated); 
-                }
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("Total Debit  amount   :" + totaldebitAmount);
 		if (LOGGER.isDebugEnabled())
@@ -1991,7 +2023,6 @@ public class CreateVoucher {
 
 			query.setString(VoucherConstant.GLCODE, glcode);
 			query.setCacheable(true);
-
 			if (null == query.list() || query.list().size() == 0)
 				throw new ApplicationRuntimeException("This code is not a control code" + glcode);
 
@@ -2799,5 +2830,10 @@ public class CreateVoucher {
 		}
 		return fiscalPeriod;
 	}
+	
+	public String getEmployeeName(Long empId){
+        
+	       return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+	    }
 
 }

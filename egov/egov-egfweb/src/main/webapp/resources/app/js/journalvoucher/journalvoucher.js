@@ -97,7 +97,7 @@ function accountDetailGlcode_initialize() {
 	    datumTokenizer: function(d) { return d.tokens; },
 	    queryTokenizer: Bloodhound.tokenizers.whitespace,
 		   remote: {
-	            url: '/EGF/common/getallaccountcodes?glcode=',
+	            url: '/services/EGF/common/getallaccountcodes?glcode=',
 	            replace: function (url, query) {
 					return url + query ;
 				},
@@ -141,7 +141,7 @@ function entityName_initialize(rowindex) {
 	    datumTokenizer: function(d) { return d.tokens; },
 	    queryTokenizer: Bloodhound.tokenizers.whitespace,
 		   remote: {
-	            url: '/EGF/common/getentitesbyaccountdetailtype?name=',
+	            url: '/services/EGF/common/getentitesbyaccountdetailtype?name=',
 	            replace: function (url, query) {
 					var accountDetailType = $('#subLedgerDetails\\['+rowindex+'\\]\\.detailTypeId').val();
 					if(accountDetailType == null || accountDetailType == ""){

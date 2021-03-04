@@ -59,7 +59,7 @@
 			<div class="col-md-12">
 				<div class="panel panel-primary" data-collapsed="0">
 					<c:if test="${not empty message}">
-						<div id="message" class="success" style="color: green;">
+						<div id="message" class="success" style="color: green;margin-top:15px;">
 							<spring:message code="${message}" />
 						</div>
 					</c:if>
@@ -88,13 +88,72 @@
 								<div id="referenceBudget"></div>
 							</div>
 						</div>
+												<br>
+						<br>
+						<br>
+						<br>
+								<div class="form-group" id="toogleDiv" style="display:none">
+							
+							<c:if test="${budgetDetails !=null && !budgetDetails.isEmpty() }">
+							<table border="0" width="100%" class="table table-bordered" cellspacing="0" cellpadding="0">
+				<tr>
+				<th>Executing Department</th>
+				<th>Fund</th>
+				<th>Function Name</th>
+				<th>Budget Name</th>
+				<th>Budget Group</th>
+				<th>Original Amount</th>
+				<th>Anticipatory Amount</th>
+				<th>Planning Percentage</th>
+				<th>Quarter-One Percentage</th>
+				<th>Quarter-Two Percentage</th>
+				<th>Quarter-Three Percentage</th>
+				<th>Quarter-Four Percentage</th>
+				</tr>
+				
+					 <c:forEach items="${budgetDetails}" var="details" varStatus="item">
+					 <tr>
+					 <td>${details.execDeptName }</td>
+					 <td>${details.fund.name }</td>
+					 <td>${details.function.name }</td>
+					 <td>${details.budget.name }</td>
+					 <td>${details.budgetGroup.name }</td>
+					 <td>${details.originalAmount }</td>
+					 <td>${details.anticipatoryAmount }</td>
+					 <td>${details.planningPercent }</td>
+					 <td>${details.quarterpercent }</td>
+					 <td>${details.quartertwopercent }</td>
+					 <td>${details.quarterthreepercent }</td>
+					 <td>${details.quarterfourpercent }</td>
+					 </tr>
+					 </c:forEach>
+						 
+				</table>
+							</c:if>
+							
+						</div>
+						<br>
+						<br>
+						
 						<div class="form-group">
 							<div class="text-center">
 								<button type='submit' class='btn btn-primary' id="btnsearch">
 									<spring:message code='lbl.approve' text="Approve"/>
 								</button>
+								<button type='submit' class='btn btn-primary' id="rejectbutton">
+
+									<spring:message code='lbl.return' />
+
+								</button>
+								
+								<button type='submit' class='btn btn-primary' id="cancelbutton">
+
+									<spring:message code='lbl.cancel' />
+
+								</button>
 								<a href='javascript:void(0)' class='btn btn-default'
 									onclick='self.close()'><spring:message code='lbl.close' text="Close"/></a>
+									<form:hidden path="" id="workAction" name="workAction"/> 
 							</div>
 						</div>
 					</div>
@@ -105,10 +164,50 @@
 </form:form>
 <script>
 	$('#btnsearch').click(function(e) {
+
+	document.getElementById("workAction").value = "VERIFY";
+
+	
+
 		if ($('form').valid()) {
+
 		} else {
+
+		e.preventDefault();
+
+	}  
+
+});
+
+$('#rejectbutton').click(function(e) {
+
+	document.getElementById("workAction").value = "REJECT";
+
+	
+
+	 if ($('form').valid()) {
+
+	} else {
+
 			e.preventDefault();
+
 		}
+
+});
+$('#cancelbutton').click(function(e) {
+
+	document.getElementById("workAction").value = "CANCEL";
+
+	
+
+	 if ($('form').valid()) {
+
+	} else {
+
+		e.preventDefault();
+
+	}  
+
 	});
 </script>
 <link rel="stylesheet"

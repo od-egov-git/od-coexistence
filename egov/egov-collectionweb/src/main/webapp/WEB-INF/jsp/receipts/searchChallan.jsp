@@ -197,9 +197,9 @@
 </div>
 </display:column>
 <display:column headerClass="bluebgheadtd" class="blueborderfortd" property="challan.challanDate" title="Challan Date" format="{0,date,dd/MM/yyyy}" style="width:10%;text-align: center" />
-<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Service Type" style="width:20%" ><div align="center"><s:hidden name="currentRow.service.name" value="%{currentRow.service.name}"/>  <c:if test="${not empty currentRow.service.name}">   <c:out value="${currentRow.service.name}"/></c:if>&nbsp;</div></display:column>
+<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Service Type" style="width:20%" ><div align="center"><s:hidden name="currentRow.service.name" value="%{currentRow.service.name}"/>  <c:if test="${not empty currentRow.service}">   <c:out value="${currentRow.service}"/></c:if>&nbsp;</div></display:column>
 <display:column headerClass="bluebgheadtd" class="blueborderfortd" property="receiptMisc.fund.name" title="Fund" style="width:20%;text-align: center" />
-<display:column headerClass="bluebgheadtd" class="blueborderfortd" property="receiptMisc.department.name" title="Department" style="width:20%;text-align: center" />
+<display:column headerClass="bluebgheadtd" class="blueborderfortd" property="receiptMisc.department" title="Department" style="width:20%;text-align: center" />
 <display:column headerClass="bluebgheadtd" class="blueborderfortd" property="totalAmount" title="Amount (Rs.)" format="{0, number, #,##0.00}" style="width:20%;text-align: center" />
 <display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Status" style="width:20%" ><div align="center"><s:hidden name="currentRow.challan.status.description" value="%{currentRow.challan.status.description}"/>  <c:if test="${not empty currentRow.challan.status.description}">   <c:out value="${currentRow.challan.status.description}"/></c:if>&nbsp;</div></display:column>
 

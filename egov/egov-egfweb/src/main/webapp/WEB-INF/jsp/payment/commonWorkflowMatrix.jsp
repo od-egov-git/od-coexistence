@@ -197,7 +197,6 @@
 					onfocus="callAlertForDesignation();" value="%{approverPositionId}"
 					cssClass="dropDownCss" />
 			</td>
-
 			<td class="${approverOddCSS}" width="5%">&nbsp;</td>
 		</tr>
 	</table>

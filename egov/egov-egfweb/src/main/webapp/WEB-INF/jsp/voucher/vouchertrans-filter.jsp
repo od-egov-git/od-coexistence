@@ -164,10 +164,9 @@
 	<td style="width: 5%"></td>
 	<s:if test="%{shouldShowHeaderField('function')}">
 		<td id="functionnametext" class="bluebox"><s:text
-				name="voucher.function" /> <s:if
-				test="%{isFieldMandatory('function')}">
+				name="voucher.function" /> 
 				<span class="bluebox"><span class="mandatory1">*</span></span>
-			</s:if></td>
+			</td>
 		<td class="bluebox"><s:select name="vouchermis.function"
 				id="vouchermis.function" list="dropdownData.functionList"
 				listKey="id" listValue="name" headerKey="-1"

@@ -89,6 +89,10 @@ public class Bank extends AbstractPersistable<Integer> {
 	@Required
 	@Length(max = 100)
 	private String name;
+	
+	@JsonIgnore
+    @Length(max = 100)
+    private String onlinelink;
 
 	@JsonIgnore
 	@Length(max = 250)
@@ -206,6 +210,14 @@ public class Bank extends AbstractPersistable<Integer> {
 
 	public void setLastModifiedDate(final Date lastModifiedDate) {
 		this.lastModifiedDate = lastModifiedDate;
+	}
+
+	public String getOnlinelink() {
+		return onlinelink;
+	}
+
+	public void setOnlinelink(String onlinelink) {
+		this.onlinelink = onlinelink;
 	}
 
 }

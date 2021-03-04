@@ -317,8 +317,8 @@ public class ChartOfAccounts {
 		if (Double.parseDouble(txn.getDrAmount()) > 0 && Double.parseDouble(txn.getCrAmount()) > 0)
 			throw new TaskFailedException("Both Debit and Credit cannot be greater than Zero.");
 		// return false;
-		if (!isRequiredPresent(txn, glAcc))
-			return false;
+		//if (!isRequiredPresent(txn, glAcc))
+			//return false;
 		return true;
 	}
 
@@ -484,7 +484,13 @@ public class ChartOfAccounts {
 			if (voucherHeader.getVouchermis().getDepartmentcode() != null)
 				paramMap.put("deptid", voucherHeader.getVouchermis().getDepartmentcode());
 			if (txnObj.functionId != null && !txnObj.functionId.equals(""))
+			{
 				paramMap.put("functionid", Long.valueOf(txnObj.functionId));
+			}
+			else if(voucherHeader.getVouchermis() != null && voucherHeader.getVouchermis().getFunction() != null)
+			{
+				paramMap.put("functionid", voucherHeader.getVouchermis().getFunction().getId());
+			}
 			if (voucherHeader.getVouchermis().getFunctionary() != null)
 				paramMap.put("functionaryid", voucherHeader.getVouchermis().getFunctionary().getId());
 			if (voucherHeader.getVouchermis().getSchemeid() != null)
@@ -770,18 +776,25 @@ public class ChartOfAccounts {
 					gLedger.setFunctionId(null);
 
 				try {
+					LOGGER.info("Start of testing GLCode");
 					// if(LOGGER.isInfoEnabled())
 					// LOGGER.info("inside the postin gl function before insert
 					// ----");
 					generalLedgerPersistenceService.persist(gLedger);
 					//populating the data related to non controlled remitted code
 					populateDataForNonControlledRemittedCode(gLedger);
+					LOGGER.info("end of remitted glcode");
 				} catch (final Exception e) {
+					e.printStackTrace();
 					LOGGER.error("error in the gl++++++++++" + e, e);
 					return false;
 				}
 				// if that code doesnot require any details no nedd to insert in
 				// GL details
+				if(glAcc != null && glAcc.getGLParameters() != null)
+				{
+					LOGGER.info("glAcc.getGLParameters().size() :::"+glAcc.getGLParameters().size());
+				}
 				if (glAcc.getGLParameters().size() <= 0)
 					continue;
 				final ArrayList glParamList = glAcc.getGLParameters();
@@ -792,28 +805,32 @@ public class ChartOfAccounts {
 				final ArrayList txnPrm = txn.getTransaxtionParam();
 				String detKeyId = "";
 				String detKeyName = "";
-				if (LOGGER.isInfoEnabled())
 					LOGGER.info("glParamList size :" + glParamList.size());
 				for (int a = 0; a < glParamList.size(); a++)
 					try {
+						LOGGER.info("Start a :::"+a);
 						// post the defaults set for details
 						final GLParameter glPrm = (GLParameter) glParamList.get(a);
 
 						{ // Post the details sent apart from defaults
+							if(txnPrm == null)
+							{
+								continue;
+							}
 							for (int z = 0; z < txnPrm.size(); z++) {
 								final TransaxtionParameter tParam = (TransaxtionParameter) txnPrm.get(z);
-								if (LOGGER.isInfoEnabled())
 									LOGGER.info("tParam.getGlcodeId():" + tParam.getGlcodeId());
-								if (LOGGER.isInfoEnabled())
 									LOGGER.info("gLedger.getglCodeId():" + gLedger.getGlcodeId());
 								if (tParam.getDetailName().equalsIgnoreCase(glPrm.getDetailName())
 										&& tParam.getGlcodeId().equals(gLedger.getGlcodeId().getId().toString())) {
+									LOGGER.info("xxxxxx");
 									gLedgerDet = new CGeneralLedgerDetail();
 									detKeyName = tParam.getDetailName();
 									detKeyId = tParam.getDetailKey();
 									gLedgerDet.setGeneralLedgerId(gLedger);
 									Accountdetailtype acctype = (Accountdetailtype) persistenceService.getSession()
 											.load(Accountdetailtype.class, glPrm.getDetailId());
+									LOGGER.info("ccccccccc");
 									gLedgerDet.setDetailTypeId(acctype);
 									gLedgerDet.setDetailKeyId(Integer.parseInt(detKeyId));
 									gLedgerDet.setDetailKeyName(detKeyName);
@@ -822,6 +839,7 @@ public class ChartOfAccounts {
 									try {
 										if (validRecoveryGlcode(String.valueOf(gLedger.getGlcodeId().getId()))
 												&& gLedger.getCreditAmount() > 0) {
+											LOGGER.info("bbbbbbbbbbbbbbbbbbbb");
 											egRemitGldtl = new EgRemittanceGldtl();
 											// if(LOGGER.isInfoEnabled())
 											// LOGGER.info("----------"+gLedger.getGlCodeId());
@@ -837,6 +855,7 @@ public class ChartOfAccounts {
 											remitanceDetPersistenceService.persist(egRemitGldtl);
 										}
 									} catch (final Exception e) {
+										e.printStackTrace();
 										LOGGER.error("Error while inserting to eg_remittance_gldtl " + e, e);
 										return false;
 									}
@@ -851,6 +870,7 @@ public class ChartOfAccounts {
 							}
 						}
 					} catch (final Exception e) {
+						e.printStackTrace();
 						LOGGER.error("inside postInGL" + e.getMessage(), e);
 						throw new TaskFailedException();
 					}
@@ -1220,7 +1240,7 @@ public class ChartOfAccounts {
 
 			if (!isClosed) {
 				List<Object[]> rs = null;
-				final String qry = "SELECT id FROM closedPeriods WHERE isClosed=true and to_char(startingDate, 'DD-MON-YYYY')<='" + date
+				final String qry = "SELECT id FROM closedPeriods WHERE to_char(startingDate, 'DD-MON-YYYY')<='" + date
 						+ "' AND endingDate>='" + date + "'";
 				if (LOGGER.isDebugEnabled())
 					LOGGER.debug(qry);

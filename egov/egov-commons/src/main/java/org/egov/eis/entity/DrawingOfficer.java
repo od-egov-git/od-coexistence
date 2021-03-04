@@ -89,8 +89,6 @@ public class DrawingOfficer extends AbstractAuditable implements EntityType {
     @JoinColumn(name = "position")
     private Position position;
 
-    private String ifscCode;
-
     public Long getId() {
         return id;
     }
@@ -176,6 +174,12 @@ public class DrawingOfficer extends AbstractAuditable implements EntityType {
     }
 
     @Override
+    public String getIfsccode() {
+     // TODO : Need to find the alternate way to get IFSC code. for now i am passing the branch code.
+        return bankBranch != null ? bankBranch.getBranchcode() : null;
+    }
+
+    @Override
     public String getModeofpay() {
         return null;
     }
@@ -193,15 +197,6 @@ public class DrawingOfficer extends AbstractAuditable implements EntityType {
     @Override
     public EgwStatus getEgwStatus() {
         return null;
-    }
-
-    @Override
-    public String getIfsccode() {
-        return ifscCode;
-    }
-    
-    public void setIfscCode(String ifscCode) {
-        this.ifscCode = ifscCode;
     }
 
 }

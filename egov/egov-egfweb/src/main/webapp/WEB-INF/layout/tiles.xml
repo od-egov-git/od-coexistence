@@ -53,12 +53,19 @@
 <tiles-definitions>
 
     <definition name="base_layout" template="/WEB-INF/views/template/main.jsp">
-        <put-attribute name="title" value="eGov Urban Portal"/>
+        <put-attribute name="title" value=""/>
         <put-attribute name="header" value="/WEB-INF/views/template/header.jsp"/>
         <put-attribute name="body" value=""/>
         <!-- put-attribute name="footer" value="/WEB-INF/views/template/footer.jsp"/> -->
     </definition>
-
+    
+	<definition name="base_layout_expense_form" template="/WEB-INF/views/template/main.jsp">
+        <put-attribute name="title" value=""/>
+        <put-attribute name="header" value="/WEB-INF/views/template/header_expense.jsp"/>
+        <put-attribute name="body" value=""/>
+        <!-- put-attribute name="footer" value="/WEB-INF/views/template/footer.jsp"/> -->
+    </definition>
+    
     <definition name="error" template="/WEB-INF/views/template/error.jsp">
         <put-attribute name="page-title" value="title.error.page" cascade="true"/>
         <put-attribute name="header" value="/WEB-INF/views/template/header.jsp"/>
@@ -405,11 +412,11 @@
                        value="/WEB-INF/views/closedperiod/closedperiod-new.jsp"/>
     </definition>
 
-    <definition name="closedperiod-reopen" extends="base_layout">
-        <put-attribute name="page-title" value="title.closedperiod.reopen"
+    <definition name="closedperiod-edit" extends="base_layout">
+        <put-attribute name="page-title" value="title.closedperiod.edit"
                        cascade="true"/>
         <put-attribute name="body"
-                       value="/WEB-INF/views/closedperiod/closedperiod-reopen.jsp"/>
+                       value="/WEB-INF/views/closedperiod/closedperiod-edit.jsp"/>
     </definition>
 
     <definition name="closedperiod-result" extends="base_layout">
@@ -528,7 +535,7 @@
                        value="/WEB-INF/views/budgetdefinition/budgetdefinition-search.jsp"/>
     </definition>
 
-    <definition name="expensebill-form" extends="base_layout">
+    <definition name="expensebill-form" extends="base_layout_expense_form">
         <put-attribute name="page-title" value="title.expensebill.create" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/expensebill/expensebill-form.jsp"/>
     </definition>
@@ -538,12 +545,12 @@
         <put-attribute name="body" value="/WEB-INF/views/expensebill/expensebill-success.jsp"/>
     </definition>
 
-    <definition name="expensebill-view" extends="base_layout">
+    <definition name="expensebill-view" extends="base_layout_expense_form">
         <put-attribute name="page-title" value="lbl.expensebill" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/expensebill/expensebill-view.jsp"/>
     </definition>
 
-    <definition name="expensebill-update" extends="base_layout">
+    <definition name="expensebill-update" extends="base_layout_expense_form">
         <put-attribute name="page-title" value="title.expensebill.create" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/expensebill/expensebill-update.jsp"/>
     </definition>
@@ -829,15 +836,47 @@
         <put-attribute name="page-title" value="title.coa.report" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/cheque/surrender_cheque.jsp"/>
     </definition>
-    
-    <definition name="remittance_collection_search" extends="base_layout">
-        <put-attribute name="page-title" value="title.coa.report" cascade="true"/>
-        <put-attribute name="body" value="/WEB-INF/views/remittance/remittance_collection_search.jsp"/>
+    <definition name="approvebudget-searchCAO" extends="base_layout">
+        <put-attribute name="page-title" value="title.approvebudget.search.cao"
+                       cascade="true"/>
+        <put-attribute name="body"
+                       value="/WEB-INF/views/approvebudget/approvebudget-searchCAO.jsp"/>
     </definition>
     
-     <definition name="remittance_pending_search" extends="base_layout">
-        <put-attribute name="page-title" value="title.remittance.pending.search.form" cascade="true"/>
-        <put-attribute name="body" value="/WEB-INF/views/remittance/remittance_pending_search.jsp"/>
+    <definition name="approvebudget-searchACMC" extends="base_layout">
+        <put-attribute name="page-title" value="title.approvebudget.search.acmc"
+                       cascade="true"/>
+        <put-attribute name="body"
+                       value="/WEB-INF/views/approvebudget/approvebudget-searchACMC.jsp"/>
+    </definition>  
+    <definition name="expensebill-update-Workflow" extends="base_layout_expense_form">
+        <put-attribute name="page-title" value="title.expensebill.create" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/expensebill/expensebill-update-Workflow.jsp"/>
+    </definition>
+    <definition name="approvebudget-searchSO" extends="base_layout">
+        <put-attribute name="page-title" value="title.approvebudget.search.cao"
+                       cascade="true"/>
+        <put-attribute name="body"
+                       value="/WEB-INF/views/approvebudget/approvebudget-searchSO.jsp"/>
+    </definition> 
+
+    <definition name="journalvoucher-search" extends="base_layout">
+        <put-attribute name="page-title" value="title.journalvoucher.create" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/journalvoucher/journalvoucher-search.jsp"/>
     </definition>
     
+
+    <definition name="pr-voucher-search" extends="base_layout">
+        <put-attribute name="page-title" value="title.voucher.search" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/paymentrefund/pr-voucher-search.jsp"/>
+    </definition>
+    <definition name="pr-voucher-view" extends="base_layout">
+        <put-attribute name="page-title" value="title.voucher.view" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/paymentrefund/pr-voucher-view.jsp"/>
+    </definition>    
+    <definition name="pr-request-form" extends="base_layout">
+        <put-attribute name="page-title" value="title.pr.request" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/paymentrefund/pr-request-form.jsp"/>
+    </definition>
+
 </tiles-definitions>

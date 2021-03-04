@@ -99,6 +99,7 @@ import org.egov.model.payment.Paymentheader;
 import org.egov.utils.FinancialConstants;
 import org.hibernate.FlushMode;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -155,9 +156,11 @@ public class BillRegisterReportAction extends SearchFormAction {
     @Autowired
     private EgovMasterDataCaching masterDataCache;
     
+    private Department deptImpl = new Department();
+    
     public BillRegisterReportAction() {
         voucherHeader.setVouchermis(new Vouchermis());
-        addRelatedEntity("vouchermis.departmentid", Department.class);
+        addRelatedEntity("vouchermis.departmentcode", String.class);
         addRelatedEntity("fundId", Fund.class);
         addRelatedEntity("vouchermis.schemeid", Scheme.class);
         addRelatedEntity("vouchermis.subschemeid", SubScheme.class);
@@ -249,6 +252,7 @@ public class BillRegisterReportAction extends SearchFormAction {
     public String billSearch() throws Exception {
         persistenceService.getSession().setDefaultReadOnly(true);
         persistenceService.getSession().setFlushMode(FlushMode.MANUAL);
+        voucherHeader.getVouchermis().setDepartmentcode(deptImpl.getCode());
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("BillRegisterReportAction | completeBill | start");
         isCompleteBillRegisterReport = true;
@@ -304,6 +308,13 @@ public class BillRegisterReportAction extends SearchFormAction {
                 final BillRegisterReportBean billRegReport = new BillRegisterReportBean();
                 billRegReport.setBillNumber(object[0].toString());
                 billRegReport.setVoucherNumber(object[1] != null ? object[1].toString() : "");
+                billRegReport.setDeducVoucherNumber(getDeducVoucherNumber(billRegReport.getVoucherNumber()));
+                billRegReport.setDeducVhId(getDeducVoucId(billRegReport.getVoucherNumber()));
+                billRegReport.setVhId(getVoucId(billRegReport.getVoucherNumber()));
+                billRegReport.setPhId(getPayId(billRegReport.getVoucherNumber()));
+                billRegReport.setPexNo(getPexNumber(billRegReport.getPhId()));
+                billRegReport.setDeducPexNo(getPexNumber(billRegReport.getDeducVhId()));
+                
                 billRegReport.setPartyName(object[2] != null ? object[2].toString() : "");
                 billRegReport.setGrossAmount(null != object[3] ? new BigDecimal(object[3].toString()).setScale(2,BigDecimal.ROUND_HALF_EVEN)
                         : BigDecimal.ZERO.setScale(2,BigDecimal.ROUND_HALF_EVEN));
@@ -513,7 +524,162 @@ public class BillRegisterReportAction extends SearchFormAction {
         egovPaginatedList.setList(billRegReportList);
     }
 
-    /*
+    private String getPexNumber(Long deducVhId) {
+    	SQLQuery query =  null;
+    	List<Object[]> rows = null;
+    	String deducvh="";
+    	try
+    	{
+    		 query = this.persistenceService.getSession().createSQLQuery("select ei.id,ei.transactionnumber from egf_instrumentheader ei where ei.id_status =2 and ei.id in (select ei2.instrumentheaderid from egf_instrumentvoucher ei2  where ei2.voucherheaderid =:deducVhId)");
+    	    query.setLong("deducVhId", deducVhId);
+    	    rows = query.list();
+    	    
+    	    if(rows != null && !rows.isEmpty())
+    	    {
+    	    	for(Object[] element : rows)
+    	    	{
+    	    		if(element[1] !=null)
+    	    		{
+    	    			deducvh= element[1].toString();
+    	    		}
+    	    		else
+    	    		{
+    	    			deducvh= "";
+    	    		}
+    	    		
+    	    	}
+    	    }
+    	}catch (Exception e) {
+			e.printStackTrace();
+		}
+	    return deducvh;
+    }
+
+	private Long getPayId(String voucherNumber) {
+    	SQLQuery query =  null;
+    	List<Object[]> rows = null;
+    	Long deducvh=0L;
+    	try
+    	{
+    		 query = this.persistenceService.getSession().createSQLQuery("select id,payvhid from miscbilldetail m where m.billvhid in (select v.id from voucherheader v where v.vouchernumber =:vouchernumber)");
+    	    query.setString("vouchernumber", voucherNumber);
+    	    rows = query.list();
+    	    
+    	    if(rows != null && !rows.isEmpty())
+    	    {
+    	    	for(Object[] element : rows)
+    	    	{
+    	    		if(element[1] !=null)
+    	    		{
+    	    			deducvh= Long.parseLong(element[1].toString());
+    	    		}
+    	    		else
+    	    		{
+    	    			deducvh= 0L;
+    	    		}
+    	    		
+    	    	}
+    	    }
+    	}catch (Exception e) {
+			e.printStackTrace();
+		}
+	    return deducvh;
+    }
+
+	private Long getVoucId(String voucherNumber) {
+    	SQLQuery query =  null;
+    	List<Object[]> rows = null;
+    	Long deducvh=0L;
+    	try
+    	{
+    		 query = this.persistenceService.getSession().createSQLQuery("select vh.id,vh.vouchernumber from voucherheader vh where vh.vouchernumber=:vouchernumber");
+    	    query.setString("vouchernumber", voucherNumber);
+    	    rows = query.list();
+    	    
+    	    if(rows != null && !rows.isEmpty())
+    	    {
+    	    	for(Object[] element : rows)
+    	    	{
+    	    		if(element[0] !=null)
+    	    		{
+    	    			deducvh= Long.parseLong(element[0].toString());
+    	    		}
+    	    		else
+    	    		{
+    	    			deducvh= 0L;
+    	    		}
+    	    		
+    	    	}
+    	    }
+    	}catch (Exception e) {
+			e.printStackTrace();
+		}
+	    return deducvh;
+    }
+
+	private Long getDeducVoucId(String voucherNumber) {
+    	SQLQuery query =  null;
+    	List<Object[]> rows = null;
+    	Long deducvh=0L;
+    	try
+    	{
+    		 query = this.persistenceService.getSession().createSQLQuery("select dvm.ph_id,(select vouchernumber from voucherheader v where v.id=dvm.ph_id) from deduc_voucher_mpng dvm where dvm.vh_id in (select vh.id from voucherheader vh where vh.vouchernumber=:vouchernumber)");
+    	    query.setString("vouchernumber", voucherNumber);
+    	    rows = query.list();
+    	    
+    	    if(rows != null && !rows.isEmpty())
+    	    {
+    	    	for(Object[] element : rows)
+    	    	{
+    	    		if(element[0] !=null)
+    	    		{
+    	    			deducvh= Long.parseLong(element[0].toString());
+    	    		}
+    	    		else
+    	    		{
+    	    			deducvh= 0L;
+    	    		}
+    	    		
+    	    	}
+    	    }
+    	}catch (Exception e) {
+			e.printStackTrace();
+		}
+	    return deducvh;
+    }
+
+	private String getDeducVoucherNumber(String voucherNumber) {
+    	SQLQuery query =  null;
+    	List<Object[]> rows = null;
+    	String deducvh="";
+    	try
+    	{
+    		 query = this.persistenceService.getSession().createSQLQuery("select dvm.id,(select vouchernumber from voucherheader v where v.id=dvm.ph_id) from deduc_voucher_mpng dvm where dvm.vh_id in (select vh.id from voucherheader vh where vh.vouchernumber=:vouchernumber)");
+    	    query.setString("vouchernumber", voucherNumber);
+    	    rows = query.list();
+    	    
+    	    if(rows != null && !rows.isEmpty())
+    	    {
+    	    	for(Object[] element : rows)
+    	    	{
+    	    		if(element[1] !=null)
+    	    		{
+    	    			deducvh= element[1].toString();
+    	    		}
+    	    		else
+    	    		{
+    	    			deducvh= "";
+    	    		}
+    	    		
+    	    	}
+    	    }
+    	}catch (Exception e) {
+			e.printStackTrace();
+		}
+	    return deducvh;
+    }
+
+	/*
      * Get remittance payment detail for the voucher Below lines to get the cheque and cheque date for the voucher /* In case
      * where for single payment multiple cheque are assigned we use chqdelimitSP / single slash separate cheque nos In case where
      * for a voucher multiple BPVs are issued and for the BPVs different cheques are issued we seperate them with chqdelimitDP //
@@ -684,7 +850,7 @@ public class BillRegisterReportAction extends SearchFormAction {
 
         if (null != voucherHeader.getFundId())
             whereQuery.append(" and mis.fundid=" + voucherHeader.getFundId().getId());
-        if (null != voucherHeader.getVouchermis().getDepartmentcode())
+        if (null != voucherHeader.getVouchermis().getDepartmentcode() && !voucherHeader.getVouchermis().getDepartmentcode().equals("-1"))
             whereQuery.append(" and mis.departmentcode='" + voucherHeader.getVouchermis().getDepartmentcode()+"'");
         if (null != voucherHeader.getVouchermis().getSchemeid())
             whereQuery.append(" and mis.schemeid=" + voucherHeader.getVouchermis().getSchemeid().getId());
@@ -934,6 +1100,14 @@ public class BillRegisterReportAction extends SearchFormAction {
 	    public void setTitleName(String titleName) {
 	        this.titleName = titleName;
 	    }
+
+		public Department getDeptImpl() {
+			return deptImpl;
+		}
+
+		public void setDeptImpl(Department deptImpl) {
+			this.deptImpl = deptImpl;
+		}
 
 	
 	

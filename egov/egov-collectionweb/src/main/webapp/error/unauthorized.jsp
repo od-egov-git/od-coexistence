@@ -51,7 +51,7 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<title>eGov - Unauthorised</title>
+	<title>MCC - Unauthorised</title>
 	</head>
 	<body>
 	<div class="formmainbox">

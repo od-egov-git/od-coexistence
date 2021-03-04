@@ -781,7 +781,7 @@ public class DishonorChequeWorkflowAction extends BaseFormAction {
         if (null == dishonorCheque.getState()) {
             final Position pos = eisService.getPrimaryPositionForUser(null/* phoenix dishonorCheque.getApproverPositionId() */,
                     new Date());
-            dishonorCheque.transition().start().withOwner(pos).withComments("DishonorCheque Work flow started");
+            dishonorCheque.transition().start().withOwner(pos).withComments("DishonorCheque Work flow started").withOwnerName((pos.getId() != null && pos.getId() > 0L) ? getEmployeeName(pos.getId()):"");
             dishonorChequeWorkflowService.transition("forward", dishonorCheque, "Created by SM");
         }
 
@@ -1005,4 +1005,9 @@ public class DishonorChequeWorkflowAction extends BaseFormAction {
     public void setMode(final String mode) {
         this.mode = mode;
     }
+    
+    public String getEmployeeName(Long empId){
+        
+        return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+     }
 }

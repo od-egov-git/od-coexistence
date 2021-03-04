@@ -49,7 +49,7 @@
 package org.egov.infra.reporting.engine;
 
 public enum ReportFormat {
-    PDF, XLS, RTF, HTM, TXT, CSV;
+    PDF, XLS, RTF, HTM, TXT, CSV, DOCX;
 
     @Override
     public String toString() {

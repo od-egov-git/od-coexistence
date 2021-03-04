@@ -109,6 +109,9 @@ public class State/* <T extends OwnerGroup> */ extends AbstractAuditable {
 
 	@Column(name = "OWNER_USER")
 	private Long ownerUser;
+	
+	@Column(name = "OWNER_NAME")
+	private String ownerName;
 
 	@OneToMany(cascade = { CascadeType.PERSIST,
 			CascadeType.MERGE }, fetch = FetchType.LAZY, mappedBy = "state", targetEntity = StateHistory.class)
@@ -375,6 +378,14 @@ public class State/* <T extends OwnerGroup> */ extends AbstractAuditable {
 
 	public enum StateStatus {
 		STARTED, INPROGRESS, ENDED
+	}
+
+	public String getOwnerName() {
+		return ownerName;
+	}
+
+	public void setOwnerName(String ownerName) {
+		this.ownerName = ownerName;
 	}
 
 }

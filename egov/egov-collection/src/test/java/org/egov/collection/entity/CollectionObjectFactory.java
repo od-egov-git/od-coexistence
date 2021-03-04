@@ -1681,7 +1681,7 @@ public class CollectionObjectFactory {
 		challan.setLastModifiedBy(user.getId());
 		challan.setChallanNumber("testChallanNo");
 		challan.setChallanDate(date);
-		challan.setService(createServiceDetails("testService"));
+		//challan.setService(createServiceDetails("testService"));
 		challan.setStatus(this.createEgwStatus(("testCodeRH" + getRandomNumber()).substring(0, 10),
 				MODULE_NAME_TESTCHALLANHEADER));
 		challan.setVoucherHeader(createVoucher("testChallanVoucher"));
@@ -1711,7 +1711,7 @@ public class CollectionObjectFactory {
 		challan.setLastModifiedBy(user.getId());
 		challan.setChallanNumber("testChallanNo");
 		challan.setChallanDate(date);
-		challan.setService(createServiceDetails("testService"));
+		//challan.setService(createServiceDetails("testService"));
 		/*
 		 * ReceiptPayeeDetails payee = createReceiptPayeeDetails();
 		 * ReceiptHeader header = payee.getReceiptHeaders().iterator().next();

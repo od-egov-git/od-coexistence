@@ -82,10 +82,10 @@
 								status="stat">
 								<th class="bluebgheadtd"><s:property value="name" /></th>
 							</s:iterator>
-							<th class="bluebgheadtd"><s:text name="report.currentTotals" />:
+							<th class="bluebgheadtd"><%--<s:text name="report.currentTotals" />:--%>
 								<s:property value="currentYearToDate" /></th>
-							<th class="bluebgheadtd"><s:text
-									name="report.previousTotals" />: <s:property
+							<th class="bluebgheadtd"><%--<s:text
+									name="report.previousTotals" />: --%><s:property
 									value="previousYearToDate" /></th>
 						</tr>
 						<s:iterator value="incomeExpenditureStatement.entries"

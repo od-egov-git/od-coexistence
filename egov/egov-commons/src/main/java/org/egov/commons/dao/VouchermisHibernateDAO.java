@@ -100,6 +100,14 @@ public class VouchermisHibernateDAO  {
         return (Vouchermis) qry.uniqueResult();
     }
     
+    public Vouchermis getVouchermisByReceiptNumber(final String recieptNumber) {
+        final Query qry = getCurrentSession().createQuery("from Vouchermis where recieptNumber =:recieptNumber");
+        qry.setString("recieptNumber", recieptNumber);
+        return (Vouchermis) qry.uniqueResult();
+    }
+    
+    
+    
     public List<CVoucherHeader> getRecentVoucherByServiceNameAndReferenceDoc(String serviceName,String referenceDocument){
         StringBuilder builderQuery = new StringBuilder("select vh from Vouchermis vmis,CVoucherHeader vh where vmis.voucherheaderid=vh.id");
         if(!StringUtils.isBlank(serviceName)){

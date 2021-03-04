@@ -115,6 +115,8 @@ public class IncomeExpenditureReportAction extends BaseFormAction {
     private String financialYearId;
     // private String asOndate;
     private Date todayDate;
+    private String fromDate;
+    private String toDate;
     private String asOnDateRange;
     private String period;
     private Integer fundId;
@@ -187,9 +189,8 @@ public class IncomeExpenditureReportAction extends BaseFormAction {
             heading.append(" in " + incomeExpenditureStatement.getFund().getName());
         }
         if (incomeExpenditureStatement.getDepartment() != null && incomeExpenditureStatement.getDepartment().getCode() != null
-                && !"null".equalsIgnoreCase(incomeExpenditureStatement.getDepartment().getCode())) {
-//            incomeExpenditureStatement.setDepartment((Department) getPersistenceService().find("from Department where id=?",
-//                    incomeExpenditureStatement.getDepartment().getId()));
+                && !incomeExpenditureStatement.getDepartment().getCode().isEmpty()) {
+
             Department dept = microserviceUtils.getDepartmentByCode(incomeExpenditureStatement.getDepartment().getCode());
             incomeExpenditureStatement.setDepartment(dept);
             heading.append(" in " + incomeExpenditureStatement.getDepartment().getName() + " Department");
@@ -320,12 +321,17 @@ public class IncomeExpenditureReportAction extends BaseFormAction {
 
     @Action(value = "/report/incomeExpenditureReport-ajaxPrintIncomeExpenditureReport")
     public String ajaxPrintIncomeExpenditureReport() {
+    	try {
         populateDataSource();
+    	}catch(Exception e)
+    	{
+    		e.printStackTrace();
+    	}
         return "results";
     }
 
     protected void populateDataSource() {
-
+    	
         setRelatedEntitesOn();
 
         statementheading.append("Income And Expenditure Statement").append(heading);
@@ -449,7 +455,8 @@ public class IncomeExpenditureReportAction extends BaseFormAction {
         return INCOME_EXPENSE_XLS;
     }
 
-    public String getCurrentYearToDate() {
+   /* public String getCurrentYearToDate() {
+    	
         return incomeExpenditureService.getFormattedDate(incomeExpenditureService.getToDate(incomeExpenditureStatement));
     }
 
@@ -465,6 +472,43 @@ public class IncomeExpenditureReportAction extends BaseFormAction {
     public String getPreviousYearFromDate() {
         return incomeExpenditureService.getFormattedDate(incomeExpenditureService.getPreviousYearFor(incomeExpenditureService
                 .getFromDate(incomeExpenditureStatement)));
+    }*/
+    public String getCurrentYearToDate() {
+	   if ("Date".equalsIgnoreCase(incomeExpenditureStatement.getPeriod()))
+	   {
+        return incomeExpenditureService.getFormattedDate(incomeExpenditureStatement.getFromDate())  +" To "+incomeExpenditureService.getFormattedDate(incomeExpenditureStatement.getToDate());
+	   }else {
+        return incomeExpenditureService.getFormattedDate(incomeExpenditureService.getToDate(incomeExpenditureStatement));
+    }
+    }
+
+    public String getPreviousYearToDate() {
+    	if ("Date".equalsIgnoreCase(incomeExpenditureStatement.getPeriod()))
+ 	   {
+    		  return incomeExpenditureService.getFormattedDate(incomeExpenditureService.getPreviousYearFor(incomeExpenditureStatement.getFromDate())) + " To " +
+    				  incomeExpenditureService.getFormattedDate(incomeExpenditureService.getPreviousYearFor(incomeExpenditureStatement.getToDate()));
+ 	   }else {
+        return incomeExpenditureService.getFormattedDate(incomeExpenditureService.getPreviousYearFor(incomeExpenditureService
+                .getToDate(incomeExpenditureStatement)));
+    }
+    }
+
+    public String getCurrentYearFromDate() {
+        return incomeExpenditureService.getFormattedDate(incomeExpenditureService.getFromDate(incomeExpenditureStatement));
+    }
+
+    public String getPreviousYearFromDate() {
+        return incomeExpenditureService.getFormattedDate(incomeExpenditureService.getPreviousYearFor(incomeExpenditureService
+                .getFromDate(incomeExpenditureStatement)));
+    }
+    public String getCurrentYearToDateStr() {
+      
+        return incomeExpenditureService.getFormattedDate(incomeExpenditureService.getToDate(incomeExpenditureStatement));
+    }
+
+    public String getPreviousYearToDateStr() {
+        return incomeExpenditureService.getFormattedDate(incomeExpenditureService.getPreviousYearFor(incomeExpenditureService
+                .getToDate(incomeExpenditureStatement)));
     }
 
     public Date getTodayDate() {
@@ -562,5 +606,22 @@ public class IncomeExpenditureReportAction extends BaseFormAction {
     public void setDetailReport(final boolean detailReport) {
         this.detailReport = detailReport;
     }
+
+	public String getFromDate() {
+		return fromDate;
+	}
+
+	public void setFromDate(String fromDate) {
+		this.fromDate = fromDate;
+	}
+
+	public String getToDate() {
+		return toDate;
+	}
+
+	public void setToDate(String toDate) {
+		this.toDate = toDate;
+	}
+
 
 }

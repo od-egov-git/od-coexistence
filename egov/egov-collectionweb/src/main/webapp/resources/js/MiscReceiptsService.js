@@ -213,6 +213,7 @@ fundsourceDropDownFailureHandler = function() {
 loadFinAccSuccessHandler = function(req, res) {
 	var noOfRows = billCreditDetailsTable.getRecordSet().getLength();
 	billCreditDetailsTable.deleteRows(0, noOfRows);
+	
 	billDetailTableIndex = 0;
 	billCreditDetailsTable.addRow({
 		SlNo : billCreditDetailsTable.getRecordSet().getLength() + 1,
@@ -224,7 +225,7 @@ loadFinAccSuccessHandler = function(req, res) {
 	updateGridMisc(VOUCHERCREDITDETAILLIST, 'creditAmountDetail', 0, "0");
 	totalcramt = "0";
 	billDetailTableIndex = 1;
-	for (i = 0; i < res.results.length - 1; i++) {
+	for (i = 0; i < res.results.length ; i++) {
 		billCreditDetailsTable.addRow({
 			SlNo : billCreditDetailsTable.getRecordSet().getLength() + 1,
 			"glcodeid" : res.results[i].glcodeIdDetail,
@@ -251,6 +252,7 @@ loadFinAccSuccessHandler = function(req, res) {
 				amounttype);
 		updateSpanMisc(VOUCHERCREDITDETAILLIST, 'creditAmountDetailamountTypeLabel', i,
 				amountTypeSign);
+		
 		totalcramt = parseFloat(totalcramt)
 				+ parseFloat(res.results[i].creditAmountDetail);
 		if (totalcramt > 0) {
@@ -261,6 +263,9 @@ loadFinAccSuccessHandler = function(req, res) {
 	document.getElementById('totalcramount').value = totalcramt;
 	updatetotalAmount();
 	patternvalidation();
+	//remove Last Empty Row From Table
+	removeLastRow(res.results.length);
+	
 }
 loadFinAccFailureHandler = function() {
 	bootbox.alert('unable to load Function');
@@ -322,4 +327,21 @@ loadFinSubledgerSuccessHandler = function(req, res) {
 
 loadFinSubledgerFailureHandler = function() {
 	bootbox.alert('Unable to load Sub Ledger');
+}
+function removeLastRow(resultCount){
+	
+	var lengthRes = resultCount+1
+	for(var i=0;i<lengthRes;i++)
+	{
+		var accValue = document.getElementById('billCreditDetailslist['+i+'].accounthead').value;
+		
+		if(accValue==''){
+			var accountRemove = document.getElementById('billCreditDetailslist['+i+'].accounthead');
+			accountRemove.style.display = 'none';
+			
+			var val = document.getElementById('billCreditDetailslist['+i+'].creditAmountDetail');
+			val.style.display = 'none';
+		}
+	}
+
 }

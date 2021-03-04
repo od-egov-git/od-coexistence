@@ -148,13 +148,12 @@
 				value="voucherHeader.vouchermis.functionary.id" style="width:180px" /></td>
 	</s:if>
 	<s:if test="%{shouldShowHeaderField('function')}">
-		<td class="bluebox"><s:text name="voucher.function" /> <s:if
-				test="%{isFieldMandatory('function')}">
+		<td class="bluebox"><s:text name="voucher.function" /> 
 				<span class="bluebox"><span class="mandatory1">*</span></span>
-			</s:if></td>
+			</td>
 		<td class="bluebox"><s:select name="vouchermis.function"
 				id="vouchermis.function" list="dropdownData.functionList"
-				listKey="id" listValue="name" headerKey="-1"
+				listKey="id" listValue="name" headerKey="" 
 				headerValue="%{getText('lbl.choose.options')}" value="%{vouchermis.function.id}" /></td>
 	</s:if>
 

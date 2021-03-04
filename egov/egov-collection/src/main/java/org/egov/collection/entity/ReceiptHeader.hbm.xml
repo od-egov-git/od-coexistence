@@ -105,10 +105,7 @@
 		</property>
 		<property name="createdDate" column="CREATEDDATE" type="timestamp"/>
 		<property name="lastModifiedDate" column="LASTMODIFIEDDATE" type="timestamp" />
-		<many-to-one name="state" class="org.egov.infra.workflow.entity.State"
-			cascade="all">
-			<column name="STATE_ID" />
-		</many-to-one>
+		
 		<property name="createdBy" type="long">
 			<column name="createdBy" />
 		</property>
@@ -224,7 +221,7 @@
     <![CDATA[select receipt from org.egov.collection.entity.ReceiptHeader receipt, org.egov.collection.entity.Challan cl WHERE cl.receiptHeader.id = receipt.id and cl.id = ?]]></query>
     
     <query name="VALIDRECEIPT_BY_CHALLANNO">
-    <![CDATA[select receipt from org.egov.collection.entity.ReceiptHeader as receipt left join receipt.challan as challan where challan.challanNumber=? and challan.state.value='END' and challan.challanDate <= current_date and challan.validUpto >= current_date]]></query>
+    <![CDATA[select receipt from org.egov.collection.entity.ReceiptHeader as receipt left join receipt.challan as challan where challan.challanNumber=?  and challan.challanDate <= current_date and challan.validUpto >= current_date]]></query>
     
     <query name="CHALLANRECEIPT_BY_REFERENCEID">
     <![CDATA[select receipt2 from org.egov.collection.entity.ReceiptHeader as receipt1,org.egov.collection.entity.ReceiptHeader as receipt2 left join receipt2.challan as challan where receipt2.receiptHeader.id=receipt1.id and receipt1.id = ?]]></query>

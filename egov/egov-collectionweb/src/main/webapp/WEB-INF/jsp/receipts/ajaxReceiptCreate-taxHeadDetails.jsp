@@ -54,7 +54,7 @@
     <s:iterator var="s" value="taxHeadMastersList" status="status">
     {"glcodeIdDetail":"<s:property value="%{code}" />",
     "accounthead":"<s:property value="%{name}" />",
-    "creditAmountDetail":"<s:property value='getText(\'format.amount\',{0})' />",
+    "creditAmountDetail":"",
     "amountType":"<s:property value="%{isDebit}" />"
     }<s:if test="!#status.last">,</s:if>
     </s:iterator>       

@@ -90,7 +90,7 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<title>eGov - Application Error</title>
+	<title>MCC - Application Error</title>
 	<link href="<cdn:url value='/resources/global/css/bootstrap/bootstrap.css' context='/services/egi'/>" rel="stylesheet" type="text/css" />
 	<link href="<cdn:url value='/resources/global/css/egov/custom.css?rnd=${app_release_no}' context='/services/egi'/>" rel="stylesheet" type="text/css" />
 	</head>

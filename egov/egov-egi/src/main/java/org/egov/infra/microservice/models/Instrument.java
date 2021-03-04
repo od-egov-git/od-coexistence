@@ -95,8 +95,6 @@ public class Instrument {
     private String instrumentStatus;
 
     private List<InstrumentVoucher> instrumentVouchers = new ArrayList<>();
-    
-    private DishonorReasonContract dishonor;
 
     public String getId() {
         return id;
@@ -280,14 +278,6 @@ public class Instrument {
 
     public void setInstrumentStatus(String instrumentStatus) {
         this.instrumentStatus = instrumentStatus;
-    }
-
-    public DishonorReasonContract getDishonor() {
-        return dishonor;
-    }
-
-    public void setDishonor(DishonorReasonContract dishonor) {
-        this.dishonor = dishonor;
     }
 
 }

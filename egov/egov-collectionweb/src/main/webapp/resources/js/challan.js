@@ -987,6 +987,10 @@ function fillNeibrAfterSplitGlcode(obj)
 		document.getElementById('billDetailslist['+currRow+'].glcodeIdDetail').value=temp[2];
 		document.getElementById('billDetailslist['+currRow+'].glcodeDetail').value=temp[1];
 		check();
+		/*if(obj.value.includes("GST"))
+		{
+		document.getElementById('billDetailslist['+currRow+'].rateDetail').style.visibility="visible";
+		}*/
 	}
 	else if(glcodeId==null || glcodeId=="")
 	{
@@ -1488,7 +1492,7 @@ function  populateService(serviceCategory){
 	populateserviceId({serviceCatId:serviceCategory.options[serviceCategory.selectedIndex].value});	
 }
 
-function loadFinDetails(service){
+/*function loadFinDetails(service){
 
 	var dept = dom.get('deptId').value;
 	var service = dom.get('serviceId').value;
@@ -1506,6 +1510,41 @@ function loadFinDetails(service){
 	var url3 = path+"/receipts/ajaxReceiptCreate-ajaxFinSubledgerByService.action";
 	makeJSONCall(["subledgerCode","glcodeId","detailTypeId","detailTypeName","detailCode","detailKeyId",
 	"detailKey","amount"],url3,{serviceId:service,deptId:dept},loadFinSubledgerSuccessHandler,loadFinSubledgerFailureHandler);
+}*/
+function loadFinDetails(service) {
+
+	var serviceCategory = dom.get('serviceCategoryid').value;
+	var service = dom.get('serviceId') != null ? dom.get('serviceId').value : -1;
+	var selectedService = dom.get('serviceId');
+	var path = '/services/collection';
+//	if (service != "-1" || dept != "-1") {
+//		var url1 = path
+//				+ "/receipts/ajaxReceiptCreate-ajaxFinMiscDtlsByService.action?serviceId="
+//				+ service + "&deptId=" + dept;
+//		var transaction = YAHOO.util.Connect.asyncRequest('POST', url1,
+//				loadMiscDetails, null);
+//	}
+
+	if (serviceCategory != -1 || service != "-1") {
+		service = service != -1 ? serviceCategory+"."+service : serviceCategory;
+		var url2 = path
+				+ "/receipts/ajaxReceiptCreate-ajaxTaxHeadMasterByService.action";
+		makeJSONCall([ "glcodeIdDetail", "accounthead",
+				"creditAmountDetail","amountType" ], url2, {
+			serviceId : service
+		}, loadFinAccSuccessHandler, loadFinAccFailureHandler);
+	}
+
+//	if (service != "-1" || dept != "-1") {
+//		var url3 = path
+//				+ "/receipts/ajaxReceiptCreate-ajaxFinSubledgerByService.action";
+//		makeJSONCall([ "subledgerCode", "glcodeId", "detailTypeId",
+//				"detailTypeName", "detailCode", "detailKeyId", "detailKey",
+//				"amount" ], url3, {
+//			serviceId : service,
+//			deptId : dept
+//		}, loadFinSubledgerSuccessHandler, loadFinSubledgerFailureHandler);
+//	}
 }
 
 var miscArray;
@@ -1634,7 +1673,7 @@ billDetailsTable.addRow({SlNo:billDetailsTable.getRecordSet().getLength()+1,
 updateGrid(VOUCHERDETAILLIST,'creditAmountDetail',0,0);
 totalcramt = 0;          
 billDetailTableIndex = 1;
-for(i=0;i<res.results.length-1;i++){
+for(i=0;i<res.results.length;i++){
 	 billDetailsTable.addRow({SlNo:billDetailsTable.getRecordSet().getLength()+1,
             "glcodeid":res.results[i].glcodeIdDetail,
             "glcode":res.results[i].glcodeDetail,
@@ -1718,4 +1757,37 @@ alert('failure');
 
 function updateGrid(prefix,field,index,value){
 	document.getElementById(prefix+'['+index+'].'+field).value=value;
+}
+
+function createRateFieldFormatter(prefix,suffix,onblurfunction,table){
+    return function(el, oRecord, oColumn, oData) {
+    var rec=billDetailTableIndex;
+	var value = (YAHOO.lang.isValue(oData))?oData:"";
+	el.innerHTML ="<select id='"+prefix+"["+rec+"]"+suffix+"' name='"+prefix+"["+rec+"]"+suffix+"' onchange='updateCreditAmountRate()' style='text-align:right;width:80px;visibility: hidden' maxlength='10' class='form-control patternvalidation text-right' data-pattern='number' ><option value='0'>--Select--</option><option value='0.125'>0.125%</option><option value='0.25'>0.25%</option><option value='1.500'>1.500%</option><option value='1'>1%</option><option value='2'>2%</option><option value='2.50'>2.50%</option><option value='3'>3.00%</option><option value='5'>5%</option><option value='6'>6%</option><option value='9'>9%</option><option value='10'>10%</option><option value='12'>12%</option><option value='14'>14%</option><option value='15'>15%</option><option value='18'>18%</option><option value='20'>20%</option><option value='28'>28%</option><option value='30'>30%</option></select>";
+	}
+}
+
+function updateCreditAmountRate()
+{
+	var amt=0;
+	for(var i=0;i<billDetailTableIndex+1;i++)
+	{
+		if(null != document.getElementById('billDetailslist['+i+'].rateDetail') && document.getElementById('billDetailslist['+i+'].rateDetail').value != 0)
+			{
+				var rate=document.getElementById('billDetailslist['+i+'].rateDetail').value;
+				var rateAmt=(rate*amt)/100;
+				document.getElementById('billDetailslist['+i+'].creditAmountDetail').value=parseFloat(rateAmt);
+				amt=amt+parseFloat(rateAmt);
+			}
+		else if(null != document.getElementById('billDetailslist['+i+'].creditAmountDetail')){
+			var val = document.getElementById('billDetailslist['+i+'].creditAmountDetail').value;
+			if(val=='') val=0;
+			if(val!="" && !isNaN(val))
+			{
+				amt = amt + parseFloat(document.getElementById('billDetailslist['+i+'].creditAmountDetail').value);
+			}
+		}
+	}
+	document.getElementById('totalcramount').value = amt;
+	populatesubledgeramount1();
 }

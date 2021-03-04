@@ -180,6 +180,23 @@
 								list="dropdownData.departmentList" listKey="code" listValue="name"
 								headerKey="" headerValue="----Choose----" /></td>
 					</tr>
+					<tr>
+						<td class="bluebox"><s:text name="scheme" /></td>
+						<td class="bluebox"><s:select 
+						name="schemeId" id="schemeId"	list="dropdownData.schemeList" listKey="id" listValue="name" onchange="getval(this);"
+								headerKey="" headerValue="%{getText('lbl.choose.options')}" /></td>
+						<td class="bluebox"><s:text name="subscheme" /></td>
+						<td class="bluebox"><select id="subschemeId" name="subschemeId" >	
+								<option value=""> ----Choose----</option>
+						</select></td>
+					</tr>
+					<tr>
+						<td class="bluebox"><s:text name="daybook.naration" /></td>
+						<td class="bluebox"><s:textfield id="narrationText"
+								name="narrationText" value="%{narrationText}"/></td>
+						<td class="bluebox">&nbsp;</td>
+						<td class="bluebox">&nbsp;</td>
+					</tr>
 
 				</table>
 				<br />

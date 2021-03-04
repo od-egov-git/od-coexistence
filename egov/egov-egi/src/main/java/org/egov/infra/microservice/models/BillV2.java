@@ -57,6 +57,7 @@ import javax.validation.Valid;
 import org.apache.commons.collections.CollectionUtils;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -75,6 +76,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class BillV2 {
     // TODO some of the fields are mandatory in yml, lets discuss billdetail and billaccountdetail also for more clarity
 
@@ -150,9 +152,6 @@ public class BillV2 {
 
           @JsonProperty("amountPaid")
           private BigDecimal amountPaid;
-          
-          @JsonProperty("fileStoreId")
-          private String fileStoreId;
 
 
 

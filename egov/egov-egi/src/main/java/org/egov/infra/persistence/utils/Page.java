@@ -82,6 +82,22 @@ public class Page<T> {
         }
         this.results = query.list();
     }
+    public Page(Query query, int pageNumber, int pageSize,List<T> list) {
+        int currentPageNo = pageNumber;
+        if (pageNumber < 1) {
+            currentPageNo = 1;
+        }
+
+        this.pageNumber = currentPageNo;
+        if (pageSize > 0) {
+            query.setFirstResult((currentPageNo - 1) * pageSize);
+            query.setMaxResults(pageSize + 1);
+            this.pageSize = pageSize;
+        } else {
+            this.pageSize = -1;
+        }
+        this.results = list;
+    }
 
     public Page(Criteria criteria, int pageNumber, int pageSize) {
         int currentPageNo = pageNumber;

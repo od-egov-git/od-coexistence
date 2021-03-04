@@ -82,11 +82,11 @@
 					<td class="greybox"><s:text name="voucher.type" /></td>
 					<td class="greybox"><s:select name="type" id="type"
 							list="dropdownData.typeList" headerKey="-1"
-							headerValue="%{getText('lbl.choose.options')}"
+							headerValue="----Choose----"
 							onchange="loadVoucherNames(this.value);activeModeOfPayment()" /></td>
 					<td class="greybox"><s:text name="voucher.name" /></td>
 					<td class="greybox"><s:select name="name" id="name"
-							list="%{nameMap}" headerKey="-1" headerValue="%{getText('lbl.choose.options')}" /></td>
+							list="%{nameMap}" headerKey="-1" headerValue="----Choose----" /></td>
 
 				</tr>
 
@@ -95,7 +95,7 @@
 					<td class="bluebox"><s:text name="voucher.modeOfPayment" /></td>
 					<td class="bluebox"><s:select name="modeOfPayment"
 							id="modeOfPayment" list="dropdownData.modeOfPaymentList"
-							headerKey="-1" headerValue="%{getText('lbl.choose.options')}" /></td>
+							headerKey="-1" headerValue="----Choose----" /></td>
 					<td class="bluebox"></td>
 					<td class="bluebox"></td>
 				</tr>
@@ -126,18 +126,18 @@
 					<td style="width: 5%"></td>
 					<td class="greybox"><s:text name="voucher.status" /></td>
 					<td class="greybox"><s:select name="status" id="status"
-							list="%{statusMap}" headerKey="-1" headerValue="%{getText('lbl.choose.options')}"
+							list="%{statusMap}" headerKey="-1" headerValue="----Choose----"
 							value="%{status}" /></td>
 					<td class="greybox"></td>
 					<td class="greybox"></td>
 				</tr>
 			</table>
 			<div class="buttonbottom">
-				<s:submit method="search" key="lbl.search" cssClass="buttonsubmit"
+				<s:submit method="search" value="Search" cssClass="buttonsubmit"
 					onclick="return validateSearch();" />
-				<s:submit method="beforeSearch" key="lbl.reset" cssClass="button"
+				<s:submit method="beforeSearch" value="Reset" cssClass="button"
 					onclick="return resetAndSubmit();" />
-				<input type="button" value="<s:text name='lbl.close'/>"
+				<input type="button" value="Close"
 					onclick="javascript:window.parent.postMessage('close','*');" class="button" />
 
 			</div>
@@ -176,9 +176,6 @@
 									<s:date name="%{#attr.currentRowObject.voucherdate}"
 										format="dd/MM/yyyy" />
 								</display:column>
-								<display:column title="Bank Account" style="text-align:center;">
-									<s:property value="%{#attr.currentRowObject.accountNumber}" />
-								</display:column>	
 								<display:column title="Source" style="text-align:center;">
 									<s:property value="%{#attr.currentRowObject.source}" />
 								</display:column>

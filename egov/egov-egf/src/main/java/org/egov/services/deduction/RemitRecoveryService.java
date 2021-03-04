@@ -193,7 +193,7 @@ public class RemitRecoveryService {
                 dateQry.append(" and vh.VOUCHERDATE <='" + Constants.DDMMYYYYFORMAT1.format(voucherHeader.getVoucherDate()) + "' ");
             query2.append("SELECT vh.NAME,  vh.VOUCHERNUMBER,  vh.VOUCHERDATE, egr.glamt, egr.ID, ");
             query2.append("(select  case when sum(egd.remittedamt) is null then 0 else sum(egd.remittedamt) end from EG_REMITTANCE_GL egr1,eg_remittance_detail egd,eg_remittance  eg,voucherheader vh where vh.status!=4 and  eg.PAYMENTVHID=vh.id and egd.remittanceid=eg.id and egd.REMITTANCEGLID=egr1.id  and egr1.id=egr.id) As col_7_0 , ");
-            query2.append("mis.departmentcode,mis.functionid  ");
+            query2.append("mis.departmentcode,mis.functionid , egr.glid ,vh.description ");
             query2.append("FROM VOUCHERHEADER vh,  VOUCHERMIS mis,  GENERALLEDGER gl,  EG_REMITTANCE_GL egr,  TDS recovery5_ ");
             query2.append("WHERE recovery5_.GLCODEID  =gl.GLCODEID AND gl.id=egr.glid and ");
             query2.append("vh.ID =gl.VOUCHERHEADERID AND mis.VOUCHERHEADERID  =vh.ID AND ");
@@ -471,33 +471,43 @@ public class RemitRecoveryService {
         final List<Object[]> list = searchSQLQuery.list();
         for (final Object[] element : list) {
             remitBean = new RemittanceBean();
-            remitBean.setVoucherName(element[0].toString());
-            remitBean.setVoucherNumber(element[1].toString());
-            try {
-                remitBean.setVoucherDate(DDMMYYYY.format(YYYYMMDD.parse(element[2].toString())));
-            } catch (final ParseException e) {
-                LOGGER.error("Exception Occured while Parsing instrument date" + e.getMessage());
-            }
-            remitBean.setDeductionAmount(BigDecimal.valueOf(Double.parseDouble(element[3].toString())));
-            if (element[5] != null)
-                remitBean.setEarlierPayment(BigDecimal.valueOf(Double.parseDouble(element[5].toString())));
-            else
-                remitBean.setEarlierPayment(BigDecimal.ZERO);
-            if (remitBean.getEarlierPayment() != null && remitBean.getEarlierPayment().compareTo(BigDecimal.ZERO) != 0)
-                remitBean.setAmount(remitBean.getDeductionAmount().subtract(remitBean.getEarlierPayment()));
-            else
-                remitBean.setAmount(remitBean.getDeductionAmount());
-            remitBean.setDepartmentId(element[6].toString());
-            if(element[7]!=null)
-                remitBean.setFunctionId(Long.valueOf(element[7].toString()));
-            if (voucherHeader == null){
-                if (remitBean.getEarlierPayment() != null && remitBean.getEarlierPayment().compareTo(BigDecimal.ZERO) != 0)
-                    remitBean.setPartialAmount(remitBean.getDeductionAmount().subtract(remitBean.getEarlierPayment()));
-                else{
-                    remitBean.setPartialAmount(remitBean.getDeductionAmount());
+            try
+            {
+            	remitBean.setVoucherName(element[0].toString());
+                remitBean.setVoucherNumber(element[1].toString());
+                try {
+                    remitBean.setVoucherDate(DDMMYYYY.format(YYYYMMDD.parse(element[2].toString())));
+                } catch (final ParseException e) {
+                    LOGGER.error("Exception Occured while Parsing instrument date" + e.getMessage());
                 }
-            }
-            remitBean.setRemittance_gl_Id(Integer.valueOf(element[4].toString()));
+                remitBean.setDeductionAmount(BigDecimal.valueOf(Double.parseDouble(element[3].toString())));
+                if (element[5] != null)
+                    remitBean.setEarlierPayment(BigDecimal.valueOf(Double.parseDouble(element[5].toString())));
+                else
+                    remitBean.setEarlierPayment(BigDecimal.ZERO);
+                if (remitBean.getEarlierPayment() != null && remitBean.getEarlierPayment().compareTo(BigDecimal.ZERO) != 0)
+                    remitBean.setAmount(remitBean.getDeductionAmount().subtract(remitBean.getEarlierPayment()));
+                else
+                    remitBean.setAmount(remitBean.getDeductionAmount());
+                remitBean.setDepartmentId(element[6].toString());
+                if(element[7]!=null)
+                    remitBean.setFunctionId(Long.valueOf(element[7].toString()));
+                if (voucherHeader == null){
+                    if (remitBean.getEarlierPayment() != null && remitBean.getEarlierPayment().compareTo(BigDecimal.ZERO) != 0)
+                        remitBean.setPartialAmount(remitBean.getDeductionAmount().subtract(remitBean.getEarlierPayment()));
+                    else{
+                        remitBean.setPartialAmount(remitBean.getDeductionAmount());
+                    }
+                }
+                remitBean.setRemittance_gl_Id(Integer.valueOf(element[4].toString()));
+                if(element[9] != null)
+                {
+                	remitBean.setNaration(element[9].toString());
+                }
+            }catch (Exception e) {
+				e.printStackTrace();
+			}
+            
             listRemitBean.add(remitBean);
         }
     }

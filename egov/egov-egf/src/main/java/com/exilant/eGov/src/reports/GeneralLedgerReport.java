@@ -226,7 +226,7 @@ public class GeneralLedgerReport {
         engineQry = engine.getVouchersListQuery(reBean);
 
         final String query = getQuery(glCode1, startDate, endDate, accEntityId, accEntityKey, reportBean.getFieldId(),
-                reBean.getFunctionId());
+                reBean.getFunctionId(),reBean.getSchemeId());
         final String functionId = reBean.getFunctionId();
         if (LOGGER.isInfoEnabled())
             LOGGER.info("**************QUERY: " + query);
@@ -850,12 +850,14 @@ public class GeneralLedgerReport {
 
     @SuppressWarnings("unchecked")
     private String getQuery(final String glCode1, final String startDate, final String endDate,
-            final String accEntityId, final String accEntityKey, final String fieldId, final String functionId)
+            final String accEntityId, final String accEntityKey, final String fieldId, final String functionId, final String schemeId)
                     throws TaskFailedException {
         String addTableToQuery = "";
         String entityCondition = "";
         String functionCondition = "";
-
+        String schemeCondition ="";
+        System.out.println("functionId  ::: "+functionId);
+        System.out.println("schemeId  ::: "+schemeId);
         if (!accEntityId.equalsIgnoreCase("") && !accEntityKey.equalsIgnoreCase(""))
             entityCondition = " AND gl.id=gldet.generalledgerid  AND gldet.detailtypeid=" + accEntityId
             + " AND cdet.detailtypeid = " + accEntityId + " AND gldet.detailkeyid=" + accEntityKey + "";
@@ -863,6 +865,8 @@ public class GeneralLedgerReport {
             addTableToQuery = ", vouchermis vmis ";
         if (!StringUtils.isEmpty(functionId))
             functionCondition = " and gl.functionid=" + functionId;
+        if (!StringUtils.isEmpty(schemeId))
+        	schemeCondition = " and vmis1.schemeid=" + schemeId;
         if (!accEntityKey.equals(""))
             return "SELECT  gl.glcode as \"code\",(select ca.type from chartofaccounts ca where glcode=gl.glcode) as \"glType\" ,"
             + " vh.id AS \"vhid\",vh.voucherDate AS \"vDate\",TO_CHAR(vh.voucherDate ,'dd-Mon-yyyy') "
@@ -887,9 +891,9 @@ public class GeneralLedgerReport {
             + " as \"creditamount\","
             + " f.name as \"fundName\",vh.isconfirmed as \"isconfirmed\",case when (gldet.generalledgerid=gl.id) "
             + " then gldet.detailkeyid else null end as \"DetailKeyId\",vh.type||'-'||vh.name as \"vouchertypename\" "
-            + " FROM generalLedger gl, voucherHeader vh, chartOfAccounts coa,"
+            + " FROM generalLedger gl, voucherHeader vh, vouchermis vmis1, chartOfAccounts coa,"
             + " generalledgerdetail gldet, chartofaccountdetail cdet ,"
-            + " fund f WHERE coa.glCode = gl.glCode AND gl.voucherHeaderId = vh.id "
+            + " fund f WHERE coa.glCode = gl.glCode AND gl.voucherHeaderId = vh.id AND vmis1.voucherheaderid =vh.id "
             + " and cdet.glcodeid=coa.id "
             + " and gl.glcode='"
             + glCode1
@@ -911,10 +915,10 @@ public class GeneralLedgerReport {
                     + " AS \"amount\", ")
                     .append(" gl.description AS \"narration\", vh.type || '-' || vh.name||CASE WHEN status = 1 THEN '(Reversed)' ELSE (CASE WHEN status = 2 THEN '(Reversal)' ELSE '' END) END AS \"type\", ")
                     .append(" gl.debitamount  AS \"debitamount\", gl.creditamount  AS \"creditamount\",f.name as \"fundName\",  vh.isconfirmed as \"isconfirmed\",gl.functionid as \"functionid\",vh.type||'-'||vh.name as \"vouchertypename\" ")
-                    .append(" FROM generalLedger gl, voucherHeader vh, chartOfAccounts coa,  fund f " + addTableToQuery
-                            + "").append(" WHERE coa.glCode = gl.glCode AND gl.voucherHeaderId = vh.id  ")
+                    .append(" FROM generalLedger gl, voucherHeader vh, vouchermis vmis1, chartOfAccounts coa,  fund f " + addTableToQuery
+                            + "").append(" WHERE coa.glCode = gl.glCode AND gl.voucherHeaderId = vh.id  AND vmis1.voucherheaderid =vh.id ")
                             .append(" AND	f.id=vh.fundid ").append(" AND gl.glcode ='" + glCode1 + "'")
-                            .append(" AND (gl.debitamount>0 OR gl.creditamount>0) ").append(functionCondition)
+                            .append(" AND (gl.debitamount>0 OR gl.creditamount>0) ").append(functionCondition).append(schemeCondition)
                             .append(" and vh.id in (" + engineQry + " )")
                             .append(" group by vh.id,gl.glcode,vh.voucherDate ,vh.voucherNumber,coa.name,gl.description,  vh.type || '-' || vh.name||CASE WHEN status = 1 THEN '(Reversed)' ELSE (CASE WHEN status = 2 THEN '(Reversal)' ELSE '' END) END, gl.debitamount , gl.creditamount  ,f.name, vh.isconfirmed, vh.type  ||'-'  ||vh.name, gl.functionid   ")
                             .append(" order by \"code\",\"vDate\" ");

@@ -73,6 +73,7 @@ public class BankAdviceReportInfo {
     private String paymentDate;
     private BigDecimal dtId;
     private BigDecimal dkId;
+    private Long instType;
 
     public BigDecimal getDtId() {
         return dtId;
@@ -217,5 +218,13 @@ public class BankAdviceReportInfo {
     public void setVhId(final BigDecimal vhId) {
         this.vhId = vhId;
     }
+
+	public Long getInstType() {
+		return instType;
+	}
+
+	public void setInstType(Long instType) {
+		this.instType = instType;
+	}
 
 }

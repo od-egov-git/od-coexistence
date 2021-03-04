@@ -101,6 +101,8 @@ public class GeneralLedgerBean
     private String deptId;
     private String vhId;
     private String subLedgerTypeName;
+    private String schemeId;
+    private String narrationText;
 
     public String getVoucherName() {
         return voucherName;
@@ -842,5 +844,21 @@ public class GeneralLedgerBean
     public void setFunctionId(String functionId) {
         this.functionId = functionId;
     }
+
+	public String getSchemeId() {
+		return schemeId;
+	}
+
+	public void setSchemeId(String schemeId) {
+		this.schemeId = schemeId;
+	}
+
+	public String getNarrationText() {
+		return narrationText;
+	}
+
+	public void setNarrationText(String narrationText) {
+		this.narrationText = narrationText;
+	}
 
 }

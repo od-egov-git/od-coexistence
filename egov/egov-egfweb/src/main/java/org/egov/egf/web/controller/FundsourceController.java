@@ -55,6 +55,8 @@ import javax.validation.Valid;
 import org.egov.commons.Fundsource;
 import org.egov.commons.service.FundsourceService;
 import org.egov.egf.web.adaptor.FundsourceJsonAdaptor;
+import org.egov.infra.config.core.ApplicationThreadLocals;
+import org.egov.infra.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.http.MediaType;
@@ -88,7 +90,7 @@ public class FundsourceController {
 		model.addAttribute("fundsources", fundsourceService.findAll());
 	}
 
-	@RequestMapping(value = "/new", method = RequestMethod.GET)
+	@RequestMapping(value = "/new", method = RequestMethod.POST)
 	public String newForm(final Model model) {
 		prepareNewForm(model);
 		model.addAttribute("fundsource", new Fundsource());
@@ -123,6 +125,8 @@ public class FundsourceController {
 			prepareNewForm(model);
 			return FUNDSOURCE_EDIT;
 		}
+		fundsource.setLastModifiedDate(DateUtils.now());
+		fundsource.setLastModifiedBy(ApplicationThreadLocals.getUserId());
 		fundsourceService.update(fundsource);
 		redirectAttrs.addFlashAttribute("message",
 				messageSource.getMessage("msg.fundsource.success", null, Locale.ENGLISH));
@@ -144,7 +148,7 @@ public class FundsourceController {
 		return FUNDSOURCE_RESULT;
 	}
 
-	@RequestMapping(value = "/search/{mode}", method = RequestMethod.GET)
+	@RequestMapping(value = "/search/{mode}", method = RequestMethod.POST)
 	public String search(@PathVariable("mode") final String mode, final Model model) {
 		final Fundsource fundsource = new Fundsource();
 		prepareNewForm(model);

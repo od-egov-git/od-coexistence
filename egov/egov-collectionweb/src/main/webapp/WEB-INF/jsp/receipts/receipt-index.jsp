@@ -67,37 +67,16 @@
 			<font size="2" color="red"><b>
 			<s:if test="target=='view'">
 				<div align="center"><s:text name="billreceipt.payement.confirmatiommessage"/></div>
-			</s:if>		
-			<s:else >
-				<div align="center"><s:text name="billreceipt.cancel.confirmatiommessage"/></div>
-			</s:else>
+			</s:if>	
+			<s:if test="target=='alreadyCancelled'">
+				<div align="center"><s:text name="billreceipt.already.confirmatiommessage"/></div>
+			</s:if>
+			<s:if test="target=='noAccess'">
+				<div align="center"><s:text name="billreceipt.noaccess.confirmatiommessage"/></div>
+			</s:if>			
+			
 			</b></font>
 		</tr>
-		<s:iterator value="%{receiptHeaderValues}"> 
-		<tr>
-			<s:if test="%{receipttype=='B'}">
-			<th class="bluebgheadtd" width="20%" ><s:text name="billreceipt.billnumber.confirmation"/></th>
-			</s:if>
-			<s:if test="%{receipttype=='C'}">
-			<th class="bluebgheadtd" width="20%" ><s:text name="billreceipt.challannumber.confirmation"/></th>
-			</s:if>
-			
-			<th class="bluebgheadtd" width="30%" ><s:text name="billreceipt.receiptnumber.confirmation"/></th>
-			<th class="bluebgheadtd" width="25%" ><s:text name="billreceipt.receiptdate.confirmation"/></th>
-			<th class="bluebgheadtd" width="25%" ><s:text name="billreceipt.receiptstatus.confirmation"/></th>
-		</tr>
-		<tr>
-			<s:if test="%{receipttype=='B'}">
-			<td class="blueborderfortd"><div align="center"><s:property value="%{referencenumber}" /></div></td>
-			</s:if>
-			<s:if test="%{receipttype=='C'}">
-			<td class="blueborderfortd"><div align="center"><s:property value="%{challan.challanNumber}" /></div></td>
-			</s:if>
-			<td class="blueborderfortd"><div align="center"><s:property value="%{receiptnumber}" /></div></td>
-			<td class="blueborderfortd"><div align="center"><s:date name="createdDate" var="cdFormat" format="dd/MM/yyyy"/><s:property value="%{cdFormat}" /></div></td>
-			<td class="blueborderfortd"><div align="center"><s:property value="%{status.description}" /></div></td>
-		</tr>
-		</s:iterator>
 	</table></td>
 </table>
 <br/>

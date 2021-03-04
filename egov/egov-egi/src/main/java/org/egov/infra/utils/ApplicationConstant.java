@@ -71,8 +71,8 @@ public final class ApplicationConstant {
     public static final String CITY_REGION_NAME_KEY = "cityRegion";
     public static final String CITY_GOOGLE_API_KEY = "googleApiKey";
 
-    public static final String CITY_LOGO_URL = "%s/egi/downloadfile/logo";
-    public static final String CITY_LOGIN_URL = "%s/egi/login/secure";
+    public static final String CITY_LOGO_URL = "%s/services/egi/downloadfile/logo";
+    public static final String CITY_LOGIN_URL = "%s/services/egi/login/secure";
     public static final String CITY_LOGO_URL_REPLACE_KEY="tenantid";
 
     public static final String CDN_ATTRIB_NAME = "cdn";
@@ -112,6 +112,11 @@ public final class ApplicationConstant {
     public static final String COMMA = ",";
     public static final String UNKNOWN = "Unknown";
 
+    public static final String DEPARTMENT_CACHE_NAME = "egi-department";
+    public static final String DESIGNATION_CACHE_NAME = "egi-designation";
+    public static final String MODULE_GENERIC="Generic";
+    public static final String MODULE_AGENDA="Agenda";
+    public static final String MODULE_FINANCE="Finance";
 
     private ApplicationConstant() {
     }

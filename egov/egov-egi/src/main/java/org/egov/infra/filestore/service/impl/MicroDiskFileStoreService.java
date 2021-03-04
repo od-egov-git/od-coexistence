@@ -88,19 +88,15 @@ public class MicroDiskFileStoreService implements FileStoreService {
 
     public FileStoreMapper storeFiles(List<MultipartFile> files, InputStream fileStream, String fileName,
             String mimeType, String moduleName, boolean closeStream) {
-        try {
-            StorageResponse storageRes = microserviceUtils.getFileStorageService(files, moduleName);
-            FileStoreMapper fileMapper = null;
-            List<FileReq> filesList = storageRes.getFiles();
-            for (FileReq filesId : filesList) {
-                fileMapper = new FileStoreMapper(filesId.getFileStoreId(), fileName);
-                fileMapper.setContentType(mimeType);
-            }
+        StorageResponse storageRes =null/* microserviceUtils.getFileStorageService(files, moduleName)*/;
+		FileStoreMapper fileMapper = null;
+		List<FileReq> filesList = storageRes.getFiles();
+		for (FileReq filesId : filesList) {
+		    fileMapper = new FileStoreMapper(filesId.getFileStoreId(), fileName);
+		    fileMapper.setContentType(mimeType);
+		}
 
-            return fileMapper;
-        } catch (IOException e) {
-            throw new ApplicationRuntimeException(String.format(FILE_STORE_ERROR, getCityCode(), moduleName), e);
-        }
+		return fileMapper;
 
     }
 
@@ -135,20 +131,16 @@ public class MicroDiskFileStoreService implements FileStoreService {
 
     public FileStoreMapper storeFiles(List<MultipartFile> files, String fileName, String mimeType, String moduleName,
             boolean deleteFile) {
-        try {
-            StorageResponse storageRes = microserviceUtils.getFileStorageService(files, moduleName);
-            FileStoreMapper fileMapper = null;
+        StorageResponse storageRes = null /*microserviceUtils.getFileStorageService(files, moduleName)*/;
+		FileStoreMapper fileMapper = null;
 
-            List<FileReq> filesList = storageRes.getFiles();
-            for (FileReq filesId : filesList) {
-                fileMapper = new FileStoreMapper(filesId.getFileStoreId(), fileName);
-                fileMapper.setContentType(mimeType);
-            }
-            
-            return fileMapper;
-        } catch (IOException e) {
-            throw new ApplicationRuntimeException(String.format(FILE_STORE_ERROR, getCityCode(), moduleName), e);
-        }
+		List<FileReq> filesList = storageRes.getFiles();
+		for (FileReq filesId : filesList) {
+		    fileMapper = new FileStoreMapper(filesId.getFileStoreId(), fileName);
+		    fileMapper.setContentType(mimeType);
+		}
+		
+		return fileMapper;
     }
 
     @Override
@@ -207,7 +199,7 @@ public class MicroDiskFileStoreService implements FileStoreService {
     }
 
     public Path fetchAsDigitPath(String fileStoreId,String moduleName) {
-        ResponseEntity<byte[]> responseEntity = microserviceUtils.fetchFilesFromDigitService(fileStoreId);
+        ResponseEntity<byte[]> responseEntity = /*microserviceUtils.fetchFilesFromDigitService(fileStoreId)*/null;
         Path fileDirPath = Paths.get(fileStoreId);
         Path path = null;
         try {
@@ -220,7 +212,7 @@ public class MicroDiskFileStoreService implements FileStoreService {
     }
 
     public File fetchDigitFilestore(String fileStoreId) throws IOException {
-        ResponseEntity<byte[]> responseEntity = microserviceUtils.fetchFilesFromDigitService(fileStoreId);
+        ResponseEntity<byte[]> responseEntity = /*microserviceUtils.fetchFilesFromDigitService(fileStoreId)*/null;
         Path fileDirPath = this.getFileDirectoryPath("EGF");
         Path path = Files.write(Paths.get(fileDirPath + separator + fileStoreId), responseEntity.getBody());
 

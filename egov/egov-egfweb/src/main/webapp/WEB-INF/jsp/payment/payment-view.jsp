@@ -63,7 +63,8 @@
 	src="/services/EGF/resources/javascript/tabber2.js?rnd=${app_release_no}"></script>
 <script type="text/javascript"
 	src="<cdn:url value='/resources/global/js/egov/inbox.js?rnd=${app_release_no}' context='/services/egi'/>"> </script>
-
+<script type="text/javascript"
+	src="${pageContext.request.contextPath}/resources/javascript/voucherHelper.js?rnd=${app_release_no}"></script>
 
 <script>
 function fetchDeptId() {
@@ -95,11 +96,23 @@ function openVoucher(vid)
 	var url = "/services/EGF/voucher/preApprovedVoucher-loadvoucherview.action?vhid="+ vid;
 	window.open(url,'','width=900, height=700');
 }
+function openBudgetDtls()
+{
+	vhId=document.getElementById('pId').value;
+	if(vhId != null && vhId != '')
+	{
+	var today = new Date();
+	var date = today.getDate()+'/'+(today.getMonth()+1)+'/'+today.getFullYear();
+	var url1 = '/services/EGF/report/budgetVarianceReport-loadData.action?asOnDate='+date+'&vtype=bpw&vhId='+vhId;
+	window.open(url1,'Source','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700')
+	}
+	
+	}
 </script>
 
 </head>
 
-<body >
+<body onload="loadVoucherDate();">
 	<br>
 	<s:form action="payment" theme="simple">
 		<s:push value="model">
@@ -154,14 +167,24 @@ function openVoucher(vid)
 																<td class="greybox">&nbsp;</td>
 																<s:if test="%{shouldShowHeaderField('department')}">
 																	<td class="greybox"><strong><s:text
-																				name="voucher.department" /></strong></td>
-																	<td class="greybox"><s:property value="%{getMasterName('department')}" /></td>
+																				name="voucher.department" /></strong> <s:if
+																			test="%{isFieldMandatory('department')}">
+																			<span class="bluebox"><span class="mandatory1">*</span></span>
+																		</s:if></td>
+																	<%--<td class="greybox"><s:property value="%{getMasterName('department')}" /></td>--%>
+																	
+																	<td class="greybox"><s:select name="department"
+																			id="department" list="dropdownData.departmentList"
+																			listKey="code" listValue="name" headerKey="-1"
+																			headerValue="%{getText('lbl.choose.options')}"
+																			value="%{paymentheader.voucherheader.vouchermis.departmentcode}" /></td>
 																</s:if>
 																<s:if test="%{shouldShowHeaderField('functionary')}">
 																	<td class="greybox"><strong><s:text
 																				name="voucher.functionary" /></strong></td>
 																	<td class="greybox" colspan="2"><s:property
-																			value="%{paymentheader.voucherheader.vouchermis.functionary.name}" /></td>
+																			value="%{paymentheader.voucherheader.vouchermis.functionary.name}" /></td>--%>
+																			
 																</s:if>
 															</tr>
 															<tr>
@@ -181,7 +204,7 @@ function openVoucher(vid)
 															</tr>
 															<tr>
 																<td class="greybox">&nbsp;</td>
-																<s:if test="%{shouldShowHeaderField('function')}">
+																<%--<s:if test="%{shouldShowHeaderField('function')}">
 																	<td class="greybox"><strong><s:text
 																				name="voucher.function" /></strong> <s:if
 																			test="%{isFieldMandatory('function')}">
@@ -191,8 +214,25 @@ function openVoucher(vid)
 																			name="paymentheader.voucherheader.vouchermis.function.name" />
 																		<s:property
 																			value="%{paymentheader.voucherheader.vouchermis.function.name}" /></td>
+																</s:if>--%>
+                                                                <s:if test="%{shouldShowHeaderField('function')}">
+																	<td class="greybox"><strong><s:text
+																				name="voucher.function" /></strong> <s:if
+																			test="%{isFieldMandatory('function')}">
+																			<span class="mandatory1">*</span>
+																		</s:if></td>
+																	<td class="greybox"><s:select name="function"
+																			id="function" list="dropdownData.functionList"
+																			listKey="id" listValue="name" headerKey="-1"
+																			headerValue="%{getText('lbl.choose.options')}"
+																			value="%{paymentheader.voucherheader.vouchermis.function.id}" />
+																		<%--  <s:property
+																		value="%{billregister.egBillregistermis.function.name}" /> --%></td>
 																</s:if>
-
+																<s:else>
+																	<td class="greybox">
+																	<td class="greybox">
+																</s:else>     
 
 																<s:if test="%{shouldShowHeaderField('field')}">
 																	<td class="greybox"><strong><s:text
@@ -207,13 +247,19 @@ function openVoucher(vid)
 																			name="payment.voucherno" /></strong></td>
 																<td class="bluebox"><s:property
 																		value="%{paymentheader.voucherheader.voucherNumber}" /></td>
-																<td class="bluebox"><strong><s:text
-																			name="payment.voucherdate" /></strong></td>
-																<td class="bluebox"><s:date
+																<td class="bluebox"><s:text
+																		name="payment.voucherdate" /><span class="mandatory1">*</span></td>
+																<%--><td class="bluebox"><s:date
 																		name="%{paymentheader.voucherheader.voucherDate}"
-																		format="dd/MM/yyyy" /></td>
+																		format="dd/MM/yyyy" /></td>--%>
+																		<td class="greybox"><s:textfield
+																		id="voucherdate" name="voucherdate"
+																		value="%{paymentheader.voucherheader.voucherDate}" format="dd/MM/yyyy"
+																		onkeyup="DateFormat(this,this.value,event,false,'3')"																		
+																		class="form-control datepicker"
+																		data-inputmask="'mask': 'd/m/y'" /></td>
 															</tr>
-															<tr>
+															<%--<tr>
 																<td class="greybox">&nbsp;</td>
 																<td class="greybox"><strong><s:text
 																			name="payment.bank" /></strong></td>
@@ -229,13 +275,79 @@ function openVoucher(vid)
 																<td class="bluebox" width="15%"><strong><s:text
 																			name="payment.balance" />(Rs)</strong></td>
 																<td class="bluebox" colspan="4"><span id="balance" /></td>
+															</tr>--%>
+															<s:if test='%{paymentheader.type.equalsIgnoreCase("TNEB")}'>
+																<tr>
+																	<td class="bluebox">&nbsp;</td>
+																	<td class="bluebox"><s:text name="payment.bank" /><span
+																		class="mandatory1">*</span></td>
+																	<td class="bluebox"><s:property
+																			value="%{paymentheader.bankaccount.bankbranch.bank.name+'-'+paymentheader.bankaccount.bankbranch.branchname}" /></td>
+																	<td class="bluebox"><s:text
+																			name="payment.bankaccount" /><span
+																		class="mandatory1">*</span></td>
+																	<td class="bluebox"><s:property
+																			value="%{paymentheader.bankaccount.accountnumber+'---'+paymentheader.bankaccount.bankbranch.bank.name}" /></td>
+																	<s:hidden name="bankbranch" id="bankbranch" />
+																	<s:hidden name="bank_branch" id="bank_branch" /> 
+																	<s:hidden name="bank_account" id="bank_account" />
+																	<s:hidden name="bankaccount" id="bankaccount" />
 															</tr>
+															</s:if>
+															<s:else>
 															<tr>
 																<td class="bluebox">&nbsp;</td>
+																	<td class="bluebox"><s:text name="payment.bank" /><span
+																		class="mandatory1">*</span></td>
+																	<td class="bluebox"><s:select name="bankbranch"
+																			id="bankbranch" list="dropdownData.bankbranchList"
+																			listKey="id" listValue="bank.name+'-'+branchname"
+																			headerKey="-1" headerValue="%{getText('lbl.choose.options')}"
+																			onchange="loadBankAccount(this)"
+																			value="%{paymentheader.bankaccount.bankbranch.id}" /></td>
+																	<egov:ajaxdropdown id="bankaccount"
+																		fields="['Text','Value']" dropdownId="bankaccount"
+																		url="voucher/common-ajaxLoadBankAccounts.action" />
+																	<td class="bluebox"><s:text
+																			name="payment.bankaccount" /><span
+																		class="mandatory1">*</span></td>
+																	<td class="bluebox" colspan="2"><s:select
+																			name="bankaccount" id="bankaccount"
+																			list="dropdownData.bankaccountList" listKey="id"
+																			listValue="accountnumber+'---'+accounttype"
+																			headerKey="-1" headerValue="%{getText('lbl.choose.options')}"
+																			onChange="populateAvailableBalance(this);"
+																			value="%{paymentheader.bankaccount.id}" /></td>
+																	<egov:updatevalues id="availableBalance"
+																		fields="['Text']"
+																		url="payment/payment-ajaxGetAccountBalance.action" />
+																</tr>
+																<tr id="bankbalanceRow">
+																	<td class="bluebox">&nbsp;</td>
+																	<td class="bluebox"><s:text
+																				name="bank.onlinelink" /></td>
+																	<td class="bluebox"><a id="onlineLink" href="#" target="_blank" style="font-size: 15px;">Click</a></td>
 																<td class="bluebox" width="15%"><strong><s:text
+																				name="payment.balance" />(Rs)</strong></td>
+																	<td class="bluebox" colspan="4"><s:textfield
+																			name="availableBalance" id="availableBalance" value="%{balance}"
+																			readonly="true" style="text-align:right" /></td>
+																</tr>
+																
+															</s:else>
+	
+															<tr>
+																<td class="bluebox">&nbsp;</td>
+																<%--<td class="bluebox" width="15%"><strong><s:text
 																			name="payment.narration" /></strong></td>
 																<td class="bluebox" colspan="4"><s:property
-																		value="%{paymentheader.voucherheader.description}" /></td>
+																		value="%{paymentheader.voucherheader.description}" /></td>--%>
+																		<td class="greybox" width="15%"><s:text
+																		name="payment.narration" /><span
+																		class="mandatory1">*</span></td>
+																<td class="greybox" colspan="4"><s:textarea
+																		name="description" id="description"  cols="70" rows="4"
+																		onblur="checkLength(this)" value="%{paymentheader.voucherheader.description}" /></td>
 															</tr>
 															<tr>
 																<td class="greybox">&nbsp;</td>
@@ -247,6 +359,7 @@ function openVoucher(vid)
 																	</s:if> <s:else>
 																		<s:text name="%{paymentheader.type}" />
 																	</s:else></td>
+																	<s:hidden name="billSubType" id="billSubType" value="%{billSubType}" />
 																<td class="greybox"><strong><s:text
 																			name="payment.amount" />(Rs)</strong></td>
 																<td class="greybox" colspan="2"><span
@@ -258,9 +371,15 @@ function openVoucher(vid)
 																<td class="bluebox">&nbsp;</td>
 																<td class="bluebox"><strong>Comments</strong></td>
 																<td class="bluebox" colspan="4"><s:textarea
-																		name="comments" id="comments" cols="100" rows="3"
+																		name="comments" id="comments" cols="100" rows="3" readonly="true"
 																		onblur="checkLength(this)" value="%{getComments()}" /></td>
 															</tr>
+															<tr>
+																<td class="bluebox">&nbsp;</td>
+																<td class="bluebox"><strong>Budget Details</strong></td>
+																<td class="bluebox" colspan="4"><a href="#" onclick="openBudgetDtls('<s:property value='%{billVoucherHeader.id}'/>')">Click</a></td>
+															</tr>
+															
 														</table> 
 
 													</span>
@@ -346,9 +465,12 @@ function openVoucher(vid)
 																					class="blueborderfortdnew"><strong>Grand
 																						Total</strong></td>
 																				<td style="text-align: right"
-																					class="blueborderfortdnew"><fmt:formatNumber
-																						value="${totalAmt}" pattern="#0.00" /></td>
+																					class="blueborderfortdnew"><input type="text" name="grandTotal"
+																							id="grandTotal"
+																							value='<fmt:formatNumber value='${totalAmt}' pattern='#0.00' />'
+																							style="text-align: right" readonly /></td>
 																			</tr>
+																			
 																		</table>
 																	</div>
 																</td>
@@ -356,13 +478,13 @@ function openVoucher(vid)
 														</table>
 													</span>
 												</div>
-												<div class="tabbertab" id="viewtab">
-													<h2>Cheque Details</h2>
+												<!-- <div class="tabbertab" id="viewtab"> -->
+													<h3>Payment Details</h3>
 													<span>
 														<table align="center" border="0" cellpadding="0"
 															cellspacing="0" class="newtable">
 															<tr>
-																<td colspan="6"><div class="subheadsmallnew">Cheque
+																<td colspan="6"><div class="subheadsmallnew">Payment
 																		Details</div></td>
 															</tr>
 															<tr>
@@ -378,17 +500,25 @@ function openVoucher(vid)
 																					<th class="bluebgheadtdnew">Cheque Date
 																					</td>
 																				</s:if>
-																				<s:else>
+																				<s:if
+																					test="%{paymentheader.type == 'pex' || paymentheader.type == 'PEX' || paymentheader.type == 'Pex'}">
+																					<th class="bluebgheadtdnew">PEX Number
+																					</td>
+																					<th class="bluebgheadtdnew">PEX Date
+																					</td>
+																				</s:if>
+																				<s:if
+																					test="%{paymentheader.type == 'rtgs' || paymentheader.type == 'RTGS' || paymentheader.type == 'Rtgs' paymentheader.type == 'advice'}">
 																					<th class="bluebgheadtdnew">RTGS Number
 																					</td>
 																					<th class="bluebgheadtdnew">RTGS Date
 																					</td>
-																				</s:else>
+																				</s:if>
 																				<th class="bluebgheadtdnew">Party Code
 																				</td>
-																				<th class="bluebgheadtdnew">Cheque Amount(Rs)
+																				<th class="bluebgheadtdnew"> Amount(Rs)
 																				</td>
-																				<th class="bluebgheadtdnew">Cheque Status
+																				<th class="bluebgheadtdnew"> Status
 																				</td>
 																			</tr>
 																			<s:if test="%{instrumentHeaderList.size>0}">
@@ -429,8 +559,7 @@ function openVoucher(vid)
 																		</table>
 																		<s:if
 																			test="%{instrumentHeaderList==null || instrumentHeaderList.size==0}">
-																			<div class="bottom" align="center">No Cheque
-																				Details Found !</div>
+																			<div class="bottom" align="center">No Details Found !</div>
 																		</s:if>
 																	</div>
 																</td>
@@ -448,8 +577,10 @@ function openVoucher(vid)
 					</tr>
 				</table>
 			</div>
+			
 			<div class="buttonbottom" id="buttondiv">
-				<s:hidden name="paymentid" value="%{paymentheader.id}" />
+			<%@ include file='../workflow/commonworkflowhistory.jsp'%>
+				<s:hidden id="pId" name="paymentid" value="%{paymentheader.id}" />
 				<s:hidden name="actionname" id="actionName" value="%{action}" />
 				<s:hidden name="finanicalYearAndClosedPeriodCheckIsClosed" id="finanicalYearAndClosedPeriodCheckIsClosed" value="%{finanicalYearAndClosedPeriodCheckIsClosed}" />
 				<s:if test="%{mode!='view'}">
@@ -474,6 +605,7 @@ function openVoucher(vid)
 			</div>
 
 			<script>
+			
 		document.getElementById('paymentAmountspan').innerHTML = "<fmt:formatNumber value='${totalAmt}' pattern='#0.00'/>";
 		if('<%=request.getParameter("paymentid")%>'==null || '<%=request.getParameter("paymentid")%>'=='null'){
 			//document.getElementById('backbtnid').style.display='inline';
@@ -482,6 +614,15 @@ function openVoucher(vid)
 		else{
 			//document.getElementById('backbtnid').style.display='none';
 			document.getElementById('printPreview').disabled=false;
+		}
+		function loadVoucherDate()
+		{
+			var voucherDate = "";
+			voucherDate='<s:date
+			name="%{paymentheader.voucherheader.voucherDate}"
+			format="dd/MM/yyyy" />';
+			document.getElementById('voucherdate').value =voucherDate;
+			
 		}
 			
 		function checkLength(obj)
@@ -506,6 +647,92 @@ function openVoucher(vid)
 			if(document.getElementById('wfBtn1'))
 				document.getElementById('wfBtn1').style.display='none';
 		}
+          
+		function loadBankAccount(obj)
+		{
+			var selectedBranchId=document.getElementById('bankbranch').value;
+			//alert("selectedBranchId:"+selectedBranchId);
+			document.getElementById("onlineLink").href='#';
+			<s:iterator value="bankBranchList">
+				var branchIdFromList='<s:property value="id"/>';
+				if(branchIdFromList == selectedBranchId)
+					{
+						var link = '<s:property value="bank.onlinelink"/>';
+						document.getElementById("onlineLink").href=link;
+					}
+			</s:iterator>
+			var fund = 0;
+			//alert("fund name::"+'<s:property value="%{paymentheader.voucherheader.fundId.name}"/>');
+			//alert("fund id::"+'<s:property value="%{paymentheader.voucherheader.fundId.id}"/>');
+			<s:if test="%{shouldShowHeaderField('fund')}">
+				fund = <s:property value="%{paymentheader.voucherheader.fundId.id}"/>;
+			</s:if>
+			var vTypeOfAccount = '<s:property value="%{typeOfAccount}"/>';
+			var billSubType = '<s:property value="%{billSubType}"/>';
+			populatebankaccount({branchId:obj.options[obj.selectedIndex].value+'&date='+new Date(), typeOfAccount:vTypeOfAccount,fundId:fund,billSubType:billSubType} );
+			//populatebankaccount({branchId:obj.options[obj.selectedIndex].value+'&date='+new Date()});
+		}
+		function calcGrandTotal(obj)
+		{
+			var vBillListSize = document.getElementById('billListSize').value;
+			var index = obj.id.substring(10,obj.id.length);
+			var putBackAmount = parseFloat(document.getElementById('payableAmt'+index).value);
+			var paymentAmount = obj.value;
+			if(paymentAmount == '' || isNaN(paymentAmount)) {
+				bootbox.alert('<s:text name="msg.payment.amount.should.be.numeric.value"/> ');
+				obj.value = putBackAmount.toFixed(vFixedDecimal);
+			}
+			
+			if(paymentAmount > parseFloat(document.getElementById('payableAmt'+index).value) ) {
+				bootbox.alert('<s:text name="msg.payment.should.not.be.greater.than.payable.amount"/>');
+				obj.value = putBackAmount.toFixed(vFixedDecimal);
+			}
+			
+			paymentAmount = obj.value;
+			var vFinalGrandTotal = 0;
+			obj.value = parseFloat(paymentAmount).toFixed(vFixedDecimal);
+			for(var i = 0; i < vBillListSize; i++) {
+				if(index == i) vFinalGrandTotal += parseFloat(paymentAmount);
+				else vFinalGrandTotal += parseFloat(document.getElementById('paymentAmt'+i).value);
+			}
+			document.getElementById('grandTotal').value = vFinalGrandTotal.toFixed(vFixedDecimal);
+			document.getElementById('paymentAmountspan').innerHTML = document.getElementById('grandTotal').value;
+		}
+
+
+		function populateAvailableBalance(accnumObj) 
+		{
+					if (document.getElementById('voucherdate').value == '') {
+						bootbox.alert("<s:text name='msg.please.select.voucher.date'/>");
+						accnumObj.options.value = -1;
+						return;
+					}
+					if (accnumObj.options[accnumObj.selectedIndex].value == -1)
+						document.getElementById('availableBalance').value = '';
+					else
+						populateavailableBalance({
+							bankaccount : accnumObj.options[accnumObj.selectedIndex].value,
+							voucherDate : document.getElementById('voucherdate').value
+									+ '&date=' + new Date()
+						});
+
+		}
+		var callback = {
+				success : function(o) {
+				console.log("success");
+				document.getElementById('availableBalance').value = o.responseText;
+				},
+				failure : function(o) {
+					console.log("failed");
+				}
+		}
+			
+		/*function onLoad(){
+			if (jQuery("#bankBalanceCheck") == null || jQuery("#bankBalanceCheck").val() == "") {
+				disableForm();
+			}
+		}*/
+		
 		function balanceCheck(obj, name, value)
 		{
 			
@@ -527,10 +754,93 @@ function openVoucher(vid)
 		}
 		function onSubmit()
 		{
-					document.forms[0].action='${pageContext.request.contextPath}/payment/payment-sendForApproval.action';
-		    		document.forms[0].submit();
-		    		return false;					
+
+		var balanceCheckMandatory='<s:text name="payment.mandatory"/>';
+		var balanceCheckWarning='<s:text name="payment.warning"/>';
+		var noBalanceCheck='<s:text name="payment.none"/>';
+
+		if(document.getElementById('department').value=='-1')
+		{
+		bootbox.alert("<s:text name='msg.please.select.department'/>");
+
+		return false;
 		}
+
+
+
+		if(document.getElementById('voucherdate').value=='')
+		{
+		bootbox.alert("<s:text name='msg.please.select.voucher.date'/>");
+
+		return false;
+		}
+		if(document.getElementById('description') == null || document.getElementById('description').value == '')
+		{
+		bootbox.alert("<s:text name='msg.please.select.voucher.narration'/>");
+
+		return false;
+		}
+		if(document.getElementById('billSubType').value!='TNEB')
+		{
+		if(document.getElementById('bankbranch').options[document.getElementById('bankbranch').selectedIndex].value==-1)
+		{
+		bootbox.alert("<s:text name='msg.please.select.bank'/>");
+
+		return false;
+		}
+		if(document.getElementById('bankaccount').options[document.getElementById('bankaccount').selectedIndex].value==-1)
+		{
+		bootbox.alert("<s:text name='msg.please.select.bank.account'/>");
+
+		return false;
+		}
+		}
+
+		if(document.getElementById('grandTotal').value==0 || document.getElementById('grandTotal').value=='NaN')
+		{
+		bootbox.alert('<s:text name="msg.payment.amount.should.be.greater.than.zero"/>');
+		document.getElementById('tabber1').onclick();
+
+		return false;
+		}
+
+		document.forms[0].action='${pageContext.request.contextPath}/payment/payment-sendForApproval.action';
+		    document.forms[0].submit();
+		    return false;
+		   
+
+					/*}*/
+		}	
+		/*function balanceCheck() {
+
+			if (document.getElementById('availableBalance')) {
+				console.log("ins did");
+				console.log(parseFloat(document.getElementById('grandTotal').value));
+				console.log(parseFloat(document.getElementById('availableBalance').value));
+				
+				if(parseFloat(document.getElementById('grandTotal').value)>parseFloat(document.getElementById('availableBalance').value))
+				{
+					console.log("ins 44");
+					return false;
+				}
+		}
+			return true;
+		} */
+		/*function billIdsToPaymentAmountsMap(billTypeObj,id){
+			alert("popoulate bill");
+			var length = 0;
+				length = <s:property value="%{billList.size()}"/>;
+			alert("bill length::"+length);
+			var selectedRowsArr = new Array();
+			for(var index=0;index<length;index++){
+					selectedRowsArr.push(
+				document.getElementsByName(billTypeObj+"["+index+"].csBillId")[0].value+":"+
+				document.getElementsByName(billTypeObj+"["+index+"].paymentAmt")[0].value);
+				}
+			document.getElementById(id).value = selectedRowsArr;
+			//disableSelectedRows();
+		}*/
+
 		function validateAppoveUser(name,value){
 			document.getElementById('lblError').innerHTML ="";
 			document.getElementById("actionName").value= name;

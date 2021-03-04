@@ -54,18 +54,19 @@
 	<div class="buttonbottom">
 		<s:text name="report.export.options" />
 		: <a
-			href='/services/EGF/report/incomeExpenditureReport-generateDetailCodeXls.action?showDropDown=false&model.period=<s:property value="model.period"/>&model.currency=<s:property value="model.currency"/>&model.financialYear.id=<s:property value="model.financialYear.id"/>&model.fund.id=<s:property value="model.fund.id"/>&model.department.id=<s:property value="model.department.id"/>&model.function.id=<s:property value="model.function.id"/>&model.functionary.id=<s:property value="model.functionary.id"/>&model.field.id=<s:property value="model.field.id"/>&model.asOndate=<s:property value="model.asOndate"/>&majorCode=<s:property value="#parameters['majorCode']" />'>Excel</a>
+			<%--href='/services/EGF/report/incomeExpenditureReport-generateDetailCodeXls.action?showDropDown=false&model.period=<s:property value="model.period"/>&model.currency=<s:property value="model.currency"/>&model.financialYear.id=<s:property value="model.financialYear.id"/>&model.fund.id=<s:property value="model.fund.id"/>&model.department.id=<s:property value="model.department.id"/>&model.function.id=<s:property value="model.function.id"/>&model.functionary.id=<s:property value="model.functionary.id"/>&model.field.id=<s:property value="model.field.id"/>&model.asOndate=<s:property value="model.asOndate"/>&majorCode=<s:property value="#parameters['majorCode']" />'>Excel</a>--%>
+			href='/services/EGF/report/incomeExpenditureReport-generateDetailCodeXls.action?showDropDown=false&model.period=<s:property value="model.period"/>&model.currency=<s:property value="model.currency"/>&model.financialYear.id=<s:property value="model.financialYear.id"/>&model.fund.id=<s:property value="model.fund.id"/>&model.department.id=<s:property value="model.department.id"/>&model.function.id=<s:property value="model.function.id"/>&model.functionary.id=<s:property value="model.functionary.id"/>&model.field.id=<s:property value="model.field.id"/>&model.fromDate=<s:property value="model.fromDate"/>&model.toDate=<s:property value="model.toDate"/>&majorCode=<s:property value="#parameters['majorCode']" />'>Excel</a>
 		| <a
-			href='/services/EGF/report/incomeExpenditureReport-generateDetailCodePdf.action?showDropDown=false&model.period=<s:property value="model.period"/>&model.currency=<s:property value="model.currency"/>&model.financialYear.id=<s:property value="model.financialYear.id"/>&model.department.id=<s:property value="model.department.id"/>&model.fund.id=<s:property value="model.fund.id"/>&model.function.id=<s:property value="model.function.id"/>&model.functionary.id=<s:property value="model.functionary.id"/>&model.field.id=<s:property value="model.field.id"/>&model.asOndate=<s:property value="model.asOndate"/>&majorCode=<s:property value="#parameters['majorCode']" />'>PDF</a>
+			href='/services/EGF/report/incomeExpenditureReport-generateDetailCodePdf.action?showDropDown=false&model.period=<s:property value="model.period"/>&model.currency=<s:property value="model.currency"/>&model.financialYear.id=<s:property value="model.financialYear.id"/>&model.department.id=<s:property value="model.department.id"/>&model.fund.id=<s:property value="model.fund.id"/>&model.function.id=<s:property value="model.function.id"/>&model.functionary.id=<s:property value="model.functionary.id"/>&model.field.id=<s:property value="model.field.id"/>&model.fromDate=<s:property value="model.fromDate"/>&model.toDate=<s:property value="model.toDate"/>&majorCode=<s:property value="#parameters['majorCode']" />'>PDF</a>
 	</div>
 </s:if>
 <s:else>
 	<div class="buttonbottom">
 		<s:text name="report.export.options" />
 		: <a
-			href='/services/EGF/report/incomeExpenditureReport-generateIncomeExpenditureScheduleXls.action?showDropDown=false&model.period=<s:property value="model.period"/>&model.currency=<s:property value="model.currency"/>&model.financialYear.id=<s:property value="model.financialYear.id"/>&model.fund.id=<s:property value="model.fund.id"/>&model.department.id=<s:property value="model.department.id"/>&model.function.id=<s:property value="model.function.id"/>&model.functionary.id=<s:property value="model.functionary.id"/>&model.field.id=<s:property value="model.field.id"/>&model.asOndate=<s:property value="model.asOndate"/>&majorCode=<s:property value="#parameters['majorCode']" />'>Excel</a>
+			href='/services/EGF/report/incomeExpenditureReport-generateIncomeExpenditureScheduleXls.action?showDropDown=false&model.period=<s:property value="model.period"/>&model.currency=<s:property value="model.currency"/>&model.financialYear.id=<s:property value="model.financialYear.id"/>&model.fund.id=<s:property value="model.fund.id"/>&model.department.id=<s:property value="model.department.id"/>&model.function.id=<s:property value="model.function.id"/>&model.functionary.id=<s:property value="model.functionary.id"/>&model.field.id=<s:property value="model.field.id"/>&model.fromDate=<s:property value="model.fromDate"/>&model.toDate=<s:property value="model.toDate"/>&majorCode=<s:property value="#parameters['majorCode']" />'>Excel</a>
 		| <a
-			href='/services/EGF/report/incomeExpenditureReport-generateIncomeExpenditureSchedulePdf.action?showDropDown=false&model.period=<s:property value="model.period"/>&model.currency=<s:property value="model.currency"/>&model.financialYear.id=<s:property value="model.financialYear.id"/>&model.department.id=<s:property value="model.department.id"/>&model.fund.id=<s:property value="model.fund.id"/>&model.function.id=<s:property value="model.function.id"/>&model.functionary.id=<s:property value="model.functionary.id"/>&model.field.id=<s:property value="model.field.id"/>&model.asOndate=<s:property value="model.asOndate"/>&majorCode=<s:property value="#parameters['majorCode']" />'>PDF</a>
+			href='/services/EGF/report/incomeExpenditureReport-generateIncomeExpenditureSchedulePdf.action?showDropDown=false&model.period=<s:property value="model.period"/>&model.currency=<s:property value="model.currency"/>&model.financialYear.id=<s:property value="model.financialYear.id"/>&model.department.id=<s:property value="model.department.id"/>&model.fund.id=<s:property value="model.fund.id"/>&model.function.id=<s:property value="model.function.id"/>&model.functionary.id=<s:property value="model.functionary.id"/>&model.field.id=<s:property value="model.field.id"/>&model.fromDate=<s:property value="model.fromDate"/>&model.toDate=<s:property value="model.toDate"/>&majorCode=<s:property value="#parameters['majorCode']" />'>PDF</a>
 	</div>
 </s:else>
 
@@ -96,6 +97,8 @@ var functionaryId = '<s:property value="model.functionary.id"/>';
 var functionName = '<s:property value="model.function.name"/>';
 var functionId = '<s:property value="model.function.id"/>';
 var fieldId = '<s:property value="model.field.id"/>';	
+
+
 var functionCode1=functionName+"~"+functionId;
 	if(deptId == ""){
 		deptId = "";
@@ -112,6 +115,7 @@ functionId="";
 if(fieldId==0){
 fieldId="";
 }
+
 var endDate=formatDateToDDMMYYYY4(toDate); 
 var startDate=formatDateToDDMMYYYY4(stDate); 
 var chkd1=endDate.split('/');

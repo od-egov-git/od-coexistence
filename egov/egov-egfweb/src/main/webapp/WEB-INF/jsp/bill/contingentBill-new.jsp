@@ -174,8 +174,9 @@ billDetailsTable = new YAHOO.widget.DataTable("billDetailTable",voucherDetailCol
 var totaldbamt=0,totalcramt=0;
 var makeVoucherDetailTableCredit = function() {
  var voucherDetailColumnsCredit = [ 
-{key:"glcode",label:'Account Code', disable:true, formatter:glcodeFormatter("billDetailsTableCredit",".glcodeDetail","text")},
-{key:"accounthead", label:'Account Head', width:600,disable:true,formatter:accountheadFormatter("billDetailsTableCredit",".accounthead","text")},				
+	 {key:"glcode",label:'Deduction Code', disable:true, formatter:glcodeFormatter("billDetailsTableCredit",".glcodeDetail","text")},
+	 {key:"accounthead", label:'Deduction Head', width:506,disable:true,formatter:accountheadFormatter("billDetailsTableCredit",".accounthead","text")},
+	 {key:"deductionRate",label:'Rate', formatter:deductionRateFormatter("billDetailsTableCredit",".deductionRateDetail","text")},
 {key:"amount",label:'Credit', formatter:amountFormatter("billDetailsTableCredit",".debitAmountDetail","text")}, 
 {key:'Add',label:'Add',formatter:createAddImageFormatter("${pageContext.request.contextPath}","addYUIRow('billDetailsTableCredit',this)")},
 {key:'Delete',label:'Delete',formatter:createDeleteImageFormatter("${pageContext.request.contextPath}","deleteYUIRow('billDetailsTableCredit',this)")}
@@ -479,11 +480,17 @@ function updateDropdown(tab,field,idx)
 document.getElementById(tab+"["+idx+"]."+field).options[<s:property value="#stat.index"/>]=new Option('<s:property value="value"/>','<s:property value="key"/>');
 </s:iterator>
 }
+function urlLoad(fileStoreId) {
+	var sUrl = "/egi/downloadfile?fileStoreId=" + fileStoreId
+			+ "&moduleName=EGF";
+	window.open(sUrl, "window",
+			'scrollbars=yes,resizable=no,height=400,width=400,status=yes');
 
+}
 </script>
 </head>
 <body>
-	<s:form action="contingentBill" theme="css_xhtml" name="cbill"
+	<s:form action="contingentBill" theme="css_xhtml" name="cbill" enctype="multipart/form-data" method ="post"
 		validate="true">
 		<s:push value="model">
 			<div id="loading"
@@ -548,6 +555,17 @@ document.getElementById(tab+"["+idx+"]."+field).options[<s:property value="#stat
 			   				makeCheckListTable();
 			   				document.getElementById('checkListTable').getElementsByTagName('table')[0].width="800";
 						</script>
+
+					</div>
+					<div class="tabbertab" id="checkList">
+						<h2>Supporting Documents</h2>
+						<div class="yui-skin-sam" align="center">
+							<div id="supportingTable">
+							<jsp:include page="uploadDocumentsFin.jsp"/>
+							</div>
+						</div>
+
+						
 
 					</div>
 					<s:hidden name="actionName" id="actionName" />

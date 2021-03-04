@@ -51,8 +51,6 @@
 <head>
 <%@ include file="/includes/taglibs.jsp"%>
 <%@ page language="java"%>
-<script
-        src="<cdn:url value='/resources/app/js/i18n/jquery.i18n.properties.js?rnd=${app_release_no}' context='/services/EGF'/>"></script>
 <script type="text/javascript"
 	src="/services/EGF/resources/javascript/voucherHelper.js?rnd=${app_release_no}"></script>
 <script type="text/javascript"
@@ -166,11 +164,11 @@ function	onLoadTask_new()
 			document.forms[0].action = "${pageContext.request.contextPath}/voucher/preApprovedVoucher-loadvoucherview.action?vhid="+vhId;
 			document.forms[0].submit();
 	}
-	 else if(button=="Save_New")
+	else if(button=="Save_New")
 	{      	document.forms[0].button.value='';
 	        document.forms[0].action = "contraBTB-newform.action";
 	 		document.forms[0].submit();
-	} 
+	}
 	}
  }
  
@@ -197,6 +195,8 @@ function	onLoadTask_new()
 			document.getElementById("chequeGrid").style.visibility="visible";
 			document.getElementById("mdcNumber").innerHTML = '<s:text name="contra.refNumber" />';
 			document.getElementById("mdcDate").innerHTML = '<s:text name="contra.refDate" />';
+		} else if(obj.value == "pex") {
+			 document.getElementById("chequeGrid").style.visibility="hidden";
 		} else {
 		<s:if test="egovCommon.isShowChequeNumber()">
 		 document.getElementById("chequeGrid").style.visibility="visible";

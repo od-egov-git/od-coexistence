@@ -76,6 +76,7 @@
 							<th class="bluebgheadtd">Month</th>
 							<th class="bluebgheadtd">Total Deduction(Rs)</th>
 							<th class="bluebgheadtd">Total Remitted(Rs)</th>
+							<th class="bluebgheadtd">Acknowledge Number</th>
 						</tr>
 						<s:iterator value="remittedTDS" status="stat" var="p">
 							<tr>
@@ -111,6 +112,12 @@
 										<s:else>0.00</s:else>
 									</div>
 								</td>
+								<td class="blueborderfortd"><div align="right">
+								<s:if test="%{#p.autoAssignNumber != null}">
+								<s:property value="autoAssignNumber" />
+								</s:if>
+										&nbsp;
+									</div></td>
 							</tr>
 						</s:iterator>
 					</table>

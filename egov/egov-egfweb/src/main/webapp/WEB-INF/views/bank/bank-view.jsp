@@ -78,6 +78,13 @@
 					</div>
 					<div class="col-sm-3 add-margin view-content">${bank.narration}</div>
 				</div>
+				<div class="row add-border">
+					<div class="col-xs-3 add-margin">
+						<spring:message code="lbl.link" text="Link"/>
+					</div>
+					<div class="col-sm-3 add-margin view-content"><a href='${bank.onlinelink}' target="_blank">Online Link</a></div>
+					
+				</div>
 			</div>
 		</div>
 	</div>

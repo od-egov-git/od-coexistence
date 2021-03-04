@@ -154,14 +154,14 @@ public class RemittanceReportController {
         model.addAttribute("bankAccServiceMapp", getBankAccountServiceMapping());
         model.addAttribute("financialYearList", financialYearDAO.getAllActivePostingAndNotClosedFinancialYears());
         model.addAttribute("instrumentTypes", getInstrumentMap());
-        model.addAttribute("businessServices", microserviceUtils.getBusinessServices(Arrays.asList(ServiceType.split(","))));
+        //model.addAttribute("businessServices", microserviceUtils.getBusinessServices(Arrays.asList(ServiceType.split(","))));
     }
     
     private void preparePendingModel(Model model) {
         model.addAttribute("remittanceReportModel",new RemittanceReportModel());
         model.addAttribute("instrumentTypes", getInstrumentMap());
-        model.addAttribute("businessServices", microserviceUtils.getBusinessServices(Arrays.asList(ServiceType.split(","))));
-        model.addAttribute("userList", microserviceUtils.getEmployeeBySearchCriteria(new EmployeeSearchCriteria().builder().roles(Arrays.asList(rolesToRemit.split(","))).build()));
+        //model.addAttribute("businessServices", microserviceUtils.getBusinessServices(Arrays.asList(ServiceType.split(","))));
+        //model.addAttribute("userList", microserviceUtils.getEmployeeBySearchCriteria(new EmployeeSearchCriteria().builder().roles(Arrays.asList(rolesToRemit.split(","))).build()));
     }
 
     private Object getBankAccountServiceMapping() {

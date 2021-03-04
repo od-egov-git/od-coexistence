@@ -210,6 +210,7 @@ public class BankBookReportAction extends BaseFormAction {
 		persistenceService.getSession().setDefaultReadOnly(true);
 		persistenceService.getSession().setFlushMode(FlushMode.MANUAL);
 		super.prepare();
+		addDropdownData("schemeList",persistenceService.findAllBy(" from Scheme where isactive=true order by name"));
 		if (!parameters.containsKey("skipPrepare")) {
 			addDropdownData("bankList", egovCommon.getBankBranchForActiveBanks());
 			addDropdownData("accNumList", Collections.EMPTY_LIST);
@@ -232,10 +233,7 @@ public class BankBookReportAction extends BaseFormAction {
 			if (headerFields.contains(Constants.FIELD))
 				addDropdownData("fieldList",
 						persistenceService.findAllBy(" from Boundary b where lower(b.boundaryType.name)='ward' "));
-			if (headerFields.contains(Constants.SCHEME))
-				addDropdownData("schemeList", Collections.EMPTY_LIST);
-			if (headerFields.contains(Constants.SUBSCHEME))
-				addDropdownData("subschemeList", Collections.EMPTY_LIST);
+			
 		}
 	}
 

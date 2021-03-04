@@ -46,38 +46,6 @@
  *
  */
 
-
-
-
-$(document).ready(function(){
-	console.log("Browser Language ",navigator.language);
-	$.i18n.properties({ 
-		name: 'message', 
-		path: '/services/EGF/resources/app/messages/', 
-		mode: 'both',
-		async: true,
-	    cache: true,
-		language: getLocale("locale"),
-		callback: function() {
-			console.log('File loaded successfully');
-		}
-	});
-	
-});
-	
-
-
-function getCookie(name){
-	let cookies = document.cookie;
-	if(cookies.search(name) != -1){
-		var keyValue = cookies.match('(^|;) ?' + name + '=([^;]*)(;|$)');
-	    return keyValue ? keyValue[2] : null;
-	}
-}
-
-function getLocale(paramName){
-	return getCookie(paramName) ? getCookie(paramName) : navigator.language;
-}
 jQuery('#btnsearch').click(function(e) {
 
 	callAjaxSearch();
@@ -106,8 +74,7 @@ function validateFields(){
 		var finYearEndDate=document.getElementById("endingDate").value;
 		
 		if(startingDate!=finYearStartDate){
-			//bootbox.alert('Enter valid Start date');
-			bootbox.alert($.i18n.prop('msg.enter.valid.startdate'));
+			bootbox.alert('Enter valid Start date');
 			getControlInBranch(tbl.rows[1],'startDate').value='';
 			getControlInBranch(tbl.rows[1],'startDate').focus();
 			return false;
@@ -115,14 +82,12 @@ function validateFields(){
 		if(lastRowEndDate!=finYearEndDate)
 		{
 			bootbox.alert('Enter valid End date');
-			bootbox.alert($.i18n.prop('msg.enter.valid.enddate'));
 			getControlInBranch(tbl.rows[lastRow],'endDate').value='';
 			getControlInBranch(tbl.rows[lastRow],'endDate').focus();
 			return false;
 		}
 		if(lastRowFiscalName==""){
-			//bootbox.alert('Enter Fiscal Period Name');
-			bootbox.alert($.i18n.prop('msg.enter.fiscal.period.name'));
+			bootbox.alert('Enter Fiscal Period Name');
 			getControlInBranch(tbl.rows[1],'name').value='';
 			getControlInBranch(tbl.rows[1],'name').focus();
 			return false;
@@ -133,8 +98,7 @@ function validateFields(){
 		    var previousEndDate=getControlInBranch(tbl.rows[previousRow],'endDate').value;
 		    if( compareDate(formatDate6(previousEndDate),formatDate6(lastRowStartDate)) == -1 )
 			{
-			    // bootbox.alert('Enter valid Start Date');
-			     bootbox.alert($.i18n.prop('msg.enter.valid.startdate'));
+			     bootbox.alert('Enter valid Start Date');
 				 getControlInBranch(tbl.rows[lastRow],'startDate').value='';
 				 getControlInBranch(tbl.rows[lastRow],'startDate').focus();
 				 return false;
@@ -255,8 +219,7 @@ function validateStartDate() {
 	if(startDate!=finYearStartDate){
 		if( compareDate(formatDate6(finYearStartDate),formatDate6(startDate)) == -1 )
 		{
-			//bootbox.alert('Enter valid Start Date');
-			bootbox.alert($.i18n.prop('msg.enter.valid.startdate'));
+			bootbox.alert('Enter valid Start Date');
 			document.getElementById('endingDate').value='';
 			document.getElementById('endingDate').focus();
 			return false;
@@ -273,8 +236,7 @@ function validateEndDate() {
 	/*To check whether Start Date is Greater than End Date*/
 	if( compareDate(formatDate6(strtDate),formatDate6(endDate)) == -1 )
 	{
-		//bootbox.alert('Start Date cannot be greater than End Date');
-		bootbox.alert($.i18n.prop('msg.startdate.enddate.greater'));
+		bootbox.alert('Start Date cannot be greater than End Date');
 		document.getElementById('endingDate').value='';
 		document.getElementById('endingDate').focus();
 		return false;
@@ -320,8 +282,7 @@ function validateFiscalEndDate() {
 
 	if( endDate == '' )
 	{
-		//bootbox.alert('Enter Ending Date');
-		bootbox.alert($.i18n.prop('msg.enter.endingdate'));
+		bootbox.alert('Enter Ending Date');
 		document.getElementById('endDate').value='';
 		document.getElementById('endDate').focus();
 		return false;
@@ -347,23 +308,13 @@ function callAjaxSearch() {
 			});
 		},
 		"bDestroy" : true,
-		dom: "<'row'<'col-xs-12 pull-right'f>r>t<'row buttons-margin'<'col-md-3 col-xs-6'i><'col-md-3  col-xs-6'l><'col-md-3 col-xs-6'B><'col-md-3 col-xs-6 text-right'p>>",
-		buttons: [
-				  {
-				    extend: 'print',
-				    title: 'Financial Year',
-				    filename: 'Financial Year'
-				},{
-				    extend: 'pdf',
-				    title: 'Financial Year',
-				    filename: 'Financial Year'
-				},{
-				    extend: 'excel',
-				    message : 'Financial Year',
-				    filename: 'Financial Year'
-				}
-				],
-		aaSorting : [],				
+		"sDom" : "<'row'<'col-xs-12 hidden col-right'f>r>t<'row'<'col-xs-3'i><'col-xs-3 col-right'l><'col-xs-3 col-right'<'export-data'T>><'col-xs-3 text-right'p>>",
+		"aLengthMenu" : [ [ 10, 25, 50, -1 ], [ 10, 25, 50, "All" ] ],
+		"oTableTools" : {
+			"sSwfPath" : "../../../../../../egi/resources/global/swf/copy_csv_xls_pdf.swf",
+			"aButtons" : [ "xls", "pdf", "print" ]
+		},
+		aaSorting: [],				
 		columns : [ { 
 			"data" : "finYearRange", "sClass" : "text-left"} ,{ 
 				"data" : "startingDate", "sClass" : "text-left"} ,{ 
@@ -408,7 +359,7 @@ $('#buttonSubmit').click(function(e){
 					});
 					
 				} else if (res == "false") {
-					bootbox.alert($.i18n.prop('msg.transfer.closing.balance.this.year'));
+					bootbox.alert("Transfer the closing balance of this year to next year in order to proceed with the closing of this year.");
 				}
 			},
 			error : function (res){

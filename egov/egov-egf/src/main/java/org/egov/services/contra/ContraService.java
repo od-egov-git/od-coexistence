@@ -610,17 +610,17 @@ public class ContraService extends PersistenceService<ContraJournalVoucher, Long
 
     private void updateInstrumentAndPayinSql(final Map instrumentDetailsMap) {
 
-//        List<Instrument> instruments = microserviceUtils.getInstruments(instrumentDetailsMap.get("instrumentheader").toString());
-        List<Instrument> instruments = (List<Instrument>) instrumentDetailsMap.get("instruments");
+        List<Instrument> instruments = microserviceUtils.getInstruments(instrumentDetailsMap.get("instrumentheader").toString());
+
         for (Instrument i : instruments) {
             i.setPayinSlipId(instrumentDetailsMap.get("payinid").toString());
         }
 
         if (instrumentDetailsMap.get("instrumenttype").toString().equalsIgnoreCase(FinancialConstants.INSTRUMENT_TYPE_DD)
                 || instrumentDetailsMap.get("instrumenttype").toString().equalsIgnoreCase(FinancialConstants.INSTRUMENT_TYPE_CHEQUE))
-            microserviceUtils.depositeInstruments(instruments, instrumentDetailsMap.get("bankaccountNumber").toString(), instrumentDetailsMap.get("bankId").toString());
+            microserviceUtils.depositeInstruments(instruments, instrumentDetailsMap.get("bankaccountNumber").toString());
         else if (instrumentDetailsMap.get("instrumenttype").toString().equalsIgnoreCase(FinancialConstants.INSTRUMENT_TYPE_CASH))
-            microserviceUtils.reconcileInstruments(instruments, instrumentDetailsMap.get("bankaccountNumber").toString(),  instrumentDetailsMap.get("bankId").toString());
+            microserviceUtils.reconcileInstruments(instruments, instrumentDetailsMap.get("bankaccountNumber").toString());
 
     }
 

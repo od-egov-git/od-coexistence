@@ -52,7 +52,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>eGov- Online Cash Collection System</title>
+<title>MCC - Online Cash Collection System</title>
 <link href="common/css/legamanagement.css" rel="stylesheet" type="text/css" />
 <link href="common/css/commonegov.css?rnd=${app_release_no}" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="common/js/collections.js?rnd=${app_release_no}"></script>

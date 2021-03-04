@@ -66,6 +66,7 @@ public class BudgetReAppropriationView {
     private BigDecimal anticipatoryAmount = new BigDecimal(Constants.ZERO);
     private BigDecimal availableAmount = new BigDecimal(Constants.ZERO);
     private BigDecimal planningPercent = new BigDecimal(Constants.ZERO);
+    private BigDecimal quarterPercent = new BigDecimal(Constants.ZERO);
     private BigDecimal planningBudgetApproved = new BigDecimal(Constants.ZERO);
     private BigDecimal planningBudgetUsage = new BigDecimal(Constants.ZERO);
     private BigDecimal planningBudgetAvailable = new BigDecimal(Constants.ZERO);
@@ -216,5 +217,13 @@ public class BudgetReAppropriationView {
     public void setPlanningBudgetAvailable(final BigDecimal planningBudgetAvailable) {
         this.planningBudgetAvailable = planningBudgetAvailable;
     }
+
+	public BigDecimal getQuarterPercent() {
+		return quarterPercent;
+	}
+
+	public void setQuarterPercent(BigDecimal quarterPercent) {
+		this.quarterPercent = quarterPercent;
+	}
 
 }

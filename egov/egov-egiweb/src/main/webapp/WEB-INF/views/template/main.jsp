@@ -97,12 +97,12 @@
 </head>
 <body class="page-body" oncontextmenu="return false;">
 <div class="page-container">
-    <tiles:insertAttribute name="header"/>
+    <%-- <tiles:insertAttribute name="header"/> --%>
     <div class="main-content">
         <spring:htmlEscape defaultHtmlEscape="true"/>
         <tiles:insertAttribute name="body"/>
     </div>
-    <tiles:insertAttribute name="footer"/>
+    <%-- <tiles:insertAttribute name="footer"/> --%>
 </div>
 <div class="modal fade loader-class" data-backdrop="static">
     <div class="modal-dialog">

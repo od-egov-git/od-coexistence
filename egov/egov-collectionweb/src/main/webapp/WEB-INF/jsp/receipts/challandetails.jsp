@@ -107,7 +107,7 @@
   					</s:else>
   					<s:if test="%{shouldShowHeaderField('department')}">
 				        <td class="bluebox"><s:text name="challan.department"/></td>
-				        <td class="bluebox"><s:textfield name="receiptMisc.department.name" id="receiptMisc.department.name" value="%{receiptMisc.department.name}" readonly="true"/></td>
+				        <td class="bluebox"><s:textfield name="receiptMisc.department" id="receiptMisc.department" value="%{receiptMisc.department}" readonly="true"/></td>
 			        </s:if>
 		   			<s:else>
   						<td class="bluebox" colspan="2"></td>
@@ -127,7 +127,7 @@
 		      	<tr>
 			        <td class="bluebox">&nbsp;</td>
 			        <td class="bluebox"><span class="bluebox"><s:text name="challan.service"/></span></td>
-			        <td class="bluebox"><s:textfield name="serviceName" id="serviceName"  value="%{challan.service.name}" readonly="true"/></td>
+			        <td class="bluebox"><s:textfield name="serviceName" id="serviceName"  value="%{challan.service}" readonly="true"/></td>
 			        <td class="bluebox">&nbsp;</td>
 			        <td class="bluebox">&nbsp;</td>
 			    </tr>

@@ -144,7 +144,7 @@ href="/services/EGF/resources/css/ccMenu.css?rnd=${app_release_no}" />
 						<tr>
 							<td class="greybox"><s:text name="chq.issued.department" /><span
 								class="mandatory1">*</span> <s:select name="department"
-									id="department" list="dropdownData.departmentList" listKey="id"
+									id="department" list="dropdownData.departmentList" listKey="code"
 									listValue="name" headerKey="-1"
 									headerValue="----Choose----" value="%{department}" /></td>
 						</tr>

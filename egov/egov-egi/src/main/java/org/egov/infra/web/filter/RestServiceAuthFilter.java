@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletResponseWrapper;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.log4j.Logger;
@@ -86,11 +87,10 @@ public class RestServiceAuthFilter implements Filter {
         
         HttpServletRequest httpRequest = (HttpServletRequest)req;
         HttpServletResponse httpResponse = (HttpServletResponse)res;
-
-        if (httpRequest.getRequestURI().contains("/ClearToken")||httpRequest.getRequestURI().contains("/refreshToken"))
-        {
-            LOGGER.info("Clear Token request recieved ");
-            httpRequest.getRequestDispatcher(httpRequest.getServletPath()).forward(req, res);
+       
+        if (httpRequest.getRequestURI().contains("/ClearToken")||httpRequest.getRequestURI().contains("/refreshToken")){
+            LOGGER.info("Clear Token request recieved " + httpRequest.getServletPath());
+            httpRequest.getRequestDispatcher(httpRequest.getServletPath()+StringUtils.defaultString(httpRequest.getPathInfo())).forward(req, res);
         }else if(httpRequest.getRequestURI().contains("/rest/voucher/")){
             try {
                 // TODO : Need to identify the external and internal to enable/disable authentication.
@@ -111,26 +111,20 @@ public class RestServiceAuthFilter implements Filter {
             }
         }else{
         
-        RestRequestWrapper request = new RestRequestWrapper(httpRequest);
-        
-        try {
-            CurrentUser user = new CurrentUser(this.getUserDetails(request));
-            Authentication auth = this.prepareAuthenticationObj(request, user);
-            SecurityContextHolder.getContext().setAuthentication(auth);
-            chain.doFilter(request, res);
-            
-        } catch (Exception e) {
-//            e.printStackTrace();
-            res.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            res.getWriter().write(getErrorResponse(e.getMessage()));  
-           
-        }
-        }
+	        RestRequestWrapper request = new RestRequestWrapper(httpRequest);
+	        
+	        try {
+	            CurrentUser user = new CurrentUser(this.getUserDetails(request));
+	            Authentication auth = this.prepareAuthenticationObj(request, user);
+	            SecurityContextHolder.getContext().setAuthentication(auth);
+	            chain.doFilter(request, res);
+	        } catch (Exception e) {
+	            res.setContentType(MediaType.APPLICATION_JSON_VALUE);
+	            res.getWriter().write(getErrorResponse(e.getMessage()));  
+	        }
+        }        
         LOGGER.info("Rest service authentication completed");
-        
- 
-
-    }
+     }
 
     private String getErrorResponse(String errorMsg) throws JsonProcessingException {
         ErrorResponse errorResp = new ErrorResponse();
@@ -181,7 +175,7 @@ public class RestServiceAuthFilter implements Filter {
         session.setAttribute(MS_USER_TOKEN, user_token);
         CustomUserDetails user = this.microserviceUtils.getUserDetails(user_token, admin_token);
         session.setAttribute(MS_TENANTID_KEY, user.getTenantId());
-        UserSearchResponse response = this.microserviceUtils.getUserInfo(user_token, user.getTenantId(), user.getUuid());
+        UserSearchResponse response = this.microserviceUtils.getUserInfo(user_token, user.getTenantId(), user.getUserName());
        
         return parepareCurrentUser(response.getUserSearchResponseContent().get(0));
     }
@@ -285,7 +279,7 @@ public class RestServiceAuthFilter implements Filter {
         if(null!=tenantid && ""!=tenantid){
         String[] tenantParts = tenantid.split("\\.");
             if(tenantParts != null||tenantParts.length>1){
-                ApplicationThreadLocals.setTenantID(tenantParts[1]); 
+                ApplicationThreadLocals.setTenantID(tenantid); 
             }
         }
         
