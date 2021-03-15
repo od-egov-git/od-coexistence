@@ -339,25 +339,6 @@ public class PaymentActionHelper {
         	}
         }
         paymentService.persist(paymentheader);
-        if(workflowBean.getWorkFlowAction().equals("Approve"))
-        {
-        	List<Miscbilldetail> miscBillList = miscbilldetailService.findAllBy(
-                    " from Miscbilldetail where payVoucherHeader.id = ? ",
-                    paymentheader.getVoucherheader().getId());
-        	
-        	if(miscBillList !=null && !miscBillList.isEmpty())
-        	{
-        		for(Miscbilldetail row : miscBillList)
-        		{
-        			 expenseBill = expenseBillService.getByBillnumber(row.getBillnumber());
-        			 if(expenseBill != null)
-        			 {
-        				 expenseBill.setStatus(egwStatusDAO.getStatusByModuleAndCode("EXPENSEBILL", "Bill Payment Approved"));
-                		 expenseBillService.create(expenseBill);
-        			 }
-        		}
-        	}
-        }
         paymentService.getSession().flush();
         persistenceService.getSession().flush();
         finDashboardService.billPaymentUpdatedAction(paymentheader);

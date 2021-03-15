@@ -172,24 +172,6 @@ public class PreApprovedActionHelper {
             	}
             }
             voucherService.persist(voucherHeader);
-            if(workflowBean.getWorkFlowAction().equals("Approve"))
-            {
-            	List<Miscbilldetail> miscBillList = miscbilldetailService.findAllBy(
-                        " from Miscbilldetail where billVoucherHeader.id = ? ",
-                        voucherHeader.getId());
-            	
-            	if(miscBillList !=null && !miscBillList.isEmpty())
-            	{
-            		for(Miscbilldetail row : miscBillList)
-            		{
-            			 expenseBill = expenseBillService.getByBillnumber(row.getBillnumber());
-            			 expenseBill.setStatus(egwStatusDAO.getStatusByModuleAndCode("EXPENSEBILL", "Voucher Approved"));
-                		 expenseBillService.create(expenseBill);
-                		 persistenceService.getSession().flush();
-            		}
-            	}
-            }
-
         } catch (final ValidationException e) {
 
             final List<ValidationError> errors = new ArrayList<>();

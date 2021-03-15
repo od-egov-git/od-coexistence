@@ -340,7 +340,7 @@ public class CreateExpenseBillController extends BaseBillController {
     private String getMessageByStatus(final EgBillregister expenseBill, final String approverName, final String nextDesign) {
         String message = "";
 
-        if (FinancialConstants.CONTINGENCYBILL_CREATED_STATUS.equals(expenseBill.getStatus().getCode()) || FinancialConstants.CONTINGENCYBILL_PENDING_FINANCE.equals(expenseBill.getStatus().getCode())) {
+        if (FinancialConstants.CONTINGENCYBILL_CREATED_STATUS.equals(expenseBill.getStatus().getCode())) {
             if (org.apache.commons.lang.StringUtils
                     .isNotBlank(expenseBill.getEgBillregistermis().getBudgetaryAppnumber())
                     && !BudgetControlType.BudgetCheckOption.NONE.toString()
@@ -356,18 +356,15 @@ public class CreateExpenseBillController extends BaseBillController {
                 message = messageSource.getMessage("msg.expense.bill.create.success",
                         new String[]{expenseBill.getBillnumber(), approverName, nextDesign}, null);
 
-        } else if (FinancialConstants.CONTINGENCYBILL_PENDING_AUDIT.equals(expenseBill.getStatus().getCode()))
+        } else if (FinancialConstants.CONTINGENCYBILL_APPROVED_STATUS.equals(expenseBill.getStatus().getCode()))
             message = messageSource.getMessage("msg.expense.bill.approved.success",
                     new String[]{expenseBill.getBillnumber()}, null);
         else if (FinancialConstants.WORKFLOW_STATE_REJECTED.equals(expenseBill.getState().getValue()))
             message = messageSource.getMessage("msg.expense.bill.reject",
                     new String[]{expenseBill.getBillnumber(), approverName, nextDesign}, null);
-        else if (FinancialConstants.WORKFLOW_STATE_CANCELLED.equals(expenseBill.getStatus().getCode()))
+        else if (FinancialConstants.WORKFLOW_STATE_CANCELLED.equals(expenseBill.getState().getValue()))
             message = messageSource.getMessage("msg.expense.bill.cancel",
                     new String[]{expenseBill.getBillnumber()}, null);
-        else if ("Pending for Cancellation".equals(expenseBill.getStatus().getCode()))
-        	message = messageSource.getMessage("msg.expense.bill.cancel.success",
-                    new String[]{expenseBill.getBillnumber(), approverName, nextDesign}, null);
 
         return message;
     }

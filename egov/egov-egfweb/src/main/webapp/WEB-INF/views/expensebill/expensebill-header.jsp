@@ -136,7 +136,7 @@
 		</div>
 	</div>
 	<div class="form-group">
-		<label class="col-sm-3 control-label text-right"><spring:message code="lbl.billsubtype" text="Bill Subtype"/>
+		<label class="col-sm-3 control-label text-right"><spring:message code="lbl.billtype" text="Bill Subtype"/>
 			<span class="mandatory"></span>
 		</label>
 		<div class="col-sm-3 add-margin">
@@ -146,71 +146,6 @@
 			</form:select>
 			<form:errors path="egBillregistermis.egBillSubType" cssClass="add-margin error-msg" />
 		</div>
-		<label class="col-sm-2 control-label text-right">
-			<spring:message code="lbl.end.billdate" text="Last Date of Bill Payment"/>
-		</label>
-		<div class="col-sm-3 add-margin">
-			<form:input id="billEndDate" path="billEndDate" placeholder="DD/MM/YYYY" class="form-control datepicker" data-date-start-date="0d" />
-		</div>
 	</div>
-	<div class="form-group">
-		<label class="col-sm-3 control-label text-right">
-			<spring:message code="lbl.bill.sanction.number" text="Sanction Number"/>
-		</label>
-		<div class="col-sm-3 add-margin">
-			<form:input class="form-control patternvalidation" data-pattern="alphanumerichyphenbackslash" id="sanctionnumber" path="sanctionnumber" maxlength="50" />
-		</div>
-		<label class="col-sm-2 control-label text-right">
-			<spring:message code="lbl.bill.sanction.date" text="Sanction Date"/>
-		</label>
-		<div class="col-sm-3 add-margin">
-			<form:input id="sanctiondate" path="sanctiondate" placeholder="DD/MM/YYYY" class="form-control datepicker" data-date-start-date="0d" />
-		</div>
-	</div>
-	<div class="form-group">
-		<label class="col-sm-3 control-label text-right">
-			<spring:message code="lbl.budget.details" text="Sanction Number"/>
-		</label>
-		<div class="col-sm-3 add-margin">
-			<a href="#" onclick="populateBdgetDetails()">Click</a>
-		</div>
-		<label class="col-sm-2 control-label text-right">
-			
-		</label>
-		<div class="col-sm-3 add-margin">
-			
-		</div>
-	</div>
-	
-	<div class="works">
-	
-	<div class="form-group">
-		<label class="col-sm-3 control-label text-right">
-			<spring:message code="lbl.billtype" text="Bill Type"/><span class="mandatory"></span>
-		</label>
-		<div class="col-sm-3 add-margin">
-			<form:select path="billtype" data-first-option="false" id="billtype" class="form-control" >
-				<form:option value=""><spring:message code="lbl.select" text="Select"/></form:option>
-					<c:forEach items="${billTypes}" var="billType">
-						<form:option value="${billType}"> ${billType} </form:option>
-					</c:forEach>
-			</form:select>
-			<form:errors path="billtype" cssClass="add-margin error-msg" />
-		</div>
-		
-		<label class="col-sm-2 control-label text-right"><spring:message code="lbl.workorder" text="Work Order"/>
-			<span class="mandatory"></span>
-		</label>
-		<div class="col-sm-3 add-margin">
-<form:input class="form-control patternvalidation" data-pattern="alphanumerichyphenbackslash" id="workOrder" path="workordernumber" maxlength="100" />
-			<form:errors path="workordernumber" cssClass="add-margin error-msg" />
-		</div>
-		
-		
-		
-	</div>
-	</div>
-	
-	
 	
 </div>

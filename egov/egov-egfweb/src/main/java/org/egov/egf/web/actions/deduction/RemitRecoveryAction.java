@@ -284,9 +284,7 @@ public class RemitRecoveryAction extends BasePaymentAction {
         addDropdownData("accNumList", Collections.EMPTY_LIST);
         modeOfCollectionMap.put(FinancialConstants.MODEOFPAYMENT_CASH, getText("cash.consolidated.cheque"));
         modeOfCollectionMap.put(FinancialConstants.MODEOFPAYMENT_RTGS, "RTGS");
-        modeOfCollectionMap.put(FinancialConstants.MODEOFPAYMENT_PEX, "PEX");
         this.setPartialPayment("deduction");
-        setDefaultPaymentMode(FinancialConstants.MODEOFPAYMENT_PEX);
         System.out.println("3");
     }
 
@@ -391,9 +389,6 @@ public class RemitRecoveryAction extends BasePaymentAction {
 
     private void prepareListRemitBean(final String selectedRows) {
         setDefaultPaymentMode(modeOfPayment);
-        if(modeOfPayment.equals(FinancialConstants.MODEOFPAYMENT_RTGS)){
-            remitRecoveryService.validateRtgsForRemittedBean(remittanceBean);
-        }
         if(remitRecoveryService.isNonControlledCodeTds(remittanceBean)){
             isNonControlledCodeTds = true;
             listRemitBean = remitRecoveryService.getRecoveryDetailsForNonControlledCode(selectedRows);

@@ -164,13 +164,6 @@ function onSubmit()
 						</tr>
 						
 					</table>
-					<table>
-						
-						<tr class="bluebox">
-							<a href="#" onclick="openBudget()">Budget Details</a>
-						</tr>
-					</table>
-
 					<br />
 					<div align="center">
 						<table border="1" width="100%">

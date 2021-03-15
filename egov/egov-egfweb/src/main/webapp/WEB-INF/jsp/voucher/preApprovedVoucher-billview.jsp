@@ -200,12 +200,6 @@ function onSubmit()
 						<td><a href="#" onclick=" return openSource()"><s:text name="lbl.source"/> </a></td>
 					</tr>
 				</table>
-				<table align="center">
-					<tr class="bluebox">
-						<td><a href="#" onclick="openBudgetVoucher()">Budget Details </a></td>
-					</tr>
-				</table>
-
 				<br />
 				<div align="center">
 					<table border="1" width="100%">

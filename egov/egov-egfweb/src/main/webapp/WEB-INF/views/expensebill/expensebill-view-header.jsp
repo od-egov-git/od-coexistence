@@ -105,7 +105,7 @@
 		
 		<div class="row add-border">
 			<div class="col-md-3 col-xs-6 add-margin">
-				<spring:message code="lbl.billsubtype" text="Bill SubType"/>
+				<spring:message code="lbl.billtype" text="Bill SubType"/>
 			</div>
 			<div class="col-md-3 col-xs-6 add-margin view-content" id="ct-mobno">
 				<c:out default="N/A" value="${egBillregister.egBillregistermis.egBillSubType.name }" />
@@ -118,45 +118,6 @@
 				<c:out default="N/A" value="${egBillregister.egBillregistermis.budgetaryAppnumber }" />
 			</div>
 		</div>
-		
-		
-<div class="row add-border">
-	<div class="works">
-	
-	
-		<div class="col-md-3 col-xs-6 add-margin">
-				<spring:message code="lbl.billtype" text="Bill Type"/>
-			</div>
-			<div class="col-md-3 col-xs-6 add-margin view-content" id="ct-mobno">
-				<c:out default="N/A" value="${egBillregister.billtype }" />
-			</div>
-		
-		
-		<div class="col-md-3 col-xs-6 add-margin">
-				<spring:message code="lbl.workorder" text="Work Order"/>
-			</div>
-			<div class="col-md-3 col-xs-6 add-margin view-content" id="ct-mobno">
-				<c:out default="N/A" value="${egBillregister.workordernumber }" />
-			</div>
-		
-		
-		
-	
-	</div>
-		</div>
-		<div class="row add-border">
-			<div class="col-md-3 col-xs-6 add-margin">
-				<spring:message code="lbl.budget.details" text="Budget Details"/>
-			</div>
-			<div class="col-md-3 col-xs-6 add-margin view-content" id="ct-mobno">
-				<a href="#" onclick="openPaymentBudgetDetails()">Click</a>
-			</div>
-			<div class="col-md-3 col-xs-6 add-margin">
-			</div>
-			<div class="col-md-3 col-xs-6 add-margin view-content" id="ct-email">
-			</div>
-		</div>
-		
 	</div>
 	
 </div>

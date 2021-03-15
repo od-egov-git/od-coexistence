@@ -48,7 +48,7 @@
 $(document).ready(function()
 {	
 var currentstate="";
-if(!$('#currentState').val()=="SaveAsDraft")
+if($('#currentState').val()!="SaveAsDraft")
 {
 	currentstate=$('#currentState').val();
 }
