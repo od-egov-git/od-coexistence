@@ -254,6 +254,7 @@ public class PaymentAction extends BasePaymentAction {
     public void prepare() {
 
         super.prepare();
+        System.out.println("Prepare 1");
         if (fromDate == null)
             fromDate = "";
         if (toDate == null)
@@ -815,6 +816,7 @@ public class PaymentAction extends BasePaymentAction {
     @ValidationErrorPage("searchbills")
     @Action(value = "/payment/payment-save")
     public String save() throws ValidationException {
+    	System.out.println("Save !!!");
         final List<PaymentBean> paymentList = new ArrayList<PaymentBean>();
         final List<AppConfigValues> cutOffDateconfigValue = appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
                 "DataEntryCutOffDate");
