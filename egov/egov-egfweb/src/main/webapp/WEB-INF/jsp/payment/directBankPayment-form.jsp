@@ -119,23 +119,6 @@
 	<TD></TD>
 	<TD></TD>
 </tr> --%>
-<tr>
-	<td class="greybox"></td>
-	<td class="greybox"><s:text name="document.number" /><span
-		class="greybox"><span class="mandatory1">*</span></span></td>
-	<td class="greybox"><s:textfield name="commonBean.documentNumber"
-			id="commonBean.documentNumber" size="25" /></td>
-	<td class="greybox"><s:text name="document.date" /><span
-		class="greybox"><span class="mandatory1">*</span></span></td>
-	<s:date name='commonBean.documentDate' var="commonBean.documentDateId"
-		format='dd/MM/yyyy' />
-	<td class="greybox"><s:textfield id="documentDate"
-			name="commonBean.documentDate" value="%{commonBean.documentDateId}"
-			data-date-end-date="0d"
-			onkeyup="DateFormat(this,this.value,event,false,'3')"
-			placeholder="DD/MM/YYYY" class="form-control datepicker"
-			data-inputmask="'mask': 'd/m/y'" /></td>
-</tr>
 
 
 <s:if test="%{instrumentHeaderList.size()>0}">
@@ -184,9 +167,8 @@
 	<td class="greybox"><s:select name="backlogEntry" headerKey="-1"
 			headerValue="Select" value="%{backlogEntry}"
 			list="#{'Y':'Yes' ,'N':'No'}" id="backlogEntry" /></td>
-	<td class="greybox"><s:text name="budget.link" /><span
-								class="mandatory1">*</span></td>
-	<td class="greybox"><a href="#" onClick="populateBudgetLink()">Click</a></td>
+	<td class="greybox"></td>
+	<td class="greybox"></td>
 </tr>
 </table>
 <div id="budgetSearchGrid">

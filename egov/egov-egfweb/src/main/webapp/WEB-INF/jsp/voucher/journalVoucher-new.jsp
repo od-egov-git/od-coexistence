@@ -128,12 +128,6 @@
 						</tr>
 						<tr>
 							<td style="width: 5%"></td>
-							<td class="greybox"><s:text name="budget.link" /><span
-								class="mandatory1">*</span></td>
-							<td class="greybox" colspan="3"><a href="#" onClick="populateBudgetLink()">Click</a></td>
-						</tr>
-						<tr>
-							<td style="width: 5%"></td>
 							<td class="greybox"><s:text name="backdated.entry" /><span
 								class="mandatory1">*</span></td>
 							<td class="greybox" colspan="3"><s:select name="backlogEntry"
