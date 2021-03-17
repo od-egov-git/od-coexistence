@@ -493,10 +493,6 @@ public class ExpenseBillService {
 
             if (null == egBillregister.getState()) {
 
-                if (designation != null
-                        && finalDesignationNames.get(designation.getName().toUpperCase()) != null)
-                    stateValue = FinancialConstants.WF_STATE_FINAL_APPROVAL_PENDING;
-
                 wfmatrix = egBillregisterRegisterWorkflowService.getWfMatrix(egBillregister.getStateType(), null,
                         null, additionalRule, currState, null);
 
@@ -547,9 +543,6 @@ public class ExpenseBillService {
                         .withNextAction(wfmatrix.getNextAction())
                         .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME);
             } else {
-                if (designation != null
-                        && finalDesignationNames.get(designation.getName().toUpperCase()) != null)
-                    stateValue = FinancialConstants.WF_STATE_FINAL_APPROVAL_PENDING;
 
              
                 

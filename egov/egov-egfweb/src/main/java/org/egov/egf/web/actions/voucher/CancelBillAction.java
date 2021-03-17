@@ -56,30 +56,27 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.convention.annotation.Results;
 import org.apache.struts2.interceptor.validation.SkipValidation;
+import org.egov.commons.EgwStatus;
 import org.egov.commons.Fund;
+import org.egov.egf.dashboard.event.FinanceEventType;
 import org.egov.egf.dashboard.event.listener.FinanceDashboardService;
-import org.egov.egf.expensebill.repository.ExpenseBillRepository;
-import org.egov.egf.expensebill.service.ExpenseBillService;
-import org.egov.egf.utils.FinancialUtils;
 import org.egov.infra.admin.master.entity.Department;
-import org.egov.infra.admin.master.entity.User;
 import org.egov.infra.config.core.ApplicationThreadLocals;
-import org.egov.infra.persistence.entity.AbstractAuditable;
-import org.egov.infra.security.utils.SecurityUtils;
 import org.egov.infra.web.struts.actions.BaseFormAction;
 import org.egov.infra.web.struts.annotation.ValidationErrorPage;
 import org.egov.infstr.services.PersistenceService;
 import org.egov.infstr.utils.EgovMasterDataCaching;
 import org.egov.model.bills.EgBillregister;
-import org.egov.pims.commons.Position;
 import org.egov.services.bills.BillsService;
 import org.egov.utils.Constants;
 import org.egov.utils.FinancialConstants;
+import org.hibernate.SQLQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -101,17 +98,6 @@ public class CancelBillAction extends BaseFormAction {
 	private boolean afterSearch = false;
 	Integer loggedInUser = ApplicationThreadLocals.getUserId().intValue();
 	public final SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", Constants.LOCALE);
-	@Autowired
-	private ExpenseBillRepository expenseBillRepository;
-	
-	//@Autowired
-	 //private ManageAuditorService manageAuditorService;
-	
-	@Autowired
-    private FinancialUtils financialUtils;
-	
-	@Autowired
-    private SecurityUtils securityUtils;
 
 	@Autowired
 	@Qualifier("persistenceService")
@@ -120,9 +106,6 @@ public class CancelBillAction extends BaseFormAction {
 	private EgovMasterDataCaching masterDataCache;
 	@Autowired
 	private CancelBillAndVoucher cancelBillAndVoucher;
-	
-	@Autowired
-    private ExpenseBillService expenseBillService;
 	
 	@Autowired
 	FinanceDashboardService finDashboardService;
@@ -213,7 +196,7 @@ public class CancelBillAction extends BaseFormAction {
 				" select billmis.egBillregister.id, billmis.egBillregister.billnumber, billmis.egBillregister.billdate, billmis.egBillregister.billamount, billmis.departmentcode from EgBillregistermis billmis ");
 		// if the logged in user is same as creator or is superruser
 		query.append(userCond);
-		
+
 		if (fund != null && fund.getId() != null && fund.getId() != -1 && fund.getId() != 0)
 			query.append(" billmis.fund.id=" + fund.getId());
 
@@ -267,7 +250,6 @@ public class CancelBillAction extends BaseFormAction {
 						+ "' and billmis.egBillregister.status.code='"
 						+ FinancialConstants.CONTRACTORBILL_APPROVED_STATUS + "'");
 		}
-		query.append(" and billmis.egBillregister.status.description not in ('Pending for Cancellation', 'Cancelled') ");
 
 		return query;
 
@@ -303,7 +285,8 @@ public class CancelBillAction extends BaseFormAction {
 			final String[] searchQuery = query();
 			final List<Object[]> tempBillList = new ArrayList<Object[]>();
 			List<Object[]> billListWithNoVouchers, billListWithCancelledReversedVouchers;
-				LOGGER.info("Search Query - " + searchQuery);
+			if (LOGGER.isDebugEnabled())
+				LOGGER.debug("Search Query - " + searchQuery);
 			billListWithNoVouchers = persistenceService.findAllBy(searchQuery[0]);
 			billListWithCancelledReversedVouchers = persistenceService.findAllBy(searchQuery[1]);
 			tempBillList.addAll(billListWithNoVouchers);
@@ -341,37 +324,61 @@ public class CancelBillAction extends BaseFormAction {
 
 		final HashSet<Long> idSet = new HashSet<>();
 		int i = 0, idListLength = 0;
-		Long billId=0L;
 		String idString = "";
-		//final StringBuilder statusQuery = new StringBuilder("from EgwStatus where ");
-		//final StringBuilder cancelQuery = new StringBuilder("Update eg_billregister set ");
+		final StringBuilder statusQuery = new StringBuilder("from EgwStatus where ");
+		final StringBuilder cancelQuery = new StringBuilder("Update eg_billregister set ");
 		for (final BillRegisterBean billRgistrBean : billListDisplay)
 			if (billRgistrBean.getIsSelected()) {
 			    idSet.add(Long.parseLong(billRgistrBean.getId()));
-			    billId=Long.parseLong(billRgistrBean.getId());
 			    idListLength++;
 			}
-		System.out.println("id :::"+billId);
-		EgBillregister egBillregister = expenseBillService.getById(billId);
-		User user = securityUtils.getCurrentUser();
-		Position owenrPos = new Position();
-		//List<ManageAuditor> auditorList=manageAuditorService.getAudiorsDepartmentByType(Integer.parseInt(egBillregister.getEgBillregistermis().getDepartmentcode()), "RSA");
-        //owenrPos.setId(Long.valueOf(auditorList.get(0).getEmployeeid()));
-		 
-		 egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
-	                FinancialConstants.CONTINGENCYBILL_PENDING_CANCEL));
-		 egBillregister.transition().startNext().withSenderName(user.getUsername() + "::" + user.getName())
-         .withComments("Send to Audit")
-         .withStateValue("Pending for Cancellation").withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
-         .withNextAction("")
-         .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME)
-         .withCreatedBy(user.getId())
-         .withtLastModifiedBy(user.getId());
-		 applyAuditing(egBillregister,user.getId());
-		 expenseBillRepository.save(egBillregister);
-		 persistenceService.getSession().flush();
-		 //egBillregister
-		addActionMessage(getText("Bill to be Cancelled has been sent to Audit Department"));
+		if (expType == null || expType.equalsIgnoreCase("")) {
+			statusQuery.append("moduletype='" + FinancialConstants.CONTINGENCYBILL_FIN + "' and description='"
+					+ FinancialConstants.CONTINGENCYBILL_CANCELLED_STATUS + "'");
+			cancelQuery.append(
+					" billstatus='" + FinancialConstants.CONTINGENCYBILL_CANCELLED_STATUS + "' , statusid=:statusId ,lastmodifiedby=:lastModifiedby ,lastmodifieddate=:lastModifiedDate ");
+		} else if (FinancialConstants.STANDARD_EXPENDITURETYPE_SALARY.equalsIgnoreCase(expType)) {
+			statusQuery.append("moduletype='" + FinancialConstants.SALARYBILL + "' and description='"
+					+ FinancialConstants.SALARYBILL_CANCELLED_STATUS + "'");
+			cancelQuery.append(
+					" billstatus='" + FinancialConstants.SALARYBILL_CANCELLED_STATUS + "' , statusid=:statusId ,lastmodifiedby=:lastModifiedby ,lastmodifieddate=:lastModifiedDate");
+
+		} else if (FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT.equalsIgnoreCase(expType)) {
+			statusQuery.append("moduletype='" + FinancialConstants.CONTINGENCYBILL_FIN + "' and description='"
+					+ FinancialConstants.CONTINGENCYBILL_CANCELLED_STATUS + "'");
+			cancelQuery.append(
+					" billstatus='" + FinancialConstants.CONTINGENCYBILL_CANCELLED_STATUS + "' , statusid=:statusId ,lastmodifiedby=:lastModifiedby ,lastmodifieddate=:lastModifiedDate ");
+		} else if (FinancialConstants.STANDARD_EXPENDITURETYPE_PURCHASE.equalsIgnoreCase(expType)) {
+			statusQuery.append("moduletype='" + FinancialConstants.SBILL + "' and description='"
+					+ FinancialConstants.SUPPLIERBILL_CANCELLED_STATUS + "'");
+			cancelQuery.append(
+					" billstatus='" + FinancialConstants.SUPPLIERBILL_CANCELLED_STATUS + "' , statusid=:statusId ,lastmodifiedby=:lastModifiedby ,lastmodifieddate=:lastModifiedDate ");
+		} else if (FinancialConstants.STANDARD_EXPENDITURETYPE_WORKS.equalsIgnoreCase(expType)) {
+			statusQuery.append("moduletype='" + FinancialConstants.CONTRACTOR_BILL + "' and description='"
+					+ FinancialConstants.CONTRACTORBILL_CANCELLED_STATUS + "'");
+			cancelQuery.append(
+					" billstatus='" + FinancialConstants.CONTRACTORBILL_CANCELLED_STATUS + "' , statusid=:statusId ,lastmodifiedby=:lastModifiedby ,lastmodifieddate=:lastModifiedDate ");
+		}
+		if (LOGGER.isDebugEnabled())
+			LOGGER.debug(" Status Query - " + statusQuery.toString());
+		final EgwStatus status = (EgwStatus) persistenceService.find(statusQuery.toString());
+		persistenceService.getSession();
+		if (idListLength != 0) {
+			cancelQuery.append(" where id in (" + StringUtils.join(idSet,",") + ")");
+			if (LOGGER.isDebugEnabled())
+				LOGGER.debug(" Cancel Query - " + cancelQuery.toString());
+			final SQLQuery totalSQLQuery = persistenceService.getSession().createSQLQuery(cancelQuery.toString());
+			totalSQLQuery.setLong("statusId", status.getId());
+			totalSQLQuery.setLong("lastModifiedby", ApplicationThreadLocals.getUserId());
+			totalSQLQuery.setTimestamp("lastModifiedDate", date);
+			if (!idSet.isEmpty()){
+			    totalSQLQuery.executeUpdate();
+			}
+		}
+		finDashboardService.publishEvent(FinanceEventType.billUpdateByIds, idSet);
+		if (!idSet.isEmpty()){
+		    addActionMessage(getText("Bills Cancelled Succesfully"));
+                }
 		prepareBeforeSearch();
 		return "search";
 	}
@@ -407,19 +414,4 @@ public class CancelBillAction extends BaseFormAction {
 	public void setLoggedInUser(final Integer loggedInUser) {
 		this.loggedInUser = loggedInUser;
 	}
-	
-	public void applyAuditing(AbstractAuditable auditable, Long createdBy) {
-		Date currentDate = new Date();
-		if (auditable.isNew()) {
-			auditable.setCreatedBy(createdBy);
-			auditable.setCreatedDate(currentDate);
-		}
-		auditable.setLastModifiedBy(createdBy);
-		auditable.setLastModifiedDate(currentDate);
-	}
-	
-	public String getEmployeeName(Long empId){
-        
-	       return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
-	    }
 }

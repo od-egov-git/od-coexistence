@@ -77,8 +77,8 @@
     .position_alert2 {
         position: fixed;
         z-index: 9999;
-        top: 41px;
-        right: 5px;
+        top: 5px;
+        right: 270px;
         background: #265988;
         padding: 10px 20px;
         border-radius: 5px;

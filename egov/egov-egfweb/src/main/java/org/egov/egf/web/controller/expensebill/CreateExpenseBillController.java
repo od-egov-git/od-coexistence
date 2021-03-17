@@ -170,7 +170,7 @@ public class CreateExpenseBillController extends BaseBillController {
         prepareWorkflow(model, egBillregister, new WorkflowContainer());
        model.addAttribute("validActionList", validActions);
        model.addAttribute(BILL_TYPES, BillType.values());
-        prepareValidActionListByCutOffDate(model);
+        //prepareValidActionListByCutOffDate(model);
         if(isBillDateDefaultValue){
             egBillregister.setBilldate(new Date());            
         }
