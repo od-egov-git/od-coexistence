@@ -591,9 +591,6 @@ function onBodyLoad(){
      <option value="cheque">CHEQUE</option>
     <option value="DD" >DD</option> 
     <option value="card" >Card</option>
-    <option value="posmohbd"> POS MOH B&D</option> 
-    <option value="posmohcattle"> POS MOH Cattle</option>
-    <option value="posmohslh">POS MOH SLH</option>
 </select> </td>
 	    
 	    </tr>

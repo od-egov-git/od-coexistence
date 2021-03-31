@@ -244,7 +244,7 @@ public class VoucherSearchUtil {
 	public String voucherFilterQuery(final CVoucherHeader voucherHeader, final Date fromDate, final Date toDate,
 			final String mode) {
 		String sql = "";
-		if (!voucherHeader.getType().equals("-1"))
+		if (!voucherHeader.getType().equals("-1") && !voucherHeader.getType().equals("Receipt Journal"))
 			sql = sql + " and vh.type='" + voucherHeader.getType() + "'";
 
 		if (voucherHeader.getName() != null && !voucherHeader.getName().equalsIgnoreCase("0")

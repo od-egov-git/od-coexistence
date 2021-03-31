@@ -21,6 +21,9 @@ public class Bill {
 
     @JsonProperty("payerAddress")
     private String payerAddress = null;
+    
+    @JsonProperty("narration")
+    private String narration = null;
 
     @JsonProperty("payerEmail")
     private String payerEmail = null;
@@ -163,6 +166,14 @@ public class Bill {
     public void setAuditDetails(AuditDetails auditDetails) {
         this.auditDetails = auditDetails;
     }
+
+	public String getNarration() {
+		return narration;
+	}
+
+	public void setNarration(String narration) {
+		this.narration = narration;
+	}
     
     
 }

@@ -286,49 +286,6 @@ function showInstrumentDetails(obj){
 		clearChequeDDDetails();
 		//clearManualReceiptData();
 	}
-	else if(obj.id=='posmohbdradiobutton'){
-		document.getElementById('cashdetails').style.display='none';
-		document.getElementById('chequeDDdetails').style.display='none';
-		document.getElementById('carddetails').style.display='table-row';
-		document.getElementById('bankdetails').style.display='none';
-		document.getElementById('onlinedetails').style.display='none';
-		document.getElementById('instrumentTypeCashOrCard').value="posmohbd";
-		document.getElementById('instrHeaderCard.instrumentAmount').value = document.getElementById('totalamountdisplay').value;
-		clearCashDetails();
-		clearBankDetails();
-		clearChequeDDDetails();
-		//clearManualReceiptData();
-	}
-	else if(obj.id=='posmohcattleradiobutton'){
-		document.getElementById('cashdetails').style.display='none';
-		document.getElementById('chequeDDdetails').style.display='none';
-		document.getElementById('carddetails').style.display='table-row';
-		document.getElementById('bankdetails').style.display='none';
-		document.getElementById('onlinedetails').style.display='none';
-		document.getElementById('instrumentTypeCashOrCard').value="posmohcattle";
-		document.getElementById('instrHeaderCard.instrumentAmount').value = document.getElementById('totalamountdisplay').value;
-		clearCashDetails();
-		clearBankDetails();
-		clearChequeDDDetails();
-		//clearManualReceiptData();
-	}
-	else if(obj.id=='bankradiobutton'){
-		document.getElementById('cashdetails').style.display='none';
-		document.getElementById('chequeDDdetails').style.display='none';
-		document.getElementById('carddetails').style.display='none';
-		document.getElementById('bankdetails').style.display='table-row';
-		document.getElementById('onlinedetails').style.display='none';
-		document.getElementById('instrumentTypeCashOrCard').value="bankchallan";
-		clearCashDetails();
-		clearCardDetails();
-		clearChequeDDDetails();
-		<s:if test="%{isBillSourcemisc()}">
-			if(document.getElementById("fundId")!=null && document.getElementById("fundId").value!="-1"){
-				getBankBranchList(document.getElementById('fundId'));
-			}
-		</s:if>
-		document.getElementById('manualreceipt').style.display='block';    
-	}
 	else if(obj.id=='onlineradiobutton'){
 		document.getElementById('onlinedetails').style.display='table-row';
 		document.getElementById('cashdetails').style.display='none';
@@ -370,7 +327,7 @@ function validateTransactionNumber()
 	
 	document.getElementById("receipt_error_area").innerHTML="";    
 	document.getElementById("receipt_error_area").style.display="none";
-	 if(document.getElementById("cardradiobutton").checked || document.getElementById("posmohbdradiobutton").checked || document.getElementById("posmohcattleradiobutton").checked || document.getElementById("posmohslhradiobutton").checked)
+	 if(document.getElementById("cardradiobutton").checked)
 		 {    
 		 	 var instrumentNum="";
 		 	 var confirmInstrumentNo="";
@@ -443,21 +400,6 @@ loadBankDetailFailureHandler = function(){
 	</span> <span style="float: left;" id="cardradiobuttonspan"> <input
 			onClick="showInstrumentDetails(this);setinstrumenttypevalue(this);" type="radio" align="absmiddle"
 			value="card" id="cardradiobutton" name="paytradiobutton" /> Credit/Debit card
-			&nbsp;
-	</span>
-	<span style="float: left;" id="posmohbdradiobuttonspan"> <input
-			onClick="showInstrumentDetails(this);setinstrumenttypevalue(this);" type="radio" align="absmiddle"
-			value="posmohbd" id="posmohbdradiobutton" name="paytradiobutton" /> POS MOH B&D
-			&nbsp;
-	</span>
-	<span style="float: left;" id="posmohcattleradiobuttonspan"> <input
-			onClick="showInstrumentDetails(this);setinstrumenttypevalue(this);" type="radio" align="absmiddle"
-			value="posmohcattle" id="posmohcattleradiobutton" name="paytradiobutton" /> POS MOH Cattle
-			&nbsp;
-	</span>
-	<span style="float: left;" id="posmohslhradiobuttonspan"> <input
-			onClick="showInstrumentDetails(this);setinstrumenttypevalue(this);" type="radio" align="absmiddle"
-			value="posmohslh" id="posmohslhradiobutton" name="paytradiobutton" /> POS MOH SLH
 			&nbsp;
 	</span>
 	 <span style="float: left;" id="bankradiobuttonspan"> <input

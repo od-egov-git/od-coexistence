@@ -124,6 +124,7 @@ $(document).ready(function(){
 
 	entityName.initialize();
 $('.subLedgerCodeOT').typeahead({
+	
 		hint : true,
 		highlight : true,
 		minLength : 1
@@ -132,12 +133,15 @@ $('.subLedgerCodeOT').typeahead({
 		source : entityName.ttAdapter()
 	}).on('typeahead:selected', function (event, data) {
 		
-		
-
 		document.getElementById('tempSubLedger[0].subLedgerCode').value=data.code;
 			detailKeyName = data.name;
 			document.getElementById('tempSubLedger[0].payTo').value=data.name;
 			document.getElementById('tempSubLedger[0].detailkeyId').value=data.id;
+			if(document.getElementById('tempSubLedger[0].netPayableDetailKeyId').value==""){
+				document.getElementById('tempSubLedger[0].netPayableDetailKeyId').value=document.getElementById('tempSubLedger[0].detailkeyId').value;
+				document.getElementById('tempSubLedger[0].netPayableDetailKeyName').value=detailKeyName;
+			}
+
 			
 			
 			
@@ -436,8 +440,10 @@ $('.subLedgerCodeOT').typeahead({
 			detailKeyName = data.name;
 			document.getElementById('tempSubLedger['+index+'].payTo').value=data.name;
 			document.getElementById('tempSubLedger['+index+'].detailkeyId').value=data.id;
-			
-				 
+			if(document.getElementById('tempSubLedger['+index+'].netPayableDetailKeyId').value==""){
+				document.getElementById('tempSubLedger['+index+'].netPayableDetailKeyId').value=document.getElementById('tempSubLedger['+index+'].detailkeyId').value;
+				document.getElementById('tempSubLedger['+index+'].netPayableDetailKeyName').value=detailKeyName;
+			}
 				
 		
 	});
@@ -662,7 +668,6 @@ $('.netPayableAccount_Code').change(function () {
 		document.getElementById('tempSubLedger['+index+'].netPayableDetailKeyName').value=detailKeyName;
 		document.getElementById('tempSubLedger['+index+'].netPayableGlcode').value=netpayGlcode.substr(0,netpayGlcode.indexOf('-'));
 		document.getElementById('tempSubLedger['+index+'].netPayableAccountHead').value=netpayGlcode.substr(netpayGlcode.indexOf('-')+1);
-		
 	}
 });
 
@@ -1165,6 +1170,7 @@ $("#populateAccountDetails").click(function () {
 				//where this id
 				$("#netPayableId").val(document.getElementById('tempSubLedger['+index+'].netPayableAccountCode').value);
 				accountDetailsCount++;
+				
 				if(document.getElementById('tempSubLedger['+index+'].netPayableIsSubLedger').value!="false"  && document.getElementById('tempSubLedger['+index+'].netPayableDetailTypeId').value!="" && document.getElementById('tempSubLedger['+index+'].netPayableDetailKeyId').value!=""){
 					populateSubLedgerDetails(document.getElementById('tempSubLedger['+index+'].netPayableAccountCode').value,document.getElementById('tempSubLedger['+index+'].netPayableGlcode').value,
 							document.getElementById('tempSubLedger['+index+'].netPayableDetailTypeId').value,document.getElementById('tempSubLedger['+index+'].netPayableDetailKeyId').value,
@@ -1176,6 +1182,7 @@ $("#populateAccountDetails").click(function () {
 		clearAllDetails();
 	}
 	calculateBillAmount();
+	
 });
 
 

@@ -360,7 +360,7 @@ function validateAccDtls()
 		alert("return false");
 		return false;
 		}
-				
+	 
 	
 	return true;
 }

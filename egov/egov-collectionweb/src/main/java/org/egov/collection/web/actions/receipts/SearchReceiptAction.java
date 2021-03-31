@@ -338,7 +338,7 @@ public class SearchReceiptAction extends SearchFormAction {
                     receiptHeader.setReceiptdate(new Date(billDetail.getReceiptDate()));
                     receiptHeader.setService(microserviceUtils.getBusinessServiceNameByCode(billDetail.getBusinessService()));
                     receiptHeader.setReferencenumber(billDetail.getBillNumber());
-                    //receiptHeader.setReferenceDesc(bill.getNarration());
+                    receiptHeader.setReferenceDesc(bill.getNarration());
                     receiptHeader.setPayeeAddress(bill.getPayerAddress());
                     receiptHeader.setPaidBy((bill.getPaidBy()).split("&")[0]+"  "+bill.getPayerAddress());
                     receiptHeader.setPayeeName(bill.getPayerName());
@@ -462,7 +462,7 @@ public class SearchReceiptAction extends SearchFormAction {
                     System.out.println("6");
                     receiptHeader.setReferencenumber("");
                     System.out.println("7");
-                    //receiptHeader.setReferenceDesc(bill.getNarration());
+                    receiptHeader.setReferenceDesc(bill.getNarration());
                     System.out.println("8");
                     receiptHeader.setPayeeName(bill.getPayerName());
                     System.out.println("9");
@@ -806,7 +806,7 @@ public class SearchReceiptAction extends SearchFormAction {
                     System.out.println("44");
                     receiptHeader.setReferencenumber("");
                     System.out.println("55");
-                    //receiptHeader.setReferenceDesc(bill.getNarration());
+                    receiptHeader.setReferenceDesc(bill.getNarration());
                     System.out.println("66");
                     receiptHeader.setPayeeAddress(bill.getPayerAddress());
                     System.out.println("77");

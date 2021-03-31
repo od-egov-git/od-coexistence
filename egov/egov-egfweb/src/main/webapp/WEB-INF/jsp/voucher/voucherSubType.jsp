@@ -61,6 +61,7 @@
 			<option value="Fixed Asset">Fixed Asset</option>
 			<!-- <option value="Salary">Salary</option> -->
 			<option value="Expense">Expense</option>
+			<option value="Receipt">Receipt</option>
 			<!-- <option value="Pension">Pension</option> -->
 	</select></td>
 	<td class="greybox"><s:text name="jv.partyName" />
@@ -122,6 +123,8 @@ function onChangeVSubType(){
 		vsubTypeValue = "fixedassetjv-Supplier Journal";
 	}else if(vType == 'Pension'){
 	vsubTypeValue = "pensionjv-Pension Journal";  
+	}else if(vType == 'Receipt'){
+	vsubTypeValue = "receiptjv-Receipt Journal";  
 	}
 	var array = vsubTypeValue.split("-");
 	document.getElementById('voucherTypeBean.voucherNumType').value = array[0];

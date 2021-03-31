@@ -89,17 +89,21 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
 						<th>Party Name</th>
 						<th>Division</th>
 						<th>Budget Head</th>
+						<th>Scheme</th>
 						<th>Gross Amount</th>
 						<th>TDS/I. Tax</th>
 						<th>TDS ON IGST</th><th>TDS ON CGST/UTGST</th><th>Labour Cess</th>
 						<th>Collection charges</th><th>Water charges</th><th>Quality Cess</th>
-						<th>Penalty/Fine</th><th>Security/Amt withheld</th><th>Any other deduction</th>
+						<th>Penalty/Fine</th><th>Security/Amt withheld</th><th>GPF</th><th>NPS/CPF</th><th>GSLIC/GIS</th><th>House Building Advance</th><th>Licence Fees</th><th>LIC</th><th>Bank Loan</th><th>Court Attachment</th><th>Pension Fund</th><th>Any other deduction</th>
 						<th>Net Amount</th>
 						<th>Paid Amount</th>
 						<th>Journal Voucher number </th>
+						<th>Jounal Voucher Date</th>
 						<th> Payment voucher number</th>
+						<th>BPV Date</th>
 						<th>PEX NUMBER</th>
 						<th>PEX DATE </th>
+						<th>Bank Account Number</th>
 						<th>Status</th>
 					</tr>
 					</thead>
@@ -118,6 +122,9 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
 						    </td>
 						    <td>
 								${ result.budgetHead}
+						    </td>
+						    <td>
+								${ result.scheme}
 						    </td>
 						    <td>
 								${ result.grossAmount}
@@ -149,6 +156,33 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
 						    <td>
 								${ result.securitAmount}
 						    </td>
+						     <td>
+								${ result.gpfAmount}
+						    </td>
+						     <td>
+								${ result.npsAmount}
+						    </td>
+						     <td>
+								${ result.gslicAmount}
+						    </td>
+						     <td>
+								${ result.hbaAmount}
+						    </td>
+						     <td>
+								${ result.licenseAmount}
+						    </td>
+						     <td>
+								${ result.licAmount}
+						    </td>
+						     <td>
+								${ result.bankAmount}
+						    </td>
+						     <td>
+								${ result.courtAmount}
+						    </td>
+						     <td>
+								${ result.pensionAmount}
+						    </td>
 						    <td>
 								${ result.deductionAmount}
 						    </td>
@@ -161,14 +195,23 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
 						    <td>
 								${ result.voucherNumber}
 						    </td>
+						     <td>
+								${ result.voucherDate}
+						    </td>
 						    <td>
 								${ result.paymentVoucherNumber}
+						    </td>
+						    <td>
+								${ result.bpvDate}
 						    </td>
 						    <td>
 								${ result.pexNo}
 						    </td>
 						    <td>
 								${ result.pexNodate}
+						    </td>
+						     <td>
+								${ result.bankaccount}
 						    </td>
 						    <td>
 								${ result.status}

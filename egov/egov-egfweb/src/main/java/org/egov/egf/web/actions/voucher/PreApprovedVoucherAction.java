@@ -590,6 +590,12 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
                     ismodifyJv = true;
                 }
             }
+            else {
+                type = FinancialConstants.JOURNALVOUCHER_NAME_GENERAL;
+                result = "editVoucher";
+                ismodifyJv = true;
+                System.out.println("type-----------5----------"+type);
+            }
         // loadApproverUser(type);
        			
         if (!ismodifyJv)
@@ -1426,12 +1432,27 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
         return tempMap;
     }
 
-    public void setupDropDownForSL(final List<Long> glcodeIdList) {
+   /* public void setupDropDownForSL(final List<Long> glcodeIdList) {
         List<CChartOfAccounts> glcodeList = null;
         final Query glcodeListQuery = persistenceService.getSession().createQuery(
                 " from CChartOfAccounts where id in (select glCodeId from CChartOfAccountDetail) and id in  ( :IDS )");
         glcodeListQuery.setParameterList("IDS", glcodeIdList);
         glcodeList = glcodeListQuery.list();
+        if (glcodeIdList.isEmpty())
+            dropdownData.put("glcodeList", Collections.EMPTY_LIST);
+        else
+            dropdownData.put("glcodeList", glcodeList);
+    }*/
+    
+    public void setupDropDownForSL(final List<Long> glcodeIdList) {
+        List<CChartOfAccounts> glcodeList = null;
+        if (!glcodeIdList.isEmpty())
+        {
+        final Query glcodeListQuery = persistenceService.getSession().createQuery(
+                " from CChartOfAccounts where id in (select glCodeId from CChartOfAccountDetail) and id in  ( :IDS )");
+        glcodeListQuery.setParameterList("IDS", glcodeIdList);
+        glcodeList = glcodeListQuery.list();
+        }
         if (glcodeIdList.isEmpty())
             dropdownData.put("glcodeList", Collections.EMPTY_LIST);
         else

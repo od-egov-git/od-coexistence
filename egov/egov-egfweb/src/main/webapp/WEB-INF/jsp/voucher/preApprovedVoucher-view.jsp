@@ -101,8 +101,15 @@
 	}
 }
 
+
+ 
+ @media print {
+    html, body {
+        height: 95%;    
+    }
+}
+
 </style>
-	
 </head>
 
 <body onload="refreshInbox()">
@@ -275,11 +282,9 @@
 						onclick="document.getElementById('actionName').value='%{name}';return true" />
 				</s:iterator>
 			</s:if>
-			<input name="button" type="button" class="buttonsubmit" id="button1"
-				value="Print" onclick="window.print()" />&nbsp;
+			<input name="button" type="button" class="buttonsubmit" id="button1" value="Print" onclick="window.print()" />&nbsp;
+		    <input type="button" name="button2" id="button2" value="Close" class="button" onclick="window.parent.postMessage('close','*');window.close();">
 				
-			<input	type="button" id="button2" value="Close"
-				onclick="javascript:window.close()" class="button" />
 				
 				
 			<s:if test="%{voucherHeader.voucherNumberPrefix!=null && voucherHeader.voucherNumberPrefix!=''}">

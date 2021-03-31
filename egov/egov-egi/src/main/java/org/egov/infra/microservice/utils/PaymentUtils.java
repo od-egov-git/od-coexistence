@@ -117,7 +117,7 @@ public class PaymentUtils {
         	bill.setPayerAddress("");
         }
         
-        //bill.setNarration(payment.getNarration());
+        bill.setNarration(payment.getNarration());
         //bill.setPayerAddress(billv2.getPayerAddress());
         bill.setPayerEmail(billv2.getPayerEmail());
         bill.setPayerId(billv2.getPayerId());
@@ -129,8 +129,6 @@ public class PaymentUtils {
         //prepare billdetails
         this.prepareBillDetailsData(paymentDetail,bill);
         receipt.getBill().add(bill);
-        System.out.println("subdivison xxxx ::: "+payment.getSubdivison());
-        System.out.println("gst xxxx ::: "+payment.getGstno());
         receipt.setSubdivison(payment.getSubdivison());
         receipt.setGstNo(payment.getGstno());
         receipt.setPaymentStatus(payment.getPaymentStatus().name());

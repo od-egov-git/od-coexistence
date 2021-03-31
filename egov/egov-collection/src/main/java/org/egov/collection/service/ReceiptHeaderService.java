@@ -1745,16 +1745,6 @@ public class ReceiptHeaderService extends PersistenceService<ReceiptHeader, Long
         case "ONLINE":
             payModeEnum = PaymentModeEnum.ONLINE;
             break;
-        case "POSMOHBD":
-            payModeEnum = PaymentModeEnum.POSMOHBD;
-            break;
-        case "POSMOHCATTLE":
-            payModeEnum = PaymentModeEnum.POSMOHCATTLE;
-            break;
-        case "POSMOHSLH":
-            payModeEnum = PaymentModeEnum.POSMOHSLH;
-            break;
-
         default:
             payModeEnum = PaymentModeEnum.CASH;
         }
