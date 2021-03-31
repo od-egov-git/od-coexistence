@@ -1,0 +1,499 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.6.0.final using JasperReports Library version 6.5.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="CollectionReport" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="1c3a4684-e156-47d4-b35a-600637088098">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="Table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<subDataset name="CollectionReportDataSet" uuid="94b87fa8-ae02-43fb-80f2-7ccabd7aaf7b">
+		<queryString>
+			<![CDATA[]]>
+		</queryString>
+		<field name="paramDate" class="java.lang.String"/>
+		<field name="receiptNo" class="java.lang.String"/>
+		<field name="collectedBy" class="java.lang.String"/>
+		<field name="payeeName" class="java.lang.String"/>
+		<field name="serviceType" class="java.lang.String"/>
+		<field name="modeOfPayment" class="java.lang.String"/>
+		<field name="particulars" class="java.lang.String"/>
+		<field name="totalReceiptAmount" class="java.math.BigDecimal"/>
+		<field name="principalAmt" class="java.math.BigDecimal"/>
+		<field name="gstAmount" class="java.math.BigDecimal"/>
+		<field name="dateOfDeposite" class="java.lang.String"/>
+		<field name="remitanceNo" class="java.lang.String"/>
+		<field name="bankAccountNo" class="java.lang.String"/>
+		<field name="depositAmount" class="java.math.BigDecimal"/>
+		<field name="slNo" class="java.lang.String"/>
+		<field name="gstNo" class="java.lang.String"/>
+		<variable name="TotalReceiptV" class="java.math.BigDecimal" calculation="Sum">
+			<variableExpression><![CDATA[$F{totalReceiptAmount}]]></variableExpression>
+		</variable>
+		<variable name="TotalDepositV" class="java.math.BigDecimal" calculation="Sum">
+			<variableExpression><![CDATA[$F{depositAmount}]]></variableExpression>
+		</variable>
+		<variable name="TotalPV" class="java.math.BigDecimal" calculation="Sum">
+			<variableExpression><![CDATA[$F{principalAmt}]]></variableExpression>
+		</variable>
+		<variable name="TotalGV" class="java.math.BigDecimal" calculation="Sum">
+			<variableExpression><![CDATA[$F{gstAmount}]]></variableExpression>
+		</variable>
+	</subDataset>
+	<parameter name="CollectionReportDataSource" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
+	<parameter name="HeaderParameter" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="46" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="802" height="46" uuid="f8312670-2040-4613-a66c-92ff130e8909"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Georgia" size="16" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{HeaderParameter}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<detail>
+		<band height="208" splitType="Stretch">
+			<componentElement>
+				<reportElement x="0" y="30" width="802" height="100" uuid="1237a33b-8790-496e-ab16-9d68343e756f"/>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="CollectionReportDataSet" uuid="bdd9a9de-6225-4e5d-83c9-1811c561e497">
+						<dataSourceExpression><![CDATA[$P{CollectionReportDataSource}]]></dataSourceExpression>
+					</datasetRun>
+					<jr:column width="30" uuid="cc87b8da-fa17-49e2-914d-62be271d5139">
+						<jr:columnHeader style="Table_CH" height="40" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="30" height="40" uuid="45c0e166-5074-4ab8-9ace-737c4548c3a4"/>
+								<textElement textAlignment="Center">
+									<font fontName="Georgia" size="11"/>
+								</textElement>
+								<text><![CDATA[Sl. No.]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter style="Table_CH" height="30" rowSpan="1"/>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="30" height="30" uuid="22135ff7-a4be-43f6-9258-1f8f1055149f"/>
+								<textElement textAlignment="Center">
+									<font fontName="Georgia" size="11"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{slNo}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="60" uuid="0ae0996f-a011-4268-b03f-697c78fdbb09">
+						<jr:columnHeader style="Table_CH" height="40" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="60" height="40" uuid="57351174-4acf-4697-ab8c-fc5136a88bc1"/>
+								<textElement textAlignment="Center">
+									<font fontName="Georgia" size="11"/>
+								</textElement>
+								<text><![CDATA[Date]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter style="Table_CH" height="30" rowSpan="1"/>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="60" height="30" isPrintWhenDetailOverflows="true" uuid="d446f99f-6b3f-46a8-a571-0a7207d37d3a"/>
+								<textElement textAlignment="Center">
+									<font fontName="Georgia" size="11"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{paramDate}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="50" uuid="91973b9e-c67d-4ba4-84f7-99716a9e965c">
+						<jr:columnHeader style="Table_CH" height="40" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="50" height="40" uuid="b012b07b-e978-4501-8bf7-ee008c97ad28"/>
+								<textElement textAlignment="Center">
+									<font fontName="Georgia" size="11"/>
+								</textElement>
+								<text><![CDATA[Receipt No]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter style="Table_CH" height="30" rowSpan="1"/>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField isStretchWithOverflow="true">
+								<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="50" height="30" isPrintWhenDetailOverflows="true" uuid="482be94b-f1da-4408-a4f0-2450cb4bde29"/>
+								<textElement textAlignment="Center">
+									<font fontName="Georgia" size="11"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{receiptNo}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="40" uuid="8b189b52-0289-427b-8bc2-adb7e4b97e57">
+						<jr:columnHeader style="Table_CH" height="40" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="40" height="40" uuid="9b4e084b-4bd7-4966-af79-3eeded02e213"/>
+								<textElement textAlignment="Center">
+									<font fontName="Georgia" size="11"/>
+								</textElement>
+								<text><![CDATA[GST No]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter style="Table_CH" height="30" rowSpan="1"/>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField isStretchWithOverflow="true">
+								<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="40" height="30" isPrintWhenDetailOverflows="true" uuid="5befc63a-cbee-4f12-94e6-55830c256c9f"/>
+								<textElement textAlignment="Center">
+									<font fontName="Georgia" size="11"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{gstNo}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="62" uuid="6c9f87d7-bcc3-45ee-b43e-dda78a4d9a3d">
+						<jr:columnHeader style="Table_CH" height="40" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="62" height="40" uuid="d6b99357-de44-49d7-92e2-6c7eed8aa3e7"/>
+								<textElement textAlignment="Center">
+									<font fontName="Georgia" size="11"/>
+								</textElement>
+								<text><![CDATA[Collected By]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter style="Table_CH" height="30" rowSpan="1"/>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField isStretchWithOverflow="true">
+								<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="62" height="30" isPrintWhenDetailOverflows="true" uuid="37439910-e5d6-4f61-8188-d57395415141"/>
+								<textElement textAlignment="Center">
+									<font fontName="Georgia" size="11"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{collectedBy}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="62" uuid="e2dfd715-ab91-4ebf-bdfa-b99a8a014b8f">
+						<jr:columnHeader style="Table_CH" height="40" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="62" height="40" uuid="21c910e4-dc44-415b-9e8e-2e9f700fd16d"/>
+								<textElement textAlignment="Center">
+									<font fontName="Georgia" size="11"/>
+								</textElement>
+								<text><![CDATA[Payee Name]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter style="Table_CH" height="30" rowSpan="1"/>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField isStretchWithOverflow="true">
+								<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="62" height="30" isPrintWhenDetailOverflows="true" uuid="cc9390ea-c102-43d8-888b-35572cbeb59b"/>
+								<textElement textAlignment="Center">
+									<font fontName="Georgia" size="11"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{payeeName}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="72" uuid="88d7d075-3fae-4062-b39a-235280054e3e">
+						<jr:columnHeader style="Table_CH" height="40" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="72" height="40" uuid="80ce1621-5b63-49bf-8a12-eca82750b077"/>
+								<textElement textAlignment="Center">
+									<font fontName="Georgia" size="11"/>
+								</textElement>
+								<text><![CDATA[Service Type]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter style="Table_CH" height="30" rowSpan="1"/>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField isStretchWithOverflow="true">
+								<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="72" height="30" isPrintWhenDetailOverflows="true" uuid="3b6c1cce-c8ca-4947-bbb0-9960f19e88b1"/>
+								<textElement textAlignment="Center">
+									<font fontName="Georgia" size="11"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{serviceType}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="62" uuid="47dc451c-44a7-4997-9096-b024f3254f7a">
+						<jr:columnHeader style="Table_CH" height="40" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="62" height="40" uuid="b3fe498b-c688-4333-82da-7740466c202d"/>
+								<textElement textAlignment="Center">
+									<font fontName="Georgia" size="11"/>
+								</textElement>
+								<text><![CDATA[Mode Of Payment]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter style="Table_CH" height="30" rowSpan="1"/>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField isStretchWithOverflow="true">
+								<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="62" height="30" isPrintWhenDetailOverflows="true" uuid="86e41886-c71e-447c-b954-b2093fc02047"/>
+								<textElement textAlignment="Center">
+									<font fontName="Georgia" size="11"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{modeOfPayment}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="92" uuid="45b3540c-1759-48e6-9844-e086439313a3">
+						<jr:columnHeader style="Table_CH" height="40" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="92" height="40" uuid="d55909cb-8e6e-449f-8f55-fedc6a68be1e"/>
+								<textElement textAlignment="Center">
+									<font fontName="Georgia" size="11"/>
+								</textElement>
+								<text><![CDATA[Particulars]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter style="Table_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="92" height="30" uuid="191da351-e1d2-4107-82fb-26d576afd428"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Georgia" size="11"/>
+								</textElement>
+								<text><![CDATA[Total]]></text>
+							</staticText>
+						</jr:columnFooter>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField isStretchWithOverflow="true">
+								<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="92" height="30" isPrintWhenDetailOverflows="true" uuid="39dca604-963b-4bab-b9a5-301315fae6bc"/>
+								<textElement textAlignment="Center">
+									<font fontName="Georgia" size="11"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{particulars}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="40" uuid="668c32e5-3f54-4b9f-a2ac-f03900b7568c">
+						<jr:columnHeader style="Table_CH" height="40" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="40" height="40" uuid="22503b79-6ca8-47f4-85c9-0d47ab62f495"/>
+								<textElement textAlignment="Center">
+									<font fontName="Georgia" size="11"/>
+								</textElement>
+								<text><![CDATA[Principal Amount]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter style="Table_CH" height="30" rowSpan="1">
+							<textField pattern="#,##0.00#">
+								<reportElement x="0" y="0" width="40" height="30" uuid="901bf244-0e51-442e-823d-9d12d098955d"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Georgia"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{TotalPV}]]></textFieldExpression>
+							</textField>
+						</jr:columnFooter>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField isStretchWithOverflow="true">
+								<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="40" height="30" isPrintWhenDetailOverflows="true" uuid="cea0a1eb-c6ae-427c-b30c-84b9cd473538"/>
+								<textElement textAlignment="Center">
+									<font fontName="Georgia" size="11"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{principalAmt}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="40" uuid="3337142e-acfc-431e-857b-2ce08bca677a">
+						<jr:columnHeader style="Table_CH" height="40" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="40" height="40" uuid="67248320-064d-4669-95c7-d8cb0a3fa3a3"/>
+								<textElement textAlignment="Center">
+									<font fontName="Georgia" size="11"/>
+								</textElement>
+								<text><![CDATA[GST]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter style="Table_CH" height="30" rowSpan="1">
+							<textField pattern="#,##0.00#">
+								<reportElement x="0" y="0" width="40" height="30" uuid="f1f232e6-ae5c-4464-9a84-76e8ae5d6376"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Georgia"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{TotalGV}]]></textFieldExpression>
+							</textField>
+						</jr:columnFooter>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField isStretchWithOverflow="true">
+								<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="40" height="30" isPrintWhenDetailOverflows="true" uuid="e0d5334b-dd0a-4b7e-8e7c-3552dbfc1555"/>
+								<textElement textAlignment="Center">
+									<font fontName="Georgia" size="11"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{gstAmount}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="62" uuid="1847345a-4720-4c07-931a-655b58290377">
+						<jr:columnHeader style="Table_CH" height="40" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="62" height="40" uuid="6eb929f5-1e31-41a4-84f0-486c2e3de1d5"/>
+								<textElement textAlignment="Center">
+									<font fontName="Georgia" size="11"/>
+								</textElement>
+								<text><![CDATA[Total Receipt Amount]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter style="Table_CH" height="30" rowSpan="1">
+							<textField pattern="#,##0.00#">
+								<reportElement x="0" y="0" width="62" height="30" uuid="93b20794-fdab-47bc-b637-fb6aac8ce5a1"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Georgia"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{TotalReceiptV}]]></textFieldExpression>
+							</textField>
+						</jr:columnFooter>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField isStretchWithOverflow="true" pattern="#,##0.00#">
+								<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="62" height="30" isPrintWhenDetailOverflows="true" uuid="53130be1-2567-4c5d-8220-662eb61b9967"/>
+								<textElement textAlignment="Center">
+									<font fontName="Georgia" size="11"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{totalReceiptAmount}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="51" uuid="829e04ba-5e5d-44bc-9236-05fd36396f38">
+						<jr:columnHeader style="Table_CH" height="40" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="51" height="40" uuid="809563f8-f495-42fc-a7b7-d362421691db"/>
+								<textElement textAlignment="Center">
+									<font fontName="Georgia" size="11"/>
+								</textElement>
+								<text><![CDATA[Date Of Deposite]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter style="Table_CH" height="30" rowSpan="1"/>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField isStretchWithOverflow="true">
+								<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="51" height="30" isPrintWhenDetailOverflows="true" uuid="4e7414b9-b15d-4e9d-ac2a-df12955ba8d8"/>
+								<textElement textAlignment="Center">
+									<font fontName="Georgia" size="11"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{dateOfDeposite}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="61" uuid="d913777e-1a2f-4d74-9f05-97ad2d917da8">
+						<jr:columnHeader style="Table_CH" height="40" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="61" height="40" uuid="fa342ccd-4185-4f27-aa50-e911dd34bf14"/>
+								<textElement textAlignment="Center">
+									<font fontName="Georgia" size="11"/>
+								</textElement>
+								<text><![CDATA[Remitance No]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter style="Table_CH" height="30" rowSpan="1"/>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField isStretchWithOverflow="true">
+								<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="61" height="30" isPrintWhenDetailOverflows="true" uuid="b914096f-29ee-4293-907b-c9b337eb6069"/>
+								<textElement textAlignment="Center">
+									<font fontName="Georgia" size="11"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{remitanceNo}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="76" uuid="1eac2327-786d-4564-9d13-810de8d46b36">
+						<jr:columnHeader style="Table_CH" height="40" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="76" height="40" uuid="c334bc99-0c19-4103-bb76-047f07dd7118"/>
+								<textElement textAlignment="Center">
+									<font fontName="Georgia" size="11"/>
+								</textElement>
+								<text><![CDATA[Bank Account No]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter style="Table_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="76" height="30" uuid="f0a65050-0853-4b4d-abb9-30894926cb69"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Georgia" size="11"/>
+								</textElement>
+								<text><![CDATA[Total]]></text>
+							</staticText>
+						</jr:columnFooter>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField isStretchWithOverflow="true">
+								<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="76" height="30" isPrintWhenDetailOverflows="true" uuid="0afb3cda-bbda-4fa9-908a-d038c9b52c46"/>
+								<textElement textAlignment="Center">
+									<font fontName="Georgia" size="11"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{bankAccountNo}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="61" uuid="5a6961e6-b98e-4f71-a729-8ae2131a9883">
+						<jr:columnHeader style="Table_CH" height="40" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="61" height="40" uuid="be89231c-9c7c-4b3a-88d4-698ee12fcce9"/>
+								<textElement textAlignment="Center">
+									<font fontName="Georgia" size="11"/>
+								</textElement>
+								<text><![CDATA[Deposit Amount]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter style="Table_CH" height="30" rowSpan="1">
+							<textField pattern="#,##0.00#">
+								<reportElement x="0" y="0" width="61" height="30" uuid="603bac89-5167-44dc-a94e-99be5b7428c7"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Georgia" size="11"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{TotalDepositV}]]></textFieldExpression>
+							</textField>
+						</jr:columnFooter>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField isStretchWithOverflow="true" pattern="#,##0.00#">
+								<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="61" height="30" isPrintWhenDetailOverflows="true" uuid="24a9ecb8-3874-47f0-9dcb-d2b33989e8ad"/>
+								<textElement textAlignment="Center">
+									<font fontName="Georgia" size="11"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{depositAmount}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+			<staticText>
+				<reportElement x="0" y="1" width="630" height="29" uuid="d6a871fc-783e-4688-8cde-426ff758049a"/>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Georgia" size="12"/>
+				</textElement>
+				<text><![CDATA[RECEIPT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="630" y="1" width="172" height="29" uuid="6688bfd5-11fa-462b-be21-4ae4ac2757c5"/>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Georgia" size="12"/>
+				</textElement>
+				<text><![CDATA[DEPOSIT]]></text>
+			</staticText>
+		</band>
+	</detail>
+</jasperReport>

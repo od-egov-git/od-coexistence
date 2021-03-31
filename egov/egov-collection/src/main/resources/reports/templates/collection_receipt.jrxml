@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.6.0.final using JasperReports Library version 6.6.0  -->
+<!-- Created with Jaspersoft Studio version 6.12.2.final using JasperReports Library version 6.12.2-75c5e90a222ab406e416cbf590a5397028a52de3  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="collection_receipt_challan" language="groovy" pageWidth="595" pageHeight="842" columnWidth="595" leftMargin="0" rightMargin="0" topMargin="10" bottomMargin="10" resourceBundle="custom" uuid="1fd0c026-6f9d-417e-b936-3ab1dd76cfd4">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="404"/>
 	<import value="org.egov.infra.reporting.util.*"/>
 	<import value="org.egov.infstr.utils.*"/>
 	<import value="net.sf.jasperreports.engine.data.*"/>
@@ -13,6 +16,10 @@
 	</parameter>
 	<parameter name="EGOV_COMMON" class="org.egov.egf.commons.EgovCommon" isForPrompting="false"/>
 	<parameter name="CITY_LOGO_PATH" class="java.lang.Object"/>
+	<parameter name="CORNER_LOGO_PATH" class="java.lang.String"/>
+	<parameter name="BACKGROUND" class="java.lang.String"/>
+	<parameter name="RECEIPT_HEADER" class="java.lang.String"/>
+	<parameter name="SUBDIVISION" class="java.lang.String"/>
 	<field name="instrumentDetails" class="java.util.Collection"/>
 	<field name="accountDetails" class="java.util.Collection"/>
 	<field name="totalAmount" class="java.math.BigDecimal"/>
@@ -25,18 +32,29 @@
 	</variable>
 	<group name="Receipt" isStartNewPage="true"/>
 	<background>
-		<band splitType="Stretch"/>
+		<band height="500" splitType="Stretch">
+			<image scaleImage="FillFrame" hAlign="Center">
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="595" height="500" uuid="c37357aa-13aa-4f7e-b514-92b4d9d713d0"/>
+				<imageExpression><![CDATA[$P{BACKGROUND}]]></imageExpression>
+			</image>
+		</band>
 	</background>
 	<detail>
-		<band height="200">
+		<band height="143">
 			<subreport>
-				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="595" height="200" isRemoveLineWhenBlank="true" uuid="3c0c1d3f-fb6f-492f-9fac-8e58a81c4b4c"/>
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="595" height="143" isRemoveLineWhenBlank="true" uuid="3c0c1d3f-fb6f-492f-9fac-8e58a81c4b4c"/>
 				<parametersMapExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}]]></parametersMapExpression>
+				<subreportParameter name="EGOV_COPY">
+					<subreportParameterExpression><![CDATA["Customer Copy"]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="RECEIPT_HEADER">
+					<subreportParameterExpression><![CDATA[$P{RECEIPT_HEADER}]]></subreportParameterExpression>
+				</subreportParameter>
 				<subreportParameter name="EGOV_COMMON">
 					<subreportParameterExpression><![CDATA[$P{EGOV_COMMON}]]></subreportParameterExpression>
 				</subreportParameter>
-				<subreportParameter name="EGOV_COPY">
-					<subreportParameterExpression><![CDATA["Official Copy"]]></subreportParameterExpression>
+				<subreportParameter name="CORNER_LOGO_PATH">
+					<subreportParameterExpression><![CDATA[$P{CORNER_LOGO_PATH}]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="CITY_LOGO_PATH">
 					<subreportParameterExpression><![CDATA[$P{CITY_LOGO_PATH}]]></subreportParameterExpression>
@@ -45,15 +63,21 @@
 				<subreportExpression><![CDATA[ReportUtil.getTemplateAsStream("collection_receipt_single.jasper")]]></subreportExpression>
 			</subreport>
 		</band>
-		<band height="200">
+		<band height="140">
 			<subreport>
-				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="595" height="200" isRemoveLineWhenBlank="true" uuid="8d69aab0-0e60-4117-a31c-35e0021ed3d1"/>
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="595" height="139" isRemoveLineWhenBlank="true" uuid="8d69aab0-0e60-4117-a31c-35e0021ed3d1"/>
 				<parametersMapExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}]]></parametersMapExpression>
+				<subreportParameter name="EGOV_COPY">
+					<subreportParameterExpression><![CDATA["Official Copy"]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="RECEIPT_HEADER">
+					<subreportParameterExpression><![CDATA[$P{RECEIPT_HEADER}]]></subreportParameterExpression>
+				</subreportParameter>
 				<subreportParameter name="EGOV_COMMON">
 					<subreportParameterExpression><![CDATA[$P{EGOV_COMMON}]]></subreportParameterExpression>
 				</subreportParameter>
-				<subreportParameter name="EGOV_COPY">
-					<subreportParameterExpression><![CDATA["Customer Copy"]]></subreportParameterExpression>
+				<subreportParameter name="CORNER_LOGO_PATH">
+					<subreportParameterExpression><![CDATA[$P{CORNER_LOGO_PATH}]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="CITY_LOGO_PATH">
 					<subreportParameterExpression><![CDATA[$P{CITY_LOGO_PATH}]]></subreportParameterExpression>
@@ -62,13 +86,40 @@
 				<subreportExpression><![CDATA[ReportUtil.getTemplateAsStream("collection_receipt_single.jasper")]]></subreportExpression>
 			</subreport>
 			<frame>
-				<reportElement x="0" y="0" width="595" height="2" uuid="e90d9345-c385-4d59-9dd7-0811cfb4d6d0">
-					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
-				</reportElement>
+				<reportElement x="0" y="0" width="595" height="2" uuid="e90d9345-c385-4d59-9dd7-0811cfb4d6d0"/>
 				<box>
 					<bottomPen lineWidth="2.0" lineStyle="Dashed"/>
 				</box>
 			</frame>
+		</band>
+		<band height="130">
+			<frame>
+				<reportElement x="0" y="0" width="595" height="2" uuid="8bb2d230-271e-4dcf-aa9c-71d9d4185a93"/>
+				<box>
+					<bottomPen lineWidth="2.0" lineStyle="Dashed"/>
+				</box>
+			</frame>
+			<subreport>
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="2" width="595" height="127" uuid="0f547d4b-8e23-4d4a-a577-05284ec65715"/>
+				<parametersMapExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}]]></parametersMapExpression>
+				<subreportParameter name="EGOV_COPY">
+					<subreportParameterExpression><![CDATA["Spare Copy"]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="RECEIPT_HEADER">
+					<subreportParameterExpression><![CDATA[$P{RECEIPT_HEADER}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="EGOV_COMMON">
+					<subreportParameterExpression><![CDATA[$P{EGOV_COMMON}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="CORNER_LOGO_PATH">
+					<subreportParameterExpression><![CDATA[$P{CORNER_LOGO_PATH}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="CITY_LOGO_PATH">
+					<subreportParameterExpression><![CDATA[$P{CITY_LOGO_PATH}]]></subreportParameterExpression>
+				</subreportParameter>
+				<dataSourceExpression><![CDATA[new JRBeanCollectionDataSource($P{REPORT_DATA_SOURCE}.getData(), false)]]></dataSourceExpression>
+				<subreportExpression><![CDATA[ReportUtil.getTemplateAsStream("collection_receipt_single.jasper")]]></subreportExpression>
+			</subreport>
 		</band>
 	</detail>
 </jasperReport>
