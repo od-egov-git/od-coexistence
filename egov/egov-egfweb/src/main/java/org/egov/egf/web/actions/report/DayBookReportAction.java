@@ -152,7 +152,8 @@ public class DayBookReportAction extends BaseFormAction {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("dayBookAction | list | End");
         heading = getGLHeading();
-        titleName = microserviceUtils.getHeaderNameForTenant().toUpperCase()+" \\n";
+        //titleName = microserviceUtils.getHeaderNameForTenant().toUpperCase()+" \\n";
+        titleName="Dehradun Nagar Nigam";
         prepareNewForm();
 
         persistenceService.getSession().setFlushMode(FlushMode.AUTO);

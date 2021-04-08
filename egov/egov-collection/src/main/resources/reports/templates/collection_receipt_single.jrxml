@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.12.2.final using JasperReports Library version 6.12.2-75c5e90a222ab406e416cbf590a5397028a52de3  -->
+<!-- Created with Jaspersoft Studio version 6.12.0.final using JasperReports Library version 6.12.1-ac0eebdb29e4c0985457bab279a6db744d661530  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="collection_receipt" language="groovy" pageWidth="595" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="30" bottomMargin="30" resourceBundle="custom" uuid="4b290c7e-638d-4115-b638-21eedae5185f">
-	<property name="ireport.zoom" value="1.0000000000000004"/>
-	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="0"/>
 	<import value="org.egov.collection.constants.*"/>
 	<import value="org.egov.infra.reporting.util.*"/>
 	<import value="org.egov.infstr.utils.*"/>
@@ -16,8 +13,6 @@
 		<defaultValueExpression><![CDATA[null]]></defaultValueExpression>
 	</parameter>
 	<parameter name="CITY_LOGO_PATH" class="java.lang.Object"/>
-	<parameter name="CORNER_LOGO_PATH" class="java.lang.String"/>
-	<parameter name="RECEIPT_HEADER" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[]]>
 	</queryString>
@@ -43,9 +38,6 @@
 	<field name="paidBy" class="java.lang.String">
 		<fieldDescription><![CDATA[Paid By]]></fieldDescription>
 	</field>
-	<field name="subdivison" class="java.lang.String">
-		<fieldDescription><![CDATA[Sub Divison]]></fieldDescription>
-	</field>
 	<field name="receiptInstrumentType" class="java.lang.String">
 		<fieldDescription><![CDATA[Receipt Instrument Type]]></fieldDescription>
 	</field>
@@ -58,7 +50,6 @@
 	<field name="createdUser" class="java.lang.String"/>
 	<field name="manualReceiptNumber" class="java.lang.String"/>
 	<field name="manualReceiptDate" class="java.util.Date"/>
-	<field name="gstno" class="java.lang.String"/>
 	<variable name="amountReceived" class="java.math.BigDecimal">
 		<initialValueExpression><![CDATA[new java.math.BigDecimal(0)]]></initialValueExpression>
 	</variable>
@@ -66,16 +57,19 @@
 		<groupExpression><![CDATA[$F{receiptNum}]]></groupExpression>
 	</group>
 	<title>
-		<band height="50">
+		<band height="41">
+			<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 			<staticText>
-				<reportElement x="248" y="25" width="100" height="16" printWhenGroupChanges="Receipt" uuid="2585456b-ee36-4775-9255-98203329e6a3"/>
+				<reportElement x="248" y="25" width="100" height="16" printWhenGroupChanges="Receipt" uuid="2585456b-ee36-4775-9255-98203329e6a3">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="11" isBold="true" pdfFontName="Times-Bold" isPdfEmbedded="true"/>
 				</textElement>
 				<text><![CDATA[RECEIPT]]></text>
 			</staticText>
-			<textField>
-				<reportElement stretchType="RelativeToBandHeight" x="469" y="3" width="97" height="17" uuid="cbbecbc4-3320-4efe-af74-54832fa32032"/>
+			<textField textAdjust="StretchHeight">
+				<reportElement stretchType="RelativeToTallestObject" x="469" y="3" width="97" height="17" uuid="cbbecbc4-3320-4efe-af74-54832fa32032"/>
 				<box leftPadding="5" rightPadding="5">
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -88,27 +82,23 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$P{EGOV_COPY}]]></textFieldExpression>
 			</textField>
-			<image>
-				<reportElement positionType="Float" x="20" y="3" width="49" height="40" uuid="a9458b00-a273-4ffa-97f3-e5c62b503233"/>
-				<imageExpression><![CDATA[$P{CORNER_LOGO_PATH}]]></imageExpression>
-			</image>
-			<image>
-				<reportElement positionType="Float" x="90" y="1" width="379" height="24" uuid="0aca9374-d21f-4165-a042-03ea4cfe4a2d"/>
-				<imageExpression><![CDATA[$P{RECEIPT_HEADER}]]></imageExpression>
-			</image>
 			<textField>
-				<reportElement x="380" y="27" width="186" height="23" uuid="acee5ad8-678c-48e5-a7ae-768ee26c89f4"/>
-				<textElement textAlignment="Right">
-					<font fontName="Times New Roman" size="9"/>
+				<reportElement x="158" y="1" width="278" height="20" uuid="d7d55a4c-f3b9-455b-9462-9727bfacefef"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="12" isBold="true" pdfFontName="Times-Bold" isPdfEmbedded="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{subdivison}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[ReportUtil.getCityName()]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
 	<detail>
 		<band height="30" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 			<staticText>
-				<reportElement stretchType="RelativeToTallestObject" x="20" y="0" width="120" height="15" uuid="e46130c4-050a-4ff3-a369-525f26459509"/>
+				<reportElement stretchType="RelativeToTallestObject" x="20" y="0" width="120" height="15" uuid="e46130c4-050a-4ff3-a369-525f26459509">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
 				<box leftPadding="5" rightPadding="5">
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -121,7 +111,7 @@
 				</textElement>
 				<text><![CDATA[Receipt No:]]></text>
 			</staticText>
-			<textField>
+			<textField textAdjust="StretchHeight">
 				<reportElement stretchType="RelativeToTallestObject" x="140" y="0" width="150" height="15" uuid="4ebe1ac2-acdf-4dad-abc6-9c4344a0f78a"/>
 				<box leftPadding="5" rightPadding="5">
 					<pen lineWidth="0.5"/>
@@ -149,7 +139,7 @@
 				</textElement>
 				<text><![CDATA[Receipt Date:]]></text>
 			</staticText>
-			<textField pattern="dd-MM-yyyy">
+			<textField textAdjust="StretchHeight" pattern="dd-MM-yyyy">
 				<reportElement stretchType="RelativeToTallestObject" x="394" y="0" width="172" height="15" uuid="3587ef74-f352-4fb7-aeae-08ff60f03037"/>
 				<box leftPadding="5" rightPadding="5">
 					<pen lineWidth="0.5"/>
@@ -163,7 +153,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$F{receiptDate}]]></textFieldExpression>
 			</textField>
-			<textField isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement stretchType="RelativeToTallestObject" x="140" y="15" width="426" height="15" uuid="1d5ad99d-b618-4e54-a412-90b973fcbc23"/>
 				<box leftPadding="5" rightPadding="5">
 					<pen lineWidth="0.5"/>
@@ -175,7 +165,7 @@
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="10" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{paidBy}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{payeeName}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement stretchType="RelativeToTallestObject" x="20" y="15" width="120" height="15" uuid="dd610602-d4e9-43ac-a935-940c3b1bf462"/>
@@ -189,34 +179,18 @@
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="10" isBold="true" pdfFontName="Times-Bold" isPdfEmbedded="true"/>
 				</textElement>
-				<text><![CDATA[Payee name & address:]]></text>
+				<text><![CDATA[Payee Name:]]></text>
 			</staticText>
 		</band>
-		<band height="46" splitType="Stretch">
-			<staticText>
-				<reportElement x="20" y="31" width="119" height="15" uuid="69bd045d-a58b-402e-a6eb-15f951e729f9"/>
-				<box leftPadding="5" rightPadding="5">
-					<pen lineWidth="0.5"/>
-				</box>
-				<textElement verticalAlignment="Middle">
-					<font fontName="Times New Roman" isBold="true" pdfFontName="Times-Bold" pdfEncoding=""/>
-				</textElement>
-				<text><![CDATA[GST No. :]]></text>
-			</staticText>
-			<textField>
-				<reportElement x="140" y="31" width="426" height="15" uuid="74461ddf-4f62-4a9d-b770-39027ace4c6e"/>
-				<box leftPadding="5" rightPadding="5">
-					<pen lineWidth="0.5"/>
-				</box>
-				<textElement verticalAlignment="Middle">
-					<font fontName="Times New Roman" isBold="false"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{gstno}]]></textFieldExpression>
-			</textField>
+		<band height="15" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 		</band>
 		<band height="15">
-			<textField pattern="" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" x="140" y="-45" width="426" height="30" uuid="5a23bdb1-ab29-45d4-83b3-0515d0e123c8"/>
+			<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+			<textField textAdjust="StretchHeight" pattern="" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="140" y="-15" width="426" height="15" uuid="5a23bdb1-ab29-45d4-83b3-0515d0e123c8">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
 				<box leftPadding="5" rightPadding="5">
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -230,7 +204,7 @@
 				<textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement stretchType="RelativeToTallestObject" x="20" y="-45" width="120" height="30" uuid="8a65e4d4-5681-4c49-ab13-77c0bc28b8c0"/>
+				<reportElement stretchType="RelativeToTallestObject" x="20" y="-15" width="120" height="15" uuid="8a65e4d4-5681-4c49-ab13-77c0bc28b8c0"/>
 				<box leftPadding="5" rightPadding="5">
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -244,7 +218,7 @@
 				<text><![CDATA[Narration:]]></text>
 			</staticText>
 		</band>
-		<band height="15">
+		<band height="30">
 			<staticText>
 				<reportElement stretchType="RelativeToTallestObject" x="20" y="0" width="120" height="15" uuid="9c2e65a7-8362-4c9d-929f-66e5847c8ad2"/>
 				<box leftPadding="5" rightPadding="5">
@@ -259,7 +233,7 @@
 				</textElement>
 				<text><![CDATA[Receipt amount (Rs):]]></text>
 			</staticText>
-			<textField isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement stretchType="RelativeToTallestObject" x="140" y="0" width="426" height="15" uuid="370460c9-09a2-4eba-baf3-95c03ec07df2"/>
 				<box leftPadding="5" rightPadding="5">
 					<pen lineWidth="0.5"/>
@@ -271,10 +245,12 @@
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="10" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{totalAmount}.setScale(2, BigDecimal.ROUND_UP)+"      ("+ReportUtil.amountInWords($F{totalAmount})+")"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{totalAmount}.setScale(2, BigDecimal.ROUND_UP)]]></textFieldExpression>
 			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="240" y="-15" width="326" height="15" uuid="f22db335-66d7-4162-8ba3-f69929989b37"/>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="240" y="-15" width="326" height="15" uuid="f22db335-66d7-4162-8ba3-f69929989b37">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
 				<box leftPadding="5" rightPadding="5">
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.0"/>
@@ -296,7 +272,9 @@
 				<text><![CDATA[Service Name:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="20" y="-15" width="120" height="15" uuid="b8afb73d-619b-4971-992f-203ac3293be9"/>
+				<reportElement x="20" y="-15" width="120" height="15" uuid="b8afb73d-619b-4971-992f-203ac3293be9">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
 				<box leftPadding="5" rightPadding="5">
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.0"/>
@@ -310,10 +288,46 @@
 				<text><![CDATA[Details of the receipt:]]></text>
 			</staticText>
 		</band>
-		<band height="15"/>
 		<band height="15">
+			<printWhenExpression><![CDATA[$F{receiptInstrumentType}.equals(CollectionConstants.INSTRUMENTTYPE_CHEQUEORDD)]]></printWhenExpression>
+			<staticText>
+				<reportElement stretchType="RelativeToTallestObject" x="20" y="-15" width="120" height="15" uuid="41fb5c85-6d7e-4041-9da3-9d02b4ed5f21"/>
+				<box leftPadding="5" rightPadding="5">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="10" isBold="true" pdfFontName="Times-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Amount in words :]]></text>
+			</staticText>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="140" y="-15" width="426" height="15" uuid="0d23473a-2f27-41c9-9917-b4a7bdcb844b">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<box leftPadding="5" rightPadding="5">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="10" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[ReportUtil.amountInWords($F{totalAmount})]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="15">
+			<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 			<subreport>
-				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="20" y="-15" width="546" height="15" uuid="cdd7705f-a78c-4c85-af4b-46f238e6418f"/>
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="20" y="-15" width="546" height="15" uuid="cdd7705f-a78c-4c85-af4b-46f238e6418f">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
 				<subreportParameter name="TOTAL_AMOUNT">
 					<subreportParameterExpression><![CDATA[$F{totalAmount}]]></subreportParameterExpression>
 				</subreportParameter>
@@ -321,9 +335,10 @@
 				<subreportExpression><![CDATA[ReportUtil.getTemplateAsStream("challan_receipt_instruments.jasper")]]></subreportExpression>
 			</subreport>
 		</band>
-		<band height="12">
-			<textField isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" x="140" y="-15" width="426" height="15" uuid="8f6f110b-2792-4006-a4b6-648c25ae8b59"/>
+		<band height="57">
+			<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="140" y="-15" width="426" height="20" uuid="8f6f110b-2792-4006-a4b6-648c25ae8b59"/>
 				<box leftPadding="5" rightPadding="5">
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -337,7 +352,7 @@
 				<textFieldExpression><![CDATA[$F{createdUser}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement stretchType="RelativeToTallestObject" x="20" y="-15" width="120" height="15" uuid="0ebd8cab-29d7-480a-ac3e-fed1c9a43303"/>
+				<reportElement stretchType="RelativeToTallestObject" x="20" y="-15" width="120" height="20" uuid="0ebd8cab-29d7-480a-ac3e-fed1c9a43303"/>
 				<box leftPadding="5" rightPadding="5">
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -351,12 +366,58 @@
 				<text><![CDATA[Collected by:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement positionType="Float" x="20" y="0" width="546" height="12" uuid="b0dc2940-1c40-4210-9f51-69e82ca79a97"/>
-				<textElement textAlignment="Right">
-					<font fontName="Times New Roman" size="9" isItalic="true"/>
+				<reportElement stretchType="RelativeToTallestObject" x="290" y="5" width="104" height="20" uuid="e263d7be-ec11-4356-a76b-ce8fe6d33ff5"/>
+				<box leftPadding="5" rightPadding="5">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="10" isBold="true" pdfFontName="Times-Bold" isPdfEmbedded="true"/>
 				</textElement>
-				<text><![CDATA[This is Computerised generated receipt and need no signature]]></text>
+				<text><![CDATA[G8 Date:]]></text>
 			</staticText>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement x="140" y="5" width="150" height="20" uuid="e1061c5e-61a1-4b62-b5b1-4ec3d100e1a0"/>
+				<box leftPadding="5" rightPadding="5">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="10" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{manualReceiptNumber}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement stretchType="RelativeToTallestObject" x="20" y="5" width="120" height="20" uuid="aaddacf3-1c37-469c-8c91-2a169a02b152"/>
+				<box leftPadding="5" rightPadding="5">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="10" isBold="true" pdfFontName="Times-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[G8 Receipt No:]]></text>
+			</staticText>
+			<textField textAdjust="StretchHeight" pattern="dd-MM-yyyy" isBlankWhenNull="true">
+				<reportElement x="394" y="5" width="172" height="20" uuid="06087648-a047-4231-83d0-7838ea7f60ef"/>
+				<box topPadding="0" leftPadding="5" rightPadding="5">
+					<pen lineWidth="0.5"/>
+					<leftPen lineWidth="0.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{manualReceiptDate}]]></textFieldExpression>
+			</textField>
 		</band>
 	</detail>
 </jasperReport>
