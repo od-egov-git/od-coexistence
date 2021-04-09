@@ -57,16 +57,19 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper;
 import org.apache.struts2.dispatcher.multipart.UploadedFile;
 import org.egov.commons.Accountdetailtype;
@@ -84,6 +87,8 @@ import org.egov.eis.web.contract.WorkflowContainer;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.filestore.service.FileStoreService;
+import org.egov.infra.microservice.models.EmployeeInfo;
+import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.validation.exception.ValidationException;
 import org.egov.model.bills.BillType;
 import org.egov.model.bills.DocumentUpload;
@@ -110,6 +115,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 @RequestMapping(value = "/contractorbill")
 public class CreateContractorBillController extends BaseBillController {
+	
+	private static final Logger LOGGER = Logger.getLogger(CreateContractorBillController.class);// added by abhishek
 
     private static final String NET_PAYABLE_CODES = "netPayableCodes";
 
@@ -173,6 +180,9 @@ public class CreateContractorBillController extends BaseBillController {
     @Autowired
     private WorkOrderService workOrderService;
 
+    @Autowired
+    private MicroserviceUtils microserviceUtils;//added abhishek on 05042021
+    
     public CreateContractorBillController(final AppConfigValueService appConfigValuesService) {
         super(appConfigValuesService);
     }
@@ -188,11 +198,25 @@ public class CreateContractorBillController extends BaseBillController {
     @RequestMapping(value = "/newform", method = RequestMethod.POST)
     public String showNewForm(@ModelAttribute("egBillregister") final EgBillregister egBillregister, final Model model,
             HttpServletRequest request) {
+    	//added by Abhishek
+    	LOGGER.info("New contractorbill creation request created");
+        Cookie[] cookies = request.getCookies();
+       List<String>  validActions = Arrays.asList("Forward","SaveAsDraft");
+    	
+    	if(null!=cookies && cookies.length>0)
+    	{
+    	   for(Cookie ck:cookies) {
+    		   System.out.println("Name:"+ck.getName()+" value"+ck.getValue());                                                                              
+    		   
+    	   }
+    	}
+    	//end
         setDropDownValues(model);
         model.addAttribute("billNumberGenerationAuto", contractorBillService.isBillNumberGenerationAuto());
         model.addAttribute(STATE_TYPE, egBillregister.getClass().getSimpleName());
         prepareWorkflow(model, egBillregister, new WorkflowContainer());
         prepareValidActionListByCutOffDate(model);
+        model.addAttribute("validActionList", validActions);
         if(isBillDateDefaultValue){
             egBillregister.setBilldate(new Date());            
         }
@@ -228,7 +252,11 @@ public class CreateContractorBillController extends BaseBillController {
         populateSubLedgerDetails(egBillregister, resultBinder);
         validateBillNumber(egBillregister, resultBinder);
         removeEmptyRows(egBillregister);
-        validateLedgerAndSubledger(egBillregister, resultBinder);
+        //validateLedgerAndSubledger(egBillregister, resultBinder);
+        if(!workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))//added abhishek on 05042021
+    	{ 
+        	validateLedgerAndSubledger(egBillregister, resultBinder);
+    	}
 
         if (resultBinder.hasErrors()) {
             setDropDownValues(model);
@@ -250,8 +278,28 @@ public class CreateContractorBillController extends BaseBillController {
             String approvalDesignation = "";
             if (request.getParameter(APPROVAL_COMENT) != null)
                 approvalComment = request.getParameter(APPROVAL_COMENT);
+			/*
+			 * if (request.getParameter(APPROVAL_POSITION) != null &&
+			 * !request.getParameter(APPROVAL_POSITION).isEmpty()) approvalPosition =
+			 * Long.valueOf(request.getParameter(APPROVAL_POSITION));
+			 */
+            //added abhishek on 05042021
             if (request.getParameter(APPROVAL_POSITION) != null && !request.getParameter(APPROVAL_POSITION).isEmpty())
+            {
+            	if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
+            	{            		
+            		approvalPosition =populatePosition();            		
+            	}
+            	else
                 approvalPosition = Long.valueOf(request.getParameter(APPROVAL_POSITION));
+            }
+            else {
+            	if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
+            	{            		
+            		approvalPosition =populatePosition();            		
+            	}
+            	
+            }//end
             if (request.getParameter(APPROVAL_DESIGNATION) != null && !request.getParameter(APPROVAL_DESIGNATION).isEmpty())
                 approvalDesignation = String.valueOf(request.getParameter(APPROVAL_DESIGNATION));
 
@@ -277,7 +325,16 @@ public class CreateContractorBillController extends BaseBillController {
                 resultBinder.reject("", e.getErrors().get(0).getMessage());
                 return CONTRACTORBILL_FORM;
             }
-            final String approverName = String.valueOf(request.getParameter(APPROVER_NAME));
+            //final String approverName = String.valueOf(request.getParameter(APPROVER_NAME));
+            //added abhishek
+            String approverName =null;
+            if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
+        	{        		
+        		approverName =populateEmpName();        		
+        	}
+        	else
+        		approverName = String.valueOf(request.getParameter("approverName"));
+           //end
 
             final String approverDetails = financialUtils.getApproverDetails(workFlowAction,
                     savedEgBillregister.getState(), savedEgBillregister.getId(), approvalPosition, approverName);
@@ -432,6 +489,9 @@ public class CreateContractorBillController extends BaseBillController {
                         new String[] { contractorBill.getBillnumber(), approverName, nextDesign,
                                 contractorBill.getEgBillregistermis().getBudgetaryAppnumber() },
                         null);
+            else if(contractorBill.getState().getValue()!=null && contractorBill.getState().getValue().equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
+                message = messageSource.getMessage("msg.contractor.bill.saveasdraft.success",//added abhishek on 05042021
+                            new String[]{contractorBill.getBillnumber()}, null);
             else
                 message = messageSource.getMessage("msg.contractor.bill.create.success",
                         new String[] { contractorBill.getBillnumber(), approverName, nextDesign }, null);
@@ -499,4 +559,30 @@ public class CreateContractorBillController extends BaseBillController {
         egBillregister.setDocumentDetail(documentDetailsList);
         return egBillregister;
     }
+   //added abhishek on 05042021 
+    private Long populatePosition() {
+    	Long empId = ApplicationThreadLocals.getUserId();
+    	Long pos=null;
+    	List<EmployeeInfo> employs = microserviceUtils.getEmployee(empId, null,null, null);
+    	if(null !=employs && employs.size()>0 )
+    	{
+    		pos=employs.get(0).getAssignments().get(0).getPosition();
+    		
+    	}
+    	
+		return pos;
+	}
+    
+    private String populateEmpName() {
+    	Long empId = ApplicationThreadLocals.getUserId();
+    	String empName=null;
+    	Long pos=null;
+    	List<EmployeeInfo> employs = microserviceUtils.getEmployee(empId, null,null, null);
+    	if(null !=employs && employs.size()>0 )
+    	{
+    		empName=employs.get(0).getUser().getName();
+    	}
+		return empName;
+	}
+    //end
 }

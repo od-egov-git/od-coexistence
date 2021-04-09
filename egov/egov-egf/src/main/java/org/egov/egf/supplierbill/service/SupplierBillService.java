@@ -236,11 +236,14 @@ public class SupplierBillService {
             egBillregister.setBillnumber(getNextBillNumber(egBillregister));
 
         // commented as budget check was disabled
+        if(!workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
+    	{//added abhishek on 05042021
          try {
-         checkBudgetAndGenerateBANumber(egBillregister);
+             checkBudgetAndGenerateBANumber(egBillregister);
          } catch (final ValidationException e) {
          throw new ValidationException(e.getErrors());
          }
+    	}
 
         final EgBillregister savedEgBillregister = supplierBillRepository.save(egBillregister);
 
@@ -448,9 +451,15 @@ public class SupplierBillService {
                 if (stateValue.isEmpty())
                     stateValue = wfmatrix.getNextState();
 
+                if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
+            	{
+                	stateValue = FinancialConstants.BUTTONSAVEASDRAFT;
+            	}
+                
                 egBillregister.transition().start().withSenderName(user.getUsername() + "::" + user.getName())
                         .withComments(approvalComent)
-                        .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
+                      //.withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
+                        .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos) //added abhishek on 05042021
                         .withNextAction(wfmatrix.getNextAction())
                         .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_SBILL_DISPLAYNAME)
                         .withCreatedBy(user.getId())
@@ -485,6 +494,12 @@ public class SupplierBillService {
                 if (stateValue.isEmpty())
                     stateValue = wfmatrix.getNextState();
 
+                if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
+            	{
+                	stateValue = FinancialConstants.BUTTONSAVEASDRAFT;
+            		
+            	}
+                
                 egBillregister.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
                         .withComments(approvalComent)
                         .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")

@@ -237,12 +237,15 @@ public class ContractorBillService {
             egBillregister.setBillnumber(getNextBillNumber(egBillregister));
 
         // commented as budget check was disabled
+        if(!workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
+    	{//added abhishek on 05042021
          try {
              checkBudgetAndGenerateBANumber(egBillregister);
          } catch (final ValidationException e) {
          throw new ValidationException(e.getErrors());
          }
-
+    	}
+        
         final EgBillregister savedEgBillregister = contractorBillRepository.save(egBillregister);
 
         if (workFlowAction.equals(FinancialConstants.CREATEANDAPPROVE)) {
@@ -448,14 +451,32 @@ public class ContractorBillService {
                 if (stateValue.isEmpty())
                     stateValue = wfmatrix.getNextState();
 
+				/*
+				 * egBillregister.transition().start().withSenderName(user.getUsername() + "::"
+				 * + user.getName()) .withComments(approvalComent)
+				 * .withStateValue(stateValue).withDateInfo(new
+				 * Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null &&
+				 * owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
+				 * .withNextAction(wfmatrix.getNextAction())
+				 * .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_WORKS_BILL_DISPLAYNAME)
+				 * .withCreatedBy(user.getId()) .withtLastModifiedBy(user.getId());
+				 */
+                if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
+            	{
+                	stateValue = FinancialConstants.BUTTONSAVEASDRAFT;
+            		
+            	}
                 egBillregister.transition().start().withSenderName(user.getUsername() + "::" + user.getName())
                         .withComments(approvalComent)
-                        .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
-                        .withNextAction(wfmatrix.getNextAction())
+                        //.withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
+                        .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos) //added abhishek on 05042021
+                        .withNextAction("")
                         .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_WORKS_BILL_DISPLAYNAME)
                         .withCreatedBy(user.getId())
                         .withtLastModifiedBy(user.getId());
-            } else if (FinancialConstants.BUTTONCANCEL.equalsIgnoreCase(workFlowAction)) {
+            
+            } 
+            else if (FinancialConstants.BUTTONCANCEL.equalsIgnoreCase(workFlowAction)) {
                 stateValue = FinancialConstants.WORKFLOW_STATE_CANCELLED;
                 egBillregister.transition().end().withSenderName(user.getUsername() + "::" + user.getName())
                         .withComments(approvalComent)
@@ -484,7 +505,12 @@ public class ContractorBillService {
 
                 if (stateValue.isEmpty())
                     stateValue = wfmatrix.getNextState();
-
+                
+                if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
+            	{
+                	stateValue = FinancialConstants.BUTTONSAVEASDRAFT;
+            		
+            	}
                 egBillregister.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
                         .withComments(approvalComent)
                         .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")

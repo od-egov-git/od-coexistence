@@ -209,7 +209,7 @@ public class ExpenseBillService {
         egBillregister.setPassedamount(egBillregister.getBillamount());
         egBillregister.getEgBillregistermis().setEgBillregister(egBillregister);
         egBillregister.getEgBillregistermis().setLastupdatedtime(new Date());
-
+        
         if (egBillregister.getEgBillregistermis().getFund() != null
                 && egBillregister.getEgBillregistermis().getFund().getId() != null)
             egBillregister.getEgBillregistermis().setFund(
@@ -276,7 +276,9 @@ public class ExpenseBillService {
 
 
         EgBillregister egbillReg = expenseBillRepository.save(savedEgBillregister);
-        persistenceService.getSession().flush();
+        System.out.println("id before:-"+egbillReg.getId());
+        
+        //persistenceService.getSession().flush();
         finDashboardService.publishEvent(FinanceEventType.billCreateOrUpdate, egbillReg);
 
        
@@ -518,7 +520,8 @@ public class ExpenseBillService {
             	}
                 egBillregister.transition().start().withSenderName(user.getUsername() + "::" + user.getName())
                         .withComments(approvalComent)
-                        .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
+                        //.withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
+                        .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos) //added abhishek on 05042021
                         .withNextAction("")
                         .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME)
                         .withCreatedBy(user.getId())

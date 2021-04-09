@@ -176,6 +176,8 @@ public class JournalVoucherAction extends BaseVoucherAction
         if(isDateAutoPopulateDefaultValueEnable()){
             voucherHeader.setVoucherDate(new Date());
         }
+      backlogEntry="N";
+      voucherHeader.setBackdateentry("N");//added by abhshek on 09042021
         // setting the typa as default for reusing billvoucher.nextdesg workflow
         showMode = NEW;
         if (LOGGER.isDebugEnabled())
@@ -215,6 +217,9 @@ public class JournalVoucherAction extends BaseVoucherAction
         LOGGER.info("Backlog entry :::"+backlogEntry);
         String voucherDate = formatter1.format(voucherHeader.getVoucherDate());
         String cutOffDate1 = null;
+        if (workFlowAction.equalsIgnoreCase(FinancialConstants.WORKFLOW_STATE_SAVEASDRAFT)) 
+        	removeEmptyRowsAccoutDraftDetail(billDetailslist);
+        else
         removeEmptyRowsAccoutDetail(billDetailslist);
         removeEmptyRowsSubledger(subLedgerlist);
         target = "";
@@ -232,8 +237,10 @@ public class JournalVoucherAction extends BaseVoucherAction
         String[] fileName = getFileFileName();
         String[] contentType = getFileContentType();
        // voucherHeader.setDocumentDetail(documentDetail);
+        if (!workFlowAction.equalsIgnoreCase("Save As Draft") || !workFlowAction.equalsIgnoreCase(FinancialConstants.WORKFLOW_STATE_SAVEASDRAFT))
         validateFields();
-        if (!validateData(billDetailslist, subLedgerlist))
+        //if (!validateData(billDetailslist, subLedgerlist))
+        if (workFlowAction.equalsIgnoreCase(FinancialConstants.WORKFLOW_STATE_SAVEASDRAFT) || !validateData(billDetailslist, subLedgerlist))
             try {
                 if (!"JVGeneral".equalsIgnoreCase(voucherTypeBean.getVoucherName())) {
                     voucherTypeBean.setTotalAmount(parameters.get("totaldbamount")[0]);
@@ -255,6 +262,10 @@ public class JournalVoucherAction extends BaseVoucherAction
                 }
                 }
                voucherHeader.setBackdateentry(backlogEntry);
+               if (workFlowAction.equalsIgnoreCase(FinancialConstants.WORKFLOW_STATE_SAVEASDRAFT)) 
+                   voucherHeader = journalVoucherActionHelper.createVcouher(billDetailslist, subLedgerlist, voucherHeader,
+                           voucherTypeBean, workflowBean);
+               else
                 voucherHeader = journalVoucherActionHelper.createVcouher(billDetailslist, subLedgerlist, voucherHeader,
                         voucherTypeBean, workflowBean);
                 voucherHeader.setDocumentDetail(documentDetail);               
@@ -382,7 +393,7 @@ public class JournalVoucherAction extends BaseVoucherAction
 	// added by satya start
 	public void populateWorkflowBean() {
 		
-		if (workFlowAction.equalsIgnoreCase("Save As Draft")) {
+		if (workFlowAction.equalsIgnoreCase(FinancialConstants.WORKFLOW_STATE_SAVEASDRAFT)) {
 			
 			Long position = populatePosition();
 			workflowBean.setApproverPositionId(position);
@@ -391,7 +402,7 @@ public class JournalVoucherAction extends BaseVoucherAction
 		}
 		workflowBean.setApproverComments(approverComments);
 		workflowBean.setWorkFlowAction(workFlowAction);
-		if (workFlowAction.equalsIgnoreCase("Save As Draft")) {
+		if (workFlowAction.equalsIgnoreCase(FinancialConstants.WORKFLOW_STATE_SAVEASDRAFT)) {
 			workflowBean.setCurrentState("SaveAsDraft");
 		} else {
 			workflowBean.setCurrentState(currentState);
@@ -419,7 +430,8 @@ public class JournalVoucherAction extends BaseVoucherAction
         {
             if (null == voucherHeader || null == voucherHeader.getId()
                     || voucherHeader.getCurrentState().getValue().endsWith("NEW")) {
-                validActions = Arrays.asList(FinancialConstants.BUTTONFORWARD);
+                //validActions = Arrays.asList(FinancialConstants.BUTTONFORWARD);
+            	validActions = Arrays.asList(FinancialConstants.BUTTONFORWARD, FinancialConstants.BUTTONSAVEASDRAFT);
             } else {
                 if (voucherHeader.getCurrentState() != null) {
                     validActions = this.customizedWorkFlowService.getNextValidActions(voucherHeader
@@ -434,7 +446,9 @@ public class JournalVoucherAction extends BaseVoucherAction
             if (null == voucherHeader || null == voucherHeader.getId()
                     || voucherHeader.getCurrentState().getValue().endsWith("NEW")) {
                 // read from constant
-                validActions = Arrays.asList(FinancialConstants.BUTTONFORWARD);
+                //validActions = Arrays.asList(FinancialConstants.BUTTONFORWARD);
+            	validActions = Arrays.asList(FinancialConstants.BUTTONFORWARD, FinancialConstants.BUTTONSAVEASDRAFT);
+            	
             } else {
                 if (voucherHeader.getCurrentState() != null) {
                     validActions = this.customizedWorkFlowService.getNextValidActions(voucherHeader

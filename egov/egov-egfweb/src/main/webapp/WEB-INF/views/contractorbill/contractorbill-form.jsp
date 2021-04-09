@@ -85,6 +85,11 @@
         color : white;
     }
 </style>
+<script>
+	window.onload=function(){
+		$('#billamount').val("0");
+	}
+</script>
     <form:form name="contractorBillForm" role="form" method="post" action="create" modelAttribute="egBillregister" id="egBillregister" class="form-horizontal form-groups-bordered" enctype="multipart/form-data">
 	
     <div class="position_alert">

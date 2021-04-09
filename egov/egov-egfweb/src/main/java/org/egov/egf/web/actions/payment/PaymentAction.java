@@ -237,7 +237,7 @@ public class PaymentAction extends BasePaymentAction {
     private List<Bankbranch> bankBranchList = new ArrayList<Bankbranch>();
     private String firstsignatory="-1";
     private String secondsignatory="-1";
-    private String backlogEntry="";
+    private String backlogEntry="N";//modified by abhishek on 09042021
  	List<HashMap<String, Object>> workflowHistory =new ArrayList<HashMap<String, Object>>(); 
    
     @Autowired

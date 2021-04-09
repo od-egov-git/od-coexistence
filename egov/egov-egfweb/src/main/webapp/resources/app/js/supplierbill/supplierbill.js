@@ -131,7 +131,17 @@ $('.btn-wf-primary').click(function(){
 			return true;
 		}else
 			return false;
-	} else{
+	}else if (button != null && (button == 'SaveAsDraft')) {//added by Abhishek on 05042021
+	       if(!validateWorkFlowApprover(button)){
+	            return false;
+	           }
+	        if(true){
+	            //deleteHiddenSubledgerRow();
+	            return true;
+	        }else{
+	            return false;
+	            }
+	}else{
 		if(!validateWorkFlowApprover(button))
 			return false;
 		if($("form").valid()){
@@ -403,6 +413,19 @@ function validateWorkFlowApprover(name) {
 		$('#approvalPosition').attr('required', 'required');
 		$('#approvalComent').removeAttr('required');
 	}
+	if (button != null && button == 'SaveAsDraft') {//added by Abhishek on 05042021
+        
+        $('#approvalDepartment').removeAttr('required');
+        $('#approvalDesignation').removeAttr('required');
+        $('#approvalPosition').removeAttr('required');
+        $('#approvalComent').removeAttr('required');
+     
+        $('#narration').removeAttr('required');
+        $('#partyBillNumber').removeAttr('required');
+        $('#partyBillDate').removeAttr('required');
+        $('#billamount').removeAttr('required');
+        $('#billtype').removeAttr('required');
+    }
 	if (button != null && button == 'Approve') {
 		$('#approvalComent').removeAttr('required');
 	}

@@ -272,6 +272,17 @@
 		}
 	}
 
+
+	// for save as draft by Abhishek on 26032021
+	function onSubmitDraft()
+	{
+		
+			document.jvcreateform.action='/services/EGF/voucher/journalVoucher-create.action';
+	    	return true;
+		
+	}
+	//////////
+	
 	function validateCutOff()
 	{
 	var cutOffDatePart=document.getElementById("cutOffDate").value.split("/");

@@ -198,7 +198,8 @@
 </div>
 
 <div class="form-group">
-	<c:choose>
+<!-- fund source commented by abhishek on 07-04-2021 -->
+	<%-- <c:choose>
 		<c:when test="${headerFields.contains('fundsource')}">
 		<form:hidden path="" name="fundSourceId" id="fundSourceId" value="${egBillregister.egBillregistermis.fundsource.id }"/>
 			<c:choose>
@@ -233,7 +234,7 @@
 			</div>
 		</c:otherwise>
 	</c:choose>
-	
+	 --%>
 	<c:choose>
 		<c:when test="${headerFields.contains('field')}">
 			<c:choose>

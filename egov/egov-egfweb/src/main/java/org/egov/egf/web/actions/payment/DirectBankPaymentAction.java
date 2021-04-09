@@ -254,6 +254,8 @@ public class DirectBankPaymentAction extends BasePaymentAction {
             loadDefalutDates();            
         }
         voucherHeader.getVouchermis().setDepartmentcode(getDefaultDepartmentValueForPayment());
+        backlogEntry="N";
+        voucherHeader.setBackdateentry("N");//added by abhshek on 09042021
         // loadApproverUser(FinancialConstants.STANDARD_VOUCHER_TYPE_PAYMENT);
         if (getBankBalanceCheck() == null || "".equals(getBankBalanceCheck()))
             addActionMessage(getText("payment.bankbalance.controltype"));
