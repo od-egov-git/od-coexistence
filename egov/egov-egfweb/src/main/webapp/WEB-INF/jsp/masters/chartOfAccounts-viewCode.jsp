@@ -108,6 +108,7 @@
 	var allGlcodes = [];
 	<s:iterator value="allChartOfAccounts">
 		allGlcodes.push("<s:property value="glcode"/>-<s:property value="name.replaceAll('\n',' ')"/>")
+		allGlcodes.push("<s:property value="name"/>-<s:property value="glcode"/>")
 	</s:iterator>
 	YAHOO.example.BasicLocal = function() { 
 		    var oDS = new YAHOO.util.LocalDataSource(allGlcodes); 

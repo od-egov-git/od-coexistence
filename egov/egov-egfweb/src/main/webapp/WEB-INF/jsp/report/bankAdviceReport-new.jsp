@@ -81,9 +81,23 @@ table.its th {
 		})
 	}
 	function populateInstrumentNumber(instrument) {
+		
+		if (document.getElementById('transDateFrom').value.trim().length == 0) {
+			bootbox.alert('From Date is Empty');
+			return false;
+		}
+		if (document.getElementById('transDateTo').value.trim().length == 0) {
+			bootbox.alert('To Date is Empty');
+			return false;
+		}
+		//null
 		var bankaccountId = instrument.options[instrument.selectedIndex].value;
+		var fromDate = document.getElementById('transDateFrom').value;
+		var toDate = document.getElementById('transDateTo').value;
 		populateinstrumentnumber({
-			bankaccountId : bankaccountId
+			bankaccountId : bankaccountId,
+			fromDate : fromDate,
+			toDate : toDate 
 		})
 	}
 </script>
@@ -91,7 +105,8 @@ table.its th {
 	<s:form action="bankAdviceReport" name="bankAdviceReport"
 		theme="simple" method="post" onsubmit="javascript:doAfterSubmit()">
 		<s:hidden id="instrumentType" name="instrumentType" />
-		<span class="mandatory1"> <s:actionerror /> <s:fielderror /> <s:actionmessage />
+		<span class="mandatory1"> <s:actionerror /> <s:fielderror />
+			<s:actionmessage />
 		</span>
 		<font style='color: red; font-weight: bold'>
 			<p class="error-block" id="lblError"></p>
@@ -102,6 +117,31 @@ table.its th {
 			</div>
 
 			<table align="center" width="100%" cellpadding="0" cellspacing="0">
+
+				<tr>
+					
+					<td class="greybox" width="10%"><s:text name="From Date:" />
+						<span class="mandatory"></span></td>
+
+					<td class="greybox"><s:date name="billDateFrom" var="DateFrom"
+							format="dd/MM/yyyy" /> <s:textfield id="transDateFrom"
+							name="transDateFrom" value="%{billDateFrom}"
+							onkeyup="DateFormat(this,this.value,event,false,'3')"
+							autocomplete="off" placeholder="DD/MM/YYYY"
+							cssClass="form-control datepicker"
+							data-inputmask="'mask': 'd/m/y'" /></td>
+
+					<td class="greybox" width="10%"><s:text name="To Date:" /> <span
+						class="mandatory"></span></td>
+
+					<td class="greybox"><s:date name="billDateTo" var="billDateTo"
+							format="dd/MM/yyyy" /> <s:textfield id="transDateTo"
+							name="transDateTo" value="%{billDateTo}"
+							onkeyup="DateFormat(this,this.value,event,false,'3')"
+							autocomplete="off" placeholder="DD/MM/YYYY"
+							cssClass="form-control datepicker"
+							data-inputmask="'mask': 'd/m/y'"/></td>
+				</tr>
 				<tr>
 					<td class="bluebox" width="10%">Bank Name:<span
 						class="bluebox"><span class="mandatory"></span></span></td>
@@ -149,7 +189,8 @@ table.its th {
 				<s:submit method="search" value="Search" cssClass="buttonsubmit"
 					onclick="return validate();" />
 				<input type="button" value="Close"
-					onclick="javascript:window.parent.postMessage('close','*');" class="button" />
+					onclick="javascript:window.parent.postMessage('close','*');"
+					class="button" />
 
 			</div>
 			<br>
@@ -166,11 +207,14 @@ table.its th {
 					</tr>
 					<s:iterator value="bankAdviseResultList" status="stat" var="p">
 						<tr>
-							<td class="blueborderfortd" style="text-align: center"><s:property value="partyName" /></td>
-							<td class="blueborderfortd" style="text-align: center"><s:property value="bank" /></td>
+							<td class="blueborderfortd" style="text-align: center"><s:property
+									value="partyName" /></td>
+							<td class="blueborderfortd" style="text-align: center"><s:property
+									value="bank" /></td>
 							<td class="blueborderfortd" style="text-align: center"><s:property
 									value="accountNumber" /></td>
-							<td class="blueborderfortd" style="text-align: center"><s:property value="ifscCode" /></td>
+							<td class="blueborderfortd" style="text-align: center"><s:property
+									value="ifscCode" /></td>
 							<td class="blueborderfortd" style="text-align: right"><s:property
 									value="amount" /></td>
 						</tr>
@@ -196,18 +240,14 @@ table.its th {
 							<tr>
 								<td align="center"><input type="button"
 									class="buttonsubmit" value="EXPORT PAGE 1" id="exportpdf"
-									name="exportpdf" onclick="exportPDF();" />
-									<input type="button"
-									class="buttonsubmit" value="EXPORT PAGE 2" id="exportpdf1"
-									name="exportpdf1" onclick="exportPDF1();" />
-									<input type="button"
-									class="buttonsubmit" value="EXPORT PAGE 3" id="exportpdf3"
-									name="exportpdf3" onclick="exportPDF3();" />
-									<input type="button"
-									class="buttonsubmit" value="EXPORT PAGE 4" id="exportpdf4"
-									name="exportpdf4	" onclick="exportPDF4();" />
-									 <input
-									type="button" class="buttonsubmit" value="EXPORT EXCEL"
+									name="exportpdf" onclick="exportPDF();" /> <input
+									type="button" class="buttonsubmit" value="EXPORT PAGE 2"
+									id="exportpdf1" name="exportpdf1" onclick="exportPDF1();" /> <input
+									type="button" class="buttonsubmit" value="EXPORT PAGE 3"
+									id="exportpdf3" name="exportpdf3" onclick="exportPDF3();" /> <input
+									type="button" class="buttonsubmit" value="EXPORT PAGE 4"
+									id="exportpdf4" name="exportpdf4	" onclick="exportPDF4();" />
+									<input type="button" class="buttonsubmit" value="EXPORT EXCEL"
 									id="exportpdf" name="exportpdf" onclick="exportExcel();" /> <!-- 	<input type="button" class="buttonsubmit" value="EXPORT HTM" id="exporthtml" name="exportpdf" onclick="exportHtml();"/>-->
 								</td>
 							</tr>
@@ -241,8 +281,7 @@ table.its th {
 			var bankaccount = document.getElementById("bankaccount").value;
 			var instrumentnumber = document.getElementById("instrumentnumber").value;
 			var url ="";
-			if (document.getElementById("instrumentType").value == 'pex')
-				{
+			if (document.getElementById("instrumentType").value == 'pex') {
 				url = "${pageContext.request.contextPath}/report/bankAdviceReport-exportPDFPex.action?bank.id="
 					+ bank
 					+ "&bankbranch.id="
@@ -250,9 +289,7 @@ table.its th {
 					+ "&bankaccount.id="
 					+ bankaccount
 					+ "&instrumentnumber.id=" + instrumentnumber;
-				}
-			else
-				{
+			} else {
 				url = "${pageContext.request.contextPath}/report/bankAdviceReport-exportPDF.action?bank.id="
 					+ bank
 					+ "&bankbranch.id="
@@ -271,8 +308,7 @@ table.its th {
 			var bankaccount = document.getElementById("bankaccount").value;
 			var instrumentnumber = document.getElementById("instrumentnumber").value;
 			var url ="";
-			if (document.getElementById("instrumentType").value == 'pex')
-				{
+			if (document.getElementById("instrumentType").value == 'pex') {
 				url = "${pageContext.request.contextPath}/report/bankAdviceReport-exportPDFPex1.action?bank.id="
 					+ bank
 					+ "&bankbranch.id="
@@ -280,9 +316,7 @@ table.its th {
 					+ "&bankaccount.id="
 					+ bankaccount
 					+ "&instrumentnumber.id=" + instrumentnumber;
-				}
-			else
-				{
+			} else {
 				url = "${pageContext.request.contextPath}/report/bankAdviceReport-exportPDF.action?bank.id="
 					+ bank
 					+ "&bankbranch.id="
@@ -301,8 +335,7 @@ table.its th {
 			var bankaccount = document.getElementById("bankaccount").value;
 			var instrumentnumber = document.getElementById("instrumentnumber").value;
 			var url ="";
-			if (document.getElementById("instrumentType").value == 'pex')
-				{
+			if (document.getElementById("instrumentType").value == 'pex') {
 				url = "${pageContext.request.contextPath}/report/bankAdviceReport-exportPDFPex3.action?bank.id="
 					+ bank
 					+ "&bankbranch.id="
@@ -310,9 +343,7 @@ table.its th {
 					+ "&bankaccount.id="
 					+ bankaccount
 					+ "&instrumentnumber.id=" + instrumentnumber;
-				}
-			else
-				{
+			} else {
 				url = "${pageContext.request.contextPath}/report/bankAdviceReport-exportPDF.action?bank.id="
 					+ bank
 					+ "&bankbranch.id="
@@ -331,8 +362,7 @@ table.its th {
 			var bankaccount = document.getElementById("bankaccount").value;
 			var instrumentnumber = document.getElementById("instrumentnumber").value;
 			var url ="";
-			if (document.getElementById("instrumentType").value == 'pex')
-				{
+			if (document.getElementById("instrumentType").value == 'pex') {
 				url = "${pageContext.request.contextPath}/report/bankAdviceReport-exportPDFPex4.action?bank.id="
 					+ bank
 					+ "&bankbranch.id="
@@ -340,9 +370,7 @@ table.its th {
 					+ "&bankaccount.id="
 					+ bankaccount
 					+ "&instrumentnumber.id=" + instrumentnumber;
-				}
-			else
-				{
+			} else {
 				url = "${pageContext.request.contextPath}/report/bankAdviceReport-exportPDF.action?bank.id="
 					+ bank
 					+ "&bankbranch.id="
@@ -361,8 +389,7 @@ table.its th {
 			var bankaccount = document.getElementById("bankaccount").value;
 			var instrumentnumber = document.getElementById("instrumentnumber").value;
 			var url = "";
-			if(document.getElementById("instrumentType").value == 'pex')
-				{
+			if (document.getElementById("instrumentType").value == 'pex') {
 				 url = "${pageContext.request.contextPath}/report/bankAdviceReport-exportExcelPex.action?bank.id="
 					+ bank
 					+ "&bankbranch.id="
@@ -370,9 +397,7 @@ table.its th {
 					+ "&bankaccount.id="
 					+ bankaccount
 					+ "&instrumentnumber.id=" + instrumentnumber;
-				}
-			else
-				{
+			} else {
 				 url = "${pageContext.request.contextPath}/report/bankAdviceReport-exportExcel.action?bank.id="
 					+ bank
 					+ "&bankbranch.id="
@@ -390,13 +415,20 @@ table.its th {
 			var bankbranch = document.getElementById("bankbranch").value;
 			var bankaccount = document.getElementById("bankaccount").value;
 			var instrumentnumber = document.getElementById("instrumentnumber").value;
+			/* var transDateFrom = document.getElementById('transDateFrom').value;
+			var transDateTo =document.getElementById('transDateTo').value; */
+			console.log(transDateFrom);
 			var url = "${pageContext.request.contextPath}/report/bankAdviceReport-exportHtml.action?bank.id="
 					+ bank
 					+ "&bankbranch.id="
 					+ bankbranch
 					+ "&bankaccount.id="
 					+ bankaccount
-					+ "&instrumentnumber.id=" + instrumentnumber;
+					+ "&instrumentnumber.id=" + instrumentnumber
+			/* + "&transDateFrom=" + transDateFrom
+			+"&transDateTo=" +transDateTo */
+			;
+
 			// window.open(url, '','height=650,width=980,scrollbars=yes,left=0,top=0,status=yes');
 			window.location.href = url;
 		}

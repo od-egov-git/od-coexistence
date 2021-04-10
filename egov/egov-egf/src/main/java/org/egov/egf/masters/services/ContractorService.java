@@ -181,9 +181,10 @@ public class ContractorService implements EntityTypeService {
     }
 
     @Override
-    public List<? extends org.egov.commons.utils.EntityType> filterActiveEntities(String filterKey, int maxRecords,
-            Integer accountDetailTypeId) {
-        return contractorRepository.findByNameLikeIgnoreCaseOrCodeLikeIgnoreCase(filterKey + "%", filterKey + "%");
+    public List<? extends org.egov.commons.utils.EntityType> filterActiveEntities(String filterKey, int maxRecords,Integer accountDetailTypeId) {
+        //return contractorRepository.findByNameLikeIgnoreCaseOrCodeLikeIgnoreCase(filterKey + "%", filterKey + "%");
+    	
+    	return contractorRepository.findByNameLikeIgnoreCase(filterKey + "%");
     }
 
     @Override

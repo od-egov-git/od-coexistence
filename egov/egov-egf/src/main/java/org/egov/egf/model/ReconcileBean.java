@@ -67,6 +67,7 @@ public class ReconcileBean {
 	private Date reconciliationDate;
 	private Date bankStatementDate;
 	private String ihId;
+	private String vhId;
 	private String voucherNumber;
 	private Integer limit;
 	private String instrumentNo;
@@ -75,6 +76,7 @@ public class ReconcileBean {
 	private BigDecimal debitAmount;
 	private BigDecimal otherCreditAmount;
 	private BigDecimal otherDebitAmount;
+	
 	
 	
 	public Long getBranchId() {
@@ -204,6 +206,13 @@ public class ReconcileBean {
     public void setInstrumentType(String instrumentType) {
         this.instrumentType = instrumentType;
     }
+	public String getVhId() {
+		return vhId;
+	}
+	public void setVhId(String vhId) {
+		this.vhId = vhId;
+	}
+	
     
 	
 }

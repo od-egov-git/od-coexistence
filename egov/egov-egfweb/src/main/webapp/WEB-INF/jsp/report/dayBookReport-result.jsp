@@ -95,6 +95,36 @@
 		<display:column headerClass="bluebgheadtd" class="blueborderfortd"
 			title="Narration" style="width:8%;text-align:center"
 			property="narration" />
+		<!--  -->
+			<display:column headerClass="bluebgheadtd" class="blueborderfortd"
+			title="Party Name" style="width:5%;text-align:right"
+			property="partyname" />
+			
+			<display:column headerClass="bluebgheadtd" class="blueborderfortd"
+			title="Budget Head" style="width:5%;text-align:right"
+			property="budgethead" />
+			
+			<display:column headerClass="bluebgheadtd" class="blueborderfortd"
+			title="DIVISION" style="width:5%;text-align:right"
+			property="division" />
+			
+			<display:column headerClass="bluebgheadtd" class="blueborderfortd"
+			title="BPV NO" style="width:5%;text-align:right"
+			property="bpvno" />
+			
+			<display:column headerClass="bluebgheadtd" class="blueborderfortd"
+			title="BPV Date" style="width:5%;text-align:right"
+			property="bpvDate" />
+			
+			<display:column headerClass="bluebgheadtd" class="blueborderfortd"
+			title="RTGS NO" style="width:5%;text-align:right"
+			property="pexno" />
+			
+			<display:column headerClass="bluebgheadtd" class="blueborderfortd"
+			title="RTGS DATE" style="width:5%;text-align:right"
+			property="pexDate" />
+			
+			<!--  -->
 		<display:column headerClass="bluebgheadtd" class="blueborderfortd"
 			title="Status" style="width:6%;text-align:center" property="status" />
 		<display:column headerClass="bluebgheadtd" class="blueborderfortd"

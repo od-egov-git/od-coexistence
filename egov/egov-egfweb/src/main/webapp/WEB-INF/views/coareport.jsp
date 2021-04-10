@@ -168,8 +168,8 @@
 										<spring:message code="lbl.select" text="Select"/>
 									</option>
 									<option value="true"><spring:message code="lbl.yes" text="Yes"/></option>
-									<option value="false"><spring:message code="lbl.no" text="No"/></:option>
-									<option value=""><spring:message code="lbl.all" text="All"/></:option>
+									<option value="false"><spring:message code="lbl.no" text="No"/></option>
+									<option value=""><spring:message code="lbl.all" text="All"/></option>
 									</select>
 							</div>
 
@@ -182,13 +182,13 @@
 										<spring:message code="lbl.select" text="Select"/>
 									</option>
 									<option value="true"><spring:message code="lbl.yes" text="Yes"/>
-										</:option>
+										</option>
 									
 									<option value="false"><spring:message code="lbl.no" text="No"/>
-										</:option>
+										</option>
 									
 									<option value=""><spring:message code="lbl.all" text="All"/>
-										</:option>
+										</option>
 								
 								</select>
 
@@ -205,13 +205,13 @@
 										<spring:message code="lbl.select" text="Select"/>
 									</option>
 									<option value="true"><spring:message code="lbl.yes" text="Yes"/>
-										</:option>
+										</option>
 									
 									<option value="false"><spring:message code="lbl.no" text="No"/>
-										</:option>
+										</option>
 									
 									<option value=""><spring:message code="lbl.all" text="All"/>
-										</:option>
+										</option>
 								
 								</select>
 							</div>
@@ -221,7 +221,7 @@
 						<div class="form-group">
 							<div class="text-center">
 								<button type='button' class='btn btn-primary' id="btnsearch">
-									<spring:message code='lbl.search'/>
+									<spring:message code='lbl.search' text="Search"/>
 								</button>
 								<a href='javascript:void(0)' class='btn btn-default'
 									onclick="javascript:window.parent.postMessage('close','*');"><spring:message
@@ -285,5 +285,3 @@
 	src="<cdn:url value='/resources/global/js/jquery/plugins/jquery.validate.min.js' context='/services/egi'/>"></script>
 <script type="text/javascript"
 	src="<cdn:url value='/resources/app/js/coareport.js?rnd=${app_release_no}'/>"></script>
-<script type="text/javascript"
-        src="<cdn:url value='/resources/app/js/i18n/jquery.i18n.properties.js?rnd=${app_release_no}' context='/services/EGF'/>"></script>

@@ -154,6 +154,7 @@ import com.exilant.eGov.src.transactions.VoucherTypeForULB;
 import com.exilant.exility.common.TaskFailedException;
 
 import com.exilant.eGov.src.reports.JournalVoucherDraftService;
+
 /**
  * This Class will create voucher from bill <br>
  * 
@@ -246,11 +247,12 @@ public class CreateVoucher {
 	@Autowired
 	private GenericSequenceNumberGenerator genericSequenceNumberGenerator;
 
-	// abhishek for save as draft
+	// jayanta for save as draft
     @Autowired
     @Qualifier("journalVoucherDraftService")
     private JournalVoucherDraftService journalVoucherDraftService;
     
+
 	private static final String ERR = "Exception in CreateVoucher";
 	private static final String DEPTMISSINGMSG = "Department is missing in the Bill cannot proceed creating vouvher";
 	private static final String IS_MISSING = "is missing";
@@ -1115,7 +1117,7 @@ public class CreateVoucher {
 	 *            recovery master.If the glcode used is mapped in the recovery
 	 *            master then this data is mandatory.
 	 * @return voucherheader object in case of success and null in case of fail.
-	 * @throws ApplicationRuntimeException
+	 * @throws ApplicationRuntimeExceptionRajat
 	 */
 	@Transactional
 	public CVoucherHeader createVoucher(final HashMap<String, Object> headerdetails,
@@ -2839,459 +2841,487 @@ public class CreateVoucher {
 		return fiscalPeriod;
 	}
 	
-	public String getEmployeeName(Long empId){
-        
-	       return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
-	    }
+	// jayanta for save as draft
+		@Transactional
+		public CVoucherHeader createPreApprovedVoucher(final HashMap<String, Object> headerdetails,
+				final List<HashMap<String, Object>> accountcodedetails,
+				final List<HashMap<String, Object>> subledgerdetails,
+				final WorkflowBean workflowBean)
+				throws ApplicationRuntimeException, ValidationException {
+			final AppConfig appConfig = appConfigService.getAppConfigByKeyName("PREAPPROVEDVOUCHERSTATUS");
+			if (null != appConfig && null != appConfig.getConfValues())
+				for (final AppConfigValues appConfigVal : appConfig.getConfValues())
+					headerdetails.put(VoucherConstant.STATUS, Integer.valueOf(appConfigVal.getValue()));
+			else
+				throw new ApplicationRuntimeException(
+						"Appconfig value for PREAPPROVEDVOUCHERSTATUS is not defined in the system");
+			CVoucherHeader vh;
+			try {
+				vh = createVoucher(headerdetails, accountcodedetails, subledgerdetails, workflowBean);
+				/*
+				 * if (vh.getModuleId() != null) startWorkflow(vh);
+				 */
+				// if u need workflow enable above lines and fix workflow
+			} catch (final ValidationException ve) {
+				LOGGER.error(ERR, ve);
+				ve.printStackTrace();
+				final List<ValidationError> errors = new ArrayList<ValidationError>();
+				//errors.add(new ValidationError("exp", ve.getErrors().get(0).getMessage()));
+				throw new ValidationException(errors);
+			} catch (final Exception e) {
+				e.printStackTrace();
+				LOGGER.error(ERR, e);
+				throw new ApplicationRuntimeException(e.getMessage());
+			}
+			return vh;
+		}
+		
+		// jayanta for save as draft
+		@Transactional
+		public CVoucherHeader createVoucher(final HashMap<String, Object> headerdetails,
+				final List<HashMap<String, Object>> accountcodedetails,
+				final List<HashMap<String, Object>> subledgerdetails,
+				final WorkflowBean workflowBean) throws ApplicationRuntimeException {
+			CVoucherHeader vh;
+			Vouchermis mis;
 
-	// abhishek for save as draft
-			@Transactional
-			public CVoucherHeader createPreApprovedVoucher(final HashMap<String, Object> headerdetails,
-					final List<HashMap<String, Object>> accountcodedetails,
-					final List<HashMap<String, Object>> subledgerdetails,
-					final WorkflowBean workflowBean)
-					throws ApplicationRuntimeException, ValidationException {
-				final AppConfig appConfig = appConfigService.getAppConfigByKeyName("PREAPPROVEDVOUCHERSTATUS");
-				if (null != appConfig && null != appConfig.getConfValues())
-					for (final AppConfigValues appConfigVal : appConfig.getConfValues())
-						headerdetails.put(VoucherConstant.STATUS, Integer.valueOf(appConfigVal.getValue()));
-				else
-					throw new ApplicationRuntimeException(
-							"Appconfig value for PREAPPROVEDVOUCHERSTATUS is not defined in the system");
-				CVoucherHeader vh;
-				try {
-					vh = createVoucher(headerdetails, accountcodedetails, subledgerdetails, workflowBean);
-					/*
-					 * if (vh.getModuleId() != null) startWorkflow(vh);
-					 */
-					// if u need workflow enable above lines and fix workflow
-				} catch (final ValidationException ve) {
-					LOGGER.error(ERR, ve);
-					ve.printStackTrace();
-					final List<ValidationError> errors = new ArrayList<ValidationError>();
-					//errors.add(new ValidationError("exp", ve.getErrors().get(0).getMessage()));
-					throw new ValidationException(errors);
-				} catch (final Exception e) {
-					e.printStackTrace();
-					LOGGER.error(ERR, e);
-					throw new ApplicationRuntimeException(e.getMessage());
-				}
-				return vh;
-			}
-			
-			// abhishek for save as draft
-			@Transactional
-			public CVoucherHeader createVoucher(final HashMap<String, Object> headerdetails,
-					final List<HashMap<String, Object>> accountcodedetails,
-					final List<HashMap<String, Object>> subledgerdetails,
-					final WorkflowBean workflowBean) throws ApplicationRuntimeException {
-				CVoucherHeader vh;
-				Vouchermis mis;
-				if (LOGGER.isDebugEnabled())
-					LOGGER.debug("start | createVoucher API");
-				try {
-		           
-		            
-					if(headerdetails.containsKey(VoucherConstant.SERVICE_NAME) && headerdetails.containsKey(VoucherConstant.REFERENCEDOC)){
-		                            String serviceName = headerdetails.get(VoucherConstant.SERVICE_NAME).toString();
-		                            String referenceDocument = headerdetails.get(VoucherConstant.REFERENCEDOC).toString();
-		                            validateReferenceDocument(referenceDocument,serviceName);
-		                        }
-					boolean CheckSaveAsDraft= true;
-					if(workflowBean.getWorkFlowAction()!= null && !(workflowBean.getWorkFlowAction().equalsIgnoreCase("SaveAsDraft") || workflowBean.getWorkFlowAction().equalsIgnoreCase(FinancialConstants.WORKFLOW_STATE_SAVEASDRAFT)))
-					{
-						for (final HashMap<String, Object> accDetailMap : accountcodedetails) {
-							String glcode = accDetailMap.get(VoucherConstant.GLCODE).toString();
-							if(glcode==null || glcode.equals(""))
-							{
-								CheckSaveAsDraft=false;
-								break;
-							}
-						}
-					}
-					
-					if(CheckSaveAsDraft)
-					{
-					    validateMandateFields(headerdetails);
-						validateLength(headerdetails);
-						validateVoucherMIS(headerdetails);
-						validateTransaction(accountcodedetails, subledgerdetails);
-						validateFunction(headerdetails, accountcodedetails);
-					}
-					
-					vh = createVoucherHeader(headerdetails);
-					mis = createVouchermis(headerdetails);
-					mis.setVoucherheaderid(vh);
-					vh.setVouchermis(mis);
-					// insertIntoVoucherHeader(vh);
-					if (LOGGER.isDebugEnabled())
-						LOGGER.debug("start | insertIntoVoucherHeader");
-					final String vdt = formatter.format(vh.getVoucherDate());
-					String fiscalPeriod = null;
-					try {
-						CFiscalPeriod fp = getFiscalPeriod(vdt);
-		                                fiscalPeriod = fp.getId().toString();
-		                                vh.setFiscalName(fp.getName());
-					} catch (final TaskFailedException e) {
-						throw new ApplicationRuntimeException("error while getting fiscal period");
-					}
-					if (null == fiscalPeriod)
-						throw new ApplicationRuntimeException(
-								"Voucher Date not within an open period or Financial year not open for posting, fiscalPeriod := "
-										+ fiscalPeriod);
-					vh.setFiscalPeriodId(Integer.valueOf(fiscalPeriod));
-					vh.setCgvn(getCGVNNumber(vh));
-					try {
-						if (!isUniqueVN(vh.getVoucherNumber(), vdt))
-							throw new ValidationException(
-									Arrays.asList(new ValidationError("Duplicate Voucher Number", "Duplicate Voucher Number")));
-					} catch (final ValidationException e) {
-						e.printStackTrace();
-						LOGGER.error(ERR, e);
-						throw e;
-					}
-					 catch (final Exception e) {
-						 e.printStackTrace();
-							LOGGER.error(ERR, e);
-							throw new ApplicationRuntimeException(e.getMessage());
-						}
-					voucherService.applyAuditing(vh);
-					if (LOGGER.isInfoEnabled())
-						LOGGER.info("++++++++++++++++++" + vh.toString());
-					voucherService.persist(vh);
-					if (null != vh.getVouchermis().getSourcePath() && null == vh.getModuleId() && vh.getVouchermis()
-							.getSourcePath().length() == vh.getVouchermis().getSourcePath().indexOf("=") + 1) {
-						final StringBuffer sourcePath = new StringBuffer();
-						if (LOGGER.isDebugEnabled())
-							LOGGER.debug("Source Path received : " + vh.getVouchermis().getSourcePath());
-						if (LOGGER.isDebugEnabled())
-							LOGGER.debug("Voucher Header Id  : " + vh.getId());
-						sourcePath.append(vh.getVouchermis().getSourcePath()).append(vh.getId().toString());
-						vh.getVouchermis().setSourcePath(sourcePath.toString());
-						voucherService.applyAuditing(vh);
-						voucherService.update(vh);
-					}
-					if (LOGGER.isDebugEnabled())
-						LOGGER.debug("End | insertIntoVoucherHeader");
-					
-					if(CheckSaveAsDraft)
-					{
-					// insertIntoRecordStatus(vh);
-					final List<Transaxtion> transactions = createTransaction(headerdetails, accountcodedetails,
-							subledgerdetails, vh);
-					// persistenceService.getSession().flush();
-					// engine = ChartOfAccounts.getInstance();
-					// setChartOfAccounts();
-					Transaxtion txnList[] = new Transaxtion[transactions.size()];
-					txnList = transactions.toArray(txnList);
-					final SimpleDateFormat formatter = new SimpleDateFormat(DD_MMM_YYYY);
-					if (!chartOfAccounts.postTransaxtions(txnList, formatter.format(vh.getVoucherDate())))
-						throw new ApplicationRuntimeException("Voucher creation Failed");
-					
-					// Generating EVENT to push the generated voucher to ES index.
-					finDashboardService.publishEvent(FinanceEventType.voucherCreateOrUpdate, vh);
-					}
-					else {
-						System.out.println("Abhishek");
-						//createVoucherDraft(headerdetails, accountcodedetails,
-							//	subledgerdetails, vh);
-						createVoucherDraft( accountcodedetails, vh);
-					}
-				}
-				catch (final ValidationException ve) {
-					ve.printStackTrace();
-					final List<ValidationError> errors = new ArrayList<ValidationError>();
-					//errors.add(new ValidationError("exp", ve.getErrors().get(0).getMessage()));
-					ve.printStackTrace();
-					throw new ValidationException(errors);
-				} catch (final Exception e) {
-					e.printStackTrace();
-					LOGGER.error(ERR, e);
-					throw new ApplicationRuntimeException(e.getMessage());
-				}
-				if (LOGGER.isDebugEnabled())
-					LOGGER.debug("End | createVoucher API");
-				return vh;
-			}
-			
-			public boolean createVoucherDraft( final List<HashMap<String, Object>> accountcodedetails,final CVoucherHeader vh)
-					throws ApplicationRuntimeException {
-				if (LOGGER.isDebugEnabled())
-					LOGGER.debug("Start | createVoucherDraft() ");
-				boolean status=false;
-				try {
-					Integer voucherLineId = 1;
-	   		
+			if (LOGGER.isDebugEnabled())
+				LOGGER.debug("start | createVoucher API");
+			try {
+	           
+	            
+				if(headerdetails.containsKey(VoucherConstant.SERVICE_NAME) && headerdetails.containsKey(VoucherConstant.REFERENCEDOC)){
+	                            String serviceName = headerdetails.get(VoucherConstant.SERVICE_NAME).toString();
+	                            String referenceDocument = headerdetails.get(VoucherConstant.REFERENCEDOC).toString();
+	                            validateReferenceDocument(referenceDocument,serviceName);
+	                        }
+				boolean CheckSaveAsDraft= true;
+				if(workflowBean.getWorkFlowAction()!= null && !workflowBean.getWorkFlowAction().equalsIgnoreCase("SaveAsDraft"))
+				{
 					for (final HashMap<String, Object> accDetailMap : accountcodedetails) {
-						VoucherDraftDetails voucherDraftDetails =new VoucherDraftDetails();
-						final String glcode = accDetailMap.get(VoucherConstant.GLCODE).toString();
-						voucherDraftDetails.setVoucherNumber(vh.getVoucherNumber());
-						
-						
-						if(accDetailMap.get(VoucherConstant.FUNCTIONIDDETAILS)!=null && !accDetailMap.get(VoucherConstant.FUNCTIONIDDETAILS).equals(""))
-							voucherDraftDetails.setFunctionIdDetail((Long)accDetailMap.get(VoucherConstant.FUNCTIONIDDETAILS));
-						if(accDetailMap.get(VoucherConstant.FUNCTIONDETAILS)!=null && !accDetailMap.get(VoucherConstant.FUNCTIONDETAILS).equals(""))
-							voucherDraftDetails.setFunctionDetail((String)accDetailMap.get(VoucherConstant.FUNCTIONDETAILS));
-						//voucherDraftDetails.setAccounthead(voucherDraftDetails);
-						voucherDraftDetails.setDebitAmountDetail(new BigDecimal(accDetailMap.get(VoucherConstant.DEBITAMOUNT).toString()));
-						voucherDraftDetails.setCreditAmountDetail(new BigDecimal(accDetailMap.get(VoucherConstant.CREDITAMOUNT).toString()));
-					//	voucherDraftDetails.setIsSubledger(isSubledger);
-						voucherDraftDetails.setGlcodeDetail(accDetailMap.get(VoucherConstant.GLCODE).toString());
-						
-						journalVoucherDraftService.delete(voucherDraftDetails);
-						journalVoucherDraftService.create(voucherDraftDetails);
-						status=true;
-						
-					}
-				} catch (final Exception e) {
-					e.printStackTrace();
-					LOGGER.error("Exception occured while posting data into voucher detail draft ");
-					throw new ApplicationRuntimeException(
-							"Exception occured while posting data into voucher detail draft" + e.getMessage());
-				}
-				if (LOGGER.isDebugEnabled())
-					LOGGER.debug("END | createVoucherDraft() ");
-				return status;
-			}
-			
-			
-			
-			// abhishek for save as draft
-					@Transactional
-					public CVoucherHeader forwardVoucherFromSaveAsDraft(final HashMap<String, Object> headerdetails,
-							final List<HashMap<String, Object>> accountcodedetails,
-							final List<HashMap<String, Object>> subledgerdetails,
-							final WorkflowBean workflowBean) throws ApplicationRuntimeException {
-						CVoucherHeader vh;
-						Vouchermis mis;
-						
-						
-						if (LOGGER.isDebugEnabled())
-							LOGGER.debug("start | createVoucher API");
-						try {
-				            
-							
-							if(headerdetails.containsKey(VoucherConstant.SERVICE_NAME) && headerdetails.containsKey(VoucherConstant.REFERENCEDOC)){
-				                            String serviceName = headerdetails.get(VoucherConstant.SERVICE_NAME).toString();
-				                            String referenceDocument = headerdetails.get(VoucherConstant.REFERENCEDOC).toString();
-				                            validateReferenceDocument(referenceDocument,serviceName);
-				                        }
-							
-							
-							
-							    validateMandateFields(headerdetails);
-								validateLength(headerdetails);
-								validateVoucherMIS(headerdetails);
-								validateTransaction(accountcodedetails, subledgerdetails);
-								validateFunction(headerdetails, accountcodedetails);
-							
-							vh = updateVoucherHeader(headerdetails);
-							mis = createVouchermis(headerdetails);
-							mis.setVoucherheaderid(vh);
-							vh.setVouchermis(mis);
-							// insertIntoVoucherHeader(vh);
-							if (LOGGER.isDebugEnabled())
-								LOGGER.debug("start | insertIntoVoucherHeader");
-							final String vdt = formatter.format(vh.getVoucherDate());
-							String fiscalPeriod = null;
-							try {
-								CFiscalPeriod fp = getFiscalPeriod(vdt);
-				                                fiscalPeriod = fp.getId().toString();
-				                                vh.setFiscalName(fp.getName());
-							} catch (final TaskFailedException e) {
-								throw new ApplicationRuntimeException("error while getting fiscal period");
-							}
-							if (null == fiscalPeriod)
-								throw new ApplicationRuntimeException(
-										"Voucher Date not within an open period or Financial year not open for posting, fiscalPeriod := "
-												+ fiscalPeriod);
-							vh.setFiscalPeriodId(Integer.valueOf(fiscalPeriod));
-							vh.setCgvn(getCGVNNumber(vh));
-							try {
-								if (!isUniqueVN(vh.getVoucherNumber(), vdt))
-									throw new ValidationException(
-											Arrays.asList(new ValidationError("Duplicate Voucher Number", "Duplicate Voucher Number")));
-							} catch (final ValidationException e) {
-								e.printStackTrace();
-								LOGGER.error(ERR, e);
-								throw e;
-							}
-							 catch (final Exception e) {
-								 e.printStackTrace();
-									LOGGER.error(ERR, e);
-									throw new ApplicationRuntimeException(e.getMessage());
-								}
-							voucherService.applyAuditing(vh);
-							if (LOGGER.isInfoEnabled())
-								LOGGER.info("++++++++++++++++++" + vh.toString());
-							voucherService.persist(vh);
-							if (null != vh.getVouchermis().getSourcePath() && null == vh.getModuleId() && vh.getVouchermis()
-									.getSourcePath().length() == vh.getVouchermis().getSourcePath().indexOf("=") + 1) {
-								final StringBuffer sourcePath = new StringBuffer();
-								if (LOGGER.isDebugEnabled())
-									LOGGER.debug("Source Path received : " + vh.getVouchermis().getSourcePath());
-								if (LOGGER.isDebugEnabled())
-									LOGGER.debug("Voucher Header Id  : " + vh.getId());
-								sourcePath.append(vh.getVouchermis().getSourcePath()).append(vh.getId().toString());
-								vh.getVouchermis().setSourcePath(sourcePath.toString());
-								voucherService.applyAuditing(vh);
-								voucherService.update(vh);
-							}
-							if (LOGGER.isDebugEnabled())
-								LOGGER.debug("End | insertIntoVoucherHeader");
-							boolean CheckSaveAsDraft=false;
-							if(CheckSaveAsDraft)
-							{
-								// insertIntoRecordStatus(vh);
-								final List<Transaxtion> transactions = createTransaction(headerdetails, accountcodedetails,
-										subledgerdetails, vh);
-								// persistenceService.getSession().flush();
-								// engine = ChartOfAccounts.getInstance();
-								// setChartOfAccounts();
-								Transaxtion txnList[] = new Transaxtion[transactions.size()];
-								txnList = transactions.toArray(txnList);
-								final SimpleDateFormat formatter = new SimpleDateFormat(DD_MMM_YYYY);
-								if (!chartOfAccounts.postTransaxtions(txnList, formatter.format(vh.getVoucherDate())))
-									throw new ApplicationRuntimeException("Voucher creation Failed");
-								
-								// Generating EVENT to push the generated voucher to ES index.
-								finDashboardService.publishEvent(FinanceEventType.voucherCreateOrUpdate, vh);
-							}
-							else {
-								//createVoucherDraft(headerdetails, accountcodedetails,
-									//	subledgerdetails, vh);
-								createVoucherDraft( accountcodedetails, vh);
-							}
+						String glcode = accDetailMap.get(VoucherConstant.GLCODE).toString();
+						if(glcode==null || glcode.equals(""))
+						{
+							CheckSaveAsDraft=false;
+							break;
 						}
-						catch (final ValidationException ve) {
-							ve.printStackTrace();
-							final List<ValidationError> errors = new ArrayList<ValidationError>();
-							//errors.add(new ValidationError("exp", ve.getErrors().get(0).getMessage()));
-							ve.printStackTrace();
-							throw new ValidationException(errors);
-						} catch (final Exception e) {
+					}
+				}
+				
+				if(CheckSaveAsDraft)
+				{
+				    validateMandateFields(headerdetails);
+					validateLength(headerdetails);
+					validateVoucherMIS(headerdetails);
+					validateTransaction(accountcodedetails, subledgerdetails);
+					validateFunction(headerdetails, accountcodedetails);
+				}
+				
+				vh = createVoucherHeader(headerdetails);
+				mis = createVouchermis(headerdetails);
+				mis.setVoucherheaderid(vh);
+				vh.setVouchermis(mis);
+				// insertIntoVoucherHeader(vh);
+
+				if (LOGGER.isDebugEnabled())
+					LOGGER.debug("start | insertIntoVoucherHeader");
+				final String vdt = formatter.format(vh.getVoucherDate());
+				String fiscalPeriod = null;
+				try {
+					CFiscalPeriod fp = getFiscalPeriod(vdt);
+	                                fiscalPeriod = fp.getId().toString();
+	                                vh.setFiscalName(fp.getName());
+				} catch (final TaskFailedException e) {
+					throw new ApplicationRuntimeException("error while getting fiscal period");
+				}
+				if (null == fiscalPeriod)
+					throw new ApplicationRuntimeException(
+							"Voucher Date not within an open period or Financial year not open for posting, fiscalPeriod := "
+									+ fiscalPeriod);
+				vh.setFiscalPeriodId(Integer.valueOf(fiscalPeriod));
+
+				vh.setCgvn(getCGVNNumber(vh));
+
+				try {
+					if (!isUniqueVN(vh.getVoucherNumber(), vdt))
+						throw new ValidationException(
+								Arrays.asList(new ValidationError("Duplicate Voucher Number", "Duplicate Voucher Number")));
+				} catch (final ValidationException e) {
+					e.printStackTrace();
+					LOGGER.error(ERR, e);
+					throw e;
+				}
+				 catch (final Exception e) {
+					 e.printStackTrace();
+						LOGGER.error(ERR, e);
+						throw new ApplicationRuntimeException(e.getMessage());
+					}
+				voucherService.applyAuditing(vh);
+				if (LOGGER.isInfoEnabled())
+					LOGGER.info("++++++++++++++++++" + vh.toString());
+				voucherService.persist(vh);
+				if (null != vh.getVouchermis().getSourcePath() && null == vh.getModuleId() && vh.getVouchermis()
+						.getSourcePath().length() == vh.getVouchermis().getSourcePath().indexOf("=") + 1) {
+					final StringBuffer sourcePath = new StringBuffer();
+					if (LOGGER.isDebugEnabled())
+						LOGGER.debug("Source Path received : " + vh.getVouchermis().getSourcePath());
+					if (LOGGER.isDebugEnabled())
+						LOGGER.debug("Voucher Header Id  : " + vh.getId());
+					sourcePath.append(vh.getVouchermis().getSourcePath()).append(vh.getId().toString());
+					vh.getVouchermis().setSourcePath(sourcePath.toString());
+					voucherService.applyAuditing(vh);
+					voucherService.update(vh);
+				}
+
+				if (LOGGER.isDebugEnabled())
+					LOGGER.debug("End | insertIntoVoucherHeader");
+				
+				if(CheckSaveAsDraft)
+				{
+				// insertIntoRecordStatus(vh);
+				final List<Transaxtion> transactions = createTransaction(headerdetails, accountcodedetails,
+						subledgerdetails, vh);
+				// persistenceService.getSession().flush();
+				// engine = ChartOfAccounts.getInstance();
+				// setChartOfAccounts();
+				Transaxtion txnList[] = new Transaxtion[transactions.size()];
+				txnList = transactions.toArray(txnList);
+				final SimpleDateFormat formatter = new SimpleDateFormat(DD_MMM_YYYY);
+				if (!chartOfAccounts.postTransaxtions(txnList, formatter.format(vh.getVoucherDate())))
+					throw new ApplicationRuntimeException("Voucher creation Failed");
+				
+				// Generating EVENT to push the generated voucher to ES index.
+				finDashboardService.publishEvent(FinanceEventType.voucherCreateOrUpdate, vh);
+				}
+				else {
+					//createVoucherDraft(headerdetails, accountcodedetails,
+						//	subledgerdetails, vh);
+					createVoucherDraft( accountcodedetails, vh);
+				}
+			}
+
+			catch (final ValidationException ve) {
+				ve.printStackTrace();
+				final List<ValidationError> errors = new ArrayList<ValidationError>();
+				//errors.add(new ValidationError("exp", ve.getErrors().get(0).getMessage()));
+				ve.printStackTrace();
+				throw new ValidationException(errors);
+			} catch (final Exception e) {
+				e.printStackTrace();
+				LOGGER.error(ERR, e);
+				throw new ApplicationRuntimeException(e.getMessage());
+			}
+			if (LOGGER.isDebugEnabled())
+				LOGGER.debug("End | createVoucher API");
+			return vh;
+
+		}
+		
+		public boolean createVoucherDraft( final List<HashMap<String, Object>> accountcodedetails,final CVoucherHeader vh)
+				throws ApplicationRuntimeException {
+			if (LOGGER.isDebugEnabled())
+				LOGGER.debug("Start | createVoucherDraft() ");
+			boolean status=false;
+			try {
+				Integer voucherLineId = 1;
+   		
+				for (final HashMap<String, Object> accDetailMap : accountcodedetails) {
+					VoucherDraftDetails voucherDraftDetails =new VoucherDraftDetails();
+					final String glcode = accDetailMap.get(VoucherConstant.GLCODE).toString();
+					voucherDraftDetails.setVoucherNumber(vh.getVoucherNumber());
+					
+					
+					if(accDetailMap.get(VoucherConstant.FUNCTIONIDDETAILS)!=null && !accDetailMap.get(VoucherConstant.FUNCTIONIDDETAILS).equals(""))
+						voucherDraftDetails.setFunctionIdDetail((Long)accDetailMap.get(VoucherConstant.FUNCTIONIDDETAILS));
+					if(accDetailMap.get(VoucherConstant.FUNCTIONDETAILS)!=null && !accDetailMap.get(VoucherConstant.FUNCTIONDETAILS).equals(""))
+						voucherDraftDetails.setFunctionDetail((String)accDetailMap.get(VoucherConstant.FUNCTIONDETAILS));
+					//voucherDraftDetails.setAccounthead(voucherDraftDetails);
+					voucherDraftDetails.setDebitAmountDetail(new BigDecimal(accDetailMap.get(VoucherConstant.DEBITAMOUNT).toString()));
+					voucherDraftDetails.setCreditAmountDetail(new BigDecimal(accDetailMap.get(VoucherConstant.CREDITAMOUNT).toString()));
+				//	voucherDraftDetails.setIsSubledger(isSubledger);
+					voucherDraftDetails.setGlcodeDetail(accDetailMap.get(VoucherConstant.GLCODE).toString());
+					
+					journalVoucherDraftService.delete(voucherDraftDetails);
+					journalVoucherDraftService.create(voucherDraftDetails);
+					status=true;
+					
+				}
+			} catch (final Exception e) {
+				e.printStackTrace();
+				LOGGER.error("Exception occured while posting data into voucher detail draft ");
+				throw new ApplicationRuntimeException(
+						"Exception occured while posting data into voucher detail draft" + e.getMessage());
+			}
+			if (LOGGER.isDebugEnabled())
+				LOGGER.debug("END | createVoucherDraft() ");
+			return status;
+		}
+		
+		
+		
+		// jayanta for save as draft
+				@Transactional
+				public CVoucherHeader forwardVoucherFromSaveAsDraft(final HashMap<String, Object> headerdetails,
+						final List<HashMap<String, Object>> accountcodedetails,
+						final List<HashMap<String, Object>> subledgerdetails,
+						final WorkflowBean workflowBean) throws ApplicationRuntimeException {
+					CVoucherHeader vh;
+					Vouchermis mis;
+					
+					
+					if (LOGGER.isDebugEnabled())
+						LOGGER.debug("start | createVoucher API");
+					try {
+			            
+						
+						if(headerdetails.containsKey(VoucherConstant.SERVICE_NAME) && headerdetails.containsKey(VoucherConstant.REFERENCEDOC)){
+			                            String serviceName = headerdetails.get(VoucherConstant.SERVICE_NAME).toString();
+			                            String referenceDocument = headerdetails.get(VoucherConstant.REFERENCEDOC).toString();
+			                            validateReferenceDocument(referenceDocument,serviceName);
+			                        }
+						
+						
+						
+						    validateMandateFields(headerdetails);
+							validateLength(headerdetails);
+							validateVoucherMIS(headerdetails);
+							validateTransaction(accountcodedetails, subledgerdetails);
+							validateFunction(headerdetails, accountcodedetails);
+						
+						vh = updateVoucherHeader(headerdetails);
+						mis = createVouchermis(headerdetails);
+						mis.setVoucherheaderid(vh);
+						vh.setVouchermis(mis);
+						// insertIntoVoucherHeader(vh);
+
+						if (LOGGER.isDebugEnabled())
+							LOGGER.debug("start | insertIntoVoucherHeader");
+						final String vdt = formatter.format(vh.getVoucherDate());
+						String fiscalPeriod = null;
+						try {
+							CFiscalPeriod fp = getFiscalPeriod(vdt);
+			                                fiscalPeriod = fp.getId().toString();
+			                                vh.setFiscalName(fp.getName());
+						} catch (final TaskFailedException e) {
+							throw new ApplicationRuntimeException("error while getting fiscal period");
+						}
+						if (null == fiscalPeriod)
+							throw new ApplicationRuntimeException(
+									"Voucher Date not within an open period or Financial year not open for posting, fiscalPeriod := "
+											+ fiscalPeriod);
+						vh.setFiscalPeriodId(Integer.valueOf(fiscalPeriod));
+
+						vh.setCgvn(getCGVNNumber(vh));
+
+						try {
+							if (!isUniqueVN(vh.getVoucherNumber(), vdt))
+								throw new ValidationException(
+										Arrays.asList(new ValidationError("Duplicate Voucher Number", "Duplicate Voucher Number")));
+						} catch (final ValidationException e) {
 							e.printStackTrace();
 							LOGGER.error(ERR, e);
-							throw new ApplicationRuntimeException(e.getMessage());
-						}
-						if (LOGGER.isDebugEnabled())
-							LOGGER.debug("End | createVoucher API");
-						return vh;
-					}
-					
-					// abhishek for forward from save as draft 
-					@Transactional
-					@SuppressWarnings("deprecation")
-					public CVoucherHeader updateVoucherHeader(final HashMap<String, Object> headerdetails)
-							throws ApplicationRuntimeException, Exception {
-						if (LOGGER.isDebugEnabled())
-							LOGGER.debug("START | updateVoucherHeader");
-						// Connection con = null;
-						Query query = null;
-						final CVoucherHeader cVoucherHeader = new CVoucherHeader();
-						try {
-							// String voucherSubType="";
-							cVoucherHeader.setName(headerdetails.get(VoucherConstant.VOUCHERNAME).toString());
-							if(headerdetails.containsKey(VoucherConstant.NARRATION)
-									&& null != headerdetails.get(VoucherConstant.NARRATION)) {
-								final String narration = headerdetails.get(VoucherConstant.NARRATION).toString();
-								cVoucherHeader.setDescription(narration);
-							}
-							String voucherType = headerdetails.get(VoucherConstant.VOUCHERTYPE).toString();
-							cVoucherHeader.setType(headerdetails.get(VoucherConstant.VOUCHERTYPE).toString());
-							String vNumGenMode = null;
-							if(headerdetails.containsKey("firstsignatory")
-									&& null != headerdetails.get("firstsignatory"))
-							{
-								cVoucherHeader.setFirstsignatory(headerdetails.get("firstsignatory").toString());
-							}
-							if(headerdetails.containsKey("secondsignatory")
-									&& null != headerdetails.get("secondsignatory"))
-							{
-								cVoucherHeader.setSecondsignatory(headerdetails.get("secondsignatory").toString());
-							}
-							// -- Voucher Type checking. --START
-							if (FinancialConstants.STANDARD_VOUCHER_TYPE_JOURNAL.equalsIgnoreCase(voucherType))
-								vNumGenMode = voucherTypeForULB.readVoucherTypes("Journal");
-							else
-								vNumGenMode = voucherTypeForULB.readVoucherTypes(voucherType);
-							// --END --
-							voucherType = voucherType.toUpperCase().replaceAll(" ", "");
-							String voucherSubType = null;
-							if (headerdetails.get(VoucherConstant.VOUCHERSUBTYPE) != null) {
-								voucherSubType = (String) headerdetails.get(VoucherConstant.VOUCHERSUBTYPE);
-								voucherSubType = voucherSubType.toUpperCase().replaceAll(" ", "");
-							}
-							// why it is type,subtype where api expects subtype,type ?
-							// if()
-							final String voucherNumberPrefix = getVoucherNumberPrefix(voucherType, voucherSubType);
-							String voucherNumber = null;
-							if (headerdetails.get(VoucherConstant.DESCRIPTION) != null)
-								cVoucherHeader.setDescription(headerdetails.get(VoucherConstant.DESCRIPTION).toString());
-							final Date voucherDate = (Date) headerdetails.get(VoucherConstant.VOUCHERDATE);
-							cVoucherHeader.setVoucherDate(voucherDate);
-							Fund fundByCode = fundDAO.fundByCode(headerdetails.get(VoucherConstant.FUNDCODE).toString());
-							if (LOGGER.isDebugEnabled())
-								LOGGER.debug("Voucher Type is :" + voucherType);
-							if (LOGGER.isDebugEnabled())
-								LOGGER.debug("vNumGenMode is  :" + vNumGenMode);
-							if (headerdetails.get(VoucherConstant.VOUCHERNUMBER) != null)
-								cVoucherHeader.setVoucherNumber(headerdetails.get(VoucherConstant.VOUCHERNUMBER).toString());
-							if (null != headerdetails.get(VoucherConstant.MODULEID))
-								vNumGenMode = "Auto";
-							cVoucherHeader.setFundId(fundByCode);
-							if (vNumGenMode.equals("Auto")) {
-								cVoucherHeader.setVoucherNumberPrefix(voucherNumberPrefix);
-								VouchernumberGenerator v = beanResolver.getAutoNumberServiceFor(VouchernumberGenerator.class);
-								final String strVoucherNumber = v.getNextNumber(cVoucherHeader);
-								cVoucherHeader.setVoucherNumber(strVoucherNumber);
-							}
-							
-							if (headerdetails.containsKey(VoucherConstant.MODULEID)
-									&& null != headerdetails.get(VoucherConstant.MODULEID)) {
-								cVoucherHeader.setModuleId(Integer.valueOf(headerdetails.get(VoucherConstant.MODULEID).toString()));
-								cVoucherHeader.setIsConfirmed(Integer.valueOf(1));
-							} else {
-								
-							}
-							if (headerdetails.containsKey(VoucherConstant.STATUS) && null != headerdetails.get(VoucherConstant.STATUS))
-								cVoucherHeader.setStatus(Integer.valueOf(headerdetails.get(VoucherConstant.STATUS).toString()));
-							else {
-								final List list = appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
-										"DEFAULTVOUCHERCREATIONSTATUS");
-								cVoucherHeader.setStatus(Integer.parseInt(((AppConfigValues) list.get(0)).getValue()));
-							}
-							if (null != headerdetails.get(VoucherConstant.ORIGIONALVOUCHER)) {
-								final Long origionalVId = Long
-										.parseLong(headerdetails.get(VoucherConstant.ORIGIONALVOUCHER).toString());
-								query = persistenceService.getSession().createQuery("from CVoucherHeader where id=:id");
-								query.setLong("id", origionalVId);
-								if (query.list().size() == 0)
-									throw new ApplicationRuntimeException("Not a valid origional voucherheader id");
-								else
-									cVoucherHeader.setOriginalvcId(origionalVId);
-							}
-							cVoucherHeader.setRefvhId((Long) headerdetails.get(VoucherConstant.REFVOUCHER));
-							cVoucherHeader.setEffectiveDate(new Date());
-							//Object billNumber = headerdetails.get(VoucherConstant.BILLNUMBER);
-				                       // cVoucherHeader.setBillNumber(billNumber != null ? billNumber.toString() : "");
-							if (LOGGER.isDebugEnabled())
-								LOGGER.debug(
-										"Printing Voucher Details------------------------------------------------------------------------------");
-							if (LOGGER.isDebugEnabled())
-								LOGGER.debug(cVoucherHeader.toString());
-							if (LOGGER.isDebugEnabled())
-								LOGGER.debug(
-										"Printing Voucher Details------------------------------------------------------------------------------");
-						} catch (final ValidationException e) {
-							LOGGER.error(e.getMessage());
 							throw e;
-						} catch (final Exception e) {
-							LOGGER.error(e);
-							throw new Exception(e.getMessage());
 						}
+						 catch (final Exception e) {
+							 e.printStackTrace();
+								LOGGER.error(ERR, e);
+								throw new ApplicationRuntimeException(e.getMessage());
+							}
+						voucherService.applyAuditing(vh);
+						if (LOGGER.isInfoEnabled())
+							LOGGER.info("++++++++++++++++++" + vh.toString());
+						voucherService.persist(vh);
+						if (null != vh.getVouchermis().getSourcePath() && null == vh.getModuleId() && vh.getVouchermis()
+								.getSourcePath().length() == vh.getVouchermis().getSourcePath().indexOf("=") + 1) {
+							final StringBuffer sourcePath = new StringBuffer();
+							if (LOGGER.isDebugEnabled())
+								LOGGER.debug("Source Path received : " + vh.getVouchermis().getSourcePath());
+							if (LOGGER.isDebugEnabled())
+								LOGGER.debug("Voucher Header Id  : " + vh.getId());
+							sourcePath.append(vh.getVouchermis().getSourcePath()).append(vh.getId().toString());
+							vh.getVouchermis().setSourcePath(sourcePath.toString());
+							voucherService.applyAuditing(vh);
+							voucherService.update(vh);
+						}
+
 						if (LOGGER.isDebugEnabled())
-							LOGGER.debug("END | createVoucherHeader");
-						return cVoucherHeader;
+							LOGGER.debug("End | insertIntoVoucherHeader");
+						boolean CheckSaveAsDraft=false;
+						if(CheckSaveAsDraft)
+						{
+							// insertIntoRecordStatus(vh);
+							final List<Transaxtion> transactions = createTransaction(headerdetails, accountcodedetails,
+									subledgerdetails, vh);
+							// persistenceService.getSession().flush();
+							// engine = ChartOfAccounts.getInstance();
+							// setChartOfAccounts();
+							Transaxtion txnList[] = new Transaxtion[transactions.size()];
+							txnList = transactions.toArray(txnList);
+							final SimpleDateFormat formatter = new SimpleDateFormat(DD_MMM_YYYY);
+							if (!chartOfAccounts.postTransaxtions(txnList, formatter.format(vh.getVoucherDate())))
+								throw new ApplicationRuntimeException("Voucher creation Failed");
+							
+							// Generating EVENT to push the generated voucher to ES index.
+							finDashboardService.publishEvent(FinanceEventType.voucherCreateOrUpdate, vh);
+						}
+						else {
+							//createVoucherDraft(headerdetails, accountcodedetails,
+								//	subledgerdetails, vh);
+							createVoucherDraft( accountcodedetails, vh);
+						}
 					}
+
+					catch (final ValidationException ve) {
+						ve.printStackTrace();
+						final List<ValidationError> errors = new ArrayList<ValidationError>();
+						//errors.add(new ValidationError("exp", ve.getErrors().get(0).getMessage()));
+						ve.printStackTrace();
+						throw new ValidationException(errors);
+					} catch (final Exception e) {
+						e.printStackTrace();
+						LOGGER.error(ERR, e);
+						throw new ApplicationRuntimeException(e.getMessage());
+					}
+					if (LOGGER.isDebugEnabled())
+						LOGGER.debug("End | createVoucher API");
+					return vh;
+
+				}
+				
+				// jayanta for forward from save as draft 
+				@Transactional
+				@SuppressWarnings("deprecation")
+				public CVoucherHeader updateVoucherHeader(final HashMap<String, Object> headerdetails)
+						throws ApplicationRuntimeException, Exception {
+					if (LOGGER.isDebugEnabled())
+						LOGGER.debug("START | updateVoucherHeader");
+					// Connection con = null;
+					Query query = null;
+					final CVoucherHeader cVoucherHeader = new CVoucherHeader();
+					try {
+						// String voucherSubType="";
+						cVoucherHeader.setName(headerdetails.get(VoucherConstant.VOUCHERNAME).toString());
+						if(headerdetails.containsKey(VoucherConstant.NARRATION)
+								&& null != headerdetails.get(VoucherConstant.NARRATION)) {
+							final String narration = headerdetails.get(VoucherConstant.NARRATION).toString();
+							cVoucherHeader.setDescription(narration);
+						}
+						String voucherType = headerdetails.get(VoucherConstant.VOUCHERTYPE).toString();
+						cVoucherHeader.setType(headerdetails.get(VoucherConstant.VOUCHERTYPE).toString());
+						String vNumGenMode = null;
+						if(headerdetails.containsKey("firstsignatory")
+								&& null != headerdetails.get("firstsignatory"))
+						{
+							cVoucherHeader.setFirstsignatory(headerdetails.get("firstsignatory").toString());
+						}
+						if(headerdetails.containsKey("secondsignatory")
+								&& null != headerdetails.get("secondsignatory"))
+						{
+							cVoucherHeader.setSecondsignatory(headerdetails.get("secondsignatory").toString());
+						}
+						// -- Voucher Type checking. --START
+						if (FinancialConstants.STANDARD_VOUCHER_TYPE_JOURNAL.equalsIgnoreCase(voucherType))
+							vNumGenMode = voucherTypeForULB.readVoucherTypes("Journal");
+						else
+							vNumGenMode = voucherTypeForULB.readVoucherTypes(voucherType);
+						// --END --
+						voucherType = voucherType.toUpperCase().replaceAll(" ", "");
+
+						String voucherSubType = null;
+						if (headerdetails.get(VoucherConstant.VOUCHERSUBTYPE) != null) {
+							voucherSubType = (String) headerdetails.get(VoucherConstant.VOUCHERSUBTYPE);
+							voucherSubType = voucherSubType.toUpperCase().replaceAll(" ", "");
+						}
+
+						// why it is type,subtype where api expects subtype,type ?
+						// if()
+						final String voucherNumberPrefix = getVoucherNumberPrefix(voucherType, voucherSubType);
+						String voucherNumber = null;
+						if (headerdetails.get(VoucherConstant.DESCRIPTION) != null)
+							cVoucherHeader.setDescription(headerdetails.get(VoucherConstant.DESCRIPTION).toString());
+						final Date voucherDate = (Date) headerdetails.get(VoucherConstant.VOUCHERDATE);
+						cVoucherHeader.setVoucherDate(voucherDate);
+						Fund fundByCode = fundDAO.fundByCode(headerdetails.get(VoucherConstant.FUNDCODE).toString());
+
+						if (LOGGER.isDebugEnabled())
+							LOGGER.debug("Voucher Type is :" + voucherType);
+						if (LOGGER.isDebugEnabled())
+							LOGGER.debug("vNumGenMode is  :" + vNumGenMode);
+
+						if (headerdetails.get(VoucherConstant.VOUCHERNUMBER) != null)
+							cVoucherHeader.setVoucherNumber(headerdetails.get(VoucherConstant.VOUCHERNUMBER).toString());
+						if (null != headerdetails.get(VoucherConstant.MODULEID))
+							vNumGenMode = "Auto";
+
+						cVoucherHeader.setFundId(fundByCode);
+						if (vNumGenMode.equals("Auto")) {
+							cVoucherHeader.setVoucherNumberPrefix(voucherNumberPrefix);
+							VouchernumberGenerator v = beanResolver.getAutoNumberServiceFor(VouchernumberGenerator.class);
+
+							final String strVoucherNumber = v.getNextNumber(cVoucherHeader);
+
+							cVoucherHeader.setVoucherNumber(strVoucherNumber);
+						}
+						
+
+
+						if (headerdetails.containsKey(VoucherConstant.MODULEID)
+								&& null != headerdetails.get(VoucherConstant.MODULEID)) {
+							cVoucherHeader.setModuleId(Integer.valueOf(headerdetails.get(VoucherConstant.MODULEID).toString()));
+							cVoucherHeader.setIsConfirmed(Integer.valueOf(1));
+						} else {
+							
+						}
+
+						if (headerdetails.containsKey(VoucherConstant.STATUS) && null != headerdetails.get(VoucherConstant.STATUS))
+							cVoucherHeader.setStatus(Integer.valueOf(headerdetails.get(VoucherConstant.STATUS).toString()));
+						else {
+							final List list = appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+									"DEFAULTVOUCHERCREATIONSTATUS");
+							cVoucherHeader.setStatus(Integer.parseInt(((AppConfigValues) list.get(0)).getValue()));
+						}
+
+						if (null != headerdetails.get(VoucherConstant.ORIGIONALVOUCHER)) {
+
+							final Long origionalVId = Long
+									.parseLong(headerdetails.get(VoucherConstant.ORIGIONALVOUCHER).toString());
+							query = persistenceService.getSession().createQuery("from CVoucherHeader where id=:id");
+							query.setLong("id", origionalVId);
+							if (query.list().size() == 0)
+								throw new ApplicationRuntimeException("Not a valid origional voucherheader id");
+							else
+								cVoucherHeader.setOriginalvcId(origionalVId);
+						}
+
+						cVoucherHeader.setRefvhId((Long) headerdetails.get(VoucherConstant.REFVOUCHER));
+						cVoucherHeader.setEffectiveDate(new Date());
+						//Object billNumber = headerdetails.get(VoucherConstant.BILLNUMBER);
+			                       // cVoucherHeader.setBillNumber(billNumber != null ? billNumber.toString() : "");
+						if (LOGGER.isDebugEnabled())
+							LOGGER.debug(
+									"Printing Voucher Details------------------------------------------------------------------------------");
+						if (LOGGER.isDebugEnabled())
+							LOGGER.debug(cVoucherHeader.toString());
+						if (LOGGER.isDebugEnabled())
+							LOGGER.debug(
+									"Printing Voucher Details------------------------------------------------------------------------------");
+					} catch (final ValidationException e) {
+						LOGGER.error(e.getMessage());
+						throw e;
+					} catch (final Exception e) {
+						LOGGER.error(e);
+						throw new Exception(e.getMessage());
+
+					}
+					if (LOGGER.isDebugEnabled())
+						LOGGER.debug("END | createVoucherHeader");
+					return cVoucherHeader;
+				}
+				
+				public String getEmployeeName(Long empId){
+			        
+				       return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+				    }
+
+
 }

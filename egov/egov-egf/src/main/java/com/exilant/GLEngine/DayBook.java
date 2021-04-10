@@ -62,6 +62,58 @@ public class DayBook
     private String creditamount;
     private String cgn;
     private String vhId;
+    private String dept;
+    private String func;
+    //new added
+    private String partyname;
+    private String budgethead;
+    private String division;
+    private String bpvno;
+    private String bpvDate;
+    private String pexno;
+    private String pexDate;
+    		
+    
+
+    public String getPexno() {
+		return pexno;
+	}
+
+	public void setPexno(String pexno) {
+		this.pexno = pexno;
+	}
+
+	public String getPartyname() {
+		return partyname;
+	}
+
+	public void setPartyname(String partyname) {
+		this.partyname = partyname;
+	}
+
+	public String getBudgethead() {
+		return budgethead;
+	}
+
+	public void setBudgethead(String budgethead) {
+		this.budgethead = budgethead;
+	}
+
+	public String getDivision() {
+		return division;
+	}
+
+	public void setDivision(String division) {
+		this.division = division;
+	}
+
+	public String getBpvno() {
+		return bpvno;
+	}
+
+	public void setBpvno(String bpvno) {
+		this.bpvno = bpvno;
+	}
 
     /**
      *
@@ -157,5 +209,37 @@ public class DayBook
     public void setVhId(String vhId) {
         this.vhId = vhId;
     }
+
+	public String getBpvDate() {
+		return bpvDate;
+	}
+
+	public void setBpvDate(String bpvDate) {
+		this.bpvDate = bpvDate;
+	}
+
+	public String getPexDate() {
+		return pexDate;
+	}
+
+	public void setPexDate(String pexDate) {
+		this.pexDate = pexDate;
+	}
+
+	public String getDept() {
+		return dept;
+	}
+
+	public void setDept(String dept) {
+		this.dept = dept;
+	}
+
+	public String getFunc() {
+		return func;
+	}
+
+	public void setFunc(String func) {
+		this.func = func;
+	}
 
 }

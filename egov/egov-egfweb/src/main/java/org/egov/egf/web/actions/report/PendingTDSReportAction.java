@@ -80,6 +80,8 @@ import org.egov.commons.utils.EntityType;
 import org.egov.deduction.model.EgRemittanceDetail;
 import org.egov.egf.commons.EgovCommon;
 import org.egov.egf.model.TDSEntry;
+import org.egov.egf.model.VoucherDetailMain;
+import org.egov.egf.model.VoucherDetailMiscMapping;
 import org.egov.infra.admin.master.service.DepartmentService;
 //import org.egov.infra.admin.master.entity.Department;
 import org.egov.infra.config.persistence.datasource.routing.annotation.ReadOnly;
@@ -97,6 +99,8 @@ import org.egov.infstr.utils.EgovMasterDataCaching;
 import org.egov.model.deduction.DeductionReportBean;
 import org.egov.model.deduction.RemittanceBean;
 import org.egov.model.instrument.InstrumentVoucher;
+import org.egov.model.masters.Contractor;
+import org.egov.model.masters.Supplier;
 import org.egov.model.recoveries.Recovery;
 import org.egov.services.deduction.RemitRecoveryService;
 import org.egov.utils.Constants;
@@ -555,6 +559,14 @@ public class PendingTDSReportAction extends BaseFormAction {
             }
         }
         org.egov.infra.admin.master.entity.Department dept =null;
+        //start view implementation
+        Map<String,String> partyNameMapAsView=new HashMap<String,String>();
+        populatePartyViewName(partyNameMapAsView);
+        Map<String,Contractor> contractorMap=new HashMap<String,Contractor>();
+        populateContractorMap(contractorMap);
+        Map<String,Supplier> supplierMap=new HashMap<String,Supplier>();
+        populateSupplierMap(supplierMap);
+        //end view implementation
         if(pendingTDS !=null && !pendingTDS.isEmpty())
         {
         	for(RemittanceBean row:pendingTDS)
@@ -567,48 +579,134 @@ public class PendingTDSReportAction extends BaseFormAction {
         		
             	if(row.getDetailKeyid() != null && row.getDetailKeyid() != 0 && row.getDetailTypeId() != null && row.getDetailTypeId() != 0)
             	{
-            		row.setPartyName(getParty(row.getDetailKeyid(),row.getDetailTypeId()));
+            		if(partyNameMapAsView.get(String.valueOf(row.getDetailKeyid())+"-"+String.valueOf(row.getDetailTypeId())) != null)
+            		{
+            			row.setPartyName(partyNameMapAsView.get(String.valueOf(row.getDetailKeyid())+"-"+String.valueOf(row.getDetailTypeId())));
+            		}
+            		else
+            		{
+            			row.setPartyName("");
+            		}
+            		
+            		
             		if(row.getDetailTypeId() == 11 && row.getPartyName() != null && !row.getPartyName().isEmpty())
             		{
-            			 List<Object[]> list = getSupplier(row.getPartyName());
-            			if(list != null && !list.isEmpty())
-            			{
-            				for (final Object[] element : list) {
-            					if(element[0] != null)
-                				{
-                					row.setPanNo(element[0].toString());
-                				}
-                				if(element[1] != null)
-                				{
-                					row.setGstNo(element[1].toString());
-                				}
-            				}
-            				
-            			}
+            			 if(supplierMap.get(row.getPartyName()) != null)
+            			 {
+            				 row.setGstNo(supplierMap.get(row.getPartyName().trim()).getTinNumber());
+            				 row.setPanNo(supplierMap.get(row.getPartyName().trim()).getPanNumber());
+            			 }
+            			
             		}
             		else if(row.getDetailTypeId() == 12 && row.getPartyName() != null && !row.getPartyName().isEmpty())
             		{
-            			List<Object[]> list = getContractor(row.getPartyName());
-            			if(list != null && !list.isEmpty())
-            			{
-            				for (final Object[] element : list) {
-            					if(element[0] != null)
-                				{
-                					row.setPanNo(element[0].toString());
-                				}
-                				if(element[1] != null)
-                				{
-                					row.setGstNo(element[1].toString());
-                				}
-            				}
-            			}
+            			row.setGstNo(contractorMap.get(row.getPartyName().trim()).getTinNumber());
+       				 	row.setPanNo(contractorMap.get(row.getPartyName().trim()).getPanNumber());
             		}
             	}
             }
         }
     }
 
-    private List<Object[]> getSupplier(String suppName) {
+    private void populateSupplierMap(Map<String, Supplier> supplierMap) {
+    	SQLQuery query =  null;
+    	List<Object[]> list = null;
+    	Supplier supplier=null;
+    	try
+    	{
+    		 query = this.persistenceService.getSession().createSQLQuery("select vw.name,vw.pannumber,tinnumber from supplier_active_view vw");
+    	     list = query.list();
+    	     if(list != null && !list.isEmpty())
+ 			{
+ 				for (final Object[] element : list) {
+ 					supplier=new Supplier();
+ 					if(element[1] != null && !(element[1].toString().isEmpty()))
+ 					{
+ 						supplier.setPanNumber(element[1].toString());
+ 					}
+ 					else
+ 					{
+ 						supplier.setPanNumber("");
+ 					}
+ 					if(element[2] != null && !(element[2].toString().isEmpty()))
+ 					{
+ 						supplier.setTinNumber(element[2].toString());
+ 					}
+ 					else
+ 					{
+ 						supplier.setTinNumber("");
+ 					}
+ 					supplierMap.put(element[0].toString(),supplier);
+ 				}
+ 				
+ 			}
+    	}catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
+
+	private void populateContractorMap(Map<String, Contractor> contractorMap) {
+		SQLQuery query =  null;
+    	List<Object[]> list = null;
+    	Contractor contractor=null;
+    	try
+    	{
+    		 query = this.persistenceService.getSession().createSQLQuery("select vw.name,vw.pannumber,tinnumber from contractor_active_view vw");
+    	     list = query.list();
+    	     if(list != null && !list.isEmpty())
+ 			{
+ 				for (final Object[] element : list) {
+ 					contractor=new Contractor();
+ 					if(element[1] != null && !(element[1].toString().isEmpty()))
+ 					{
+ 						contractor.setPanNumber(element[1].toString());
+ 					}
+ 					else
+ 					{
+ 						contractor.setPanNumber("");
+ 					}
+ 					if(element[2] != null && !(element[2].toString().isEmpty()))
+ 					{
+ 						contractor.setTinNumber(element[2].toString());
+ 					}
+ 					else
+ 					{
+ 						contractor.setTinNumber("");
+ 					}
+ 					contractorMap.put(element[0].toString(),contractor);
+ 				}
+ 				
+ 			}
+    	}catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
+
+	private void populatePartyViewName(Map<String, String> partyNameMapAsView) {
+    	SQLQuery query =  null;
+    	List<Object[]> rows = null;
+    	String partyName="";
+    	try
+    	{
+    		 query = this.persistenceService.getSession().createSQLQuery("select comp,detailname from recovery_report_party");
+    	    rows = query.list();
+    	    
+    	    if(rows != null && !rows.isEmpty())
+    	    {
+    	    	for(Object[] element : rows)
+    	    	{
+    	    		partyNameMapAsView.put(element[0].toString(),element[1].toString());
+    	    	}
+    	    }
+    	}catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
+
+	private List<Object[]> getSupplier(String suppName) {
     	SQLQuery query =  null;
     	List<Object[]> list = null;
     	try
@@ -854,20 +952,25 @@ public class PendingTDSReportAction extends BaseFormAction {
     @Action(value = "/report/pendingTDSReport-exportDeductionXls")
     public String exportDeductionXls() throws JRException, IOException {
         populateData();
+        //view
+        Map<String,VoucherDetailMain> voucherDetailMainMapping=new HashMap<String,VoucherDetailMain>();
+        Map<Long,List<VoucherDetailMiscMapping>> voucherDetailMiscMapping=new HashMap<Long,List<VoucherDetailMiscMapping>>();
+        Map<Long,CVoucherHeader> voucherDetailBpvMapping=new HashMap<Long,CVoucherHeader>();
+        Map<Long,CVoucherHeader> voucherDetailIntrumentMapping=new HashMap<Long,CVoucherHeader>();
+        populateVoucherDetailMain(voucherDetailMainMapping);
+        populateMisMapping(voucherDetailMiscMapping);
+        populateBpvMapping(voucherDetailBpvMapping);
+        populateDetailInstrument(voucherDetailIntrumentMapping);
         List<DeductionReportBean> reportList=new ArrayList<DeductionReportBean>();
         DeductionReportBean bean=null;
         int i=1;
         Map<String, Object> paramMap = new HashMap<String, Object>();
         populateHeadingAndNote(paramMap);
-        String jasperName=(String) paramMap.get("jasper");
-        System.out.println("jasper :"+jasperName);
         if(pendingTDS != null && !pendingTDS.isEmpty())
         {
-        	System.out.println("1 : "+pendingTDS.get(0).getDepartmentId());
         	org.egov.infra.admin.master.entity.Department dept =null;
         	for(RemittanceBean row:pendingTDS)
             {
-        		System.out.println("3");
         		dept = departmentService.getDepartmentById(Long.parseLong(row.getDepartmentId()));
         		bean =new DeductionReportBean();
         		bean.setSlNo(i++);
@@ -878,15 +981,22 @@ public class PendingTDSReportAction extends BaseFormAction {
         		bean.setAmount(row.getAmount());
         		bean.setGstNoOfAgency(row.getGstNo());
         		bean.setPanNoOfAgency(row.getPanNumber());
-        		bean.setWorkDone(getNarration(row.getVoucherNumber()));
-        		bean.setBillVoucherNo(getBillVoucherNumber(row.getVoucherNumber()));
-        		bean.setPexNo(getPexNo(row.getVoucherNumber()));
+        		if(row.getVoucherNumber() != null && voucherDetailMainMapping.get(row.getVoucherNumber()) != null)
+        		{
+        			bean.setWorkDone(voucherDetailMainMapping.get(row.getVoucherNumber()).getDescription());
+        			if(voucherDetailMiscMapping.get(voucherDetailMainMapping.get(row.getVoucherNumber()).getId()) != null)
+        			{
+        				bean.setBillVoucherNo(voucherDetailBpvMapping.get((voucherDetailMiscMapping.get(voucherDetailMainMapping.get(row.getVoucherNumber()).getId())).get(0).getBpvId()).getVoucherNumber());
+        				if(voucherDetailIntrumentMapping.get((voucherDetailMiscMapping.get(voucherDetailMainMapping.get(row.getVoucherNumber()).getId())).get(0).getBpvId()) != null)
+        				{
+        					bean.setPexNo((voucherDetailIntrumentMapping.get((voucherDetailMiscMapping.get(voucherDetailMainMapping.get(row.getVoucherNumber()).getId())).get(0).getBpvId())).getVoucherNumber());
+        				}
+        			}
+        		}
         		reportList.add(bean);
             }
         }
-        System.out.println("4");
         System.out.println("report list size ::: "+reportList.size());
-        System.out.println("5");
 		try {
 			byte[] fileContent=populateExcel(reportList,paramMap);
 			inputStream = new ByteArrayInputStream(fileContent);
@@ -899,7 +1009,161 @@ public class PendingTDSReportAction extends BaseFormAction {
         return "deductionXLS";
     }
 
-    private byte[] populateExcel(List<DeductionReportBean> reportList, Map<String, Object> paramMap) throws IOException {
+    private void populateDetailInstrument(Map<Long, CVoucherHeader> voucherDetailIntrumentMapping) {
+    	SQLQuery queryInstru =  null;
+       	final StringBuffer query5 = new StringBuffer(500);
+       	List<Object[]> list= null;
+      	query5
+          .append("select vdi.id,vdi.transactionnumber, vdi.transactiondate ,vdi.voucherheaderid,vdi.accountnumber from voucher_detail_instrument vdi   ");
+      	LOGGER.info("Query 5 :: "+query5.toString());
+      	queryInstru=this.persistenceService.getSession().createSQLQuery(query5.toString());
+       	list = queryInstru.list();
+      	LOGGER.info("pex map");
+      	CVoucherHeader pexDetail=null;
+      	
+      	if (list.size() != 0) {
+      		LOGGER.info("size ::: "+list.size());
+      		for (final Object[] object : list)
+      		{
+      			pexDetail=new CVoucherHeader();
+      			if(object[3] != null)
+      			{
+      				pexDetail.setId(Long.parseLong(object[3].toString()));
+      			}
+      			if(object[1] != null)
+      			{
+      				pexDetail.setVoucherNumber(object[1].toString());
+      			}
+      			if(object[2] != null)
+      			{
+      				pexDetail.setApprovalComent(object[2].toString());
+      			}
+      			if(object[4] != null)
+      			{
+      				pexDetail.setCgvn(object[4].toString());
+      			}
+      			voucherDetailIntrumentMapping.put(pexDetail.getId(), pexDetail);
+      		}
+      		
+      	}
+		
+	}
+
+	private void populateBpvMapping(Map<Long, CVoucherHeader> voucherDetailBpvMapping) {
+		
+    	CVoucherHeader bpvMapping =null;
+    	SQLQuery queryBpv =  null;
+    	final StringBuffer query2 = new StringBuffer(500);
+    	List<Object[]> list= null;
+    	query2
+        .append("select vdb.id,vdb.vouchernumber,vdb.voucherdate from voucher_detail_bpvmapping vdb");
+    	LOGGER.info("Query 2 :: "+query2.toString());
+    	queryBpv=this.persistenceService.getSession().createSQLQuery(query2.toString());
+    	list = queryBpv.list();
+    	LOGGER.info("after exe");
+    	if (list.size() != 0) {
+    		LOGGER.info("size ::: "+list.size());
+    		for (final Object[] object : list)
+    		{
+    			bpvMapping=new CVoucherHeader();
+    			bpvMapping.setId(Long.parseLong(object[0].toString()));
+    			bpvMapping.setVoucherNumber(object[1].toString());
+    			bpvMapping.setPartyBillNumber(object[2].toString());
+    			voucherDetailBpvMapping.put(bpvMapping.getId(), bpvMapping);
+    		}
+    	}
+		
+	}
+
+	private void populateMisMapping(Map<Long, List<VoucherDetailMiscMapping>> voucherDetailMiscMapping) {
+		
+    	SQLQuery queryMisc =  null;
+    	final StringBuffer query3 = new StringBuffer(500);
+    	List<Object[]> list= null;
+   	query3
+       .append("select vdm.id,vdm.billvhid,vdm.payvhid,vdm.paidamount from voucher_detail_miscbill vdm ");
+   	LOGGER.info("Query 3 :: "+query3.toString());
+   	queryMisc=this.persistenceService.getSession().createSQLQuery(query3.toString());
+   	list = queryMisc.list();
+   	LOGGER.info("1 map");
+   	VoucherDetailMiscMapping voucherDetailMisc=null;
+   	List<VoucherDetailMiscMapping> miscbillList=null;
+   	if (list.size() != 0) {
+   		LOGGER.info("size ::: "+list.size());
+   		for (final Object[] object : list)
+   		{
+   			voucherDetailMisc=new VoucherDetailMiscMapping();
+   			voucherDetailMisc.setId(Long.parseLong(object[0].toString()));
+   			if(object[1] != null)
+   			{
+   				voucherDetailMisc.setVoucherId(Long.parseLong(object[1].toString()));
+   			}
+   			if(object[2] != null)
+   			{
+   				voucherDetailMisc.setBpvId(Long.parseLong(object[2].toString()));
+   			}
+   			if(object[3] != null )
+   			{
+   				voucherDetailMisc.setAmountPaid(new BigDecimal(object[3].toString()));
+   			}
+   			if(voucherDetailMiscMapping.get(voucherDetailMisc.getVoucherId()) == null)
+   			{
+   				miscbillList=new ArrayList<VoucherDetailMiscMapping>();
+   				miscbillList.add(voucherDetailMisc);
+   				voucherDetailMiscMapping.put(voucherDetailMisc.getVoucherId(), miscbillList);
+   			}
+   			else
+   			{
+   				voucherDetailMiscMapping.get(voucherDetailMisc.getVoucherId()).add(voucherDetailMisc);
+   			}
+   		}
+   		
+   	}
+		
+	}
+
+	private void populateVoucherDetailMain(Map<String, VoucherDetailMain> voucherDetailMainMapping) {
+    	SQLQuery queryMain =  null;
+    	final StringBuffer query1 = new StringBuffer(500);
+    	
+    	List<Object[]> list= null;
+    	query1
+        .append("select vdm.voucherid ,vdm.vouchernumber ,vdm.status,vdm.head,vdm.department,vdm.voucherdate,vdm.scheme,vdm.description from voucher_detail_main vdm ");
+    	LOGGER.info("Query 1 :: "+query1.toString());
+    	queryMain=this.persistenceService.getSession().createSQLQuery(query1.toString());
+    	list = queryMain.list();
+    	LOGGER.info("after execution");
+    	VoucherDetailMain voucherDetailMain=null;
+    	//voucher detail main mapping
+    	if (list.size() != 0) {
+    		LOGGER.info("size ::: "+list.size());
+    		for (final Object[] object : list)
+    		{
+    			voucherDetailMain=new VoucherDetailMain();
+    			voucherDetailMain.setId(Long.parseLong(object[0].toString()));
+    			voucherDetailMain.setVoucherNumber(object[1].toString());
+    			voucherDetailMain.setStatus(object[2].toString());
+    			if(object[3] != null)
+    			{
+    				voucherDetailMain.setHead(object[3].toString());
+    			}
+    			voucherDetailMain.setDepartment(object[4].toString());
+    			voucherDetailMain.setVoucherDate(object[5].toString());
+    			if(object[6] != null)
+    			{
+    				voucherDetailMain.setScheme(object[6].toString());
+    			}
+    			if(object[7] != null)
+    			{
+    				voucherDetailMain.setDescription(object[7].toString());
+    			}
+    			voucherDetailMainMapping.put(voucherDetailMain.getVoucherNumber(), voucherDetailMain);
+    		}
+    	}
+		
+	}
+
+	private byte[] populateExcel(List<DeductionReportBean> reportList, Map<String, Object> paramMap) throws IOException {
     	String jasper=(String)paramMap.get("jasper");
     	String heading=(String)paramMap.get("header");
     	String note=(String)paramMap.get("note");
@@ -1226,7 +1490,7 @@ public class PendingTDSReportAction extends BaseFormAction {
 			note="Note: The responsibility for work done & GST No. lies with concerned Division.";
 			jasper="TDSOnGST";
 		}
-		else if(recoveryCode.equals("3502007") || recoveryCode.equals("3502009") || recoveryCode.equals("3502010") || recoveryCode.equals("3502013"))
+		else if(recoveryCode.equals("3502007") || recoveryCode.equals("3502009") || recoveryCode.equals("3502010") || recoveryCode.equals("3502013") )
 		{
 			heading="Detail of Income Tax for the month of "+fDate+ " - "+tDate+ "of Engg. Wing, M.C.(Non Salary)";
 			note="Note: The responsibility for work done & PAN No. lies with concerned Division.";
@@ -1394,7 +1658,7 @@ public class PendingTDSReportAction extends BaseFormAction {
     private static JRBeanCollectionDataSource getDataSource(List<DeductionReportBean> reportList) {
         return new JRBeanCollectionDataSource(reportList); 
     }
-    
+     
     
 
 }

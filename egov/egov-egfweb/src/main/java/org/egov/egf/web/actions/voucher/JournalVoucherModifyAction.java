@@ -228,6 +228,23 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
         }
         billDetailslist = (List<VoucherDetails>) vhInfoMap.get(Constants.GLDEATILLIST);
         subLedgerlist = (List<VoucherDetails>) vhInfoMap.get("subLedgerDetail");
+        if (voucherHeader.getState().getValue().contains("SaveAsDraft")) {
+            if(billDetailslist==null || billDetailslist.size()==0)
+            {
+                
+                
+                  billDetailslist = voucherService.getVoucherDraftInfo(voucherHeader.getVoucherNumber());
+                 
+                   
+            }
+            if(subLedgerlist==null || subLedgerlist.size()==0)
+            {
+                
+                    subLedgerlist = new ArrayList<VoucherDetails>();                  
+                    subLedgerlist.add(new VoucherDetails());
+            }
+            
+        }
         getBillInfo();
         loadSchemeSubscheme();
         loadFundSource();
@@ -324,11 +341,19 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
             voucherHeader.setVoucherNumber(voucherNumManual);
         voucherHeader.setIsRestrictedtoOneFunctionCenter(isOneFunctionCenter);
 
+        //removeEmptyRowsAccoutDetail(billDetailslist);
+        // jayanta for save as draft
+        // removeEmptyRowsAccoutDetail(billDetailslist);
+         if (workFlowAction.equalsIgnoreCase("Save As Draft")) 
+             removeEmptyRowsAccoutDraftDetail(billDetailslist);
+         else
         removeEmptyRowsAccoutDetail(billDetailslist);
         removeEmptyRowsSubledger(subLedgerlist);
         LOGGER.info("before Submit");
         try {
-            if (!validateData(billDetailslist, subLedgerlist)) {
+        	 // if (!workFlowAction.equalsIgnoreCase("Save As Draft")) 
+            // {
+              if (workFlowAction.equalsIgnoreCase("Save As Draft") || !validateData(billDetailslist, subLedgerlist)) {
             	LOGGER.info("edit");
             	 if(uploadedFiles!=null)
                  {

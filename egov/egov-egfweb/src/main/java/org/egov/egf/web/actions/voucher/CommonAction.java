@@ -53,6 +53,7 @@ package org.egov.egf.web.actions.voucher;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -126,13 +127,13 @@ import org.hibernate.type.BigDecimalType;
 import org.hibernate.type.LongType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.web.header.writers.frameoptions.StaticAllowFromStrategy;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 //import com.exilant.eGov.src.domain.Bank;
 
-@Results({
-        @Result(name = "bankAccountByBranch", location = "common-bankAccountByBranch.jsp"),
+@Results({ @Result(name = "bankAccountByBranch", location = "common-bankAccountByBranch.jsp"),
         @Result(name = "branch", location = "common-branch.jsp"),
         @Result(name = "users", location = "common-users.jsp"),
         @Result(name = "arfNoSearchResults", location = "common-arfNoSearchResults.jsp"),
@@ -268,6 +269,8 @@ public class CommonAction extends BaseFormAction {
     @Autowired
     private BudgetDetailService budgetDetailService;
     private ArrayList<Department> listOfDepartments;
+	private String fromDate;
+	private String toDate;
 
     public String getSerialNo() {
         return serialNo;
@@ -317,6 +320,28 @@ public class CommonAction extends BaseFormAction {
     public void setBankList(final List<Bank> bankList) {
         this.bankList = bankList;
     }
+
+	public String getTransactionRange(final String transDateFrom, final String transDateTo) {
+		final StringBuffer numDateQuery = new StringBuffer();
+		try {
+
+			if (null != transDateFrom && StringUtils.isNotEmpty(transDateFrom))
+				numDateQuery.append("and ih.transactionDate>='")
+						.append(Constants.DDMMYYYYFORMAT1.format(Constants.DDMMYYYYFORMAT2.parse(transDateFrom)))
+						.append("'");
+			if (null != transDateTo && StringUtils.isNotEmpty(transDateTo))
+				numDateQuery.append(" and ih.transactionDate<='")
+						.append(Constants.DDMMYYYYFORMAT1.format(Constants.DDMMYYYYFORMAT2.parse(transDateTo)))
+						.append("'");
+		} catch (final ParseException e) {
+			if (LOGGER.isDebugEnabled())
+				LOGGER.debug("Exception occured while parsing date" + e);
+		} catch (final Exception e) {
+			LOGGER.error(e);
+			throw new ApplicationRuntimeException("Error occured while executing search instrument query");
+		}
+		return numDateQuery.toString();
+	}
 
     @SuppressWarnings("unchecked")
     @Action(value = "/voucher/common-ajaxLoadSchemes")
@@ -762,6 +787,8 @@ public class CommonAction extends BaseFormAction {
         List<Object[]> resultList = new ArrayList<Object[]>();
         new ArrayList<Object>();
         // rtgsNumber=;
+        LOGGER.info("fromDate :::"+fromDate);
+        LOGGER.info("toDate :::"+toDate);
         instrumentHeaderList = new ArrayList<InstrumentHeader>();
         try {
             final Calendar calendar = Calendar.getInstance();
@@ -772,8 +799,19 @@ public class CommonAction extends BaseFormAction {
             final SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yy");
             final String date1 = sdf.format(date);
 
-            resultList = getPersistenceService()
-                    .findAllBy(RTGSPEXNUMBERSQUERY, bankaccountId);
+			final StringBuffer query = new StringBuffer(500);
+			
+			query.append("SELECT ih.id, ih.transactionNumber FROM InstrumentHeader ih, InstrumentVoucher iv, ").append("Paymentheader ph WHERE ih.isPayCheque ='1' AND ih.bankAccountId.id = ? AND ih.statusId.description in ('New')")
+			.append(" AND ih.statusId.moduletype='Instrument' AND iv.instrumentHeaderId = ih.id and ih.bankAccountId is not null ")
+			.append("AND iv.voucherHeaderId     = ph.voucherheader AND ph.bankaccount = ih.bankAccountId AND ph.type IN ( '")
+			.append(FinancialConstants.MODEOFPAYMENT_RTGS + "' , '" + FinancialConstants.MODEOFPAYMENT_PEX + "') ")
+			.append(getTransactionRange(fromDate, toDate))
+			.append("GROUP BY ih.transactionNumber,ih.id order by ih.id desc");
+			
+
+			
+			
+			resultList = getPersistenceService().findAllBy(query.toString(), bankaccountId);
             for (final Object[] obj : resultList) {
                 InstrumentHeader ih = new InstrumentHeader();
                 ih = (InstrumentHeader) persistenceService.find("from InstrumentHeader where id=?", (Long) obj[0]);
@@ -4333,4 +4371,20 @@ public class CommonAction extends BaseFormAction {
     public void setListOfDepartments(ArrayList<Department> listOfDepartments) {
         this.listOfDepartments = listOfDepartments;
     }
+
+	public String getFromDate() {
+		return fromDate;
+	}
+
+	public void setFromDate(String fromDate) {
+		this.fromDate = fromDate;
+	}
+
+	public String getToDate() {
+		return toDate;
+	}
+
+	public void setToDate(String toDate) {
+		this.toDate = toDate;
+	}
 }

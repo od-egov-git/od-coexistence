@@ -177,7 +177,8 @@ public class SupplierService implements EntityTypeService {
     @Override
     public List<? extends org.egov.commons.utils.EntityType> filterActiveEntities(String filterKey, int maxRecords,
             Integer accountDetailTypeId) {
-        return supplierRepository.findByNameLikeIgnoreCaseOrCodeLikeIgnoreCase(filterKey + "%", filterKey + "%");
+       // return supplierRepository.findByNameLikeIgnoreCaseOrCodeLikeIgnoreCase(filterKey + "%", filterKey + "%");
+    	return supplierRepository.findByNameLikeIgnoreCase(filterKey + "%");
     }
 
     @Override

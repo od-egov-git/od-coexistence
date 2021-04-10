@@ -65,4 +65,8 @@ public interface SupplierRepository extends JpaRepository<Supplier, Long> {
     
     @Query("from Supplier where status.code='Active'")
     public List<Supplier> findByStatus();
+    
+    
+    @Query("from Supplier where status.code='Active' and (LOWER(name) LIKE LOWER(concat(?1, '%')) or LOWER(name) LIKE LOWER(concat(?1, '%')))")
+	public List<Supplier> findByNameLikeIgnoreCase(String name);
 }

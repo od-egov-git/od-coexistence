@@ -63,6 +63,9 @@
 	src="/services/EGF/resources/javascript/dateValidation.js?rnd=${app_release_no}"></script>
 <script type="text/javascript"
 	src="<cdn:url value='/resources/global/js/egov/inbox.js?rnd=${app_release_no}' context='/services/egi'/>"> </script>
+	
+	
+	<script type="text/javascript" src="/services/EGF/resources/javascript/autocomplete-debug.js"></script>
 <meta http-equiv="Content-Type"
 	content="text/html; charset=windows-1252" />
 <title>Journal voucher Modify</title>
@@ -252,6 +255,14 @@ function onSubmit()
 			
 			return false;
 }
+			
+}
+//jayanta for save as draft
+function onSubmitDraft()
+{
+	
+	document.forms[0].action='${pageContext.request.contextPath}/voucher/journalVoucherModify-update.action';
+	document.forms[0].submit();
 			
 }
 /*function validateAndSubmitJV()

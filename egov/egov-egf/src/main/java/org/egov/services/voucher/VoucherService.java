@@ -124,6 +124,7 @@ import org.egov.model.bills.EgBillregister;
 import org.egov.model.bills.EgBillregistermis;
 import org.egov.model.payment.Paymentheader;
 import org.egov.model.voucher.VoucherDetails;
+import org.egov.model.voucher.VoucherDraftDetails;
 import org.egov.model.voucher.VoucherTypeBean;
 import org.egov.pims.commons.Designation;
 import org.egov.pims.commons.Position;
@@ -140,13 +141,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.egov.model.voucher.VoucherDraftDetails;//added abhishek
 
 import com.exilant.GLEngine.Transaxtion;
 import com.exilant.GLEngine.TransaxtionParameter;
 import com.exilant.eGov.src.common.EGovernCommon;
+import com.exilant.eGov.src.reports.JournalVoucherDraftService;
 import com.exilant.eGov.src.transactions.VoucherTypeForULB;
-import com.exilant.eGov.src.reports.JournalVoucherDraftService;//added abhishek
 
 @Service
 public class VoucherService extends PersistenceService<CVoucherHeader, Long> {
@@ -224,11 +224,14 @@ public class VoucherService extends PersistenceService<CVoucherHeader, Long> {
 	  @Autowired
 	    private CommonDocumentUploadRepository documentUploadRepository;
 
-	// abhishek for save as draft
+	  // jayanta for save as draft
       @Autowired
       @Qualifier("journalVoucherDraftService")
       private JournalVoucherDraftService journalVoucherDraftService;
-     
+   
+   
+   
+
 	public VoucherService(final Class<CVoucherHeader> voucherHeader) {
 		super(voucherHeader);
 	}
@@ -1577,10 +1580,11 @@ public class VoucherService extends PersistenceService<CVoucherHeader, Long> {
 	 
 	 //added by Abhishek
 	 public List<VoucherDetails> getVoucherDraftInfo(final String voucherNumber) {
+
 			
 			
 			final List<VoucherDraftDetails> dl = persistenceService.findAllBy(
-              " from VoucherDraftDetails where vouchernumber=? order by id asc",voucherNumber);
+                 " from VoucherDraftDetails where vouchernumber=? order by id asc",voucherNumber);
 			
 			
 			final List<VoucherDetails> billDetailslist = new ArrayList<>();
@@ -1595,12 +1599,14 @@ public class VoucherService extends PersistenceService<CVoucherHeader, Long> {
 					
 					voucherDetail.setGlcodeIdDetail(voucherDraftDetails.getGlcodeIdDetail());
 					voucherDetail.setGlcodeDetail(voucherDraftDetails.getGlcodeDetail());
+
 					//voucherDetail.setAccounthead(coaDAO.findById(generalLedger.getGlcodeId().getId(), false).getName());
 					drAmount = voucherDetail.getDebitAmountDetail();//new BigDecimal(voucherDetail.getDebitAmountDetail());
 					crAmount = voucherDetail.getCreditAmountDetail();//new BigDecimal(generalLedger.getCreditAmount());
 					voucherDetail.setDebitAmountDetail(drAmount.setScale(2, BigDecimal.ROUND_HALF_UP));
 					voucherDetail.setCreditAmountDetail(crAmount.setScale(2, BigDecimal.ROUND_HALF_UP));
 					billDetailslist.add(voucherDetail);
+
 					
 				}
 			} catch (final HibernateException e) {
@@ -1608,12 +1614,14 @@ public class VoucherService extends PersistenceService<CVoucherHeader, Long> {
 			} catch (final Exception e) {
 				LOGGER.error("Exception occured in VoucherSerive |getVoucherInfo " + e);
 			}
+
 			//voucherMap.put(Constants.GLDEATILLIST, billDetailslist);
 			/**
 			 * create empty sub ledger row
 			 */
 		
 			return billDetailslist;
+
 		}
 	 
 	 
@@ -1655,8 +1663,10 @@ public class VoucherService extends PersistenceService<CVoucherHeader, Long> {
 				throw new ApplicationRuntimeException(
 						"Exception occured while posting data into voucher detail and transaction" + e.getMessage());
 			}
+
 			return status;
+
 		}
-	 //end
+	 
 
 }

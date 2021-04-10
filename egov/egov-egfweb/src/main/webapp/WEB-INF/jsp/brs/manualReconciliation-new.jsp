@@ -83,6 +83,40 @@
 			branchId : bid
 		})
 	}
+	
+	
+		function openVoucher(vid,url,voucherNumber){
+		
+		//var showMode = document.getElementById('showMode').value ;
+		var showMode = "" ;
+		
+		if(showMode=='nonbillPayment')
+		{
+		url="../payment/directBankPayment-nonBillPayment.action?showMode="+showMode+"&voucherHeader.id="+vid;
+		window.open(url,'Search','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700');
+		}
+		else if(showMode == 'sourceLink' ){
+			window.returnValue = voucherNumber+"$"+voucherDate+"$"+vid;
+	        window.close();
+	        return;
+		}
+		else if(showMode == '' ){
+			var url = "${pageContext.request.contextPath}/voucher/preApprovedVoucher-loadvoucherview.action?vhid="+ vid;
+		}
+		else{
+
+			var url =  url+'='+ vid+'&showMode='+showMode;
+		}
+			window.open(url,'','width=900, height=700');
+			// var form = document.createElement("voucherform");
+			// form.setAttribute("method", "post");
+			 //form.setAttribute("action", url, '');
+			 //form.setAttribute("target", "NewFile");
+			// document.body.appendChild(form);
+			 //window.open("post.htm", "NewFile", 'width=800, height=600');
+			 //form.submit();
+			 //document.body.removeChild(form);
+		}
 </script>
 </head>
 <body>

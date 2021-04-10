@@ -210,6 +210,7 @@ public interface FinancialConstants {
 	public static final String STANDARD_VOUCHER_TYPE_PAYMENT = "Payment";
 	public static final String STANDARD_VOUCHER_TYPE_RECEIPT = "Receipt";
 	public static final String STANDARD_VOUCHER_TYPE_JOURNAL = "Journal Voucher";
+	public static final String STANDARD_VOUCHER_TYPE_RECEIPTJ= "Receipt Voucher";
 	// Contra related - Voucher Names
 	public static final String CONTRAVOUCHER_NAME_BTOB = "BankToBank";
 	public static final String CONTRAVOUCHER_NAME_BTOC = "BankToCash";

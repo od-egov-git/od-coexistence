@@ -54,6 +54,7 @@
 <title>Detailed Chart Of Accounts</title>
 
 <script type="text/javascript">
+
 		function validateAndSubmit(obj){
 			if(document.getElementById('glCode').value == null || document.getElementById('glCode').value==''){
 				bootbox.alert("<s:text name='msg.please.enter.account.code'/>");
@@ -106,6 +107,7 @@
 	var allGlcodes = [];
 	<s:iterator value="allChartOfAccounts">
 		allGlcodes.push("<s:property value="glcode"/>-<s:property value="name.replaceAll('\n',' ')"/>")
+		allGlcodes.push("<s:property value="name"/>-<s:property value="glcode"/>")
 	</s:iterator>
 	YAHOO.example.BasicLocal = function() { 
 		    var oDS = new YAHOO.util.LocalDataSource(allGlcodes); 

@@ -139,7 +139,10 @@ public class JournalVoucherActionHelper {
             }
             voucherHeader.setVoucherSubType(voucherTypeBean.getVoucherSubType());
            
-            voucherHeader = createVoucherAndledger(billDetailslist, subLedgerlist, voucherHeader);
+            //voucherHeader = createVoucherAndledger(billDetailslist, subLedgerlist, voucherHeader);
+         // jayanta for save as draft
+            voucherHeader = createVoucherAndledger(billDetailslist, subLedgerlist, voucherHeader, workflowBean);
+            
             if (!"JVGeneral".equalsIgnoreCase(voucherTypeBean.getVoucherName()) && !"Receipt Journal".equalsIgnoreCase(voucherTypeBean.getVoucherName())) {
                 if (LOGGER.isDebugEnabled())
                     LOGGER.debug(" Journal Voucher Action | Bill create | voucher name = " + voucherTypeBean.getVoucherName());
@@ -179,15 +182,9 @@ public class JournalVoucherActionHelper {
    public void saveDocuments(CVoucherHeader voucherHeader)
    {
 	   List<DocumentUploads> files = voucherHeader.getDocumentDetail() == null ? null : voucherHeader.getDocumentDetail();
-       List<DocumentUploads> documentDetails = null;
-       try
-       {
-    	   documentDetails = docUtils.getDocumentDetails(files, voucherHeader,
-                   CommonConstants.JOURNAL_VOUCHER_OBJECT);
-       }catch (Exception e) {
-    	   e.printStackTrace();
-	}
-       
+       final List<DocumentUploads> documentDetails;
+       documentDetails = docUtils.getDocumentDetails(files, voucherHeader,
+               CommonConstants.JOURNAL_VOUCHER_OBJECT);
        if (!documentDetails.isEmpty()) {
        	voucherHeader.setDocumentDetail(documentDetails);
        	voucherService.persistDocuments(documentDetails);
@@ -239,6 +236,23 @@ public class JournalVoucherActionHelper {
             LOGGER.info("after update");
             voucherService.deleteGLDetailByVHId(voucherHeader.getId());
             voucherHeader.getGeneralLedger().removeAll(voucherHeader.getGeneralLedger());
+            boolean CheckSaveAsDraft= true;
+            if(workflowBean.getWorkFlowAction()!= null && !workflowBean.getWorkFlowAction().equalsIgnoreCase("SaveAsDraft"))
+            {
+                
+                  for (final VoucherDetails vd : billDetailslist) {
+                  if(vd.getGlcodeIdDetail()==null ||
+                  vd.getGlcodeIdDetail().toString().equals("")) { 
+                	  CheckSaveAsDraft=false;
+                	  break; 
+                	  } 
+                  }
+                 
+                //CheckSaveAsDraft=false;
+            }
+            if(CheckSaveAsDraft)
+            {
+            
             final List<Transaxtion> transactions = voucherService.postInTransaction(billDetailslist, subLedgerlist,
                     voucherHeader);
             LOGGER.info("1");
@@ -261,6 +275,11 @@ public class JournalVoucherActionHelper {
                 }
                 voucherHeader.setStatus(FinancialConstants.PREAPPROVEDVOUCHERSTATUS);
 
+            }
+            }
+            else
+            {
+                boolean ststud=voucherService.updateVoucherDraft(billDetailslist, voucherHeader);
             }
             LOGGER.info("2");
             voucherHeader = transitionWorkFlow(voucherHeader, workflowBean);
@@ -312,9 +331,7 @@ public class JournalVoucherActionHelper {
                     .withSenderName(user.getName()).withComments(workflowBean.getApproverComments())
                     .withDateInfo(currentDate.toDate());
         } else {
-        	System.out.println("voucherHeader.getState() : "+voucherHeader.getState());
-        	System.out.println("voucherHeader.getState() : "+voucherHeader.getStateType());
-        	System.out.println("workflowBean.getCurrentState() : "+workflowBean.getCurrentState());
+        	
             if (null == voucherHeader.getState()) {
                 final WorkFlowMatrix wfmatrix = voucherHeaderWorkflowService.getWfMatrix(voucherHeader.getStateType(), null,
                         null, null, workflowBean.getCurrentState(), null);
@@ -392,7 +409,7 @@ public class JournalVoucherActionHelper {
         return headerdetails;
     }
 
-    @Transactional
+  /*  @Transactional
     public CVoucherHeader createVoucherAndledger(final List<VoucherDetails> billDetailslist,
             final List<VoucherDetails> subLedgerlist, CVoucherHeader voucherHeader) {
         try {
@@ -453,7 +470,10 @@ public class JournalVoucherActionHelper {
                 subledgerDetails.add(subledgertDetailMap);
             }
 
-            voucherHeader = createVoucher.createPreApprovedVoucher(headerDetails, accountdetails, subledgerDetails);
+           // voucherHeader = createVoucher.createPreApprovedVoucher(headerDetails, accountdetails, subledgerDetails);
+            // jayanta for save as draft
+            voucherHeader = createVoucher.createPreApprovedVoucher(headerDetails, accountdetails, subledgerDetails, workflowBean);
+            
 
         } catch (final HibernateException e) {
             LOGGER.error(e.getMessage(), e);
@@ -473,7 +493,9 @@ public class JournalVoucherActionHelper {
             LOGGER.debug("Posted to Ledger " + voucherHeader.getId());
         return voucherHeader;
 
-    }
+    }*/
+    
+ 
 
     private String populateEmpName() {
 		Long empId = ApplicationThreadLocals.getUserId();
@@ -496,6 +518,116 @@ public class JournalVoucherActionHelper {
 		}
 		return pos;
 	}
+    
+    
+    
+ // jayanta for save as draft
+    @Transactional
+    public CVoucherHeader createVoucherAndledger(final List<VoucherDetails> billDetailslist,
+            final List<VoucherDetails> subLedgerlist, CVoucherHeader voucherHeader, WorkflowBean workflowBean) {
+        try {
+            final HashMap<String, Object> headerDetails = createHeaderAndMisDetails(voucherHeader);
+            HashMap<String, Object> detailMap = null;
+            HashMap<String, Object> subledgertDetailMap = null;
+            final List<HashMap<String, Object>> accountdetails = new ArrayList<HashMap<String, Object>>();
+            final List<HashMap<String, Object>> subledgerDetails = new ArrayList<HashMap<String, Object>>();
+            detailMap = new HashMap<String, Object>();
+            final Map<String, Object> glcodeMap = new HashMap<String, Object>();
+           
+            
+            
+            for (final VoucherDetails voucherDetail : billDetailslist) {
+                detailMap = new HashMap<String, Object>();
+                
+                if(workflowBean.getWorkFlowAction()!= null && !workflowBean.getWorkFlowAction().equalsIgnoreCase("SaveAsDraft"))
+    			{
+                	if(voucherDetail!=null)
+                	{
+                		System.out.println("voucherDetail.getFunctionIdDetail()   :::: "+voucherDetail.getFunctionIdDetail());
+                	}
+                	 if(voucherDetail.getFunctionIdDetail()==null)
+                		 detailMap.put(VoucherConstant.FUNCTIONIDDETAILS, "");
+                	 else
+                		 detailMap.put(VoucherConstant.FUNCTIONIDDETAILS, voucherDetail.getFunctionIdDetail());
+                	 
+                	 
+                	 if(voucherDetail.getFunctionDetail()==null)
+                		 detailMap.put(VoucherConstant.FUNCTIONDETAILS, "");
+                	 else
+                		 detailMap.put(VoucherConstant.FUNCTIONDETAILS, voucherDetail.getFunctionDetail());
+    			
+    			}
+                
+                
+                if (voucherDetail.getFunctionIdDetail() != null)
+                    if (voucherHeader.getIsRestrictedtoOneFunctionCenter())
+                        detailMap.put(VoucherConstant.FUNCTIONCODE, voucherHeader.getVouchermis().getFunction().getCode());
+                    else if (null != voucherDetail.getFunctionIdDetail()) {
+                        final CFunction function = (CFunction) persistenceService.getSession().load(CFunction.class,
+                                voucherDetail.getFunctionIdDetail());
+                        detailMap.put(VoucherConstant.FUNCTIONCODE, function.getCode());
+                    } else if (null != voucherHeader.getVouchermis().getFunction())
+                        detailMap.put(VoucherConstant.FUNCTIONCODE, voucherHeader.getVouchermis().getFunction().getCode());
+                if (voucherDetail.getCreditAmountDetail().compareTo(BigDecimal.ZERO) == 0) {
+                    detailMap.put(VoucherConstant.DEBITAMOUNT, voucherDetail.getDebitAmountDetail().toString());
+                    detailMap.put(VoucherConstant.CREDITAMOUNT, "0");
+                    detailMap.put(VoucherConstant.GLCODE, voucherDetail.getGlcodeDetail());
+                    accountdetails.add(detailMap);
+                    glcodeMap.put(voucherDetail.getGlcodeDetail(), VoucherConstant.DEBIT);
+                } else {
+                    detailMap.put(VoucherConstant.CREDITAMOUNT, voucherDetail.getCreditAmountDetail().toString());
+                    detailMap.put(VoucherConstant.DEBITAMOUNT, "0");
+                    detailMap.put(VoucherConstant.GLCODE, voucherDetail.getGlcodeDetail());
+                    accountdetails.add(detailMap);
+                    glcodeMap.put(voucherDetail.getGlcodeDetail(), VoucherConstant.CREDIT);
+                }
+            }
+            for (final VoucherDetails voucherDetail : subLedgerlist) {
+                subledgertDetailMap = new HashMap<String, Object>();
+                final String amountType = glcodeMap.get(voucherDetail.getSubledgerCode()) != null ? glcodeMap.get(
+                        voucherDetail.getSubledgerCode()).toString() : null; // Debit or Credit.
+                if (voucherDetail.getFunctionDetail() != null && !voucherDetail.getFunctionDetail().equalsIgnoreCase("")
+                        && !voucherDetail.getFunctionDetail().equalsIgnoreCase("0")) {
+                    final CFunction function = (CFunction) persistenceService.find("from CFunction where id = ?",
+                            Long.parseLong(voucherDetail.getFunctionDetail()));
+                    subledgertDetailMap.put(VoucherConstant.FUNCTIONCODE, function != null ? function.getCode() : "");
+                }
+                if (null != amountType && amountType.equalsIgnoreCase(VoucherConstant.DEBIT))
+                    subledgertDetailMap.put(VoucherConstant.DEBITAMOUNT, voucherDetail.getAmount());
+                else if (null != amountType)
+                    subledgertDetailMap.put(VoucherConstant.CREDITAMOUNT, voucherDetail.getAmount());
+                subledgertDetailMap.put(VoucherConstant.DETAILTYPEID, voucherDetail.getDetailType().getId());
+                subledgertDetailMap.put(VoucherConstant.DETAILKEYID, voucherDetail.getDetailKeyId());
+                subledgertDetailMap.put(VoucherConstant.GLCODE, voucherDetail.getSubledgerCode());
+                subledgerDetails.add(subledgertDetailMap);
+            }
+           // voucherHeader = createVoucher.createPreApprovedVoucher(headerDetails, accountdetails, subledgerDetails);
+         // jayanta for save as draft
+            voucherHeader = createVoucher.createPreApprovedVoucher(headerDetails, accountdetails, subledgerDetails, workflowBean);
+            
+        } catch (final HibernateException e) {
+            e.printStackTrace();
+            LOGGER.error(e.getMessage(), e);
+            throw new ValidationException(Arrays.asList(new ValidationError(EXCEPTION_WHILE_SAVING_DATA, FAILED)));
+        } catch (final ApplicationRuntimeException e) {
+            e.printStackTrace();
+            LOGGER.error(e.getMessage(), e);
+            throw new ValidationException(Arrays.asList(new ValidationError(e.getMessage(), e.getMessage())));
+        } catch (final ValidationException e) {
+            e.printStackTrace();
+            LOGGER.error(e.getMessage(), e);
+            throw e;
+        } catch (final Exception e) {
+            e.printStackTrace();
+            // handle engine exception
+            LOGGER.error(e.getMessage(), e);
+            throw new ValidationException(Arrays.asList(new ValidationError(e.getMessage(), e.getMessage())));
+        }
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Posted to Ledger " + voucherHeader.getId());
+        return voucherHeader;
+    }
+    
     public String getEmployeeName(Long empId){
         
         return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();

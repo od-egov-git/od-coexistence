@@ -72,7 +72,9 @@
 					<input type="hidden"
 						name="instrumentHeaders[<s:property value="#status.index"/>]"
 						value='<s:property value="ihId"/>' />
-					<td style="text-align: left"><s:property value="voucherNumber" /></td>
+					<%-- <td style="text-align: left"><s:property value="voucherNumber" /></td> --%>
+					<td style="text-align: left"><a href="#"	onclick="openVoucher('<s:property value="vhId" />','<s:property value="voucherNumber" />');">
+					<s:property	value="voucherNumber" /></td>
 					<td style="text-align: left"><s:property value="chequeNumber" /></td>
 					<td><s:property value="chequeDate" /></td>
 					<td><s:property value="type" /></td>

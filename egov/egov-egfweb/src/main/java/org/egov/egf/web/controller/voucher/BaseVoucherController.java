@@ -151,7 +151,7 @@ public abstract class BaseVoucherController extends GenericWorkFlowController {
         if (!cutOffDateconfigValue.isEmpty()) {
             final DateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
             model.addAttribute("validActionList",
-                    Arrays.asList(FinancialConstants.BUTTONFORWARD));
+            		Arrays.asList(FinancialConstants.BUTTONFORWARD,FinancialConstants.BUTTONSAVEASDRAFT));
             try {
                 model.addAttribute("cutOffDate",
                         DateUtils.getDefaultFormattedDate(df.parse(cutOffDateconfigValue.get(0).getValue())));

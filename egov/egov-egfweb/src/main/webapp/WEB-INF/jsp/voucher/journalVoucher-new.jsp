@@ -271,18 +271,16 @@
 			return false;
 		}
 	}
-
-
-	// for save as draft by Abhishek on 26032021
+	
+	// jayanta for save as draft
 	function onSubmitDraft()
 	{
-		
-			document.jvcreateform.action='/services/EGF/voucher/journalVoucher-create.action';
+		var backlog=document.getElementById('backlogEntry');
+			document.jvcreateform.action='/services/EGF/voucher/journalVoucher-create.action?backlogEntry='+backlog.value;
 	    	return true;
 		
 	}
-	//////////
-	
+
 	function validateCutOff()
 	{
 	var cutOffDatePart=document.getElementById("cutOffDate").value.split("/");
@@ -568,7 +566,6 @@
 	function loadBank(fund){
 	}
 function onloadtask(){
-//autocompleteEntities1By20();
 	var VTypeFromBean = '<s:property value="voucherTypeBean.voucherSubType"/>';
 	if(VTypeFromBean == "") 
 		VTypeFromBean = '-1';
@@ -599,6 +596,7 @@ function onloadtask(){
 		populateslDropDown(); // to load the subledger detils when page loads, required when validation fails.
 	if(document.getElementById('approverDepartment'))
 		document.getElementById('approverDepartment').value = "-1";
+		
   }
 function showMessage(message){
 	var buttonValue = '<s:property value="buttonValue"/>';

@@ -62,9 +62,15 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ContractorRepository extends JpaRepository<Contractor, Long> {
 
+	
     public List<Contractor> findByNameLikeIgnoreCaseOrCodeLikeIgnoreCase(String name, String code);
     
     @Query("from Contractor where status.code='Active'")
     public List<Contractor> findByStatus();
+    
+    //@Query("from Contractor where status.code='Active' and name like '?1%'")
+    
+    @Query("from Contractor where status.code='Active' and (LOWER(name) like LOWER(concat(?1, '%')) or LOWER(code) like LOWER(concat(?1, '%')))")
+    public List<Contractor> findByNameLikeIgnoreCase(String name);
 
 }

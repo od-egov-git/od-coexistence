@@ -147,7 +147,9 @@
 					</td>
 				</tr>
 				<tr align="center">
-					<td><display:table name="searchResult" export="true"
+					<td>
+											
+					<display:table name="searchResult" export="true"
 							id="searchResultid" uid="currentRowObject" cellpadding="0"
 							cellspacing="0" requestURI="" sort="external" class="its"
 							style="border:1px;width:100%;empty-cells:show;border-collapse:collapse;">
@@ -162,8 +164,14 @@
 							<display:column title="Bill Date"
 								style="width:8%;text-align:center" property="billDate"
 								sortProperty="billdate" sortable="true" />
-							<display:column title="Voucher number" href="javascript:openVoucher('${currentRowObject.vhId}');"
-								style="width:11%;text-align:center" property="voucherNumber" sortProperty="vouchernumber" sortable="true"/>
+								<!-- ${currentRowObject.vhId}-->
+							<%-- <display:column title="Voucher number" href="javascript:openVoucher('${currentRowObject.vhId}');"
+								style="width:11%;text-align:center" property="voucherNumber" sortProperty="vouchernumber" sortable="true"/> --%>
+							<display:column title="Voucher Number" style="width:4%;text-align:center" sortProperty="vouchernumber" sortable="true">
+								<a href="#"	onclick="return openVoucher('<s:property value="#attr.currentRowObject.vhId"/>')"> 
+								<s:property value="#attr.currentRowObject.vouchernumber"/></a>
+							</display:column>
+						
 							<display:column title="Party Name"
 								style="width:5%;text-align:center" property="partyName" />
 							<display:column title="  Gross Amount"
@@ -174,15 +182,24 @@
 								style="width:7%;text-align:right" property="netAmount" />
 							<display:column title="Paid Amount"
 								style="width:7%;text-align:right" property="paidAmount" />
-							<display:column title="Payment voucher number " href="javascript:openVoucher('${currentRowObject.phId}');"
+							<%-- <display:column title="Payment voucher number " href="javascript:openVoucher('${currentRowObject.phId}');"
 								style="width:11%;text-align:center"
-								property="paymentVoucherNumber" sortProperty="vouchernumber" sortable="true"/>
+								property="paymentVoucherNumber" sortProperty="vouchernumber" sortable="true"/> --%>
+							<display:column  title="Payment voucher number " style="width:4%;text-align:center" sortProperty="paymentVoucherNumber" sortable="true">
+								<a href="#"	onclick="return openVoucher('<s:property value="#attr.currentRowObject.phId"/>')"> 
+								<s:property value="#attr.currentRowObject.paymentVoucherNumber"/></a>
+							</display:column>
+							
 							<display:column title="Payment Pex number " 
 								style="width:11%;text-align:center"
 								property="pexNo" />
-							<display:column title="Deduction voucher number " href="javascript:openVoucher('${currentRowObject.deducVhId}');"
+							<%-- <display:column title="Deduction voucher number " href="javascript:openVoucher('${currentRowObject.deducVhId}');"
 								style="width:11%;text-align:center"
-								property="deducVoucherNumber" />
+								property="deducVoucherNumber" /> --%>
+							<display:column title="Deduction voucher number "	style="width:4%;text-align:center" sortProperty="deducVoucherNumber" sortable="true">
+								<a href="#"	onclick="return openVoucher('<s:property value="#attr.currentRowObject.deducVhId"/>')"> 
+								<s:property value="#attr.currentRowObject.deducVoucherNumber"/></a>
+							</display:column>
 							<display:column title="Deduction Pex number "
 								style="width:11%;text-align:center"
 								property="deducPexNo" />
