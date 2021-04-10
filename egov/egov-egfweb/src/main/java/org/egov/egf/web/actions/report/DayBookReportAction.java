@@ -61,11 +61,8 @@ import org.apache.struts2.interceptor.validation.SkipValidation;
 import org.egov.commons.CVoucherHeader;
 import org.egov.commons.Fund;
 import org.egov.commons.SubScheme;
-<<<<<<< HEAD
 import org.egov.egf.model.VoucherDetailMiscMapping;
-=======
 import org.egov.infra.admin.master.service.CityService;
->>>>>>> 90554bfcfdb437877c49a13e7dbdf0b52a3bb6b9
 import org.egov.infra.config.persistence.datasource.routing.annotation.ReadOnly;
 import org.egov.infra.reporting.util.ReportUtil;
 import org.egov.infra.web.struts.actions.BaseFormAction;
