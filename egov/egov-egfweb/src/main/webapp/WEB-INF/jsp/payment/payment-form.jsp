@@ -339,16 +339,14 @@
 																</tr>
 																<tr>
 																	<td class="bluebox">&nbsp;</td>
-																	<td class="bluebox"><s:text name="payment.budgetDetails" /><span
+																	<td class="bluebox"><s:text name="backdated.entry" /><span
 																		class="mandatory1">*</span></td>
-																	<td class="bluebox"><a href="#" onclick="openBudgetDetails()"> Click</a>
-																	</td>
-																	<td class="bluebox" width="15%"><s:text name="backdated.entry" /><span
-																		class="mandatory1">*</span></td>
-																	<td class="bluebox" colspan="4"><s:select name="backlogEntry"
+																	<td class="bluebox"><s:select name="backlogEntry"
 																	headerKey="-1" headerValue="Select" value="%{backlogEntry}"
 																	list="#{'Y':'Yes' ,'N':'No'}"
 																			id="backlogEntry" /></td>
+																	<td class="bluebox" width="15%">&nbsp;</td>
+																	<td class="bluebox" colspan="4">&nbsp;</td>
 																</tr>
 																
 															<tr>

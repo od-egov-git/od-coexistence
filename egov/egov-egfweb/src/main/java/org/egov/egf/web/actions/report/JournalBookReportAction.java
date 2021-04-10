@@ -160,7 +160,8 @@ public class JournalBookReportAction extends BaseFormAction {
             addActionMessage("No records found.");
         }
         heading = getGLHeading();
-        titleName = microserviceUtils.getHeaderNameForTenant().toUpperCase()+" \\n";
+        //titleName = microserviceUtils.getHeaderNameForTenant().toUpperCase()+" \\n";
+        titleName=getUlbName().toUpperCase()+" \\n";
         prepareNewForm();
         return "result";
     }
@@ -321,5 +322,9 @@ public class JournalBookReportAction extends BaseFormAction {
     public void setTitleName(String titleName) {
         this.titleName = titleName;
     }
+    
+    private String getUlbName() {
+		return ReportUtil.getCityName() +" "+(cityService.getCityGrade()==null ? "" :cityService.getCityGrade());
+	}
 
 }

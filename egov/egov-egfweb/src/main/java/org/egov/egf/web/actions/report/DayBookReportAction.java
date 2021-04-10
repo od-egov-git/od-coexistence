@@ -60,7 +60,9 @@ import org.apache.struts2.convention.annotation.Results;
 import org.apache.struts2.interceptor.validation.SkipValidation;
 import org.egov.commons.Fund;
 import org.egov.commons.SubScheme;
+import org.egov.infra.admin.master.service.CityService;
 import org.egov.infra.config.persistence.datasource.routing.annotation.ReadOnly;
+import org.egov.infra.reporting.util.ReportUtil;
 import org.egov.infra.web.struts.actions.BaseFormAction;
 import org.egov.infra.web.struts.annotation.ValidationErrorPage;
 import org.egov.infstr.services.PersistenceService;
@@ -106,6 +108,9 @@ public class DayBookReportAction extends BaseFormAction {
     private String currentDate;
     private String titleName = "";
     private String scheme;
+    
+    @Autowired
+    private CityService cityService;
 
     public DayBookReportAction() {
         super();
@@ -153,7 +158,7 @@ public class DayBookReportAction extends BaseFormAction {
             LOGGER.debug("dayBookAction | list | End");
         heading = getGLHeading();
         //titleName = microserviceUtils.getHeaderNameForTenant().toUpperCase()+" \\n";
-        titleName="Dehradun Nagar Nigam";
+        titleName=getUlbName().toUpperCase()+" \\n";
         prepareNewForm();
 
         persistenceService.getSession().setFlushMode(FlushMode.AUTO);
@@ -344,6 +349,10 @@ public class DayBookReportAction extends BaseFormAction {
 
 	public void setScheme(String scheme) {
 		this.scheme = scheme;
+	}
+	
+	private String getUlbName() {
+		return ReportUtil.getCityName() +" "+(cityService.getCityGrade()==null ? "" :cityService.getCityGrade());
 	}
     
 }
