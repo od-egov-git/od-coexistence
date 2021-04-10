@@ -58,8 +58,10 @@ import org.apache.struts2.convention.annotation.ParentPackage;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.convention.annotation.Results;
 import org.apache.struts2.interceptor.validation.SkipValidation;
+import org.egov.commons.CVoucherHeader;
 import org.egov.commons.Fund;
 import org.egov.commons.SubScheme;
+import org.egov.egf.model.VoucherDetailMiscMapping;
 import org.egov.infra.config.persistence.datasource.routing.annotation.ReadOnly;
 import org.egov.infra.web.struts.actions.BaseFormAction;
 import org.egov.infra.web.struts.annotation.ValidationErrorPage;
@@ -67,6 +69,7 @@ import org.egov.infstr.services.PersistenceService;
 import org.egov.utils.FinancialConstants;
 import org.hibernate.FlushMode;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.StringType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,8 +81,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 @ParentPackage("egov")
@@ -152,8 +157,7 @@ public class DayBookReportAction extends BaseFormAction {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("dayBookAction | list | End");
         heading = getGLHeading();
-        //titleName = microserviceUtils.getHeaderNameForTenant().toUpperCase()+" \\n";
-        titleName="Dehradun Nagar Nigam";
+        titleName = microserviceUtils.getHeaderNameForTenant().toUpperCase()+" \\n";
         prepareNewForm();
 
         persistenceService.getSession().setFlushMode(FlushMode.AUTO);
@@ -185,7 +189,7 @@ public class DayBookReportAction extends BaseFormAction {
         }
         String query = "SELECT voucherdate as vdate, TO_CHAR(voucherdate, 'dd-Mon-yyyy')  AS  voucherdate, vouchernumber as vouchernumber , gd.glcode AS glcode,ca.name AS particulars ,vh.name ||' - '|| vh.TYPE AS type"
                 + ", CASE WHEN vh.description is null THEN ' ' ELSE vh.description END AS narration, CASE  WHEN status=0 THEN ( 'Approved') ELSE ( case WHEN status=1 THEN 'Reversed' else (case WHEN status=2 THEN 'Reversal' else ' ' END) END ) END as status , debitamount  , "
-                + " creditamount,vh.CGVN ,vh.isconfirmed as \"isconfirmed\",vh.id as vhId FROM voucherheader vh,vouchermis vmis, generalledger gd, chartofaccounts ca WHERE vh.ID=gd.VOUCHERHEADERID AND vh.id=vmis.voucherheaderid"
+                + " creditamount,vh.CGVN ,vh.isconfirmed as \"isconfirmed\",vh.id as vhId,(select dep.name from eg_department dep where dep.code=vmis.departmentcode) as dept,(select fun.name from function fun where fun.id=vmis.functionid) as func FROM voucherheader vh,vouchermis vmis, generalledger gd, chartofaccounts ca WHERE vh.ID=gd.VOUCHERHEADERID AND vh.id=vmis.voucherheaderid"
                 + " AND ca.GLCODE=gd.GLCODE AND voucherdate >= '"
                 + startDate
                 + "' and voucherdate <= '"
@@ -213,6 +217,17 @@ public class DayBookReportAction extends BaseFormAction {
     }
 
     private void prepareResultList() {
+    	//view start
+    	Map<Long,CVoucherHeader> voucherDetailPartyMapping=new HashMap<Long,CVoucherHeader>();
+    	populatePartyNames(voucherDetailPartyMapping);
+    	Map<Long,List<VoucherDetailMiscMapping>> voucherDetailMiscMapping=new HashMap<Long,List<VoucherDetailMiscMapping>>();
+    	populateMiscDetail(voucherDetailMiscMapping);
+    	Map<Long,CVoucherHeader> voucherDetailBpvMapping=new HashMap<Long,CVoucherHeader>();
+    	populateBpv(voucherDetailBpvMapping);
+    	Map<Long,CVoucherHeader> voucherDetailIntrumentMapping=new HashMap<Long,CVoucherHeader>();
+    	populateInstrument(voucherDetailIntrumentMapping);
+    	
+    	//view end
         String voucherDate = "", voucherNumber = "", voucherType = "", narration = "", status = "";
         Query query = null;
         query = persistenceService.getSession().createSQLQuery(getQuery())
@@ -226,6 +241,8 @@ public class DayBookReportAction extends BaseFormAction {
                 .addScalar("creditamount", StringType.INSTANCE)
                 .addScalar("debitamount", StringType.INSTANCE)
                 .addScalar("vhId", StringType.INSTANCE)
+                .addScalar("dept", StringType.INSTANCE)
+                .addScalar("func", StringType.INSTANCE)
                 .setResultTransformer(Transformers.aliasToBean(DayBook.class));
         dayBookDisplayList = query.list();
         for (DayBook bean : dayBookDisplayList) {
@@ -254,6 +271,29 @@ public class DayBookReportAction extends BaseFormAction {
                 bean.setVouchernumber("");
             } else {
                 voucherNumber = bean.getVouchernumber();
+                bean.setDivision(bean.getDept());
+                bean.setBudgethead(bean.getFunc());
+                //view
+                if(voucherDetailPartyMapping.get(Long.parseLong(bean.getVhId())) != null)
+                {
+                	bean.setPartyname(voucherDetailPartyMapping.get(Long.parseLong(bean.getVhId())).getVoucherNumber());
+                }
+                if(voucherDetailMiscMapping.get(Long.parseLong(bean.getVhId())) != null && !voucherDetailMiscMapping.get(Long.parseLong(bean.getVhId())).isEmpty())
+                {
+                	bean.setBpvno(voucherDetailBpvMapping.get(voucherDetailMiscMapping.get(Long.parseLong(bean.getVhId())).get(0).getBpvId()).getVoucherNumber());
+                	bean.setBpvDate(voucherDetailBpvMapping.get(voucherDetailMiscMapping.get(Long.parseLong(bean.getVhId())).get(0).getBpvId()).getPartyBillNumber());
+                	if(voucherDetailIntrumentMapping.get(voucherDetailBpvMapping.get(voucherDetailMiscMapping.get(Long.parseLong(bean.getVhId())).get(0).getBpvId()).getId()) != null)
+                	{
+                		bean.setPexno(voucherDetailIntrumentMapping.get(voucherDetailBpvMapping.get(voucherDetailMiscMapping.get(Long.parseLong(bean.getVhId())).get(0).getBpvId()).getId()).getVoucherNumber());
+                		bean.setPexDate(voucherDetailIntrumentMapping.get(voucherDetailBpvMapping.get(voucherDetailMiscMapping.get(Long.parseLong(bean.getVhId())).get(0).getBpvId()).getId()).getApprovalComent());
+                	}
+                }
+                if(voucherDetailIntrumentMapping.get(Long.parseLong(bean.getVhId())) != null)
+                {
+                	bean.setPexno(voucherDetailIntrumentMapping.get(Long.parseLong(bean.getVhId())).getVoucherNumber());
+                	bean.setPexDate(voucherDetailIntrumentMapping.get(Long.parseLong(bean.getVhId())).getApprovalComent());
+                }
+                
             }
 
             if (narration != null && !narration.equalsIgnoreCase("") && narration.equalsIgnoreCase(bean.getNarration())) {
@@ -266,7 +306,144 @@ public class DayBookReportAction extends BaseFormAction {
 
     }
 
-    private String getGLHeading() {
+    private void populateInstrument(Map<Long, CVoucherHeader> voucherDetailIntrumentMapping) {
+    	SQLQuery queryInstru =  null;
+       	final StringBuffer query5 = new StringBuffer(500);
+      	List<Object[]> list= null;
+      	query5
+          .append("select vdi.id,vdi.transactionnumber, vdi.transactiondate ,vdi.voucherheaderid,vdi.accountnumber from voucher_detail_instrument vdi   ");
+      	LOGGER.info("Query 5 :: "+query5.toString());
+      	queryInstru=this.persistenceService.getSession().createSQLQuery(query5.toString());
+       	list = queryInstru.list();
+      	LOGGER.info("pex map");
+      	CVoucherHeader pexDetail=null;
+      	
+      	if (list.size() != 0) {
+      		LOGGER.info("size ::: "+list.size());
+      		for (final Object[] object : list)
+      		{
+      			pexDetail=new CVoucherHeader();
+      			if(object[3] != null)
+      			{
+      				pexDetail.setId(Long.parseLong(object[3].toString()));
+      			}
+      			if(object[1] != null)
+      			{
+      				pexDetail.setVoucherNumber(object[1].toString());
+      			}
+      			if(object[2] != null)
+      			{
+      				pexDetail.setApprovalComent(object[2].toString());
+      			}
+      			if(object[4] != null)
+      			{
+      				pexDetail.setCgvn(object[4].toString());
+      			}
+      			voucherDetailIntrumentMapping.put(pexDetail.getId(), pexDetail);
+      		}
+      		
+      	}
+		
+	}
+
+	private void populateBpv(Map<Long, CVoucherHeader> voucherDetailBpvMapping) {
+		CVoucherHeader bpvMapping =null;
+    	SQLQuery queryBpv =  null;
+    	final StringBuffer query2 = new StringBuffer(500);
+    	List<Object[]> list= null;
+    	query2
+        .append("select vdb.id,vdb.vouchernumber,vdb.voucherdate from voucher_detail_bpvmapping vdb");
+    	LOGGER.info("Query 2 :: "+query2.toString());
+    	queryBpv=this.persistenceService.getSession().createSQLQuery(query2.toString());
+    	list = queryBpv.list();
+    	LOGGER.info("after exe");
+    	if (list.size() != 0) {
+    		LOGGER.info("size ::: "+list.size());
+    		for (final Object[] object : list)
+    		{
+    			bpvMapping=new CVoucherHeader();
+    			bpvMapping.setId(Long.parseLong(object[0].toString()));
+    			bpvMapping.setVoucherNumber(object[1].toString());
+    			bpvMapping.setPartyBillNumber(object[2].toString());
+    			voucherDetailBpvMapping.put(bpvMapping.getId(), bpvMapping);
+    		}
+    	}
+		
+	}
+
+	private void populateMiscDetail(Map<Long, List<VoucherDetailMiscMapping>> voucherDetailMiscMapping) {
+		
+    	SQLQuery queryMisc =  null;
+    	final StringBuffer query3 = new StringBuffer(500);
+   	 List<Object[]> list= null;
+   	query3
+       .append("select vdm.id,vdm.billvhid,vdm.payvhid,vdm.paidamount from voucher_detail_miscbill vdm ");
+   	LOGGER.info("Query 3 :: "+query3.toString());
+   	queryMisc=this.persistenceService.getSession().createSQLQuery(query3.toString());
+   	list = queryMisc.list();
+   	LOGGER.info("1 map");
+   	VoucherDetailMiscMapping voucherDetailMisc=null;
+   	List<VoucherDetailMiscMapping> miscbillList=null;
+   	if (list.size() != 0) {
+   		LOGGER.info("size ::: "+list.size());
+   		for (final Object[] object : list)
+   		{
+   			voucherDetailMisc=new VoucherDetailMiscMapping();
+   			voucherDetailMisc.setId(Long.parseLong(object[0].toString()));
+   			if(object[1] != null)
+   			{
+   				voucherDetailMisc.setVoucherId(Long.parseLong(object[1].toString()));
+   			}
+   			if(object[2] != null)
+   			{
+   				voucherDetailMisc.setBpvId(Long.parseLong(object[2].toString()));
+   			}
+   			if(object[3] != null )
+   			{
+   				voucherDetailMisc.setAmountPaid(new BigDecimal(object[3].toString()));
+   			}
+   			if(voucherDetailMiscMapping.get(voucherDetailMisc.getVoucherId()) == null)
+   			{
+   				miscbillList=new ArrayList<VoucherDetailMiscMapping>();
+   				miscbillList.add(voucherDetailMisc);
+   				voucherDetailMiscMapping.put(voucherDetailMisc.getVoucherId(), miscbillList);
+   			}
+   			else
+   			{
+   				voucherDetailMiscMapping.get(voucherDetailMisc.getVoucherId()).add(voucherDetailMisc);
+   			}
+   		}
+   		
+   	}
+		
+	}
+
+	private void populatePartyNames(Map<Long, CVoucherHeader> voucherDetailPartyMapping) {
+    	SQLQuery queryParty =  null;
+       	final StringBuffer query4 = new StringBuffer(500);
+       	List<Object[]> list= null;
+      	query4
+          .append("select vdp.id,vdp.detailname from daybook_detail_party vdp  ");
+      	LOGGER.info("Query 4 :: "+query4.toString());
+      	queryParty=this.persistenceService.getSession().createSQLQuery(query4.toString());
+       	list = queryParty.list();
+      	LOGGER.info("1 map");
+      	CVoucherHeader partyDetail=null;
+      	
+      	if (list.size() != 0) {
+      		LOGGER.info("size ::: "+list.size());
+      		for (final Object[] object : list)
+      		{
+      			partyDetail=new CVoucherHeader();
+      			partyDetail.setId(Long.parseLong(object[0].toString()));
+      			partyDetail.setVoucherNumber(object[1].toString());
+      			voucherDetailPartyMapping.put(partyDetail.getId(), partyDetail);
+      		}
+      	}
+		
+	}
+
+	private String getGLHeading() {
 
         String heading = "Day Book report from " + dayBookReport.getStartDate() + " to " + dayBookReport.getEndDate();
         Fund fund = new Fund();
