@@ -263,7 +263,7 @@ function enableAll() {
 }
 
 function validate() {
-	
+	/*comment by abhishek on 10042021
 	 //Added for validation Signatory by Prasanta
 		var firstsignatory='';
 		if(dom.get('firstsignatory') == null || dom.get('firstsignatory').value == '-1')
@@ -287,7 +287,7 @@ function validate() {
 		}
 	   //end validation of Signatory and get selected value
 	   
-	   
+	   */
 	   
 	var insuffientAlert = 'There is no sufficient bank balance. ';
 	var continueAlert = 'Do you want to continue ? ';

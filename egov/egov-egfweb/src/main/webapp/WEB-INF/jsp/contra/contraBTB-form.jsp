@@ -179,7 +179,9 @@
 			listValue="glcode+'-'+name" headerKey="-1"
 			headerValue="----Choose----" /></td>
 </tr>
-<tr>
+
+<!-- comment by Abhishek on 10042021
+<tr> 
 	<td class="bluebox">&nbsp;</td>
 	<td class="bluebox">First Signatory<span class="mandatory1">*</span></td>
 	<td class="bluebox"><s:select name="firstsignatory" headerKey="-1"
@@ -193,8 +195,7 @@
 			list="#{'Chief Accounts Officer':'Chief Accounts Officer' ,'Assistant Controller (F and A)':'Assistant Controller (F and A)' ,'Section Officer':'Section Officer'}"
 			id="secondsignatory" /></td>
 </tr>
-
-
+-->
 
 <tr>
 	<td class="bluebox"></td>

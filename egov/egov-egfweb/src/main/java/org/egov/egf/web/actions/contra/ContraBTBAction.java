@@ -203,10 +203,10 @@ public class ContraBTBAction extends BaseVoucherAction {
 	public void prepare() {
 		super.prepare();
 		ModeOfCollectionMap = new LinkedHashMap<String, String>();
-		// ModeOfCollectionMap.put(MDC_CHEQUE, MDC_CHEQUE);
-		ModeOfCollectionMap.put(MDC_PEX,MDC_PEX);
+		
+		//ModeOfCollectionMap.put(MDC_PEX,MDC_PEX);//comment by Abhishek on 10042021
 		//ModeOfCollectionMap.put(MDC_OTHER, MDC_OTHER);//comment by Abhishek on 08042021 
-		//ModeOfCollectionMap.put(MDC_CHEQUE, MDC_CHEQUE);//comment by Abhishek on 08042021
+		ModeOfCollectionMap.put(MDC_CHEQUE, MDC_CHEQUE);
 		final List<CChartOfAccounts> glCodeList = persistenceService.findAllBy(
 				"from CChartOfAccounts coa where coa.purposeId=8 and coa.classification=4 and coa.isActiveForPosting=true order by coa.glcode ");
 		addDropdownData("interFundList", glCodeList);
@@ -258,16 +258,14 @@ public class ContraBTBAction extends BaseVoucherAction {
 	@ValidationErrorPage(value = NEW)
 	@Action(value = "/contra/contraBTB-create")
 	public String create() throws ValidationException {
-		String fSignatory = firstsignatory;
-		String sSignatory = secondsignatory;
-		
-		
-			if(fSignatory!=null) {
-				voucherHeader.setFirstsignatory(fSignatory);
-			}
-			if(sSignatory!=null) {
-				voucherHeader.setSecondsignatory(sSignatory);
-			}
+		/*
+		 * String fSignatory = firstsignatory; String sSignatory = secondsignatory;
+		 * 
+		 * 
+		 * if(fSignatory!=null) { voucherHeader.setFirstsignatory(fSignatory); }
+		 * if(sSignatory!=null) { voucherHeader.setSecondsignatory(sSignatory); }
+		 */
+		//comment by abhishek on 10042021
 		
 		
 		if (LOGGER.isDebugEnabled())

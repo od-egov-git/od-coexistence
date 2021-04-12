@@ -345,7 +345,7 @@ public class JournalVoucherActionHelper {
                         .withComments(workflowBean.getApproverComments())
                        // .withStateValue(wfmatrix.getNextState()).withDateInfo(currentDate.toDate())
                         .withStateValue(ststeValue).withDateInfo(currentDate.toDate())
-                        .withOwner(workflowBean.getApproverPositionId()).withOwnerName((workflowBean.getApproverPositionId() != null && workflowBean.getApproverPositionId() > 0L) ? getEmployeeName(workflowBean.getApproverPositionId()):"")
+                        .withOwner(workflowBean.getApproverPositionId())//.withOwnerName((workflowBean.getApproverPositionId() != null && workflowBean.getApproverPositionId() > 0L) ? getEmployeeName(workflowBean.getApproverPositionId()):"")
                         .withNextAction(wfmatrix.getNextAction())
                         .withInitiator(user.getId());
                         //.withInitiator((info != null && info.getAssignments() != null && !info.getAssignments().isEmpty())

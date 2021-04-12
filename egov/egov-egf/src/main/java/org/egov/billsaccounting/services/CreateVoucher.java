@@ -2975,7 +2975,6 @@ public class CreateVoucher {
 
 				if (LOGGER.isDebugEnabled())
 					LOGGER.debug("End | insertIntoVoucherHeader");
-				
 				if(CheckSaveAsDraft)
 				{
 				// insertIntoRecordStatus(vh);
