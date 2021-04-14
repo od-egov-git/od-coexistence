@@ -106,8 +106,8 @@
 																			test="%{isFieldMandatory('fund')}">
 																			<span class="bluebox"><span class="mandatory1">*</span></span>
 																		</s:if></td>
-																	<td width="20%" class="bluebox"><s:property
-																			value="%{billregister.egBillregistermis.fund.name}" /></td>
+																	<td width="20%" class="bluebox"><s:textfield
+																			value="%{billregister.egBillregistermis.fund.name}" readonly="true"/></td>
 																</s:if>
 																<s:else>
 																	<td class="greybox">
@@ -119,8 +119,8 @@
 																			test="%{isFieldMandatory('fundsource')}">
 																			<span class="bluebox"><span class="mandatory1">*</span></span>
 																		</s:if></td>
-																	<td width="33%" class="bluebox"><s:property
-																			value="%{billregister.egBillregistermis.fundsource.name}" /></td>
+																	<td width="33%" class="bluebox"><s:textfield
+																			value="%{billregister.egBillregistermis.fundsource.name}" readonly="true" /></td>
 																</s:if>
 																<s:else>
 																	<td class="greybox">
@@ -139,7 +139,7 @@
 																			id="department" list="dropdownData.departmentList"
 																			listKey="code" listValue="name" headerKey="-1"
 																			headerValue="%{getText('lbl.choose.options')}"
-																			value="%{billregister.egBillregistermis.departmentcode}" /></td>
+																			value="%{billregister.egBillregistermis.departmentcode}" disabled="true"/></td>
 																	<%-- <s:property
 																	value="%{billregister.egBillregistermis.egDepartment.name}" /> --%>
 																</s:if>
@@ -153,8 +153,8 @@
 																			test="%{isFieldMandatory('functionary')}">
 																			<span class="bluebox"><span class="mandatory1">*</span></span>
 																		</s:if></td>
-																	<td class="greybox" colspan="4"><s:property
-																			value="%{billregister.egBillregistermis.functionaryid.name}" /></td>
+																	<td class="greybox" colspan="4"><s:textfield
+																			value="%{billregister.egBillregistermis.functionaryid.name}" readonly="true"  /></td>
 																</s:if>
 																<s:else>
 																	<td class="greybox">
@@ -169,8 +169,8 @@
 																			test="%{isFieldMandatory('scheme')}">
 																			<span class="mandatory1">*</span>
 																		</s:if></td>
-																	<td class="bluebox"><s:property
-																			value="%{billregister.egBillregistermis.scheme.name}" /></td>
+																	<td class="bluebox"><s:textfield
+																			value="%{billregister.egBillregistermis.scheme.name}" readonly="true" /></td>
 																</s:if>
 																<s:else>
 																	<td class="greybox">
@@ -182,8 +182,8 @@
 																			test="%{isFieldMandatory('subscheme')}">
 																			<span class="mandatory1">*</span>
 																		</s:if></td>
-																	<td class="bluebox"><s:property
-																			value="%{billregister.egBillregistermis.subScheme.name}" /></td>
+																	<td class="bluebox"><s:textfield
+																			value="%{billregister.egBillregistermis.subScheme.name}" readonly="true" /></td>
 																</s:if>
 																<s:else>
 																	<td class="greybox">
@@ -202,7 +202,7 @@
 																			id="function" list="dropdownData.functionList"
 																			listKey="id" listValue="name" headerKey="-1"
 																			headerValue="%{getText('lbl.choose.options')}"
-																			value="%{billregister.egBillregistermis.function.id}" />
+																			value="%{billregister.egBillregistermis.function.id}" disabled="true" />
 																		<%--  <s:property
 																		value="%{billregister.egBillregistermis.function.name}" /> --%></td>
 																</s:if>
@@ -217,8 +217,8 @@
 																			test="%{isFieldMandatory('field')}">
 																			<span class="mandatory1">*</span>
 																		</s:if></td>
-																	<td class="greybox" colspan="4"><s:property
-																			value="%{billregister.egBillregistermis.fieldid.name}" /></td>
+																	<td class="greybox" colspan="4"><s:textfield
+																			value="%{billregister.egBillregistermis.fieldid.name}" readonly="true"/></td>
 																</s:if>
 																<s:else>
 																	<td class="greybox">
@@ -233,12 +233,11 @@
 																		test="%{paymentMode == 'cash' || paymentMode == 'Cash'}">
 																		<s:text name="cash.consolidated.cheque" />
 																	</s:if> <s:else>
-																		<s:text name="%{paymentMode}" />
+																		<s:textfield name="paymentMode" value="%{paymentMode}" readonly="true"/>
 																	</s:else></td>
 																<td class="bluebox"><strong><s:text
 																			name="payment.amount" /></strong></td>
-																<td class="bluebox" colspan="2"><span
-																	id="paymentAmountspan" /></td>
+																<td class="bluebox" colspan="2"><s:textfield name="paymentAmountspan" id="paymentAmountspan" value="" readonly="true"/></td>
 															</tr>
 															<tr>
 																<td class="greybox">&nbsp;</td>
@@ -247,7 +246,7 @@
 																			name="payment.voucherno" /><span class="mandatory1">*</span></td>
 																	<td class="greybox"><s:textfield
 																			name="vouchernumber" id="vouchernumber"
-																			value="%{vouchernumber}" /></td>
+																			value="%{vouchernumber}" readonly="true" /></td>
 																</s:if>
 																<s:else>
 																	<td class="greybox" />
@@ -258,10 +257,7 @@
 																<td class="greybox" colspan="2"><s:textfield
 																		id="voucherdate" name="voucherdate"
 																		value="%{voucherdate}" data-date-end-date="0d"
-																		onkeyup="DateFormat(this,this.value,event,false,'3')"
-																		placeholder="DD/MM/YYYY"
-																		class="form-control datepicker"
-																		data-inputmask="'mask': 'd/m/y'" /></td>
+																		data-inputmask="'mask': 'd/m/y'" readonly="true" /></td>
 															</tr>
 															<s:if test='%{billSubType.equalsIgnoreCase("TNEB")}'>
 																<tr>
@@ -555,6 +551,7 @@
 
 			<div class="buttonbottom" id="buttondiv">
 				<s:hidden name="paymentid" value="%{paymentheader.id}" />
+				
 				<s:hidden name="actionname" id="actionName" value="%{action}" />
 				<s:hidden name="billSubType" id="billSubType" value="%{billSubType}" />
 			</div>
@@ -628,7 +625,7 @@
 				else vFinalGrandTotal += parseFloat(document.getElementById('paymentAmt'+i).value);
 			}
 			document.getElementById('grandTotal').value = vFinalGrandTotal.toFixed(vFixedDecimal);
-			document.getElementById('paymentAmountspan').innerHTML = document.getElementById('grandTotal').value;
+			document.getElementById('paymentAmountspan').value = document.getElementById('grandTotal').value;
 		}
 
 
@@ -851,7 +848,7 @@
 			var url = "${pageContext.request.contextPath}/voucher/preApprovedVoucher-loadvoucherview.action?vhid="+ vid;
 			window.open(url,'','width=900, height=700');
 		}
-		document.getElementById('paymentAmountspan').innerHTML = document.getElementById('grandTotal').value;
+		document.getElementById('paymentAmountspan').value = document.getElementById('grandTotal').value;
 
 		function billIdsToPaymentAmountsMap(billTypeObj,id){
 			var	length = <s:property value="%{billList.size()}"/>;

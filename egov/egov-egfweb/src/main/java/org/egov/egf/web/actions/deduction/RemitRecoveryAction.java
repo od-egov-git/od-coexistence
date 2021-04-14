@@ -283,7 +283,6 @@ public class RemitRecoveryAction extends BasePaymentAction {
         addDropdownData("recoveryList", listRecovery);
         addDropdownData("accNumList", Collections.EMPTY_LIST);
         modeOfCollectionMap.put(FinancialConstants.MODEOFPAYMENT_CASH, getText("cash.consolidated.cheque"));
-        modeOfCollectionMap.put(FinancialConstants.MODEOFPAYMENT_RTGS, "RTGS");
         this.setPartialPayment("deduction");
         System.out.println("3");
     }
