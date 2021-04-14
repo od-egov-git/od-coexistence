@@ -429,7 +429,7 @@ function validateWorkFlowApprover(name) {
 		$('#approvalComent').removeAttr('required');
 	}
 	if (button != null && button == 'Create And Approve') {
-		return validateCutOff();
+		return true;//validateCutOff();
 	}else
 		return true;
 	

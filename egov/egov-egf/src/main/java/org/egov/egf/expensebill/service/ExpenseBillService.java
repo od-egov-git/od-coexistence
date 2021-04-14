@@ -580,6 +580,15 @@ public class ExpenseBillService {
             	}
 				
 				if (FinancialConstants.BUTTONREJECT.equalsIgnoreCase(workFlowAction)) {
+					int size=egBillregister.getStateHistory().size();//added abhishek on 12042021
+					if(size>0)
+					{
+						List history=egBillregister.getStateHistory();
+						Long owenrPos1=(long) history.indexOf(size);
+						owenrPos.setId(owenrPos1);
+					}
+					else
+						owenrPos.setId(egBillregister.getCreatedBy());
 		            stateValue = FinancialConstants.WORKFLOW_STATE_REJECTED;
 		            egBillregister.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
                     .withComments(approvalComent)

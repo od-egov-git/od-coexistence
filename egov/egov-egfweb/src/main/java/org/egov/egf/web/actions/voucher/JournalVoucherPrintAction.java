@@ -110,6 +110,7 @@ public class JournalVoucherPrintAction extends BaseFormAction {
     InputStream inputStream;
     ReportHelper reportHelper;
     Long id;
+    int i=1;
     List<WorkFlowHistoryItem> inboxHistory = new ArrayList<>();
     private CityService cityService;
     private BillsService billsManager;
@@ -157,7 +158,11 @@ public class JournalVoucherPrintAction extends BaseFormAction {
 
     @Override
     public void prepare() {
+    	System.out.println("i "+i);
+    	if(i==1) {
         populateVoucher();
+    	i++;
+    	}
     }
 
     @Override

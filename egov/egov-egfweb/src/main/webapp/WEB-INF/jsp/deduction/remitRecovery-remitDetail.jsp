@@ -219,16 +219,17 @@ function populateUser(){
 					firstsignatory=dom.get('firstsignatory').value;
 				}
 			var secondsignatory=''
+			/* comment by abhishek on 13042021 
 			if(dom.get('secondsignatory') == null || dom.get('secondsignatory').value == '-1')
 		   {
 		   document.getElementById('lblError').innerHTML='Please Select Second Signatory';
 		   return false;
 		   }
 			else
-			{
+			{ */
 				secondsignatory=dom.get('secondsignatory').value;
 				
-			}
+			//}
 		   
 		   
 		   
@@ -275,16 +276,17 @@ function onSubmit()
 				firstsignatory=dom.get('firstsignatory').value;
 			}
 		var secondsignatory=''
+		/* comment by abhishek on 13042021
 		if(dom.get('secondsignatory') == null || dom.get('secondsignatory').value == '-1')
 		{
 			document.getElementById('lblError').innerHTML='Please Select Second Signatory';
 			return false;
 		}
 		else
-		{
+		{ */
 			secondsignatory=dom.get('secondsignatory').value;
 			
-		}
+		//}
 	   //end validation of Signatory and get selected value 
 		
 		 var myform = jQuery('#remittanceForm');
@@ -477,8 +479,7 @@ else{
 																	list="#{'Commissioner':'Commissioner' ,'Additional Commissioner':'Additional Commissioner' ,'Deputy Commissioner':'Deputy Commissioner','Executive Officer':'Executive Officer'}"
 																			id="firstsignatory" />
 																	</td>
-																	<td class="bluebox" width="15%">Second Signatory<span
-																		class="mandatory1">*</span></td>
+																	<td class="bluebox" width="15%">Second Signatory</td>
 																	<td class="bluebox" colspan="4"><s:select name="secondsignatory"
 																	headerKey="-1" headerValue="Select Second Signatory"
 																	list="#{'Commissioner':'Commissioner' ,'Additional Commissioner':'Additional Commissioner' ,'Deputy Commissioner':'Deputy Commissioner','Executive Officer':'Executive Officer','Accounts Officer':'Accounts Officer'}"

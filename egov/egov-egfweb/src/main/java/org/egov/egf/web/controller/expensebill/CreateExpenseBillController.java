@@ -157,7 +157,7 @@ public class CreateExpenseBillController extends BaseBillController {
     public String showNewForm(@ModelAttribute("egBillregister") final EgBillregister egBillregister, final Model model,HttpServletRequest request) {
         LOGGER.info("New expensebill creation request created");
         Cookie[] cookies = request.getCookies();
-       List<String>  validActions = Arrays.asList("Forward","SaveAsDraft");
+       List<String>  validActions = Arrays.asList("Forward","SaveAsDraft","Create And Approve");
     	
     	if(null!=cookies && cookies.length>0)
     	{

@@ -380,6 +380,12 @@ public class UpdateExpenseBillController extends BaseBillController {
         		approverName =populateEmpName();
         		
         	}
+            else if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONREJECT))
+        	{
+        		
+        		approverName =getEmployeeName(approvalPosition);
+        		
+        	}
             model.addAttribute(BILL_TYPES, BillType.values());
             final String approverDetails = financialUtils.getApproverDetails(workFlowAction,
                     updatedEgBillregister.getState(), updatedEgBillregister.getId(), approvalPosition, approverName);

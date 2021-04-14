@@ -153,8 +153,7 @@
 			headerValue="Select First Signatory" value="%{firstsignatory}"
 			list="#{'Commissioner':'Commissioner' ,'Additional Commissioner':'Additional Commissioner' ,'Deputy Commissioner':'Deputy Commissioner','Executive Officer':'Executive Officer'}"
 			id="firstsignatory" /></td>
-	<td class="greybox"><s:text name="payment.secondsignatory" /><span
-		class="greybox"><span class="mandatory1">*</span></span></td>
+	<td class="greybox"><s:text name="payment.secondsignatory" /></td>
 	<td class="greybox"><s:select name="secondsignatory" headerKey="-1"
 			headerValue="Select Second Signatory"
 			list="#{'Commissioner':'Commissioner' ,'Additional Commissioner':'Additional Commissioner' ,'Deputy Commissioner':'Deputy Commissioner','Executive Officer':'Executive Officer','Accounts Officer':'Accounts Officer'}"

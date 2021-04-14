@@ -330,8 +330,7 @@
 																	list="#{'Commissioner':'Commissioner' ,'Additional Commissioner':'Additional Commissioner' ,'Deputy Commissioner':'Deputy Commissioner','Executive Officer':'Executive Officer'}"
 																			id="firstsignatory" />
 																	</td>
-																	<td class="bluebox" width="15%"><s:text name="payment.secondsignatory" /><span
-																		class="mandatory1">*</span></td>
+																	<td class="bluebox" width="15%"><s:text name="payment.secondsignatory" /></td>
 																	<td class="bluebox" colspan="4"><s:select name="secondsignatory"
 																	headerKey="-1" headerValue="Select Second Signatory"
 																	list="#{'Commissioner':'Commissioner' ,'Additional Commissioner':'Additional Commissioner' ,'Deputy Commissioner':'Deputy Commissioner','Executive Officer':'Executive Officer','Accounts Officer':'Accounts Officer'}"
@@ -723,6 +722,7 @@
 					firstsignatory=dom.get('firstsignatory').value;
 				}
 			var secondsignatory=''
+			/* comment by abhishek on 13042021 
 			if(dom.get('secondsignatory') == null || dom.get('secondsignatory').value == '-1')
 			{
 				bootbox.alert("Please select Second Signatory");
@@ -730,9 +730,9 @@
 				return false;
 			}
 			else
-			{
+			{ */
 				secondsignatory=dom.get('secondsignatory').value;
-			}
+			//}
 			var backlogEntry='';
 			if(dom.get('backlogEntry') == null || dom.get('backlogEntry').value == '-1')
 			{

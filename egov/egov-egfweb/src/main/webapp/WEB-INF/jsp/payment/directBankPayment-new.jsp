@@ -455,6 +455,7 @@ function onSubmit()
 		{
 			firstsignatory=document.getElementById('firstsignatory').value;
 		}
+	/* comment by abhishek on 12042021 
 	var secondsignatory=''
 	if(document.getElementById('secondsignatory') == null || document.getElementById('secondsignatory').value == '-1')
 	{
@@ -463,9 +464,9 @@ function onSubmit()
 		return false;
 	}
 	else
-	{
+	{ */
 		secondsignatory=document.getElementById('secondsignatory').value;
-	}
+	//}
 	if(document.getElementById('backlogEntry') == null || document.getElementById('backlogEntry').value == '-1')
 	{
 		bootbox.alert("Please select whether it is backdated entry");

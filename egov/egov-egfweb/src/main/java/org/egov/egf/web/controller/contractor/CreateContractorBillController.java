@@ -201,7 +201,7 @@ public class CreateContractorBillController extends BaseBillController {
     	//added by Abhishek
     	LOGGER.info("New contractorbill creation request created");
         Cookie[] cookies = request.getCookies();
-       List<String>  validActions = Arrays.asList("Forward","SaveAsDraft");
+       List<String>  validActions = Arrays.asList("Forward","SaveAsDraft","Create And Approve");
     	
     	if(null!=cookies && cookies.length>0)
     	{
