@@ -509,14 +509,10 @@ public class ExpenseBillService {
                 		stateValue = wfmatrix.getNextState();
                 		//egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
                           //      FinancialConstants.CONTINGENCYBILL_PENDING_FINANCE));
-                		
                 	}
-                    
                 }
-		if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
-            	{
+		if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT)){
                 	stateValue = FinancialConstants.BUTTONSAVEASDRAFT;
-            		
             	}
                 egBillregister.transition().start().withSenderName(user.getUsername() + "::" + user.getName())
                         .withComments(approvalComent)
@@ -581,19 +577,23 @@ public class ExpenseBillService {
 				
 				if (FinancialConstants.BUTTONREJECT.equalsIgnoreCase(workFlowAction)) {
 					int size=egBillregister.getStateHistory().size();//added abhishek on 12042021
-					if(size>0)
+					if(size>1)
 					{
-						List history=egBillregister.getStateHistory();
-						Long owenrPos1=(long) history.indexOf(size);
+						Long owenrPos1=(long) egBillregister.getState().getPreviousOwner();
+						if(owenrPos1==90)
+							owenrPos1=315l;
+						else
+							owenrPos1=(long) egBillregister.getState().getPreviousOwner();
+						System.out.println("E owner position "+owenrPos1);
 						owenrPos.setId(owenrPos1);
 					}
 					else
-						owenrPos.setId(egBillregister.getCreatedBy());
+						owenrPos.setId(egBillregister.getState().getCreatedBy());
 		            stateValue = FinancialConstants.WORKFLOW_STATE_REJECTED;
 		            egBillregister.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
                     .withComments(approvalComent)
                     .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
-                    .withNextAction(wfmatrix.getNextAction())
+                    .withNextAction("")
                     .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME);
 		        
 		        }

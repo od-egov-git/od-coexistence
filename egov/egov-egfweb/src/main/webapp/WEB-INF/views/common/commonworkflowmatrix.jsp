@@ -122,7 +122,7 @@
 					</div>
 					</c:if>
 					<div class="show-row form-group">
-						<label class="col-sm-3 control-label text-right"><spring:message code="lbl.comments"/></label>
+						<label class="col-sm-3 control-label text-right"><spring:message code="lbl.comments"/><span class="mandatory"></span></label>
 						<div class="col-sm-8 add-margin">
 							<form:textarea class="form-control" path="approvalComent"  id="approvalComent" name="approvalComent" />
 						</div>

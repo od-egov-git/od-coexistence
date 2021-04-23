@@ -807,6 +807,13 @@
         <put-attribute name="body" value="/WEB-INF/views/supplierbill/supplierbill-update.jsp"/>
     </definition>
     
+    <!-- added by abhishek on 18042021 -->
+    <definition name="supplierbill-update-Workflow" extends="base_layout">
+        <put-attribute name="page-title" value="title.supplierbill.create" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/supplierbill/supplierbill-update-Workflow.jsp"/>
+    </definition>
+    <!-- end -->
+    
     <definition name="contractorbill-form" extends="base_layout">
         <put-attribute name="page-title" value="title.contractorbill.create" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/contractorbill/contractorbill-form.jsp"/>
@@ -826,6 +833,13 @@
         <put-attribute name="page-title" value="title.contractorbill.create" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/contractorbill/contractorbill-update.jsp"/>
     </definition>
+    
+    <!-- added by abhishek on 18042021 -->
+    <definition name="contractorbill-update-Workflow" extends="base_layout">
+        <put-attribute name="page-title" value="title.contractorbill.create" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/contractorbill/contractorbill-update-Workflow.jsp"/>
+    </definition>
+    <!-- end -->
     
      <definition name="coareport" extends="base_layout">
         <put-attribute name="page-title" value="title.coa.report" cascade="true"/>

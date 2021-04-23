@@ -76,6 +76,7 @@ import org.egov.commons.Accountdetailtype;
 import org.egov.commons.CChartOfAccountDetail;
 import org.egov.commons.service.AccountdetailtypeService;
 import org.egov.commons.service.ChartOfAccountsService;
+import org.egov.egf.autonumber.ExpenseBillNumberGenerator;
 import org.egov.egf.budget.model.BudgetControlType;
 import org.egov.egf.budget.service.BudgetControlTypeService;
 import org.egov.egf.contractorbill.service.ContractorBillService;
@@ -89,6 +90,7 @@ import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.filestore.service.FileStoreService;
 import org.egov.infra.microservice.models.EmployeeInfo;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
+import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
 import org.egov.infra.validation.exception.ValidationException;
 import org.egov.model.bills.BillType;
 import org.egov.model.bills.DocumentUpload;
@@ -183,6 +185,9 @@ public class CreateContractorBillController extends BaseBillController {
     @Autowired
     private MicroserviceUtils microserviceUtils;//added abhishek on 05042021
     
+    @Autowired
+	private AutonumberServiceBeanResolver beanResolver;
+    
     public CreateContractorBillController(final AppConfigValueService appConfigValuesService) {
         super(appConfigValuesService);
     }
@@ -190,7 +195,7 @@ public class CreateContractorBillController extends BaseBillController {
     @Override
     protected void setDropDownValues(final Model model) {
         super.setDropDownValues(model);
-        model.addAttribute(BILL_TYPES, BillType.values());
+        //model.addAttribute(BILL_TYPES, BillType.get);
         model.addAttribute(CONTRACTORS, contractorService.getAllActiveContractors());
         model.addAttribute(NET_PAYABLE_CODES, chartOfAccountsService.getContractorNetPayableAccountCodes());
     }
@@ -201,7 +206,7 @@ public class CreateContractorBillController extends BaseBillController {
     	//added by Abhishek
     	LOGGER.info("New contractorbill creation request created");
         Cookie[] cookies = request.getCookies();
-       List<String>  validActions = Arrays.asList("Forward","SaveAsDraft","Create And Approve");
+       List<String>  validActions = Arrays.asList("Forward","SaveAsDraft","CreateAndApprove");
     	
     	if(null!=cookies && cookies.length>0)
     	{
@@ -212,7 +217,7 @@ public class CreateContractorBillController extends BaseBillController {
     	}
     	//end
         setDropDownValues(model);
-        model.addAttribute("billNumberGenerationAuto", contractorBillService.isBillNumberGenerationAuto());
+        //model.addAttribute("billNumberGenerationAuto", contractorBillService.isBillNumberGenerationAuto());
         model.addAttribute(STATE_TYPE, egBillregister.getClass().getSimpleName());
         prepareWorkflow(model, egBillregister, new WorkflowContainer());
         prepareValidActionListByCutOffDate(model);
@@ -229,6 +234,11 @@ public class CreateContractorBillController extends BaseBillController {
             throws IOException {
 
         egBillregister.setCreatedBy(ApplicationThreadLocals.getUserId());
+        ExpenseBillNumberGenerator v = beanResolver.getAutoNumberServiceFor(ExpenseBillNumberGenerator.class);
+
+		final String billNumber = v.getNextNumber(egBillregister);
+		egBillregister.setBillnumber(billNumber);
+		
         if (StringUtils.isBlank(egBillregister.getExpendituretype()))
             egBillregister.setExpendituretype(FinancialConstants.STANDARD_EXPENDITURETYPE_WORKS);
         String[] contentType = ((MultiPartRequestWrapper) request).getContentTypes(FILE);

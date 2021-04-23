@@ -118,7 +118,7 @@ $('.btn-wf-primary').click(function(){
 		}else
 			return false;
 		
-	}else if (button != null && (button == 'Create And Approve')) {
+	}else if (button != null && (button == 'CreateAndApprove')) {
 		$('#approvalDepartment').removeAttr('required');
 		$('#approvalDesignation').removeAttr('required');
 		$('#approvalPosition').removeAttr('required');
@@ -411,6 +411,7 @@ function validateWorkFlowApprover(name) {
 		$('#approvalDesignation').attr('required', 'required');
 		$('#approvalPosition').attr('required', 'required');
 		$('#approvalComent').removeAttr('required');
+		$('#narration').attr('required', 'required');
 	}
 	 if (button != null && button == 'SaveAsDraft') {//added by Abhishek on 05042021
 	        
@@ -428,7 +429,7 @@ function validateWorkFlowApprover(name) {
 	if (button != null && button == 'Approve') {
 		$('#approvalComent').removeAttr('required');
 	}
-	if (button != null && button == 'Create And Approve') {
+	if (button != null && button == 'CreateAndApprove') {
 		return true;//validateCutOff();
 	}else
 		return true;

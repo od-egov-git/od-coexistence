@@ -80,6 +80,7 @@ public interface FinancialConstants {
 	// Standard Bill Types or Expernditure type
 
 	public static final String STANDARD_EXPENDITURETYPE_CONTINGENT = "Expense";
+	public static final String STANDARD_EXPENDITURETYPE_CONTINGENT_CS = "ContractorSupplier";
 	public static final String STANDARD_EXPENDITURETYPE_WORKS = "Works";
 	public static final String STANDARD_EXPENDITURETYPE_PURCHASE = "Purchase";
 	public static final String STANDARD_EXPENDITURETYPE_SALARY = "Salary";
@@ -111,11 +112,12 @@ public interface FinancialConstants {
 	public static final String SUPPLIERBILL_PAID_STATUS = "Paid";
 	public static final String SUPPLIERBILL_REJECTED_STATUS = "Rejected";
 	// Status for Contrator Bills
-	public static final String CONTRACTORBILL_CREATED_STATUS = "CREATED";
+	public static final String CONTRACTORBILL_CREATED_STATUS = "Created";
 	public static final String CONTRACTORBILL_CANCELLED_STATUS = "Cancelled";
 	public static final String CONTRACTORBILL_APPROVED_STATUS = "APPROVED";
 	public static final String CONTRACTORBILL_PASSED_STATUS = "Passed";
 	public static final String CONTRACTORBILL_PAID_STATUS = "Paid";
+	public static final String CONTRACTORBILL_REJECTED_STATUS = "Rejected";
 
 	// Status for Pension Bills
 	public static final String PENSIONBILL_CANCELLED_STATUS = "Cancelled";
@@ -370,7 +372,7 @@ public interface FinancialConstants {
 	public static final String WF_STATE_EOA_Approval_Pending = "EOA Approval Pending";
 	public static final String WF_STATE_COMM_Approval_Pending = "Commissioner Approval Pending";
 
-	public static final String CREATEANDAPPROVE = "Create And Approve";
+	public static final String CREATEANDAPPROVE = "CreateAndApprove";
 	public static final String BUDGET_CHECK_ERROR_MESSAGE = "Budgetary check is failed";
 
 	public static final String BUDGET = "BUDGET";

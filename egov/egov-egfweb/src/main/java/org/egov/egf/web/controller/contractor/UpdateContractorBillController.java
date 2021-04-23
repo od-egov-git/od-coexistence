@@ -50,6 +50,7 @@ package org.egov.egf.web.controller.contractor;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -72,8 +73,10 @@ import org.egov.egf.utils.FinancialUtils;
 import org.egov.egf.web.controller.expensebill.BaseBillController;
 import org.egov.eis.web.contract.WorkflowContainer;
 import org.egov.infra.admin.master.service.AppConfigValueService;
+import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.exception.ApplicationException;
 import org.egov.infra.microservice.models.Department;
+import org.egov.infra.microservice.models.EmployeeInfo;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.validation.exception.ValidationException;
 import org.egov.infstr.models.EgChecklists;
@@ -129,6 +132,8 @@ public class UpdateContractorBillController extends BaseBillController {
     private static final String APPROVAL_POSITION = "approvalPosition";
 
     private static final String CONTRACTORBILL_VIEW = "contractorbill-view";
+    
+    private static final String CONTRACTORBILL_UPDATE_WORKFLOW = "contractorbill-update-Workflow";//added by abhishek on 17042021
 
     private static final String NET_PAYABLE_ID = "netPayableId";
     @Autowired
@@ -178,6 +183,7 @@ public class UpdateContractorBillController extends BaseBillController {
         final List<DocumentUpload> documents = documentUploadRepository.findByObjectId(Long.valueOf(billId));
         egBillregister.setDocumentDetail(documents);
         List<Map<String, Object>> budgetDetails = null;
+        List<String>  validActions = Arrays.asList("Forward","SaveAsDraft");
         setDropDownValues(model);
         model.addAttribute(STATE_TYPE, egBillregister.getClass().getSimpleName());
         if (egBillregister.getState() != null)
@@ -199,7 +205,8 @@ public class UpdateContractorBillController extends BaseBillController {
                 model.addAttribute(NET_PAYABLE_ID, details.getChartOfAccounts().getId());
                 model.addAttribute(NET_PAYABLE_AMOUNT, details.getCreditamount());
             }
-
+        prepareCheckListForEdit(egBillregister, model);
+        
         String department = this.getDepartmentName(egBillregister.getEgBillregistermis().getDepartmentcode());
 
         if (department != null)
@@ -223,17 +230,40 @@ public class UpdateContractorBillController extends BaseBillController {
                 (FinancialConstants.WORKFLOW_STATE_REJECTED.equals(egBillregister.getState().getValue()) ||
                         financialUtils.isBillEditable(egBillregister.getState()))) {
             model.addAttribute("mode", "edit");
+            return CONTRACTORBILL_UPDATE_WORKFLOW;
+        }
+        else if (egBillregister.getState() != null
+                && (FinancialConstants.BUTTONSAVEASDRAFT.equals(egBillregister.getState().getValue()) )) {
+            model.addAttribute("mode", "edit");
+            model.addAttribute("validActionList", validActions);
             return "contractorbill-update";
-        } else {
-            model.addAttribute("mode", "view");
+        }
+        else {
+            //model.addAttribute("mode", "view"); //comment by abhishek on 17042021
+        	model.addAttribute("mode", "edit");
             if (egBillregister.getEgBillregistermis().getBudgetaryAppnumber() != null &&
                     !egBillregister.getEgBillregistermis().getBudgetaryAppnumber().isEmpty()) {
                 budgetDetails = contractorBillService.getBudgetDetailsForBill(egBillregister);
             }
             model.addAttribute("budgetDetails", budgetDetails);
-            return CONTRACTORBILL_VIEW;
+            //return CONTRACTORBILL_VIEW;
+            return CONTRACTORBILL_UPDATE_WORKFLOW;
         }
 
+    }
+    
+    private void prepareCheckListForEdit(final EgBillregister egBillregister, final Model model) {
+        final List<EgChecklists> checkLists = checkListService.getByObjectId(egBillregister.getId());
+        egBillregister.getCheckLists().addAll(checkLists);
+        final StringBuilder selectedCheckList = new StringBuilder();
+        for (final EgChecklists checkList : egBillregister.getCheckLists()) {
+            selectedCheckList.append(checkList.getAppconfigvalue().getId());
+            selectedCheckList.append("-");
+            selectedCheckList.append(checkList.getChecklistvalue());
+            selectedCheckList.append(",");
+        }
+        if (!checkLists.isEmpty())
+            model.addAttribute("selectedCheckList", selectedCheckList.toString().substring(0, selectedCheckList.length() - 1));
     }
 
     private void populateSubLedgerDetails(final EgBillregister egBillregister, final BindingResult resultBinder) {
@@ -417,7 +447,20 @@ public class UpdateContractorBillController extends BaseBillController {
                 approvalPosition = contractorBillService.getApprovalPositionByMatrixDesignation(
                         egBillregister, null, mode, workFlowAction);
 
-            final String approverName = String.valueOf(request.getParameter(APPROVER_NAME));
+            //final String approverName = String.valueOf(request.getParameter(APPROVER_NAME));
+            String approverName = String.valueOf(request.getParameter("approverName"));
+            if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
+        	{
+        		
+        		approverName =populateEmpName();
+        		
+        	}
+            else if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONREJECT))
+        	{
+        		
+        		approverName =getEmployeeName(approvalPosition);
+        		
+        	}
             final String approverDetails = financialUtils.getApproverDetails(workFlowAction,
                     updatedEgBillregister.getState(), updatedEgBillregister.getId(), approvalPosition, approverName);
 
@@ -480,4 +523,23 @@ public class UpdateContractorBillController extends BaseBillController {
         return departmentName;
     }
 
+    private String populateEmpName() {
+    	Long empId = ApplicationThreadLocals.getUserId();
+    	String empName=null;
+    	Long pos=null;
+    	List<EmployeeInfo> employs = microServiceUtil.getEmployee(empId, null,null, null);
+    	if(null !=employs && employs.size()>0 )
+    	{
+    		//pos=employs.get(0).getAssignments().get(0).getPosition();
+    		empName=employs.get(0).getUser().getName();
+    		
+    	}
+		return empName;
+	}
+    
+    public String getEmployeeName(Long empId){
+        
+        return microServiceUtil.getEmployee(empId, null, null, null).get(0).getUser().getName();
+     }
+    
 }

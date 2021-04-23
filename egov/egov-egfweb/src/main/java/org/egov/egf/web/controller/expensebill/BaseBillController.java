@@ -116,10 +116,15 @@ public abstract class BaseBillController extends BaseVoucherController {
         model.addAttribute("subLedgerTypes", accountdetailtypeService.findAll());
         model.addAttribute("cFunctions", functionDAO.getAllActiveFunctions());
         isBillDateDefaultValue = expenseBillService.isDefaultAutoPopulateCurrDateEnable();
+        model.addAttribute("billTypes", getBillTypes());
     }
 
     public List<EgBillSubType> getBillSubTypes() {
         return egBillSubTypeService.getByExpenditureType(FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT);
+    }
+    
+    public List<EgBillSubType> getBillTypes() {
+        return egBillSubTypeService.getByExpenditureType(FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT_CS);
     }
 
     protected void validateBillNumber(final EgBillregister egBillregister, final BindingResult resultBinder) {

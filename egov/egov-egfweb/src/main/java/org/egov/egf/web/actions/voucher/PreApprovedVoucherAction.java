@@ -150,6 +150,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.ui.Model;
 
 import com.exilant.GLEngine.ChartOfAccounts;
 import com.exilant.eGov.src.transactions.VoucherTypeForULB;
@@ -160,6 +161,7 @@ import com.exilant.eGov.src.transactions.VoucherTypeForULB;
         @Result(name = "view", location = "preApprovedVoucher-view.jsp"),
         @Result(name = PreApprovedVoucherAction.VOUCHEREDIT, location = "preApprovedVoucher-voucheredit.jsp"),
         @Result(name = "billview", location = "preApprovedVoucher-billview.jsp"),
+        @Result(name = "billeditview", location = "preApprovedVoucher-billeditview.jsp"),
         @Result(name = "voucherview", location = "preApprovedVoucher-voucherview.jsp"),
         @Result(name = "message", location = "preApprovedVoucher-message.jsp") })
 @ParentPackage("egov")
@@ -253,6 +255,7 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
     private boolean showVoucherDate;
     private String mode = "";
     protected Long voucherId;
+    private String backdateentry;
     private EgBillregister billRegister;
     @Autowired
     private EgovMasterDataCaching masterDataCache;
@@ -263,7 +266,7 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
     private boolean finanicalYearAndClosedPeriodCheckIsClosed=false;
     SimpleDateFormat formatter1 = new SimpleDateFormat("yyyy-MM-dd");
     Date date;
-    
+    private String backlogEntry="N";
     @Autowired
     FinanceDashboardService finDashboardService;
     @Autowired
@@ -419,14 +422,18 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
         } else {
             try {
                 // loading the bill detail info.
+            	showVoucherDate = true;
                 getMasterDataForBill();
+                preApprovedVoucher.setVoucherDate(new Date());
+                //voucherDateId.
             } catch (final Exception e) {
                 final List<ValidationError> errors = new ArrayList<ValidationError>();
                 errors.add(new ValidationError("exp", e.getMessage()));
                 throw new ValidationException(errors);
             }
             action = "save";
-            return "billview";
+            //return "billview";
+            return "billeditview";
         }
 
     }
@@ -808,10 +815,12 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
         try {
             if (LOGGER.isDebugEnabled())
                 LOGGER.debug("bill id=======" + parameters.get(BILLID)[0]);
+            LOGGER.info("Backlog entry :::"+backlogEntry);
             methodName = "save";
             String voucherDate = formatter1.format(voucherHeader.getVoucherDate());
             String cutOffDate1 = null;
             egBillregister = billsService.getBillRegisterById(Integer.valueOf(parameters.get(BILLID)[0]));
+            voucherHeader.setBackdateentry(backlogEntry);
             validateBillVoucherDate(egBillregister, voucherHeader);
             getMasterDataForBill();
             populateWorkflowBean();
@@ -1879,6 +1888,22 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
 
 	public void setPEXNUMBER(String pEXNUMBER) {
 		PEXNUMBER = pEXNUMBER;
+	}
+
+	public String getBackdateentry() {
+		return backdateentry;
+	}
+
+	public void setBackdateentry(String backdateentry) {
+		this.backdateentry = backdateentry;
+	}
+
+	public String getBacklogEntry() {
+		return backlogEntry;
+	}
+
+	public void setBacklogEntry(String backlogEntry) {
+		this.backlogEntry = backlogEntry;
 	}
 
 	public String getINSTRUMENTAMOUNT() {

@@ -205,9 +205,7 @@ public class UpdateExpenseBillController extends BaseBillController {
                 financialUtils.getHistory(egBillregister.getState(), egBillregister.getStateHistory()));
         List<String>  validActions = Arrays.asList("Forward","SaveAsDraft");
             prepareWorkflow(model, egBillregister, new WorkflowContainer());
-       
-
-        egBillregister.getBillDetails().addAll(egBillregister.getEgBilldetailes());
+              egBillregister.getBillDetails().addAll(egBillregister.getEgBilldetailes());
         prepareBillDetailsForView(egBillregister);
         expenseBillService.validateSubledgeDetails(egBillregister);
         final List<CChartOfAccounts> expensePayableAccountList = chartOfAccountsService
@@ -232,7 +230,8 @@ public class UpdateExpenseBillController extends BaseBillController {
                 && (FinancialConstants.WORKFLOW_STATE_REJECTED.equals(egBillregister.getState().getValue())
                         || financialUtils.isBillEditable(egBillregister.getState()))) {
             model.addAttribute("mode", "edit");
-            return "expensebill-update";
+            //return "expensebill-update"; comment by abhishek on 17042021
+            return EXPENSEBILL_UPDATE_WORKFLOW;
         } 
         else if (egBillregister.getState() != null
                 && (FinancialConstants.BUTTONSAVEASDRAFT.equals(egBillregister.getState().getValue()) )) {
@@ -312,13 +311,14 @@ public class UpdateExpenseBillController extends BaseBillController {
             validateBillNumber(egBillregister, resultBinder);
             validateLedgerAndSubledger(egBillregister, resultBinder);
         }
-        
+        else{
         if(!egBillregister.getBillPayeedetails().isEmpty())
     	{
         populateBillDetails(egBillregister);
         validateBillNumber(egBillregister, resultBinder);
         validateLedgerAndSubledger(egBillregister, resultBinder);
     	}
+        }
         if (resultBinder.hasErrors()) {
             setDropDownValues(model);
             model.addAttribute("stateType", egBillregister.getClass().getSimpleName());

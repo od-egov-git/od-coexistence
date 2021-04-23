@@ -58,12 +58,10 @@
 	<div class="form-group">
 		<c:choose>
 			<c:when test="${!billNumberGenerationAuto}">
-				<label class="col-sm-3 control-label text-right"><spring:message code="lbl.billnumber" text="Bill Number"/><span class="mandatory"></span>
-					<span class="mandatory"></span>
+				<label class="col-sm-3 control-label text-right"><spring:message code="lbl.billnumber" text="Bill Number"/>
 				</label>
 				<div class="col-sm-3 add-margin">
-					<form:input class="form-control patternvalidation" data-pattern="alphanumericwithspecialcharacters" id="billnumber" path="billnumber" maxlength="50" required="required" />
-					<form:errors path="billnumber" cssClass="add-margin error-msg" />
+					<form:input class="form-control patternvalidation" data-pattern="alphanumericwithspecialcharacters" id="billnumber" path="billnumber" maxlength="50" readonly="true" />
 				</div>
 				
 				<label class="col-sm-2 control-label text-right"><spring:message code="lbl.billdate" text="Bill Date"/><span class="mandatory"></span>
@@ -170,7 +168,7 @@
 		</div>
 				
 		<label class="col-sm-2 control-label text-right"><spring:message code="lbl.narration" text="Narration"/>
-		</label>
+		<span class="mandatory"></span></label>
 		<div class="col-sm-3 add-margin">
 			<form:textarea path="egBillregistermis.narration" id="narration" class="form-control" maxlength="1024" ></form:textarea>
 			<form:errors path="egBillregistermis.narration" cssClass="add-margin error-msg" />
@@ -208,9 +206,10 @@
 		<div class="col-sm-3 add-margin">
 			<form:select path="billtype" data-first-option="false" id="billtype" class="form-control" required="required"  >
 				<form:option value=""><spring:message code="lbl.select" text="Select"/></form:option>
-					<c:forEach items="${billTypes}" var="billType">
+					<%-- <c:forEach items="${billTypes}" var="billType">
 						<form:option value="${billType}"> ${billType} </form:option>
-					</c:forEach>
+					</c:forEach> --%>
+					<form:options items="${billTypes}" itemValue="id" itemLabel="name" />
 			</form:select>
 			<form:errors path="billtype" cssClass="add-margin error-msg" />
 		</div>

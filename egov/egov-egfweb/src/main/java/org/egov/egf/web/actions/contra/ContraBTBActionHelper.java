@@ -579,7 +579,7 @@ public class ContraBTBActionHelper {
 			{*/
 			detailMap = new HashMap<String, Object>();
 			 LOGGER.info("Subledder Details getToBankAccountID==> " + contraVoucher.getToBankAccountId().getId());
-			final Bankaccount ba = getBankaccount(contraVoucher.getToBankAccountId().getId());
+			/*final Bankaccount ba = getBankaccount(contraVoucher.getToBankAccountId().getId());
 			   OtherParty otherparty = new OtherParty();
 	           otherparty.setCode(ba.getAccountnumber());
 	           otherparty.setName(ba.getAccountnumber());
@@ -602,7 +602,7 @@ public class ContraBTBActionHelper {
             for (final HashMap<String, Object> subdetailDetailMap : subledgerDetails) {
             	LOGGER.info("Subledger Details DETAILTYPEID==> " +	subdetailDetailMap.get(VoucherConstant.DETAILTYPEID).toString());
             }
-            
+            */
 			voucher = createVoucher.createVoucher(headerDetails, accountdetails, subledgerDetails);
 
 		} catch (final HibernateException e) {

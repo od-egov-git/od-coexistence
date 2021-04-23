@@ -413,7 +413,7 @@ public class SupplierBillService {
         if (null != egBillregister.getId())
             // wfInitiator = assignmentService.getPrimaryAssignmentForUser(egBillregister.getCreatedBy());
             wfInitiator = this.getCurrentUserAssignmet(egBillregister.getCreatedBy());
-        if (FinancialConstants.BUTTONREJECT.equalsIgnoreCase(workFlowAction)) {
+       /* if (FinancialConstants.BUTTONREJECT.equalsIgnoreCase(workFlowAction)) {
             stateValue = FinancialConstants.WORKFLOW_STATE_REJECTED;
             egBillregister.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
                     .withComments(approvalComent)
@@ -421,7 +421,7 @@ public class SupplierBillService {
                     .withOwner(wfInitiator.getPosition()).withOwnerName((wfInitiator.getPosition().getId() != null && wfInitiator.getPosition().getId() > 0L) ? getEmployeeName(wfInitiator.getPosition().getId()):"")
                     .withNextAction("")
                     .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_SBILL_DISPLAYNAME);
-        } else {
+        } else {*/
             // if (null != approvalPosition && approvalPosition != -1 && !approvalPosition.equals(Long.valueOf(0)))
             // wfInitiator = assignmentService.getAssignmentsForPosition(approvalPosition).get(0);
             WorkFlowMatrix wfmatrix;
@@ -499,14 +499,38 @@ public class SupplierBillService {
                 	stateValue = FinancialConstants.BUTTONSAVEASDRAFT;
             		
             	}
-                
+                if (FinancialConstants.BUTTONREJECT.equalsIgnoreCase(workFlowAction)) {
+					int size=egBillregister.getStateHistory().size();//added abhishek on 12042021
+					if(size>1)
+					{
+						Long owenrPos1=(long) egBillregister.getState().getPreviousOwner();
+						if(owenrPos1==90)
+							owenrPos1=315l;
+						else
+							owenrPos1=(long) egBillregister.getState().getPreviousOwner();
+						System.out.println("S owner position "+owenrPos1);
+						owenrPos.setId(owenrPos1);
+					}
+					else
+						owenrPos.setId(egBillregister.getState().getCreatedBy());
+		            stateValue = FinancialConstants.WORKFLOW_STATE_REJECTED;
+		            egBillregister.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
+                    .withComments(approvalComent)
+                    .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
+                    .withNextAction("")
+                    .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_SBILL_DISPLAYNAME);
+		        
+		        }
+				else
+				{
                 egBillregister.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
                         .withComments(approvalComent)
                         .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
                         .withNextAction(wfmatrix.getNextAction())
                         .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_SBILL_DISPLAYNAME);
-            }
-        }
+				}
+			}
+        //}
         if (LOG.isDebugEnabled())
             LOG.debug(" WorkFlow Transition Completed  ...");
     }

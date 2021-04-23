@@ -82,24 +82,24 @@
 	border-radius: 5px;
 }
 </style>
-<form:form name="contractorBillForm" role="form"
+<form:form name="supplierBillForm" role="form"
 	modelAttribute="egBillregister" id="egBillregister"
 	class="form-horizontal form-groups-bordered"
 	enctype="multipart/form-data">
 	<div class="position_alert">
 		<spring:message code="lbl.netpayable.amount" text="Net Payable Amount"/>
-		: &#8377 <span id="contractorNetPayableAmount"><c:out
-				value="${contractorNetPayableAmount}" default="0.0"></c:out></span>
+		: &#8377 <span id="supplierNetPayableAmount"><c:out
+				value="${supplierNetPayableAmount}" default="0.0"></c:out></span>
 	</div>
 	<div class="position_alert1">
 		<spring:message code="lbl.total.debit.amount" text="Total Debit Amount"/>
-		: &#8377 <span id="contractorBillTotalDebitAmount"> <c:out
-				value="${contractorBillTotalDebitAmount}" default="0.0"></c:out></span>
+		: &#8377 <span id="supplierBillTotalDebitAmount"> <c:out
+				value="${supplierBillTotalDebitAmount}" default="0.0"></c:out></span>
 	</div>
 	<div class="position_alert2">
 		<spring:message code="lbl.total.deduction.amount" text="Total Deduction Amount"/>
-		: &#8377 <span id="contractorBillTotalCreditAmount"> <c:out
-				value="${contractorBillTotalCreditAmount}" default="0.0"></c:out></span>
+		: &#8377 <span id="supplierBillTotalCreditAmount"> <c:out
+				value="${supplierBillTotalCreditAmount}" default="0.0"></c:out></span>
 	</div>
 
 	<form:hidden path="" id="selectedCheckList" value="${selectedCheckList}" />
@@ -108,6 +108,7 @@
 	<form:hidden path="" name="netPayableId" id="netPayableId" value="${netPayableId}" />
 	<form:hidden path="" name="netPayableAmount" id="netPayableAmount" value="${netPayableAmount}" />
 	<form:hidden path="passedamount" name="passedamount" id="passedamount" value="${egBillregister.passedamount}"/>
+	
 	<div class="panel-title text-center" style="color: green;">
 		<c:out value="${message}" />
 		<br />
@@ -119,30 +120,29 @@
 			<br />
 		</div>
 	</spring:hasBindErrors>
-	<div class="tab-content">
-		<div class="tab-pane fade in active" id="contractorbillheader">
-		<jsp:include page="contractorbill-header.jsp" />
+
+		<jsp:include page="supplierbill-header.jsp" />
 		<div class="panel panel-primary" data-collapsed="0">
-			<jsp:include page="contractorbill-debitdetails.jsp" />
-			<jsp:include page="contractorbill-creditdetails.jsp" />
-			<jsp:include page="contractorbill-netpayable.jsp" />
+			<jsp:include page="supplierbill-debitdetails.jsp" />
+			<jsp:include page="supplierbill-creditdetails.jsp" />
+			<jsp:include page="supplierbill-netpayable.jsp" />
 		</div>
-         <c:if test="${egBillregister.documentDetail != null &&  !egBillregister.documentDetail.isEmpty()}">
+		<jsp:include page="billdocument-upload.jsp"/>
+         <%-- <c:if test="${egBillregister.documentDetail != null &&  !egBillregister.documentDetail.isEmpty()}">
              <jsp:include page="billdocument-upload.jsp"/>
-         </c:if>
-         
+         </c:if> --%>
+         <jsp:include page="../common/commonworkflowhistory-view.jsp"></jsp:include>
 		<jsp:include page="../common/commonworkflowmatrix-expensebill.jsp" />
 		<div class="buttonbottom" align="center">
 			<jsp:include page="../common/commonworkflowmatrix-button.jsp" />
 		</div>
 
 </form:form>
-<script
-        src="<cdn:url value='/resources/app/js/i18n/jquery.i18n.properties.js?rnd=${app_release_no}' context='/services/EGF'/>"></script>
+<script src="<cdn:url value='/resources/app/js/i18n/jquery.i18n.properties.js?rnd=${app_release_no}' context='/services/EGF'/>"></script>
 <script
 	src="<cdn:url value='/resources/app/js/common/helper.js?rnd=${app_release_no}'  context='/services/EGF'/>"></script>
 <script
-	src="<cdn:url value='/resources/app/js/contractorbill/contractorbill.js?rnd=${app_release_no}'  context='/services/EGF'/>"></script>
+	src="<cdn:url value='/resources/app/js/supplierbill/supplierbill.js?rnd=${app_release_no}'  context='/services/EGF'/>"></script>
 <script
 	src="<cdn:url value='/resources/app/js/common/voucherBillHelper.js?rnd=${app_release_no}'  context='/services/EGF'/>"></script>
 <script

@@ -127,10 +127,14 @@
 			<jsp:include page="contractorbill-creditdetails.jsp" />
 			<jsp:include page="contractorbill-netpayable.jsp" />
 		</div>
-         <c:if test="${egBillregister.documentDetail != null &&  !egBillregister.documentDetail.isEmpty()}">
+         <%-- <c:if test="${egBillregister.documentDetail != null &&  !egBillregister.documentDetail.isEmpty()}">
              <jsp:include page="billdocument-upload.jsp"/>
-         </c:if>
-         
+         </c:if> --%>
+         <jsp:include page="billdocument-upload.jsp"/>
+         <%-- <div class="tab-pane fade" id="checklist">
+			<jsp:include page="expensebill-checklist.jsp" />
+		</div> --%>
+		<jsp:include page="../common/commonworkflowhistory-view.jsp"></jsp:include>
 		<jsp:include page="../common/commonworkflowmatrix-expensebill.jsp" />
 		<div class="buttonbottom" align="center">
 			<jsp:include page="../common/commonworkflowmatrix-button.jsp" />

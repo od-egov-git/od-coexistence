@@ -118,7 +118,7 @@ $('.btn-wf-primary').click(function(){
 		}else
 			return false;
 		
-	}else if (button != null && (button == 'Create And Approve')) {
+	}else if (button != null && (button == 'CreateAndApprove')) {
 		$('#approvalDepartment').removeAttr('required');
 		$('#approvalDesignation').removeAttr('required');
 		$('#approvalPosition').removeAttr('required');

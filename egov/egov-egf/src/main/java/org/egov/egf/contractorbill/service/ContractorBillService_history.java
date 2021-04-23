@@ -118,9 +118,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
-public class ContractorBillService {
+public class ContractorBillService_history {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ContractorBillService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ContractorBillService_history.class);
 
     private final ContractorBillRepository contractorBillRepository;
 
@@ -183,7 +183,7 @@ public class ContractorBillService {
     FinanceDashboardService finDashboardService;
 
     @Autowired
-    public ContractorBillService(final ContractorBillRepository contractorBillRepository,
+    public ContractorBillService_history(final ContractorBillRepository contractorBillRepository,
             final ScriptService scriptExecutionService) {
         this.contractorBillRepository = contractorBillRepository;
         this.scriptExecutionService = scriptExecutionService;
@@ -515,12 +515,7 @@ public class ContractorBillService {
 					int size=egBillregister.getStateHistory().size();//added abhishek on 12042021
 					if(size>1)
 					{
-						//Long owenrPos1=0l;
-						Long owenrPos1=(long)egBillregister.getState().getPreviousOwner();
-						if(owenrPos1==90)
-							owenrPos1=315l;
-						else
-							owenrPos1=(long) egBillregister.getState().getPreviousOwner();
+						Long owenrPos1=(long) egBillregister.getState().getPreviousOwner();
 						System.out.println("C owner position "+owenrPos1);
 						owenrPos.setId(owenrPos1);
 					}

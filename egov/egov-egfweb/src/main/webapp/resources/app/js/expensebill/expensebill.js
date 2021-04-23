@@ -198,7 +198,7 @@ $('.btn-wf-primary').click(function(){
 	            }
 	        
 	    
-	}else if (button != null && (button == 'Create And Approve')) {
+	}else if (button != null && (button == 'CreateAndApprove')) {
 		$('#approvalDepartment').removeAttr('required');
 		$('#approvalDesignation').removeAttr('required');
 		$('#approvalPosition').removeAttr('required');
@@ -1409,7 +1409,7 @@ function validateWorkFlowApprover(name) {
 	if (button != null && button == 'Verify') {
 		$('#approvalComent').removeAttr('required');
 	}
-	if (button != null && button == 'Create And Approve') {
+	if (button != null && button == 'CreateAndApprove') {
 		return true;//validateCutOff();
 	}else
 		return true;
