@@ -1678,18 +1678,6 @@ System.out.println(":::::::::::::"+accountDetail.getGlcodeIdDetail());
             return vmisHibernateDao.getRecentVoucherByServiceNameAndReferenceDoc(serviceName, referenceDocument);
         }
 	
-	    //Impplemented By Prasanta
-	 public Vouchermis getVouchermisByReceiptNumber(String recieptNumber) {
-		 System.out.println("Inside Service>>"+recieptNumber);
-		 Vouchermis vmis = new Vouchermis();
-		 try {
-		 vmis = vmisHibernateDao.getVouchermisByReceiptNumber(recieptNumber);
-		 }catch(NullPointerException e) {
-			 e.printStackTrace();
-		 }
-		 System.out.println(vmis.toString());
-		 return vmis;
-	 }
 	 
 	 public void updateSourcePathForGJV(CVoucherHeader voucherHeader)
      {
