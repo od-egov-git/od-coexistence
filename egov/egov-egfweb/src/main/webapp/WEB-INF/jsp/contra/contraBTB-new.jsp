@@ -135,8 +135,10 @@ function	onLoadTask_new()
 	//loadFromDepartment();
 	//loadToDepartment();
 	var 	button='<s:property value="button"/>';
-	var 	srcFund='<s:property value="contraBean.fromFundId"/>'
-	var 	desFund='<s:property value="contraBean.toFundId"/>'
+	var 	srcFund='<s:property value="contraBean.fromFundId"/>';
+	var 	desFund='<s:property value="contraBean.toFundId"/>';
+	
+	
 	if(srcFund!="" && desFund!="")
 	{
 		if(srcFund!=desFund)
@@ -149,24 +151,33 @@ function	onLoadTask_new()
 	
 	if(button!=null && button!="")
 	{
+	//alert(button);
 	
-	if(document.getElementById("Errors").innerHTML=='')  
+	if(document.getElementById("Errors").value === undefined)  
 	{
-	bootbox.alert('<s:text name="contra.transaction.succcess"/>');
+		
+	
 		
 	if(button=="Save_Close")
 	{
-	window.close();
+		bootbox.alert('<s:text name="contra.transaction.succcess"/>');
+		document.forms[0].button.value='';
+        document.forms[0].action = "${pageContext.request.contextPath}/contra/contraBTB-create.action";
+ 		document.forms[0].submit();
+	//window.close();
 	}
 	else if(button=="Save_View")
 	{
 			var vhId='<s:property value="vhId"/>';
-			document.forms[0].action = "${pageContext.request.contextPath}/voucher/preApprovedVoucher-loadvoucherview.action?vhid="+vhId;
-			document.forms[0].submit();
+			//document.forms[0].action = "${pageContext.request.contextPath}/voucher/preApprovedVoucher-loadvoucherview.action?vhid="+vhId;
+			//document.forms[0].submit();
+			//alert("::::::"+vhId);
 	}
 	else if(button=="Save_New")
-	{      	document.forms[0].button.value='';
-	        document.forms[0].action = "contraBTB-newform.action";
+	{   
+		bootbox.alert('<s:text name="contra.transaction.succcess"/>');
+		document.forms[0].button.value='';
+	        document.forms[0].action = "${pageContext.request.contextPath}/contra/contraBTB-create.action";
 	 		document.forms[0].submit();
 	}
 	}

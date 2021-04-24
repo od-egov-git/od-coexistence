@@ -535,7 +535,32 @@ public class ChartOfAccounts {
 			return false;
 		return true;
 	}
-
+	@Transactional
+	public boolean postTransaxtionssave(final Transaxtion txnList[], final String vDate,boolean check)
+			throws Exception, ValidationException {
+if(check) {
+		if (!checkBudget(txnList))
+			throw new TaskFailedException(FinancialConstants.BUDGET_CHECK_ERROR_MESSAGE);
+}
+		// if objects are lost load them
+		loadAccountData();
+		try {
+			if (!validPeriod(vDate))
+				throw new TaskFailedException(
+						"Voucher Date is not within an open period. Please use an open period for posting");
+			if(check) {
+			if (!validateTxns(txnList))
+				return false;
+			}
+		} catch (final Exception e) {
+			LOGGER.error(e.getMessage(), e);
+			throw new TaskFailedException(e.getMessage());
+		}
+		// entityManager.flush();
+		if (!postInGLNew(txnList,check))
+			return false;
+		return true;
+	}
 	private void checkfuctreqd(final String glcode, final String fuctid, final DataCollection dc) throws Exception {
 
 		final String sql = "select FUNCTIONREQD from chartofaccounts where glcode = ?";
@@ -879,6 +904,165 @@ public class ChartOfAccounts {
 		return true;
 	}
 
+	@Transactional
+	private boolean postInGLNew(final Transaxtion txnList[], boolean check) throws Exception {
+
+		CGeneralLedger gLedger = null;
+		CGeneralLedgerDetail gLedgerDet = null;
+		EgRemittanceGldtl egRemitGldtl = null;
+		// DataExtractor de=DataExtractor.getExtractor();
+
+		for (final Transaxtion element : txnList) {
+			final Transaxtion txn = element;
+			if (LOGGER.isInfoEnabled())
+				LOGGER.info("GL Code is :" + txn.getGlCode() + ":txn.getFunctionId()" + txn.getFunctionId()
+						+ "  Debit Amount :" + String.valueOf(txn.getDrAmount()) + " Credit Amt :"
+						+ String.valueOf(txn.getCrAmount()));
+			if ("0".equals(String.valueOf(txn.getDrAmount())) && "0".equals(String.valueOf(txn.getCrAmount())) && check) {
+				if (LOGGER.isInfoEnabled())
+					LOGGER.info("Comming in the zero  block");
+				return false;
+			} else {
+				gLedger = new CGeneralLedger();
+				final GLAccount glAcc = (GLAccount) getGlAccountCodes().get(txn.getGlCode());
+				if (txn.getVoucherLineId() != null)
+					gLedger.setVoucherlineId(Integer.parseInt(txn.getVoucherLineId()));
+				CChartOfAccounts cChartOfAccounts = (CChartOfAccounts) persistenceService
+						.find("from CChartOfAccounts where id=?", glAcc.getId());
+				gLedger.setGlcodeId(cChartOfAccounts);
+				gLedger.setGlcode(txn.getGlCode());
+				gLedger.setDebitAmount(Double.parseDouble(txn.getDrAmount()));
+				gLedger.setCreditAmount(Double.parseDouble(txn.getCrAmount()));
+				gLedger.setDescription(txn.getNarration());
+				CVoucherHeader cVoucherHeader = voucherService.findById(Long.valueOf(txn.getVoucherHeaderId()), false);
+				if(cVoucherHeader.getGeneralledger() == null){
+				    Set<CGeneralLedger> set = new HashSet<>();
+				    set.add(gLedger);
+				    cVoucherHeader.setGeneralLedger(set);
+				}else{
+				    cVoucherHeader.getGeneralLedger().add(gLedger);
+				}
+				gLedger.setVoucherHeaderId(cVoucherHeader);
+				gLedger.setEffectiveDate(new Date());
+				if (LOGGER.isInfoEnabled())
+					LOGGER.info("Value of function in COA before setting :" + txn.getFunctionId());
+				if (!(txn.getFunctionId() == null || txn.getFunctionId().trim().equals("")
+						|| txn.getFunctionId().equals("0"))) {
+					if (LOGGER.isInfoEnabled())
+						LOGGER.info("txn.getFunctionId()" + txn.getFunctionId());
+					gLedger.setFunctionId(Integer.parseInt(txn.getFunctionId()));
+				} else if (glAcc.getFunctionRequired() != null && glAcc.getFunctionRequired()) {
+					final List<ValidationError> errors = new ArrayList<ValidationError>();
+					errors.add(
+							new ValidationError("exp", "function is required for account code : " + txn.getGlCode()));
+					throw new ValidationException(errors);
+
+				} else
+					gLedger.setFunctionId(null);
+
+				try {
+					LOGGER.info("Start of testing GLCode");
+					// if(LOGGER.isInfoEnabled())
+					// LOGGER.info("inside the postin gl function before insert
+					// ----");
+					generalLedgerPersistenceService.persist(gLedger);
+					//populating the data related to non controlled remitted code
+					populateDataForNonControlledRemittedCode(gLedger);
+					LOGGER.info("end of remitted glcode");
+				} catch (final Exception e) {
+					e.printStackTrace();
+					LOGGER.error("error in the gl++++++++++" + e, e);
+					return false;
+				}
+				// if that code doesnot require any details no nedd to insert in
+				// GL details
+				if(glAcc != null && glAcc.getGLParameters() != null)
+				{
+					LOGGER.info("glAcc.getGLParameters().size() :::"+glAcc.getGLParameters().size());
+				}
+				if (glAcc.getGLParameters().size() <= 0)
+					continue;
+				final ArrayList glParamList = glAcc.getGLParameters();
+				final Set temp = new HashSet<>();
+				temp.addAll(glParamList);
+				glParamList.clear();
+				glParamList.addAll(temp);
+				final ArrayList txnPrm = txn.getTransaxtionParam();
+				String detKeyId = "";
+				String detKeyName = "";
+					LOGGER.info("glParamList size :" + glParamList.size());
+				for (int a = 0; a < glParamList.size(); a++)
+					try {
+						LOGGER.info("Start a :::"+a);
+						// post the defaults set for details
+						final GLParameter glPrm = (GLParameter) glParamList.get(a);
+
+						{ // Post the details sent apart from defaults
+							if(txnPrm == null)
+							{
+								continue;
+							}
+							for (int z = 0; z < txnPrm.size(); z++) {
+								final TransaxtionParameter tParam = (TransaxtionParameter) txnPrm.get(z);
+									LOGGER.info("tParam.getGlcodeId():" + tParam.getGlcodeId());
+									LOGGER.info("gLedger.getglCodeId():" + gLedger.getGlcodeId());
+								if (tParam.getDetailName().equalsIgnoreCase(glPrm.getDetailName())
+										&& tParam.getGlcodeId().equals(gLedger.getGlcodeId().getId().toString())) {
+									LOGGER.info("xxxxxx");
+									gLedgerDet = new CGeneralLedgerDetail();
+									detKeyName = tParam.getDetailName();
+									detKeyId = tParam.getDetailKey();
+									gLedgerDet.setGeneralLedgerId(gLedger);
+									Accountdetailtype acctype = (Accountdetailtype) persistenceService.getSession()
+											.load(Accountdetailtype.class, glPrm.getDetailId());
+									LOGGER.info("ccccccccc");
+									gLedgerDet.setDetailTypeId(acctype);
+									gLedgerDet.setDetailKeyId(Integer.parseInt(detKeyId));
+									gLedgerDet.setDetailKeyName(detKeyName);
+									gLedgerDet.setAmount(new BigDecimal(tParam.getDetailAmt()));
+									generalLedgerDetPersistenceService.persist(gLedgerDet);
+									try {
+										if (validRecoveryGlcode(String.valueOf(gLedger.getGlcodeId().getId()))
+												&& gLedger.getCreditAmount() > 0) {
+											LOGGER.info("bbbbbbbbbbbbbbbbbbbb");
+											egRemitGldtl = new EgRemittanceGldtl();
+											// if(LOGGER.isInfoEnabled())
+											// LOGGER.info("----------"+gLedger.getGlCodeId());
+											egRemitGldtl.setGeneralledgerdetail(gLedgerDet);
+											egRemitGldtl.setGldtlamt(gLedgerDet.getAmount());
+											Recovery tdsentry = null;
+											if (tParam.getTdsId() != null)
+												tdsentry = (Recovery) persistenceService.find(
+														"from Recovery where id=?", Long.parseLong(tParam.getTdsId()));
+											if (tdsentry != null) {
+												egRemitGldtl.setRecovery(tdsentry);
+											}
+											remitanceDetPersistenceService.persist(egRemitGldtl);
+										}
+									} catch (final Exception e) {
+										e.printStackTrace();
+										LOGGER.error("Error while inserting to eg_remittance_gldtl " + e, e);
+										return false;
+									}
+									if(gLedger.getGeneralLedgerDetails() == null){
+									    Set<CGeneralLedgerDetail> gldSet = new HashSet<>();
+									    gldSet.add(gLedgerDet);
+									    gLedger.setGeneralLedgerDetails(gldSet);
+									}else{
+									    gLedger.getGeneralLedgerDetails().add(gLedgerDet);
+									}
+								}
+							}
+						}
+					} catch (final Exception e) {
+						e.printStackTrace();
+						LOGGER.error("inside postInGL" + e.getMessage(), e);
+						throw new TaskFailedException();
+					}
+			}
+		}
+		return true;
+	}
 	/**
 	 * 
 	 * @param gLedger

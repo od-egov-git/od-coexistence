@@ -273,9 +273,8 @@ public class ContraBTBAction extends BaseVoucherAction {
 		try {
 			getHibObjectsFromContraBean();
 			if (egovCommon.isShowChequeNumber())
-				if (contraBean.getModeOfCollection().equalsIgnoreCase(MDC_CHEQUE))
-					validateChqNumber(contraBean.getChequeNumber(), contraVoucher.getFromBankAccountId().getId(),
-							voucherHeader);
+				if (contraBean.getModeOfCollection() != null && contraBean.getModeOfCollection().equalsIgnoreCase(MDC_CHEQUE))
+					validateChqNumber(contraBean.getChequeNumber(), contraVoucher.getFromBankAccountId().getId(),voucherHeader);
 			voucherHeader = contraBTBActionHelper.create(contraBean, contraVoucher, voucherHeader);
 			addActionMessage("Bank to Bank Transfer " + getText("transaction.success") + " with Voucher number: "
 					+ voucherHeader.getVoucherNumber());
@@ -285,9 +284,11 @@ public class ContraBTBAction extends BaseVoucherAction {
 				LOGGER.debug("Completed Bank to Bank Transfer .");
 		} catch (final ValidationException e) {
 			LoadAjaxedDropDowns();
+			e.printStackTrace();
 			throw new ValidationException(Arrays
 					.asList(new ValidationError(e.getErrors().get(0).getMessage(), e.getErrors().get(0).getMessage())));
 		} catch (final Exception e) {
+			e.printStackTrace();
 			LoadAjaxedDropDowns();
 			throw new ValidationException(Arrays.asList(new ValidationError(e.getMessage(), e.getMessage())));
 		}
@@ -752,7 +753,8 @@ public class ContraBTBAction extends BaseVoucherAction {
 					|| voucherHeader.getVouchermis().getFunction().getId() == null) {
 				addFieldError("voucherHeader.vouchermis.departmentid", getText("fromFunction.required"));
 			}
-			if(!contraBean.getModeOfCollection().equals(MDC_PEX))
+			System.out.println(":::::::::::::::::::::::::::::::::::"+contraBean.getModeOfCollection());
+			if(contraBean.getModeOfCollection() !=null && !contraBean.getModeOfCollection().equals(MDC_PEX))
 			{
 			if (egovCommon.isShowChequeNumber() || contraBean.getModeOfCollection().equals(MDC_OTHER)) {
 				if (contraBean.getChequeNumber() == null || contraBean.getChequeNumber().isEmpty())

@@ -47,15 +47,24 @@
  */
 package org.egov.egf.web.actions.contra;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.egov.billsaccounting.services.CreateVoucher;
 import org.egov.billsaccounting.services.VoucherConstant;
 import org.egov.commons.Accountdetailkey;
 import org.egov.commons.Accountdetailtype;
 import org.egov.commons.Bankaccount;
-import org.egov.commons.CFunction;
 import org.egov.commons.CVoucherHeader;
 import org.egov.commons.Fund;
+import org.egov.commons.service.AccountDetailKeyService;
 import org.egov.commons.service.AccountdetailtypeService;
 import org.egov.egf.commons.EgovCommon;
 import org.egov.egf.masters.services.OtherPartyService;
@@ -65,15 +74,12 @@ import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.validation.exception.ValidationError;
 import org.egov.infra.validation.exception.ValidationException;
 import org.egov.infstr.services.PersistenceService;
-import org.egov.model.bills.Miscbilldetail;
 import org.egov.model.contra.ContraBean;
 import org.egov.model.contra.ContraJournalVoucher;
 import org.egov.model.instrument.InstrumentHeader;
 import org.egov.model.masters.OtherParty;
-import org.egov.model.payment.Paymentheader;
 import org.egov.services.cheque.ChequeService;
 import org.egov.services.instrument.InstrumentService;
-import org.egov.commons.service.AccountDetailKeyService;
 import org.egov.services.payment.MiscbilldetailService;
 import org.egov.services.payment.PaymentService;
 import org.egov.services.voucher.ContraJournalVoucherService;
@@ -84,15 +90,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Transactional(readOnly = true)
 @Service
@@ -142,16 +139,20 @@ public class ContraBTBActionHelper {
 		try {
 			voucherHeader2 = null;
 			 List<InstrumentHeader> instrumentList = null;
-			if(!contraBean.getModeOfCollection().equalsIgnoreCase(MDC_PEX))
+			 
+				 instrumentList = instrumentService
+							.addToInstrument(createInstruments(contraBean, contraVoucher, voucherHeader));
+			
+			/*if(contraBean.getModeOfCollection() !=null && !contraBean.getModeOfCollection().equalsIgnoreCase(MDC_PEX))
 			{
 			instrumentList = instrumentService
 					.addToInstrument(createInstruments(contraBean, contraVoucher, voucherHeader));
-			}
+			}*/
 			if (contraBean.getToFundId() != null && !voucherHeader.getFundId().getId().equals(contraBean.getToFundId()))
 				voucherHeader = callCreateVoucherForInterFund(voucherHeader, contraVoucher, contraBean);
 			else
 				voucherHeader = callCreateVoucher(voucherHeader, contraVoucher, contraBean);
-			if(contraBean.getModeOfCollection().equalsIgnoreCase(MDC_PEX))
+			/*if(contraBean.getModeOfCollection() !=null && contraBean.getModeOfCollection().equalsIgnoreCase(MDC_PEX))
 			{
 				final Bankaccount ba = getBankaccount(contraVoucher.getFromBankAccountId().getId());
 				contraVoucher = addOrupdateContraJournalVoucherPEX(contraVoucher,
@@ -173,11 +174,11 @@ public class ContraBTBActionHelper {
 	           miscbilldetailService.create(miscBilldetail);
 	           
 	          
-			}else {
+			}else {*/
 			updateInstrument(instrumentList.get(0), voucherHeader);
 			contraVoucher = addOrupdateContraJournalVoucher(contraVoucher, instrumentList.get(0), voucherHeader,
 					contraBean);
-			}
+			//}
 			ContraJournalVoucher contraVoucher2 = null;
 			if (voucherHeader2 != null) {
 				final List<Map<String, Object>> createInstrumentMap = createInstrumentsForReceipt(contraBean,
@@ -200,22 +201,23 @@ public class ContraBTBActionHelper {
 				}
 			} else {
 				List<Map<String, Object>> iList = new ArrayList<Map<String, Object>>();
-				if(contraBean.getModeOfCollection().equalsIgnoreCase(MDC_PEX))
+				/*if(contraBean.getModeOfCollection() !=null && contraBean.getModeOfCollection().equalsIgnoreCase(MDC_PEX))
 				{
 					
 					contraVoucher = addOrupdateContraJournalVoucherPEX(contraVoucher,
 							voucherHeader, contraBean);   
 					
 		        	
-				}else {
+				}else {*/
 				iList = createInstrumentsForReceipt(contraBean, contraVoucher, voucherHeader);
 				final List<InstrumentHeader> receiptInstrumentList = instrumentService.addToInstrument(iList);
 				updateInstrument(receiptInstrumentList.get(0), voucherHeader);
 				contraVoucher = addOrupdateContraJournalVoucher(contraVoucher, receiptInstrumentList.get(0),
 						voucherHeader, contraBean);
-			}
+			//}
 			}
 		} catch (final ValidationException e) {
+			e.printStackTrace();
 			throw new ValidationException(Arrays
 					.asList(new ValidationError(e.getErrors().get(0).getMessage(), e.getErrors().get(0).getMessage())));
 		} catch (final Exception e) {
@@ -241,7 +243,7 @@ public class ContraBTBActionHelper {
 			iMap.put("Bank branch name", cVoucher.getToBankAccountId().getBankbranch().getBranchaddress1());
 			iMap.put("Bank account id", cVoucher.getToBankAccountId().getId());
 
-			if (cBean.getModeOfCollection().equalsIgnoreCase(MDC_CHEQUE)) {
+			if (cBean.getModeOfCollection() != null && cBean.getModeOfCollection().equalsIgnoreCase(MDC_CHEQUE)) {
 				if (!egovCommon.isShowChequeNumber()) {
 
 					try {
@@ -266,7 +268,7 @@ public class ContraBTBActionHelper {
 
 				iMap.put("Instrument type", FinancialConstants.INSTRUMENT_TYPE_CHEQUE);
 
-			} else if(cBean.getModeOfCollection().equalsIgnoreCase(MDC_OTHER)){
+			} else if(cBean.getModeOfCollection() !=null && cBean.getModeOfCollection().equalsIgnoreCase(MDC_OTHER)){
 
                             iMap.put("Transaction number", cBean.getChequeNumber());
                             try {
@@ -278,7 +280,7 @@ public class ContraBTBActionHelper {
                             iMap.put("Transaction date", dt);
                             // change this to advice type later
                             iMap.put("Instrument type", FinancialConstants.INSTRUMENT_TYPE_BANK_TO_BANK);
-                    } else if(cBean.getModeOfCollection().equalsIgnoreCase(MDC_PEX)){
+                    } else if(cBean.getModeOfCollection() !=null && cBean.getModeOfCollection().equalsIgnoreCase(MDC_PEX)){
 
                         iMap.put("Transaction number", cBean.getChequeNumber());
                         try {
@@ -331,7 +333,7 @@ public class ContraBTBActionHelper {
 		iMap.put("Bank branch name", cVoucher.getFromBankAccountId().getBankbranch().getBranchaddress1());
 		iMap.put("Bank account id", cVoucher.getFromBankAccountId().getId());
 
-		if (cBean.getModeOfCollection().equalsIgnoreCase(MDC_CHEQUE)) {
+		if (cBean.getModeOfCollection()!=null && cBean.getModeOfCollection().equalsIgnoreCase(MDC_CHEQUE)) {
 			if (!egovCommon.isShowChequeNumber()) {
 
 				try {
@@ -575,11 +577,12 @@ public class ContraBTBActionHelper {
 			detailMap.put(VoucherConstant.GLCODE, contraVoucher.getToBankAccountId().getChartofaccounts().getGlcode());
 			accountdetails.add(detailMap);
 			
-			/*if(contraBean.getModeOfCollection().equalsIgnoreCase(MDC_PEX))
-			{*/
+			if(contraBean.getModeOfCollection()!= null && contraBean.getModeOfCollection().equalsIgnoreCase(MDC_PEX))
+			{
 			detailMap = new HashMap<String, Object>();
 			 LOGGER.info("Subledder Details getToBankAccountID==> " + contraVoucher.getToBankAccountId().getId());
-			/*final Bankaccount ba = getBankaccount(contraVoucher.getToBankAccountId().getId());
+			final Bankaccount ba = getBankaccount(contraVoucher.getToBankAccountId().getId());
+			System.out.println(":::::"+ba.getAccountnumber()+"::::::"+ba.getAccounttype());
 			   OtherParty otherparty = new OtherParty();
 	           otherparty.setCode(ba.getAccountnumber());
 	           otherparty.setName(ba.getAccountnumber());
@@ -602,20 +605,24 @@ public class ContraBTBActionHelper {
             for (final HashMap<String, Object> subdetailDetailMap : subledgerDetails) {
             	LOGGER.info("Subledger Details DETAILTYPEID==> " +	subdetailDetailMap.get(VoucherConstant.DETAILTYPEID).toString());
             }
-            */
+            
+			
+			}
 			voucher = createVoucher.createVoucher(headerDetails, accountdetails, subledgerDetails);
-
 		} catch (final HibernateException e) {
+			e.printStackTrace();
 			LOGGER.error(e.getMessage());
 			throw new ValidationException(
 					Arrays.asList(new ValidationError(EXCEPTION_WHILE_SAVING_DATA, TRANSACTION_FAILED)));
 		} catch (final ApplicationRuntimeException e) {
+			e.printStackTrace();
 			LOGGER.error(e.getMessage());
 			throw new ValidationException(Arrays.asList(new ValidationError(e.getMessage(), e.getMessage())));
 		} catch (final ValidationException e) {
 			throw new ValidationException(Arrays
 					.asList(new ValidationError(e.getErrors().get(0).getMessage(), e.getErrors().get(0).getMessage())));
 		} catch (final Exception e) {
+			e.printStackTrace();
 			throw new ValidationException(Arrays.asList(new ValidationError(e.getMessage(), e.getMessage())));
 		}
 		if (LOGGER.isDebugEnabled())

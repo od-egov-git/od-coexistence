@@ -1117,7 +1117,7 @@ public class CreateVoucher {
 	 *            recovery master.If the glcode used is mapped in the recovery
 	 *            master then this data is mandatory.
 	 * @return voucherheader object in case of success and null in case of fail.
-	 * @throws ApplicationRuntimeExceptionRajat
+	 * @throws ApplicationRuntimeException
 	 */
 	@Transactional
 	public CVoucherHeader createVoucher(final HashMap<String, Object> headerdetails,
@@ -1134,10 +1134,11 @@ public class CreateVoucher {
                             String referenceDocument = headerdetails.get(VoucherConstant.REFERENCEDOC).toString();
                             validateReferenceDocument(referenceDocument,serviceName);
                         }
+                        boolean check=true;
 		        validateMandateFields(headerdetails);
 			validateLength(headerdetails);
 			validateVoucherMIS(headerdetails);
-			validateTransaction(accountcodedetails, subledgerdetails);
+			validateTransaction(accountcodedetails, subledgerdetails,check);
 			validateFunction(headerdetails, accountcodedetails);
 			vh = createVoucherHeader(headerdetails);
 			mis = createVouchermis(headerdetails);
@@ -1930,12 +1931,13 @@ public class CreateVoucher {
 	}
 
 	public void validateTransaction(final List<HashMap<String, Object>> accountcodedetails,
-			final List<HashMap<String, Object>> subledgerdetails) throws ApplicationRuntimeException, Exception {
+			final List<HashMap<String, Object>> subledgerdetails,boolean check) throws ApplicationRuntimeException, Exception {
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("START | validateTransaction");
 		// List<Transaxtion> transaxtionList = new ArrayList<Transaxtion>();
 		BigDecimal totaldebitAmount = BigDecimal.valueOf(0);
 		BigDecimal totalcreditAmount = BigDecimal.valueOf(0);
+		System.out.println(":::::::::::::::::::"+accountcodedetails.isEmpty());
 		if(accountcodedetails.isEmpty())
 		{
 			ValidationError error=new ValidationError("Account details Missing","Account details Missing");
@@ -1960,7 +1962,7 @@ public class CreateVoucher {
 			if (debitAmount.compareTo(BigDecimal.ZERO) != 0 && creditAmount.compareTo(BigDecimal.ZERO) != 0)
 				throw new ApplicationRuntimeException(
 						"Both debit amount and credit amount cannot be greater than zero");
-			if (debitAmount.compareTo(BigDecimal.ZERO) == 0 && creditAmount.compareTo(BigDecimal.ZERO) == 0)
+			if (debitAmount.compareTo(BigDecimal.ZERO) == 0 && creditAmount.compareTo(BigDecimal.ZERO) == 0 && check)
 				throw new ApplicationRuntimeException("debit and credit both amount is Zero");
 			if (null != accDetailMap.get(VoucherConstant.FUNCTIONCODE)
 					&& "" != accDetailMap.get(VoucherConstant.FUNCTIONCODE)) {
@@ -1994,7 +1996,7 @@ public class CreateVoucher {
 			LOGGER.debug("Total Debit  amount after round off :" + totaldebitAmount);
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("Total Credit amount after round off :" + totalcreditAmount);
-		if (totaldebitAmount.compareTo(totalcreditAmount) != 0)
+		if (totaldebitAmount.compareTo(totalcreditAmount) != 0 && check)
 			throw new ApplicationRuntimeException("total debit and total credit amount is not matching");
 		final Map<String, BigDecimal> subledAmtmap = new HashMap<String, BigDecimal>();
 		for (final HashMap<String, Object> subdetailDetailMap : subledgerdetails) {
@@ -2585,7 +2587,7 @@ public class CreateVoucher {
 				subledgerMap.put(VoucherConstant.DETAILTYPEID, ledgerDetail.getDetailTypeId().getId());
 				subledgerMap.put(VoucherConstant.DETAILKEYID, ledgerDetail.getDetailKeyId());
 				// even for subledger debit becomes credit ,credit becomes debit
-				if (BigDecimal.valueOf(ledger.getDebitAmount()).compareTo(BigDecimal.ZERO) != 0)
+				if ((ledger.getDebitAmount()).compareTo(BigDecimal.ZERO.doubleValue()) != 0)
 					subledgerMap.put(VoucherConstant.CREDITAMOUNT, ledgerDetail.getAmount());
 				else
 					subledgerMap.put(VoucherConstant.DEBITAMOUNT,
@@ -2896,6 +2898,7 @@ public class CreateVoucher {
 	                            validateReferenceDocument(referenceDocument,serviceName);
 	                        }
 				boolean CheckSaveAsDraft= true;
+				boolean check= true;
 				if(workflowBean.getWorkFlowAction()!= null && !workflowBean.getWorkFlowAction().equalsIgnoreCase("SaveAsDraft"))
 				{
 					for (final HashMap<String, Object> accDetailMap : accountcodedetails) {
@@ -2907,13 +2910,16 @@ public class CreateVoucher {
 						}
 					}
 				}
-				
+				if(workflowBean.getWorkFlowAction().equalsIgnoreCase("Save As Draft")) {
+					check=false;
+				}
+				System.out.println("::::::::::::"+CheckSaveAsDraft);
 				if(CheckSaveAsDraft)
 				{
 				    validateMandateFields(headerdetails);
 					validateLength(headerdetails);
 					validateVoucherMIS(headerdetails);
-					validateTransaction(accountcodedetails, subledgerdetails);
+					validateTransaction(accountcodedetails, subledgerdetails,check);
 					validateFunction(headerdetails, accountcodedetails);
 				}
 				
@@ -2975,6 +2981,7 @@ public class CreateVoucher {
 
 				if (LOGGER.isDebugEnabled())
 					LOGGER.debug("End | insertIntoVoucherHeader");
+				
 				if(CheckSaveAsDraft)
 				{
 				// insertIntoRecordStatus(vh);
@@ -2986,7 +2993,7 @@ public class CreateVoucher {
 				Transaxtion txnList[] = new Transaxtion[transactions.size()];
 				txnList = transactions.toArray(txnList);
 				final SimpleDateFormat formatter = new SimpleDateFormat(DD_MMM_YYYY);
-				if (!chartOfAccounts.postTransaxtions(txnList, formatter.format(vh.getVoucherDate())))
+				if (!chartOfAccounts.postTransaxtionssave(txnList, formatter.format(vh.getVoucherDate()),check))
 					throw new ApplicationRuntimeException("Voucher creation Failed");
 				
 				// Generating EVENT to push the generated voucher to ES index.
@@ -3079,12 +3086,12 @@ public class CreateVoucher {
 			                            validateReferenceDocument(referenceDocument,serviceName);
 			                        }
 						
-						
+						boolean check = true;
 						
 						    validateMandateFields(headerdetails);
 							validateLength(headerdetails);
 							validateVoucherMIS(headerdetails);
-							validateTransaction(accountcodedetails, subledgerdetails);
+							validateTransaction(accountcodedetails, subledgerdetails,check);
 							validateFunction(headerdetails, accountcodedetails);
 						
 						vh = updateVoucherHeader(headerdetails);

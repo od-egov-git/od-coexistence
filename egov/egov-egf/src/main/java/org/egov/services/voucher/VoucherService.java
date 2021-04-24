@@ -427,7 +427,7 @@ public class VoucherService extends PersistenceService<CVoucherHeader, Long> {
 			voucherMap.put("fundname", voucherheader.getFundId().getName());
 			final Set<CGeneralLedger> vDetailSet = voucherheader.getGeneralledger();
 			for (final CGeneralLedger detail : vDetailSet)
-				amt = amt.add(new BigDecimal(detail.getDebitAmount()));
+				amt = amt.add(BigDecimal.valueOf(detail.getDebitAmount()));
 			voucherMap.put("amount", amt);
 			if (voucherheader.getStatus() != null)
 				voucherMap.put("status",
@@ -473,8 +473,8 @@ public class VoucherService extends PersistenceService<CVoucherHeader, Long> {
 				voucherDetail.setGlcodeDetail(generalLedger.getGlcodeId().getGlcode());
 
 				voucherDetail.setAccounthead(coaDAO.findById(generalLedger.getGlcodeId().getId(), false).getName());
-				drAmount = new BigDecimal(generalLedger.getDebitAmount());
-				crAmount = new BigDecimal(generalLedger.getCreditAmount());
+				drAmount = BigDecimal.valueOf(generalLedger.getDebitAmount());
+				crAmount = BigDecimal.valueOf(generalLedger.getCreditAmount());
 				voucherDetail.setDebitAmountDetail(drAmount.setScale(2, BigDecimal.ROUND_HALF_UP));
 				voucherDetail.setCreditAmountDetail(crAmount.setScale(2, BigDecimal.ROUND_HALF_UP));
 				billDetailslist.add(voucherDetail);
@@ -1196,6 +1196,7 @@ public class VoucherService extends PersistenceService<CVoucherHeader, Long> {
 			egBillregistermis.setLastupdatedtime(new Date());
 			egBillregistermis.setVoucherHeader(voucherHeader);
 			egBillregister.setEgBillregistermis(egBillregistermis);
+			System.out.println("::::::::::"+voucherTypeBean.getBillNum());
 			if (null != voucherTypeBean.getBillNum() && StringUtils.isNotEmpty(voucherTypeBean.getBillNum()))
 				egBillregister.setBillnumber(voucherTypeBean.getBillNum());
 			else {
@@ -1278,9 +1279,12 @@ public class VoucherService extends PersistenceService<CVoucherHeader, Long> {
 			LOGGER.debug("Voucher Service | updateBillForVSubType | Start");
 		EgBillregister egBillregister = null;
 		try {
+			System.out.println("::::::::::::::::"+voucherHeader.getId());
 			egBillregister = (EgBillregister) persistenceService.find(
 					"from EgBillregister br where br.egBillregistermis.voucherHeader.id=" + voucherHeader.getId());
+			
 			final EgBillregistermis egBillregistermis = egBillregister.getEgBillregistermis();
+			
 			if (null != voucherTypeBean.getBillDate())
 				egBillregister.setBilldate(voucherTypeBean.getBillDate());
 			else
@@ -1331,7 +1335,122 @@ public class VoucherService extends PersistenceService<CVoucherHeader, Long> {
 			LOGGER.debug("Voucher Service | updateBillForVSubType | End");
 		return egBillregister;
 	}
+	@Transactional
+	public EgBillregister updateBillForVSubTypesave(final List<VoucherDetails> billDetailslist,
+			final List<VoucherDetails> subLedgerlist, final CVoucherHeader voucherHeader,
+			final VoucherTypeBean voucherTypeBean, final BigDecimal totalBillAmount) {
+		if (LOGGER.isDebugEnabled())
+			LOGGER.debug("VoucherService | createBillForVoucherSubType | Start");
+		final EgBillregister egBillregister = new EgBillregister();
+		// Fix it for basic financial type also
+		try {
+			egBillregister.setBillstatus("APPROVED");
+			EgwStatus egwstatus = null;
+			if ("Contractor Journal".equalsIgnoreCase(voucherTypeBean.getVoucherName())) {
+				egwstatus = (EgwStatus) persistenceService.find(
+						"from EgwStatus where upper(moduletype)=? and upper(description)=?", "CONTRACTORBILL",
+						"APPROVED");
+				egBillregister.setExpendituretype("Works");
+			} else if ("Supplier Journal".equalsIgnoreCase(voucherTypeBean.getVoucherName())) {
+				egwstatus = (EgwStatus) persistenceService
+						.find("from EgwStatus where upper(moduletype)=? and upper(description)=?", "SBILL", "APPROVED");
+				egBillregister.setExpendituretype("Purchase");
+			} else if ("Salary Journal".equalsIgnoreCase(voucherTypeBean.getVoucherName())) {
+				egwstatus = (EgwStatus) persistenceService.find(
+						"from EgwStatus where upper(moduletype)=? and upper(description)=?", "SALBILL", "APPROVED");
+				egBillregister.setExpendituretype("Salary");
+			} else if ("Expense Journal".equalsIgnoreCase(voucherTypeBean.getVoucherName())) {
+				egwstatus = (EgwStatus) persistenceService.find(
+						"from EgwStatus where upper(moduletype)=? and upper(description)=?", "EXPENSEBILL", "APPROVED");
+				egBillregister.setExpendituretype("Expense");
+			} else if ("Pension Journal".equalsIgnoreCase(voucherTypeBean.getVoucherName())) {
+				egwstatus = (EgwStatus) persistenceService.find(
+						"from EgwStatus where upper(moduletype)=? and upper(description)=?", "PENSIONBILL", "APPROVED");
+				egBillregister.setExpendituretype("Pension");
+			}
+			egBillregister.setStatus(egwstatus);
+			if (null != voucherTypeBean.getBillDate())
+				egBillregister.setBilldate(voucherTypeBean.getBillDate());
+			else
+				egBillregister.setBilldate(voucherHeader.getVoucherDate());
+			if (null != voucherHeader.getVouchermis().getDivisionid())
+				egBillregister
+						.setFieldid(new BigDecimal(voucherHeader.getVouchermis().getDivisionid().getId().toString()));
+			egBillregister.setNarration(voucherHeader.getDescription());
+			egBillregister.setIsactive(true);
+			egBillregister.setBilltype("Final Bill");
+			egBillregister.setPassedamount(totalBillAmount);
+			egBillregister.setBillamount(totalBillAmount);
 
+			final EgBillregistermis egBillregistermis = new EgBillregistermis();
+			egBillregistermis.setFund(voucherHeader.getFundId());
+			egBillregistermis.setDepartmentcode(voucherHeader.getVouchermis().getDepartmentcode());
+			egBillregistermis.setFunctionaryid(voucherHeader.getVouchermis().getFunctionary());
+			egBillregistermis.setFunction(voucherHeader.getVouchermis().getFunction());
+			egBillregistermis.setFundsource(voucherHeader.getVouchermis().getFundsource());
+			egBillregistermis.setScheme(voucherHeader.getVouchermis().getSchemeid());
+			egBillregistermis.setSubScheme(voucherHeader.getVouchermis().getSubschemeid());
+			egBillregistermis.setNarration(voucherHeader.getDescription());
+			egBillregistermis.setPartyBillDate(voucherTypeBean.getPartyBillDate());
+			egBillregistermis.setPayto(voucherTypeBean.getPartyName());
+			egBillregistermis.setPartyBillNumber(voucherTypeBean.getPartyBillNum());
+			egBillregistermis.setFieldid(voucherHeader.getVouchermis().getDivisionid());
+			if (voucherTypeBean.getVoucherNumType().equalsIgnoreCase("fixedassetjv")) {
+				final EgBillSubType egBillSubType = (EgBillSubType) persistenceService
+						.find("from EgBillSubType where name=? and expenditureType=?", "Fixed Asset", "Purchase");
+				egBillregistermis.setEgBillSubType(egBillSubType);
+			}
+			egBillregistermis.setLastupdatedtime(new Date());
+			egBillregistermis.setVoucherHeader(voucherHeader);
+			egBillregister.setEgBillregistermis(egBillregistermis);
+			System.out.println("::::::::::"+voucherTypeBean.getBillNum());
+			if (null != voucherTypeBean.getBillNum() && StringUtils.isNotEmpty(voucherTypeBean.getBillNum()))
+				egBillregister.setBillnumber(voucherTypeBean.getBillNum());
+			else {
+				final JVBillNumberGenerator b = beanResolver.getAutoNumberServiceFor(JVBillNumberGenerator.class);
+				final String billNumber = b.getNextNumber(egBillregister);
+
+				egBillregister.setBillnumber(billNumber);
+				if (LOGGER.isDebugEnabled())
+					LOGGER.debug(
+							"VoucherService | createBillForVoucherSubType | Bill number generated :=" + billNumber);
+			}
+			if (!isBillNumUnique(egBillregister.getBillnumber()))
+				throw new ValidationException(Arrays.asList(new ValidationError("bill number",
+						"Duplicate Bill Number : " + egBillregister.getBillnumber())));
+			egBillregistermis.setEgBillregister(egBillregister);
+
+			Set<EgBilldetails> egBilldetailes = new HashSet<>();
+			egBilldetailes = prepareBillDetails(egBillregister, billDetailslist, subLedgerlist, voucherHeader,
+					egBilldetailes);
+			egBillregister.setEgBilldetailes(egBilldetailes);
+			
+
+			egBillRegisterService.applyAuditing(egBillregister);
+			egBillRegisterService.persist(egBillregister);
+
+			voucherHeader.getVouchermis().setSourcePath(
+					"/services/EGF/voucher/journalVoucherModify-beforeModify.action?voucherHeader.id=" + voucherHeader.getId());
+			update(voucherHeader);
+			//publishing event to push the created bill to ESK index.
+			finDashboardService.publishEvent(FinanceEventType.billCreateOrUpdate, egBillregister);
+			persistenceService.getSession().flush();
+		} catch (final ValidationException e) {
+			e.printStackTrace();
+			final List<ValidationError> errors = new ArrayList<>();
+			errors.add(new ValidationError("exp", e.getErrors().get(0).getMessage()));
+			throw new ValidationException(errors);
+		} catch (final Exception e) {
+			final List<ValidationError> errors = new ArrayList<>();
+			errors.add(new ValidationError("exp", e.getMessage()));
+			throw new ValidationException(errors);
+		}
+		if (LOGGER.isDebugEnabled())
+			LOGGER.debug("VoucherService | createBillForVoucherSubType | End | bill number : = "
+					+ egBillregister.getBillnumber());
+		return egBillregister;
+
+	}
 	/**
 	 *
 	 * @param egBillregister
@@ -1347,11 +1466,12 @@ public class VoucherService extends PersistenceService<CVoucherHeader, Long> {
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("Voucher Service | prepareBillDetails | Start");
 		for (final VoucherDetails accountDetail : billDetailslist) {
-
+System.out.println(":::::::::::::"+accountDetail.getGlcodeIdDetail());
 			final EgBilldetails egBilldetail = new EgBilldetails();
 			egBilldetail.setEgBillregister(egBillregister);
-			egBilldetail.setGlcodeid(new BigDecimal(accountDetail.getGlcodeIdDetail().toString()));
+			egBilldetail.setGlcodeid((accountDetail.getGlcodeIdDetail() !=null) ? new BigDecimal(accountDetail.getGlcodeIdDetail().toString()): new BigDecimal(0));
 			egBilldetail.setDebitamount(accountDetail.getDebitAmountDetail());
+			
 			egBilldetail.setCreditamount(accountDetail.getCreditAmountDetail());
 			if (null != accountDetail.getFunctionIdDetail())
 				egBilldetail.setFunctionid(new BigDecimal(accountDetail.getFunctionIdDetail()));
@@ -1362,7 +1482,7 @@ public class VoucherService extends PersistenceService<CVoucherHeader, Long> {
 			Set<EgBillPayeedetails> egBillPaydetailes = null;
 
 			for (final VoucherDetails subledgerDetail : subLedgerlist)
-				if (accountDetail.getGlcodeIdDetail().equals(subledgerDetail.getGlcode().getId())) {
+				if (accountDetail.getGlcodeIdDetail()!=null && accountDetail.getGlcodeIdDetail().equals(subledgerDetail.getGlcode().getId())) {
 					if (null == egBillPaydetailes)
 						egBillPaydetailes = new HashSet<>();
 					final EgBillPayeedetails egBillPaydetail = new EgBillPayeedetails();
@@ -1667,6 +1787,18 @@ public class VoucherService extends PersistenceService<CVoucherHeader, Long> {
 			return status;
 
 		}
+	 //Impplemented By Prasanta
+	 public Vouchermis getVouchermisByReceiptNumber(String recieptNumber) {
+		 System.out.println("Inside Service>>"+recieptNumber);
+		 Vouchermis vmis = new Vouchermis();
+		 try {
+		 vmis = vmisHibernateDao.getVouchermisByReceiptNumber(recieptNumber);
+		 }catch(NullPointerException e) {
+			 e.printStackTrace();
+		 }
+		 System.out.println(vmis.toString());
+		 return vmis;
+	 }
 	 
 
 }
