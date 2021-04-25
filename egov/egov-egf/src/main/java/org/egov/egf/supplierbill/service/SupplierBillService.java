@@ -460,7 +460,7 @@ public class SupplierBillService {
                         .withComments(approvalComent)
                       //.withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
                         .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos) //added abhishek on 05042021
-                        .withNextAction(wfmatrix.getNextAction())
+                        .withNextAction("")
                         .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_SBILL_DISPLAYNAME)
                         .withCreatedBy(user.getId())
                         .withtLastModifiedBy(user.getId());
@@ -501,22 +501,32 @@ public class SupplierBillService {
             	}
                 if (FinancialConstants.BUTTONREJECT.equalsIgnoreCase(workFlowAction)) {
 					int size=egBillregister.getStateHistory().size();//added abhishek on 12042021
+					Position owenrPosName = new Position();
+					owenrPosName.setId(approvalPosition);
 					if(size>1)
 					{
 						Long owenrPos1=(long) egBillregister.getState().getPreviousOwner();
+						owenrPosName.setId(owenrPos1);
 						if(owenrPos1==90)
 							owenrPos1=315l;
-						else
-							owenrPos1=(long) egBillregister.getState().getPreviousOwner();
+						
 						System.out.println("S owner position "+owenrPos1);
 						owenrPos.setId(owenrPos1);
 					}
 					else
+					{
 						owenrPos.setId(egBillregister.getState().getCreatedBy());
-		            stateValue = FinancialConstants.WORKFLOW_STATE_REJECTED;
+						if(owenrPos.getId()==315)
+							owenrPosName.setId(90l);
+						else
+							owenrPosName.setId(egBillregister.getState().getCreatedBy());
+					}
+		            System.out.println("ownerPostion id- "+owenrPos);
+		            System.out.println("ownerPostion Nameid- "+owenrPosName);
+					stateValue = FinancialConstants.WORKFLOW_STATE_REJECTED;
 		            egBillregister.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
                     .withComments(approvalComent)
-                    .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
+                    .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPosName).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
                     .withNextAction("")
                     .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_SBILL_DISPLAYNAME);
 		        

@@ -1405,6 +1405,7 @@ function validateWorkFlowApprover(name) {
 		$('#approvalDesignation').attr('required', 'required');
 		$('#approvalPosition').attr('required', 'required');
 		$('#approvalComent').attr('required', 'required');
+		$('#narration').attr('required', 'required');
 	}
 	if (button != null && button == 'Verify') {
 		$('#approvalComent').removeAttr('required');

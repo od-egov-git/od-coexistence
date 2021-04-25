@@ -376,20 +376,18 @@ public class UpdateExpenseBillController extends BaseBillController {
             String approverName = String.valueOf(request.getParameter("approverName"));
             if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
         	{
-        		
         		approverName =populateEmpName();
-        		
         	}
             else if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONREJECT))
         	{
-        		
+            	if(approvalPosition==90)
+            		approvalPosition=315l;
         		approverName =getEmployeeName(approvalPosition);
-        		
         	}
             model.addAttribute(BILL_TYPES, BillType.values());
             final String approverDetails = financialUtils.getApproverDetails(workFlowAction,
                     updatedEgBillregister.getState(), updatedEgBillregister.getId(), approvalPosition, approverName);
-
+            System.out.println("Expense Approval Details "+approverDetails);
             return "redirect:/expensebill/success?approverDetails=" + approverDetails + "&billNumber="
                     + updatedEgBillregister.getBillnumber();
         }

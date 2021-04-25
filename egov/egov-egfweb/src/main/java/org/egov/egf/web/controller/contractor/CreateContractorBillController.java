@@ -489,7 +489,7 @@ public class CreateContractorBillController extends BaseBillController {
 
     private String getMessageByStatus(final EgBillregister contractorBill, final String approverName, final String nextDesign) {
         String message = "";
-
+        System.out.println("contractor status code "+contractorBill.getStatus().getCode());
         if (FinancialConstants.CONTRACTORBILL_CREATED_STATUS.equals(contractorBill.getStatus().getCode())) {
             if (org.apache.commons.lang.StringUtils
                     .isNotBlank(contractorBill.getEgBillregistermis().getBudgetaryAppnumber())

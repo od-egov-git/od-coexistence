@@ -450,19 +450,17 @@ public class UpdateSupplierBillController extends BaseBillController {
             String approverName = String.valueOf(request.getParameter("approverName"));
             if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
         	{
-        		
         		approverName =populateEmpName();
-        		
         	}
             else if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONREJECT))
         	{
-        		
+            	if(approvalPosition==90)
+            		approvalPosition=315l;
         		approverName =getEmployeeName(approvalPosition);
-        		
         	}
             final String approverDetails = financialUtils.getApproverDetails(workFlowAction,
                     updatedEgBillregister.getState(), updatedEgBillregister.getId(), approvalPosition, approverName);
-
+            System.out.println("Supplier Approval Details "+approverDetails);
             return "redirect:/supplierbill/success?approverDetails=" + approverDetails + "&billNumber="
                     + updatedEgBillregister.getBillnumber();
         }

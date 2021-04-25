@@ -348,21 +348,21 @@ public class ContractorBillService {
     public void contractorBillRegisterStatusChange(final EgBillregister egBillregister, final String workFlowAction) {
         if (null != egBillregister && null != egBillregister.getStatus()
                 && null != egBillregister.getStatus().getCode())
-            if (FinancialConstants.CONTINGENCYBILL_CREATED_STATUS.equals(egBillregister.getStatus().getCode())
+            if (FinancialConstants.CONTRACTORBILL_CREATED_STATUS.equals(egBillregister.getStatus().getCode())
                     && egBillregister.getState() != null && workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONAPPROVE))
                 egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTRACTOR_BILL,
                         FinancialConstants.CONTRACTORBILL_APPROVED_STATUS));
             else if (workFlowAction.equals(FinancialConstants.BUTTONREJECT))
                 egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTRACTOR_BILL,
-                        FinancialConstants.CONTINGENCYBILL_REJECTED_STATUS));
-            else if (FinancialConstants.CONTINGENCYBILL_REJECTED_STATUS.equals(egBillregister.getStatus().getCode())
+                        FinancialConstants.CONTRACTORBILL_REJECTED_STATUS));
+            else if (FinancialConstants.CONTRACTORBILL_REJECTED_STATUS.equals(egBillregister.getStatus().getCode())
                     && workFlowAction.equals(FinancialConstants.BUTTONCANCEL))
                 egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTRACTOR_BILL,
-                        FinancialConstants.CONTINGENCYBILL_CANCELLED_STATUS));
-            else if (FinancialConstants.CONTINGENCYBILL_REJECTED_STATUS.equals(egBillregister.getStatus().getCode())
+                        FinancialConstants.CONTRACTORBILL_CANCELLED_STATUS));
+            else if (FinancialConstants.CONTRACTORBILL_REJECTED_STATUS.equals(egBillregister.getStatus().getCode())
                     && workFlowAction.equals(FinancialConstants.BUTTONFORWARD))
                 egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTRACTOR_BILL,
-                        FinancialConstants.CONTINGENCYBILL_CREATED_STATUS));
+                        FinancialConstants.CONTRACTORBILL_CREATED_STATUS));
 
     }
 
@@ -513,23 +513,32 @@ public class ContractorBillService {
             	}
                 if (FinancialConstants.BUTTONREJECT.equalsIgnoreCase(workFlowAction)) {
 					int size=egBillregister.getStateHistory().size();//added abhishek on 12042021
+					Position owenrPosName = new Position();
+					owenrPosName.setId(approvalPosition);
 					if(size>1)
 					{
-						//Long owenrPos1=0l;
-						Long owenrPos1=(long)egBillregister.getState().getPreviousOwner();
+						Long owenrPos1=(long) egBillregister.getState().getPreviousOwner();
+						owenrPosName.setId(owenrPos1);
 						if(owenrPos1==90)
 							owenrPos1=315l;
-						else
-							owenrPos1=(long) egBillregister.getState().getPreviousOwner();
+						
 						System.out.println("C owner position "+owenrPos1);
 						owenrPos.setId(owenrPos1);
 					}
 					else
+					{
 						owenrPos.setId(egBillregister.getState().getCreatedBy());
-		            stateValue = FinancialConstants.WORKFLOW_STATE_REJECTED;
+						if(owenrPos.getId()==315)
+							owenrPosName.setId(90l);
+						else
+							owenrPosName.setId(egBillregister.getState().getCreatedBy());
+					}
+		            System.out.println("ownerPostion id- "+owenrPos);
+		            System.out.println("ownerPostion Nameid- "+owenrPosName);
+					stateValue = FinancialConstants.WORKFLOW_STATE_REJECTED;
 		            egBillregister.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
                     .withComments(approvalComent)
-                    .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
+                    .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPosName).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
                     .withNextAction("")
                     .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_WORKS_BILL_DISPLAYNAME);
 		        

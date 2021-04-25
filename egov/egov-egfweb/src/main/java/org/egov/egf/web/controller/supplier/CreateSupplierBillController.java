@@ -492,7 +492,7 @@ public class CreateSupplierBillController extends BaseBillController {
 
     private String getMessageByStatus(final EgBillregister supplierBill, final String approverName, final String nextDesign) {
         String message = "";
-
+        System.out.println("supplier status code "+supplierBill.getStatus().getCode());
         if (FinancialConstants.SUPPLIERBILL_CREATED_STATUS.equals(supplierBill.getStatus().getCode())) {
             if (org.apache.commons.lang.StringUtils
                     .isNotBlank(supplierBill.getEgBillregistermis().getBudgetaryAppnumber())

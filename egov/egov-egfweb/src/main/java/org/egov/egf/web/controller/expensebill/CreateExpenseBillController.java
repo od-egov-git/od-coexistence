@@ -339,7 +339,7 @@ public class CreateExpenseBillController extends BaseBillController {
 
     private String getMessageByStatus(final EgBillregister expenseBill, final String approverName, final String nextDesign) {
         String message = "";
-
+        System.out.println("expense status code "+expenseBill.getStatus().getCode());
         if (FinancialConstants.CONTINGENCYBILL_CREATED_STATUS.equals(expenseBill.getStatus().getCode())) {
             if (org.apache.commons.lang.StringUtils
                     .isNotBlank(expenseBill.getEgBillregistermis().getBudgetaryAppnumber())
