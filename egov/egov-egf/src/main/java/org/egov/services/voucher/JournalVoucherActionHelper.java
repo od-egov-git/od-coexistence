@@ -359,7 +359,7 @@ public class JournalVoucherActionHelper {
                     return voucherHeader;
                 }
                 final WorkFlowMatrix wfmatrix = voucherHeaderWorkflowService.getWfMatrix(voucherHeader.getStateType(), null,
-                        null, null,"", null);
+                        null, null,voucherHeader.getCurrentState().getValue(), null);
                 String ststeValue=wfmatrix.getNextState();
                 Long owner = workflowBean.getApproverPositionId();
                 if ("Save As Draft".equalsIgnoreCase(workflowBean.getWorkFlowAction()))
