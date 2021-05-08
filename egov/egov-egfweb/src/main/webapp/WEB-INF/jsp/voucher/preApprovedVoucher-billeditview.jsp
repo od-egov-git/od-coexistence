@@ -58,15 +58,21 @@
 <title><s:property value="type" /> JV-Create</title>
 </head>
 <script>
-window.onload=function(){
-	var cDate = new Date();
-	var month=parseInt(cDate.getMonth())+1;
-	var currDate = cDate.getDate()+"/";
-	if(month<10)
-		month="0"+month;
-	currDate=currDate+month;
-	currDate=currDate+"/"+cDate.getYear();
-	document.getElementById('voucherDate').value=cDate;
+ window.onload=function(){
+	 var cDate = new Date();
+		var date=cDate.getDate();
+		if(date<10)
+			date="0"+date;
+		var month=parseInt(cDate.getMonth())+1;
+		var currDate = date+"/";
+		if(month<10)
+			month="0"+month;
+		currDate=currDate+month;
+	    var year=cDate.getFullYear();
+		currDate=currDate+"/"+year;
+		
+	document.getElementById('voucherDate').value=currDate;
+	
 }
 	function checkBillIdBillview(){
 		if(document.getElementById('id').value!=''){

@@ -424,7 +424,9 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
                 // loading the bill detail info.
             	showVoucherDate = true;
                 getMasterDataForBill();
-                preApprovedVoucher.setVoucherDate(new Date());
+                final Date currDate = new Date();
+    			final SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                preApprovedVoucher.setVoucherDate(sdf.parse(sdf.format(currDate)));
                 //voucherDateId.
             } catch (final Exception e) {
                 final List<ValidationError> errors = new ArrayList<ValidationError>();

@@ -989,7 +989,8 @@
                 <artifactId>log4j</artifactId>
                 <version>${log4j-version}</version>
             </dependency>
-            <!-- LOGGING END -->
+            
+           <!-- LOGGING END -->
 
             <!-- DATABASE START -->
             <dependency>

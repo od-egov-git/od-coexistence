@@ -272,14 +272,25 @@ public class ContraBTBAction extends BaseVoucherAction {
 			LOGGER.debug("Starting Bank to Bank Transfer ...");
 		try {
 			getHibObjectsFromContraBean();
+			boolean valid=true;
 			if (egovCommon.isShowChequeNumber())
 				if (contraBean.getModeOfCollection() != null && contraBean.getModeOfCollection().equalsIgnoreCase(MDC_CHEQUE))
-					validateChqNumber(contraBean.getChequeNumber(), contraVoucher.getFromBankAccountId().getId(),voucherHeader);
-			voucherHeader = contraBTBActionHelper.create(contraBean, contraVoucher, voucherHeader);
-			addActionMessage("Bank to Bank Transfer " + getText("transaction.success") + " with Voucher number: "
+					valid=validateChqNumber(contraBean.getChequeNumber(), contraVoucher.getFromBankAccountId().getId(),voucherHeader);
+			
+			if(valid==true)
+			{
+				voucherHeader = contraBTBActionHelper.create(contraBean, contraVoucher, voucherHeader);
+				addActionMessage("Bank to Bank Transfer " + getText("transaction.success") + " with Voucher number: "
 					+ voucherHeader.getVoucherNumber());
-			setVhId(voucherHeader.getId());
-			LoadAjaxedDropDowns();
+				setVhId(voucherHeader.getId());
+				LoadAjaxedDropDowns();
+			}
+			else
+			{
+				addActionMessage("Invalid Cheque Number");
+				return NEW;
+			}
+			
 			if (LOGGER.isDebugEnabled())
 				LOGGER.debug("Completed Bank to Bank Transfer .");
 		} catch (final ValidationException e) {
@@ -1538,12 +1549,14 @@ public class ContraBTBAction extends BaseVoucherAction {
 		instrumentService.updateInstrumentVoucherReference(iList);
 	}
 
-	private void validateChqNumber(final String chqNo, final Long bankaccId, final CVoucherHeader voucherHeader) {
+	private boolean validateChqNumber(final String chqNo, final Long bankaccId, final CVoucherHeader voucherHeader) {
 		if (!instrumentService.isChequeNumberValid(chqNo, bankaccId,
 				voucherHeader.getVouchermis().getDepartmentcode(), null))
-			throw new ValidationException(
+		return false;
+			/*	throw new ValidationException(
 					Arrays.asList(new ValidationError("Invalid cheque number", "Invalid cheque number")));
-
+		 */
+		return true;
 	}
 
 	/**

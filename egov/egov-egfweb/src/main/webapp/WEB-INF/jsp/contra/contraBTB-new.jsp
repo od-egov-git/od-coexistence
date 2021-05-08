@@ -90,6 +90,8 @@
 						<s:fielderror />
 					</div> <s:actionmessage />
 				</span>
+				</br>
+	
 				<table border="0" width="100%" cellspacing="0" cellpadding="0">
 					<tr>
 						<td class="bluebox"></td>
