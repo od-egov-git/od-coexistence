@@ -276,6 +276,7 @@ public class JournalVoucherService {
                     FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT);
             egBillregister.setExpendituretype(FinancialConstants.STANDARD_EXPENDITURETYPE_PENSION);
         }
+        System.out.println("::::STATUS:::::: "+egwstatus);
         egBillregister.setStatus(egwstatus);
         if (null != voucherHeader.getBillDate())
             egBillregister.setBilldate(voucherHeader.getBillDate());

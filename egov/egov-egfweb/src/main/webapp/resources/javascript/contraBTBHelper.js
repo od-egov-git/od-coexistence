@@ -98,6 +98,7 @@ function loadFromAccNum(branch) {
 	var index = bankbranchId.indexOf("-");
 	var bankId = bankbranchId.substring(0, index);
 	var brId = bankbranchId.substring(index + 1, bankbranchId.length);
+	document.getElementById('fromBankBalance').value="";// added abhishek on 21052021
 	populatefromAccountNumber({
 		fundId : fundObj.options[fundObj.selectedIndex].value,
 		branchId : brId,
@@ -110,6 +111,7 @@ function loadToAccNum(branch) {
 	var index = bankbranchId.indexOf("-");
 	var bankId = bankbranchId.substring(0, index);
 	var brId = bankbranchId.substring(index + 1, bankbranchId.length);
+	document.getElementById('toBankBalance').value="";// added abhishek on 21052021
 	populatetoAccountNumber({
 		fundId : fundObj.options[fundObj.selectedIndex].value,
 		branchId : brId,

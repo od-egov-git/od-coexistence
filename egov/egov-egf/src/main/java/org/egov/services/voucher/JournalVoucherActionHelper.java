@@ -336,9 +336,10 @@ public class JournalVoucherActionHelper {
                 final WorkFlowMatrix wfmatrix = voucherHeaderWorkflowService.getWfMatrix(voucherHeader.getStateType(), null,
                         null, null, workflowBean.getCurrentState(), null);
                 String ststeValue=wfmatrix.getNextState();
-                if ("Save As Draft".equalsIgnoreCase(workflowBean.getWorkFlowAction()))
+                if ("Save As Draft".equalsIgnoreCase(workflowBean.getWorkFlowAction())) {
                 		ststeValue =FinancialConstants.WORKFLOW_STATE_SAVEASDRAFT;
-                
+                		voucherHeader.setStatus(6);
+                }
                
                 System.out.println("::::::::"+workflowBean.getApproverPositionId());
                 voucherHeader.transition().start().withSenderName(user.getName())
@@ -366,7 +367,7 @@ public class JournalVoucherActionHelper {
                 {
                 		ststeValue =FinancialConstants.WORKFLOW_STATE_SAVEASDRAFT;
                 		owner = populatePosition();
-                		
+                		voucherHeader.setStatus(6);
                 		
                 }
                 

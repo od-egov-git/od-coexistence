@@ -202,8 +202,8 @@
 	<td class="bluebox"><s:text name="contra.modeOfCollection" /> <span
 		class="bluebox"><span class="mandatory1">*</span></span></td>
 	<td class="bluebox"><s:radio name="contraBean.modeOfCollection"
-			id="modeOfCollection" list="%{modeOfCollectionMap}"
-			onclick="toggleChequeAndRefNumber(this)"/></td>
+			id="modeOfCollection" list="#{'cheque':'Cheque'}"
+			 value="cheque" checked="checked"/></td>
 	<td class="bluebox"></td>
 	<td class="bluebox"></td>
 </tr>
@@ -211,7 +211,7 @@
 <tr id="chequeGrid">
 	<td class="greybox"></td>
 	<td class="greybox"><span id="mdcNumber"><s:text
-				name="contra.refNumber" /></span> <span class="greybox"><span
+				name="contra.chequeNumber" /></span> <span class="greybox"><span
 			class="mandatory1">*</span></span></td>
 	<td class="greybox"><s:textfield name="contraBean.chequeNumber"
 			id="chequeNum" value="%{contraBean.chequeNumber}" onblur="validateChequeNumber(this)" onkeyup="decimalvalue(this)"/>
@@ -222,7 +222,7 @@
 				</span>		
 	</td>
 	<td class="greybox"><span id="mdcDate"><s:text
-				name="contra.refDate" /></span></td>
+				name="contra.chequeDate" /></span></td>
 	<td class="greybox"><s:textfield id="chequeDate"
 			name="contraBean.chequeDate" data-date-end-date="0d"
 			onkeyup="DateFormat(this,this.value,event,false,'3')"
@@ -236,7 +236,7 @@
 	<td class="bluebox"><s:text name="contra.amount" /> (Rs.) <span
 		class="bluebox"><span class="mandatory1">*</span></span></td>
 	<td class="bluebox"><s:textfield name="amount" id="amount"
-			cssStyle="text-align:right" /></td>
+			cssStyle="text-align:right" cssClass="form-control patternvalidation" data-pattern="number"/></td>
 	<td class="bluebox"></td>
 	<td class="bluebox"></td>
 </tr>

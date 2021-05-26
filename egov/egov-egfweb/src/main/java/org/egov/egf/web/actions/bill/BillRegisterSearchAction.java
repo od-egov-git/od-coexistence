@@ -225,21 +225,46 @@ public class BillRegisterSearchAction extends BaseFormAction {
     	}
             LOGGER.debug("BillRegisterSearchAction | search | Start");
         final StringBuffer query = new StringBuffer(500);
+		/*
+		 * query .append(
+		 * "select br.expendituretype , br.billtype ,br.billnumber , br.billdate , br.billamount , br.passedamount ,egwstatus.description,billmis.sourcePath,"
+		 * )
+		 * .append(" br.id ,br.status.id,egwstatus.description ,br.state.id,br.lastModifiedBy.id "
+		 * ) .append(
+		 * " from EgBillregister br, EgBillregistermis billmis , EgwStatus egwstatus where   billmis.egBillregister.id = br.id and egwstatus.id = br.status.id  "
+		 * ) .append(" and br.expendituretype=?").append( VoucherHelper
+		 * .getBillDateQuery(billDateFrom, billDateTo))
+		 * .append(VoucherHelper.getBillMisQuery(billregister));
+		 */
+        //modified abhishek on21052021
         query
         .append(
-                "select br.expendituretype , br.billtype ,br.billnumber , br.billdate , br.billamount , br.passedamount ,egwstatus.description,billmis.sourcePath,")
-                .append(" br.id ,br.status.id,egwstatus.description ,br.state.id,br.lastModifiedBy.id ")
+                "select br.expendituretype , br.billtype ,br.billnumber , br.billdate , br.billamount, br.passedamount, egwstatus.description, billmis.sourcePath,")
+                .append(" br.id ,br.statusid,br.state_id,br.lastModifiedBy ")
                 .append(
-                        " from EgBillregister br, EgBillregistermis billmis , EgwStatus egwstatus where   billmis.egBillregister.id = br.id and egwstatus.id = br.status.id  ")
-                        .append(" and br.expendituretype=?").append(
+                        " from Eg_Billregister br, Eg_Billregistermis billmis, Egw_Status egwstatus where billmis.id = br.id and egwstatus.id = br.statusid  ")
+                        .append(" and br.expendituretype='"+expType+"'").append(
                                 VoucherHelper
                                 .getBillDateQuery(billDateFrom, billDateTo))
                                 .append(VoucherHelper.getBillMisQuery(billregister));
 
-        final List<Object[]> list = persistenceService.findAllBy(query.toString(),
-                expType);
+        LOGGER.info("Query 2 :: "+query.toString());
+        System.out.println(expType);
+		/*
+		 * final List<Object[]> list = persistenceService.findAllBy(query.toString(),
+		 * expType);
+		 */
+        List<Object[]> list= null;
+        try {
+        	list = persistenceService.getSession().createSQLQuery(query.toString()).list();
+        }
+        catch(Exception e) {
+        	System.out.println("error "+e.getMessage());
+        }
         final List<Long> stateIds = new ArrayList<Long>();
         final Map<Long, String> stateIdAndOwnerNameMap = new HashMap<Long, String>();
+        System.out.println("--------end--------");
+        LOGGER.info("size ::: "+list1.size());
         for (final Object[] object : list)
             stateIds.add(getLongValue(object[11]));
         List<Object[]> oWnerNamesList = new ArrayList<Object[]>();

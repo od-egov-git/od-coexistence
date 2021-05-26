@@ -88,7 +88,7 @@
     <c:if test="${mode != 'view' && mode != 'readOnly' }">
         <div>
             <table width="100%">
-                <c:if test="${egBillregister.documentDetail.isEmpty()}">
+                <%-- <c:if test="${egBillregister.documentDetail.isEmpty()}"> --%>
                         <tbody>
                         <tr>
                             <td valign="top">
@@ -107,7 +107,7 @@
                             </td>
                         </tr>
                         </tbody>
-                </c:if>
+                <%-- </c:if> --%>
             </table>
         </div>
     </c:if>

@@ -48,6 +48,7 @@
 package org.egov.egf.web.controller.expensebill;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -63,6 +64,7 @@ import org.egov.egf.web.controller.voucher.BaseVoucherController;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.exception.ApplicationRuntimeException;
 import org.egov.infstr.services.PersistenceService;
+import org.egov.model.bills.BillType;
 import org.egov.model.bills.EgBillPayeedetails;
 import org.egov.model.bills.EgBillSubType;
 import org.egov.model.bills.EgBilldetails;
@@ -111,12 +113,20 @@ public abstract class BaseBillController extends BaseVoucherController {
     @Override
     protected void setDropDownValues(final Model model) {
         super.setDropDownValues(model);
+List<String> billtype=new ArrayList<>();
+    	
+    	for(BillType bill:BillType.values()) {
+    		billtype.add(bill.getValue());
+    		//System.out.println("::::::::: "+bill.getValue());
+    	}
+        model.addAttribute("billTypes", billtype);
+        
         model.addAttribute("billNumberGenerationAuto", expenseBillService.isBillNumberGenerationAuto());
         model.addAttribute("billSubTypes", getBillSubTypes());
         model.addAttribute("subLedgerTypes", accountdetailtypeService.findAll());
         model.addAttribute("cFunctions", functionDAO.getAllActiveFunctions());
         isBillDateDefaultValue = expenseBillService.isDefaultAutoPopulateCurrDateEnable();
-        model.addAttribute("billTypes", getBillTypes());
+       // model.addAttribute("billTypes", getBillTypes());
     }
 
     public List<EgBillSubType> getBillSubTypes() {

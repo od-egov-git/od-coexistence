@@ -198,7 +198,13 @@ public class CreateSupplierBillController extends BaseBillController {
     @Override
     protected void setDropDownValues(final Model model) {
         super.setDropDownValues(model);
-        //model.addAttribute(BILL_TYPES, BillType.values());
+List<String> billtype=new ArrayList<>();
+    	
+    	for(BillType bill:BillType.values()) {
+    		billtype.add(bill.getValue());
+    		//System.out.println("::::::::: "+bill.getValue());
+    	}
+       // model.addAttribute(BILL_TYPES, billtype);
         model.addAttribute(SUPPLIERS, supplierService.getAllActiveSuppliers());
         model.addAttribute(NET_PAYABLE_CODES, chartOfAccountsService.getSupplierNetPayableAccountCodes());
     }
@@ -218,6 +224,12 @@ public class CreateSupplierBillController extends BaseBillController {
     		   
     	   }
     	}
+/*List<String> billtype=new ArrayList<>();
+    	
+    	for(BillType bill:BillType.values()) {
+    		billtype.add(bill.getValue());
+    		//System.out.println("::::::::: "+bill.getValue());
+    	}*/
     	//end
     	setDropDownValues(model);
         model.addAttribute("billNumberGenerationAuto", supplierBillService.isBillNumberGenerationAuto());
@@ -225,6 +237,7 @@ public class CreateSupplierBillController extends BaseBillController {
         prepareWorkflow(model, egBillregister, new WorkflowContainer());
         prepareValidActionListByCutOffDate(model);
         model.addAttribute("validActionList", validActions);
+       // model.addAttribute(BILL_TYPES, billtype);
         if(isBillDateDefaultValue){
             egBillregister.setBilldate(new Date());            
         }
@@ -482,8 +495,14 @@ public class CreateSupplierBillController extends BaseBillController {
             model.addAttribute(APPROVER_NAME, approverName);
 
         final EgBillregister supplierBill = supplierBillService.getByBillnumber(billNumber);
-
-        final String message = getMessageByStatus(supplierBill, approverName, nextDesign);
+        String message="";
+        if(supplierBill.getState().getValue()!=null && supplierBill.getState().getValue().equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT)) {
+        	message = messageSource.getMessage("msg.supplier.bill.saveasdraft.success",//added abhishek on 05042021
+                    new String[]{supplierBill.getBillnumber()}, null);
+        }else {
+        	 message = getMessageByStatus(supplierBill, approverName, nextDesign);
+        }
+       // final String message = getMessageByStatus(supplierBill, approverName, nextDesign);
 
         model.addAttribute("message", message);
 

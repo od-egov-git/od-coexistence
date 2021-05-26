@@ -162,7 +162,7 @@ function	onLoadTask_new()
 		
 	if(button=="Save_Close")
 	{
-		bootbox.alert('<s:text name="contra.transaction.succcess"/>');
+		//bootbox.alert('<s:text name="contra.transaction.succcess"/>');
 		document.forms[0].button.value='';
         document.forms[0].action = "${pageContext.request.contextPath}/contra/contraBTB-create.action";
  		document.forms[0].submit();
@@ -177,7 +177,7 @@ function	onLoadTask_new()
 	}
 	else if(button=="Save_New")
 	{   
-		bootbox.alert('<s:text name="contra.transaction.succcess"/>');
+		//bootbox.alert('<s:text name="contra.transaction.succcess"/>');
 		document.forms[0].button.value='';
 	        document.forms[0].action = "${pageContext.request.contextPath}/contra/contraBTB-create.action";
 	 		document.forms[0].submit();
@@ -204,23 +204,23 @@ function	onLoadTask_new()
 	function toggleChequeAndRefNumber(obj) {
 			jQuery('#chequeNum').val('');
 			document.getElementById('chequeNumberlblError').innerHTML='';
-			if (obj.value == "RTGS/NEFT") {
+			/* if (obj.value == "RTGS/NEFT") {
 			document.getElementById("chequeGrid").style.visibility="visible";
 			document.getElementById("mdcNumber").innerHTML = '<s:text name="contra.refNumber" />';
 			document.getElementById("mdcDate").innerHTML = '<s:text name="contra.refDate" />';
 		} else if(obj.value == "pex") {
 			 document.getElementById("chequeGrid").style.visibility="hidden";
-		} else {
-		<s:if test="egovCommon.isShowChequeNumber()">
-		 document.getElementById("chequeGrid").style.visibility="visible";
-		 </s:if>
+		} else { */
+		//<s:if test="egovCommon.isShowChequeNumber()">
+		 //document.getElementById("chequeGrid").style.visibility="visible";
+		 /* </s:if>
 		 <s:else>
 		 document.getElementById("chequeGrid").style.visibility="hidden";
-		 </s:else>
+		 </s:else> */
 			document.getElementById("mdcNumber").innerHTML = '<s:text name="contra.chequeNumber" />';
 			document.getElementById("mdcDate").innerHTML = '<s:text name="contra.chequeDate" />';
 			
-		}
+		//}
 	}
 
 	

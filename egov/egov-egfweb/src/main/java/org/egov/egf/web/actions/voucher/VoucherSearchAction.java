@@ -636,6 +636,8 @@ public class VoucherSearchAction extends BaseFormAction {
 
 
 	private String getVoucherStatus(final int status) {
+		
+		System.out.println(":::::::::::: "+status);
 		if (FinancialConstants.CREATEDVOUCHERSTATUS.equals(status))
 			return "Approved";
 		if (FinancialConstants.REVERSEDVOUCHERSTATUS.equals(status))
@@ -646,6 +648,11 @@ public class VoucherSearchAction extends BaseFormAction {
 			return "Cancelled";
 		if (FinancialConstants.PREAPPROVEDVOUCHERSTATUS.equals(status))
 			return "Created";
+		if (FinancialConstants.SAVEASDRAFT.equals(status))
+			return "Save As Draft";
+		
+			
+		
 		return "";
 	}
 

@@ -97,7 +97,7 @@
 			var="billDateId" format="dd/MM/yyyy" /> <s:textfield
 			name="voucherTypeBean.billDate" id="billDate" value="%{billDateId}"
 			data-date-end-date="0d"
-			onkeyup="DateFormat(this,this.value,event,false,'3')"
+			
 			placeholder="DD/MM/YYYY" cssClass="form-control datepicker"
 			data-inputmask="'mask': 'd/m/y'" /></td>
 </tr>
@@ -140,16 +140,16 @@ function onChangeVSubType(){
 		
 		document.getElementById('voucherTypeBean.partyBillNum').readOnly=true;
 		document.getElementById('voucherTypeBean.partyName').readOnly=true;
-		document.getElementById('partyBillDate').readOnly=true;
+		//document.getElementById('partyBillDate').readOnly=true;
 		document.getElementById('voucherTypeBean.billNum').readOnly=true;
-		document.getElementById('billDate').readOnly=true;
+		//document.getElementById('billDate').readOnly=true;
 	}
 	else{
 		document.getElementById('voucherTypeBean.partyBillNum').readOnly=false;
 		document.getElementById('voucherTypeBean.partyName').readOnly=false;
-		document.getElementById('partyBillDate').readOnly=false;
+		//document.getElementById('partyBillDate').readOnly=false;
 		document.getElementById('voucherTypeBean.billNum').readOnly=false;
-		document.getElementById('billDate').readOnly=false;
+		//document.getElementById('billDate').readOnly=false;
 	}
 	
 	if(vType == 'JVGeneral' || vType == '-1') {

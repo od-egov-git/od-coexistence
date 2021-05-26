@@ -623,13 +623,14 @@ public class ChartOfAccountsAction extends BaseFormAction {
     @Action(value = "/masters/chartOfAccounts-modifySearch")
     public String modifySearch() throws Exception {
         if (glCode != null) {
-            /*model = chartOfAccountsService.find("from CChartOfAccounts where classification=4 and glcode=?",
-                    glCode.split("-")[0]);*/
+            model = chartOfAccountsService.find("from CChartOfAccounts where classification=4 and glcode=?",
+                    glCode.split("-")[0]);
         	
-            //modified by Abhishek on 22032021
-        	model = chartOfAccountsService.find("from CChartOfAccounts where classification=4 and (glcode=? or glcode=? or glcode=?)",
-                    glCode.split("-")[0],glCode.split("-")[1],glCode.split("-")[2]);
-            
+			/*
+			 * //modified by Abhishek on 22032021 model = chartOfAccountsService.
+			 * find("from CChartOfAccounts where classification=4 and (glcode=? or glcode=? or glcode=?)"
+			 * , glCode.split("-")[0],glCode.split("-")[1],glCode.split("-")[2]);
+			 */
             if (model == null) {
                 addActionMessage(getText("charOfAccount.no.record"));
                 return editDetailedCode();
@@ -648,14 +649,16 @@ public class ChartOfAccountsAction extends BaseFormAction {
     @Action(value = "/masters/chartOfAccounts-viewSearch")
     public String viewSearch() throws Exception {
         if (glCode != null) {
+			
+			  model = chartOfAccountsService.
+			  find("from CChartOfAccounts where classification=4 and glcode=?",
+			  glCode.split("-")[0]);
+			 
 			/*
-			 * model = chartOfAccountsService.
-			 * find("from CChartOfAccounts where classification=4 and glcode=?",
-			 * glCode.split("-")[0]);
+			 * //modified by Abhishek on 22032021 model = chartOfAccountsService.
+			 * find("from CChartOfAccounts where classification=4 and (glcode=? or glcode=? or glcode=?)"
+			 * , glCode.split("-")[0],glCode.split("-")[1],glCode.split("-")[2]);
 			 */
-        	//modified by Abhishek on 22032021
-            model = chartOfAccountsService.find("from CChartOfAccounts where classification=4 and (glcode=? or glcode=? or glcode=?)",
-                    glCode.split("-")[0],glCode.split("-")[1],glCode.split("-")[2]);
             if (model == null) {
                 addActionMessage(getText("charOfAccount.no.record"));
                 return viewDetailedCode();

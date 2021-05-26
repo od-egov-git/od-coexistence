@@ -173,9 +173,19 @@ function getFormData($form) {
 	return indexed_array;
 }
 
+function prepareHeading(){
+	var heading= "Work Order Search Result ";
+		
+	$("#workorderresult").html(heading);
+
+return heading;
+		
+}
+
 function callAjaxSearch() {
 	drillDowntableContainer = jQuery("#resultTable");
 	jQuery('.report-section').removeClass('display-hide');
+	var heading1 = prepareHeading();
 	reportdatatable = drillDowntableContainer
 			.dataTable({
 				ajax : {
@@ -199,12 +209,16 @@ function callAjaxSearch() {
 							});
 				},
 				"bDestroy" : true,
-				"sDom" : "<'row'<'col-xs-12 hidden col-right'f>r>t<'row'<'col-xs-3'i><'col-xs-3 col-right'l><'col-xs-3 col-right'<'export-data'T>><'col-xs-3 text-right'p>>",
+				dom : "<'row'<'col-xs-12 pull-right'f>r>t<'row buttons-margin'<'col-md-2 col-xs-6'i><'col-md-2  col-xs-6'l><'col-md-5 col-xs-6'B><'col-md-3 col-xs-6 text-right'p>>",
 				"aLengthMenu" : [ [ 10, 25, 50, -1 ], [ 10, 25, 50, "All" ] ],
-				"oTableTools" : {
+				/*"oTableTools" : {
 					"sSwfPath" : "../../../../../../egi/resources/global/swf/copy_csv_xls_pdf.swf",
 					"aButtons" : [ "xls", "pdf", "print" ]
-				},
+				},*/
+				buttons :[
+					{extend:'print',title: ""+heading1+"",filename: 'View Work Orders'},
+					{extend:'excel',title: ""+heading1+"",filename: 'View Work Orders'},
+					{ extend:'pdf',title: ""+heading1+"",filename: 'View Work Orders'}],
 				aaSorting : [],
 				columns : [ {
 					"data" : "orderNumber",

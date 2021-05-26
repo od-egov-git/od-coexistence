@@ -309,7 +309,14 @@ public class ContractorBillService {
             updatedegBillregister = contractorBillRepository.save(egBillregister);
 
             egBillregister.getEgBillregistermis().setBudgetaryAppnumber(null);
-
+            List<DocumentUpload> files = egBillregister.getDocumentDetail() == null ? null : egBillregister.getDocumentDetail();
+            final List<DocumentUpload> documentDetails;
+            documentDetails = financialUtils.getDocumentDetails(files, updatedegBillregister,
+                    FinancialConstants.FILESTORE_MODULEOBJECT);
+            if (!documentDetails.isEmpty()) {
+            	updatedegBillregister.setDocumentDetail(documentDetails);
+                persistDocuments(documentDetails);
+            }
             // commented as budget check was disabled
             // try {
             // checkBudgetAndGenerateBANumber(egBillregister);

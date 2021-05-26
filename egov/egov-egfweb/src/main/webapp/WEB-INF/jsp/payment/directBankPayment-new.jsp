@@ -439,6 +439,8 @@ function populateAccNum(branch){
 }
 function onSubmit()
 {
+	if(checkdate())
+	{
 	enableAll();
 	var balanceCheckMandatory='<s:text name="payment.mandatory"/>';
 	var balanceCheckWarning='<s:text name="payment.warning"/>';
@@ -538,7 +540,11 @@ function onSubmit()
 		document.dbpform.action = '/services/EGF/payment/directBankPayment-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory+'&backlogEntry='+backlogEntry;
 		document.dbpform.submit();
 	}
-		
+	}
+	else{
+		bootbox.alert("Please select back dated entry option correctly");
+		return false;
+	}
 }
 
 function validateCutOff()
@@ -560,6 +566,51 @@ else{
 		return false;
 	}
 }
+
+function checkdate()
+{
+	backlogEntry
+	var backlog=document.getElementById('backlogEntry').value;
+	var date2=document.getElementById('voucherDate').value;
+	//alert(":::::::voucher Date efore split:: "+date2);
+	var parts = date2.split("/");
+	   var date = new Date(parts[1] + "/" + parts[0] + "/" + parts[2]);
+	   //alert(":::::Backlog:: "+backlog);
+//alert(":::Voucher  Date after split::: "+date);
+	var curdate = new Date();
+	//alert("::::Current date:: "+curdate);
+	if(backlog!='Y'){
+	if(date.setHours(0,0,0,0) == curdate.setHours(0,0,0,0)) {
+	    // Date equals today's date
+	   // alert("date is equal:::");
+		if(backlog == 'N'){
+	    	//alert(":in N:");
+	    	return true;
+	    }
+	    return false;
+	}
+	else{
+		//alert(":::::Else:::: ");
+		return false;
+	}
+	}else{
+		return true;
+	}
+	
+	//alert("::::::::"+date3);
+	/* if(date3>curdate){
+		alert("greater");
+	}
+	if(date3=curdate){
+		alert("date is equal");
+	}
+	if(date3!=curdate){
+		alert("Date are different");
+	} */
+	
+	
+}
+
 
 </SCRIPT>
 </body>

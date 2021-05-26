@@ -192,10 +192,11 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("JournalVoucherModifyAction | loadvouchers | Start ");
         if (voucherHeader != null && voucherHeader.getId() != null)
-            voucherHeaderId = voucherHeader.getId().toString();
+       voucherHeaderId = voucherHeader.getId().toString();
         else
-            voucherHeaderId = parameters.get("voucherId")[0];
-        isOneFunctionCenter = voucherHeader.getIsRestrictedtoOneFunctionCenter();
+        	 voucherHeaderId = parameters.get("voucherId")[0];
+         isOneFunctionCenter = voucherHeader.getIsRestrictedtoOneFunctionCenter();
+       
         if (voucherHeaderId != null)
             voucherHeader = (CVoucherHeader) getPersistenceService().find(VOUCHERQUERY, Long.valueOf(voucherHeaderId));
         final Map<String, Object> vhInfoMap = voucherService.getVoucherInfo(voucherHeader.getId());
@@ -339,8 +340,11 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
         }
         if (null != voucherNumManual && StringUtils.isNotEmpty(voucherNumManual))
             voucherHeader.setVoucherNumber(voucherNumManual);
+        try {
         voucherHeader.setIsRestrictedtoOneFunctionCenter(isOneFunctionCenter);
-
+        }catch(Exception e){
+        	e.printStackTrace();
+        }
         //removeEmptyRowsAccoutDetail(billDetailslist);
         // jayanta for save as draft
         // removeEmptyRowsAccoutDetail(billDetailslist);

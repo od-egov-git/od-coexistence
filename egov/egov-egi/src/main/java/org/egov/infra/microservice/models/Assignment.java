@@ -54,6 +54,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 public class Assignment {
 
     private String id;
+    private Long empId;
 
     @NotNull
     private Long position;
@@ -432,5 +433,13 @@ public class Assignment {
                 + createdBy + ", createdDate=" + createdDate + ", lastModifiedBy=" + lastModifiedBy
                 + ", lastModifiedDate=" + lastModifiedDate + ", tenantId=" + tenantId + "]";
     }
+
+	public Long getEmpId() {
+		return empId;
+	}
+
+	public void setEmpId(Long empId) {
+		this.empId = empId;
+	}
 
 }

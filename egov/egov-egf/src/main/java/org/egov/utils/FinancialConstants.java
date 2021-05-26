@@ -248,6 +248,7 @@ public interface FinancialConstants {
 	public static final Integer CANCELLEDVOUCHERSTATUS = 4;
 	public static final Integer PREAPPROVEDVOUCHERSTATUS = 5;
 	public static final Integer CREATEDVOUCHERSTATUS = 0;
+	public static final Integer SAVEASDRAFT = 6;
 	// Receipt Names
 	public static final String RECEIPT_NAME_DIRECT = "Direct";
 	public static final String RECEIPT_NAME_REMITTANCE_PAYMENT = "Remittance Payment";

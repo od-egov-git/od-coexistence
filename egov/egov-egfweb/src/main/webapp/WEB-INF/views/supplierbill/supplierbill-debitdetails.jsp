@@ -71,7 +71,7 @@
 				<c:when test="${egBillregister.debitDetails.size() == 0}">
 					<tr id="debitdetailsrow">
 						<td>
-							<input type="text" id="debitDetails[0].debitGlcode" name="debitDetails[0].debitGlcode" class="form-control table-input debitDetailGlcode debitGlcode"  data-errormsg="Account Code is mandatory!" data-idx="0" data-optional="0"   placeholder="Type first 3 letters of Account code" >
+							<input type="text" id="debitDetails[0].debitGlcode" name="debitDetails[0].debitGlcode" class="form-control table-input debitDetailGlcode debitGlcode"  data-errormsg="Account Code is mandatory!" data-idx="0" data-optional="0"   placeholder="Type any letters of Account code" >
 							<form:hidden path="debitDetails[0].glcodeid" id="debitDetails[0].glcodeid" class="form-control table-input hidden-input debitdetailid"/> 
 						</td>
 						<td>
