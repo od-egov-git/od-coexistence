@@ -204,6 +204,8 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
         List<DocumentUploads> voucherDocList = voucherService.findByObjectIdAndObjectType(voucherHeader.getId(), CommonConstants.JOURNAL_VOUCHER_OBJECT);
         voucherHeader.setDocumentDetail(voucherDocList);
         voucherHeader.setDocumentMode(CommonConstants.DOCUMENT_ADD_VIEW_MODE);
+        System.out.println("::::BackdateEntry::"+voucherHeader.getBackdateentry());
+       // voucherHeader.setBackdateentry(voucherHeader.getBackdateentry());
         try {
             if (voucherHeader != null && voucherHeader.getState() != null)
                 if (voucherHeader.getState().getValue().contains("Rejected")) {
@@ -333,6 +335,7 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
         File[] uploadedFiles = getFile();
         String[] fileName = getFileFileName();
         String[] contentType = getFileContentType();
+        
         if (FinancialConstants.BUTTONCANCEL.equalsIgnoreCase(workflowBean.getWorkFlowAction())) {
             voucherHeader = (CVoucherHeader) voucherService.findById(Long.parseLong(parameters.get(VHID)[0]), false);
             sendForApproval();
@@ -354,6 +357,7 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
         removeEmptyRowsAccoutDetail(billDetailslist);
         removeEmptyRowsSubledger(subLedgerlist);
         LOGGER.info("before Submit");
+        
         try {
         	 // if (!workFlowAction.equalsIgnoreCase("Save As Draft")) 
             // {
@@ -374,7 +378,8 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
  	                    documentDetail.add(upload);
  	                }
                  }
-                
+            	 System.out.println(":::::::: "+voucherHeader.getBackdateentry());
+                 voucherHeader.setBackdateentry(voucherHeader.getBackdateentry());
                 voucherHeader = journalVoucherActionHelper.editVoucher(billDetailslist, subLedgerlist, voucherHeader,
                         voucherTypeBean, workflowBean, parameters.get("totaldbamount")[0]);
                 voucherHeader.setDocumentDetail(documentDetail);
@@ -397,7 +402,7 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
                         new String[] { this.getEmployeeName(voucherHeader.getState()
                                 .getOwnerPosition()) }));
             }
-			if ("Save As Draft".equalsIgnoreCase(workflowBean.getWorkFlowAction())){               
+			if ("Save As Draft".equalsIgnoreCase(workflowBean.getWorkFlowAction()) || "SaveAsDraft".equalsIgnoreCase(workflowBean.getWorkFlowAction())){               
             	 addActionMessage(getText("msg.expense.bill.saveasdraft.success",
                          new String[] { voucherHeader.getVoucherNumber() }));
             }

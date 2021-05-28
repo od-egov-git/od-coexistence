@@ -263,7 +263,7 @@ public class JournalVoucherAction extends BaseVoucherAction
                     documentDetail.add(upload);
                 }
                 }
-                voucherHeader.setBackdateentry(backlogEntry);
+                voucherHeader.setBackdateentry(getBacklogEntry());
                 System.out.println("before save");
               //  voucherHeader = journalVoucherActionHelper.createVcouher(billDetailslist, subLedgerlist, voucherHeader,
                //         voucherTypeBean, workflowBean);

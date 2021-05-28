@@ -195,13 +195,13 @@ public class CreateContractorBillController extends BaseBillController {
     @Override
     protected void setDropDownValues(final Model model) {
         super.setDropDownValues(model);
-List<String> billtype=new ArrayList<>();
-    	
-    	for(BillType bill:BillType.values()) {
-    		billtype.add(bill.getValue());
-    		//System.out.println("::::::::: "+bill.getValue());
-    	}
-        //model.addAttribute(BILL_TYPES, billtype);
+										
+	 
+										   
+									
+														 
+	  
+        //model.addAttribute(BILL_TYPES, BillType.get);
         model.addAttribute(CONTRACTORS, contractorService.getAllActiveContractors());
         model.addAttribute(NET_PAYABLE_CODES, chartOfAccountsService.getContractorNetPayableAccountCodes());
     }
@@ -221,12 +221,12 @@ List<String> billtype=new ArrayList<>();
     		   
     	   }
     	}
-    	/*List<String> billtype=new ArrayList<>();
-    	
-    	for(BillType bill:BillType.values()) {
-    		billtype.add(bill.getValue());
-    		//System.out.println("::::::::: "+bill.getValue());
-    	}*/
+											   
+	 
+										   
+									
+														 
+		
     	//end
         setDropDownValues(model);
         //model.addAttribute("billNumberGenerationAuto", contractorBillService.isBillNumberGenerationAuto());
@@ -234,7 +234,7 @@ List<String> billtype=new ArrayList<>();
         prepareWorkflow(model, egBillregister, new WorkflowContainer());
         prepareValidActionListByCutOffDate(model);
         model.addAttribute("validActionList", validActions);
-       // model.addAttribute(BILL_TYPES, billtype);
+												   
         if(isBillDateDefaultValue){
             egBillregister.setBilldate(new Date());            
         }
@@ -492,15 +492,15 @@ List<String> billtype=new ArrayList<>();
             model.addAttribute(APPROVER_NAME, approverName);
 
         final EgBillregister contractorBill = contractorBillService.getByBillnumber(billNumber);
-        String message="";
-        if(contractorBill.getState().getValue()!=null && contractorBill.getState().getValue().equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT)) {
-        	message = messageSource.getMessage("msg.contractor.bill.saveasdraft.success",//added abhishek on 05042021
-                    new String[]{contractorBill.getBillnumber()}, null);
-        }else {
-        	 message = getMessageByStatus(contractorBill, approverName, nextDesign);
-        }
-            
-         //message = getMessageByStatus(contractorBill, approverName, nextDesign);
+
+																																					   
+																																						
+									
+			   
+        final String message = getMessageByStatus(contractorBill, approverName, nextDesign);
+		 
+			
+																				  
 
         model.addAttribute("message", message);
 
@@ -509,7 +509,7 @@ List<String> billtype=new ArrayList<>();
 
     private String getMessageByStatus(final EgBillregister contractorBill, final String approverName, final String nextDesign) {
         String message = "";
-       // System.out.println("contractor status code "+contractorBill.getStatus().getCode());
+        System.out.println("contractor status code "+contractorBill.getStatus().getCode());
         if (FinancialConstants.CONTRACTORBILL_CREATED_STATUS.equals(contractorBill.getStatus().getCode())) {
             if (org.apache.commons.lang.StringUtils
                     .isNotBlank(contractorBill.getEgBillregistermis().getBudgetaryAppnumber())

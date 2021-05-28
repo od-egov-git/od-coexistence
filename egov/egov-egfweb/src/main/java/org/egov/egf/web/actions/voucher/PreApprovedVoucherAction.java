@@ -266,7 +266,8 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
     private boolean finanicalYearAndClosedPeriodCheckIsClosed=false;
     SimpleDateFormat formatter1 = new SimpleDateFormat("yyyy-MM-dd");
     Date date;
-    private String backlogEntry="N";
+    private String backlogEntry="";
+    private String narration="";
     @Autowired
     FinanceDashboardService finDashboardService;
     @Autowired
@@ -376,6 +377,8 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
 
             }
         }
+        voucherHeader.setBackdateentry("N");
+        voucherHeader.setVoucherDate(new Date());
         egBillregister = (EgBillregister) getPersistenceService().find(" from EgBillregister where id=?",
                 Long.valueOf(parameters.get(BILLID)[0]));
         if (egBillregister.getEgBillregistermis().getVoucherHeader() != null && egBillregister.getEgBillregistermis()
@@ -822,7 +825,11 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
             String voucherDate = formatter1.format(voucherHeader.getVoucherDate());
             String cutOffDate1 = null;
             egBillregister = billsService.getBillRegisterById(Integer.valueOf(parameters.get(BILLID)[0]));
-            voucherHeader.setBackdateentry(backlogEntry);
+            char entry=backlogEntry.charAt(0);
+            voucherHeader.setBackdateentry(Character.toString(entry));
+            System.out.println("narration "+narration);
+            if(narration!=null)
+            voucherHeader.setDescription(narration);
             validateBillVoucherDate(egBillregister, voucherHeader);
             getMasterDataForBill();
             populateWorkflowBean();
@@ -849,7 +856,7 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
                 }
             } else {
                 if (voucherHeader.getVouchermis().getBudgetaryAppnumber() == null) {
-                	if(workFlowAction.equalsIgnoreCase("Save As Draft"))
+                	if(workFlowAction.equalsIgnoreCase("Save As Draft") || workFlowAction.equalsIgnoreCase("SaveAsDraft"))
                 	{
                 		addActionMessage(getText(egBillregister.getExpendituretype() + ".voucher.saveAsDraft.created",
                                 new String[] { voucherHeader.getVoucherNumber(), " saved as draft " }));
@@ -1163,12 +1170,15 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
                 val = voucherHeader.getVouchermis().getFunctionary().getName();
             else if ("narration".equals(name))
                 val = voucherHeader.getDescription();
+            //val=egBillregister.getEgBillregistermis().getNarration();
             else if ("billnumber".equals(name))
                 val = ((EgBillregister) getPersistenceService()
                         .find(" from EgBillregister br where br.egBillregistermis.voucherHeader=?", voucherHeader))
                                 .getBillnumber();
             else if ("budgetaryAppnumber".equals(name))
                 val = voucherHeader.getVouchermis().getBudgetaryAppnumber();
+            else if ("backdateentry".equalsIgnoreCase(name) || "backlogEntry".equalsIgnoreCase(name))
+            	val=voucherHeader.getBackdateentry();
         } else if (name.equals("fund") && egBillregister.getEgBillregistermis().getFund() != null)
             val = egBillregister.getEgBillregistermis().getFund().getName();
         else if (name.equals("fundsource") && egBillregister.getEgBillregistermis().getFundsource() != null)
@@ -1919,6 +1929,14 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
 	protected String getMessage(final String key) {
         return getText(key);
     }
+
+	public String getNarration() {
+		return narration;
+	}
+
+	public void setNarration(String narration) {
+		this.narration = narration;
+	}
     
 
 }

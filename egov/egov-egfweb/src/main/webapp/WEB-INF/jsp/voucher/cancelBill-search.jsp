@@ -106,6 +106,7 @@ function resetSelectedRows()
 
 function validateCancel()
 {
+	bootbox.alert("Bill will be Cancelled.");
 	var rows=parseInt(document.getElementById('selectedRows').value);
 	console.log("rows : ",rows);
 	console.log("rows : ",rows == 0 || rows == "");
@@ -117,6 +118,12 @@ function validateCancel()
 	document.billForm.action='/services/EGF/voucher/cancelBill-cancelBill.action';
 	document.billForm.submit();
 	return true;
+}
+
+function viewBill(vid){
+	
+	var url = '../supplierbill/view/'+vid;
+	window.open(url,'',' width=900, height=700');
 }
 </script>
 <body onload="resetSelectedRows()">
@@ -203,8 +210,9 @@ function validateCancel()
 						<td style="text-align: center" class="<c:out value="${trclass}"/>">
 							<s:hidden id="billNumber"
 								name="billListDisplay[%{#s.index}].billNumber"
-								value="%{billNumber}" />
-							<s:property value="%{billNumber}" />
+								value="%{billNumber}" /><a href="javascript:void(0);"
+							onclick='viewBill(<s:property value="%{id}"/>);'>
+							<s:property value="%{billNumber}" /></a>&nbsp;
 						</td>
 						<td style="text-align: center" class="<c:out value="${trclass}"/>">
 							<s:hidden id="billDeptName"

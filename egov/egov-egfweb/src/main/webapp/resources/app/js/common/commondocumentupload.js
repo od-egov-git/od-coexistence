@@ -30,11 +30,23 @@ function addFileInputField() {
     inputFile.setAttribute("id", "file" + trNo);
     inputFile.setAttribute("class", "padding-10");
     inputFile.setAttribute("onchange", "isValidFile(this.id)");
+    
+   // var bt = document.createElement("input");//addedd
+   // bt.setAttribute("type", "button");
+   // bt.setAttribute("id", "button1");
+   // bt.setAttribute("name", "Remove");
+    
+   // bt.setAttribute("onclick", "test(this.id)");
     td.appendChild(inputFile);
     tr.appendChild(td);
+   // tr.appendChild(bt);
+    
     tbody.appendChild(tr);
+    
 }
-
+function test(av){
+	alert("testinggggg.."+av);
+}
 function getTotalFileSize() {
     var uploaderTbl = document.getElementById("uploadertbl");
     var tbody = uploaderTbl.lastChild;

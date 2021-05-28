@@ -216,6 +216,7 @@ public class UpdateExpenseBillController extends BaseBillController {
                 model.addAttribute(NET_PAYABLE_ID, details.getChartOfAccounts().getId());
                 model.addAttribute(NET_PAYABLE_AMOUNT, details.getCreditamount());
             }
+       
         prepareCheckListForEdit(egBillregister, model);
 
         String department = this.getDepartmentName(egBillregister.getEgBillregistermis().getDepartmentcode());
@@ -245,7 +246,7 @@ public class UpdateExpenseBillController extends BaseBillController {
                     && !egBillregister.getEgBillregistermis().getBudgetaryAppnumber().isEmpty()) {
                 budgetDetails = expenseBillService.getBudgetDetailsForBill(egBillregister);
             }
-
+            model.addAttribute("validActionList", validActions);
             model.addAttribute("budgetDetails", budgetDetails);
             return EXPENSEBILL_UPDATE_WORKFLOW;
         }

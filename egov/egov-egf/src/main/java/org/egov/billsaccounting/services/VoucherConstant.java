@@ -135,6 +135,6 @@ public interface VoucherConstant {
     public static final String BILLNUMBER = "billnumber";
     public static final String FUNCTIONIDDETAILS = "FunctionIdDetail"; 
     public static final String FUNCTIONDETAILS = "FunctionDetail"; 
-    
+    public static final String BACKDATE="backdateentry";//added abhishek
     
 }

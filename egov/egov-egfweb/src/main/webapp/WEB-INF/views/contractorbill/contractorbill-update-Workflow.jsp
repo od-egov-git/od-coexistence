@@ -57,7 +57,7 @@
 	z-index: 9999;
 	top: 50px;
 	right: 20px;
-	background: #F2DEDE;
+	background: #265988;
 	padding: 10px 20px;
 	border-radius: 5px;
 }
@@ -67,7 +67,7 @@
 	z-index: 9999;
 	top: 50px;
 	right: 520px;
-	background: #F2DEDE;
+	background: #265988;
 	padding: 10px 20px;
 	border-radius: 5px;
 }
@@ -77,7 +77,7 @@
 	z-index: 9999;
 	top: 50px;
 	right: 270px;
-	background: #F2DEDE;
+	background: #265988;
 	padding: 10px 20px;
 	border-radius: 5px;
 }

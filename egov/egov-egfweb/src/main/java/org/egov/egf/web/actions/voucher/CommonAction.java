@@ -1349,6 +1349,19 @@ public class CommonAction extends BaseFormAction {
             LOGGER.debug("Completed ajaxValidateReassignSurrenderChequeNumber.");
         return "result";
     }
+    
+    @Action(value = "/voucher/common-ajaxValidateReassignSurrenderChequeNumber1")
+    public String ajaxValidateReassignSurrenderChequeNumber1() {
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Starting ajaxValidateReassignSurrenderChequeNumber...");
+       System.out.println("::::CheckNUMBER:: "+chequeNumber+" ::::bankaccountID:: "+bankaccountId+" :::departmentID:: "+departmentId);
+        value = instrumentService.isChequeNumberValid(chequeNumber, bankaccountId, departmentId, null) == true
+                ?  "~true"
+                : "~false";
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Completed ajaxValidateReassignSurrenderChequeNumber.");
+        return "result";
+    }
 
     @Action(value = "/voucher/common-ajaxLoadUser")
     public String ajaxLoadUser() throws Exception {

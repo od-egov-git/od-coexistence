@@ -555,6 +555,7 @@ public class VoucherService extends PersistenceService<CVoucherHeader, Long> {
 			existingVH.getVouchermis().setFundsource(voucherHeader.getVouchermis().getFundsource());
 			existingVH.setVoucherDate(voucherHeader.getVoucherDate());
 			existingVH.setDescription(voucherHeader.getDescription());
+			existingVH.setBackdateentry(voucherHeader.getBackdateentry());
 			applyAuditing(existingVH);
 			update(existingVH);
 		} catch (final HibernateException e) {

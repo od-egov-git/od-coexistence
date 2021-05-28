@@ -96,7 +96,7 @@ function callAjaxSearch() {
 			});
 				 },
 				"bDestroy" : true,
-				dom : "<'row'<'col-xs-12 pull-right'f>r>t<'row buttons-margin'<'col-md-2 col-xs-6'i><'col-md-2  col-xs-6'l><'col-md-5 col-xs-6'B><'col-md-3 col-xs-6 text-right'p>>",
+				dom : "<'row'<'col-xs-12 pull-right'f>r>t<'row buttons-margin'<'col-md-3 col-xs-6'i><'col-md-3 col-xs-6'l><'col-md-6 col-xs-3'B><'col-md-6 col-xs-6 text-right'p>>",
 				"aLengthMenu" : [ [ 10, 25, 50, -1 ], [ 10, 25, 50, "All" ] ],
 				/*"oTableTools" : {
 					"sSwfPath" : "../../../../../../egi/resources/global/swf/copy_csv_xls_pdf.swf",

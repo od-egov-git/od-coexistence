@@ -41,7 +41,7 @@
     
     </div>
 				 <div>
-            <table width=89%">
+            <table width=60%">
                         <tbody>
                         <tr>
                             <td valign="top">
@@ -49,6 +49,9 @@
                                 <tr id="row1">
                                     <td>
                                         <input type="file" name="file" id="file1" onchange="isValidFile(this.id)" class="padding-10">
+                                     </td>
+                                     <td>   
+                                     <input type="button" id="button" value="X" class="padding-10">
                                     </td>
                                 </tr>
                                 </tbody></table>

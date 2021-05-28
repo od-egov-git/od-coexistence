@@ -75,7 +75,7 @@
 	<td class="greybox"><s:text name="contra.fromBankAccount" /> <span
 		class="greybox"><span class="mandatory1">*</span></span></td>
 	<td class="greybox"><s:select name="contraBean.fromBankAccountId"
-			value="%{contraBean.fromBankAccountId}" id="fromAccountNumber"
+			value="%{contraBean.fromBankAccountId}" id="fromAccountNumber" 
 			list="dropdownData.fromAccNumList" listKey="id"
 			listValue="accountnumber" headerKey="-1" headerValue="----Choose----"
 			onChange="populatefromNarration(this);loadFromBalance(this)" /> 
@@ -124,7 +124,7 @@
 				<span class="bluebox"><span class="mandatory1">*</span></span>
 			</s:if></td>
 		<td id="interFundRow2" style="visibility: hidden" class="greybox"><s:select
-				name="contraBean.toDepartment" id="contraBean.toDepartment"
+				name="contraBean.toDepartment" id="contraBean.toDepartment" 
 				list="dropdownData.departmentList" listKey="code" listValue="name"
 				headerKey="" headerValue="----Choose----"
 				value="voucherHeader.vouchermis.departmentcode"
@@ -214,7 +214,7 @@
 				name="contra.chequeNumber" /></span> <span class="greybox"><span
 			class="mandatory1">*</span></span></td>
 	<td class="greybox"><s:textfield name="contraBean.chequeNumber"
-			id="chequeNum" value="%{contraBean.chequeNumber}" onblur="validateChequeNumber(this)" onkeyup="decimalvalue(this)"/>
+			id="chequeNum" value="%{contraBean.chequeNumber}" onblur="validateChequeNumber(this)" onchange="validateReassignSurrenderChequeNumber(this)"/>
 				<span>
 					<font style='color: red;'>
 						<p class="error-block" id="chequeNumberlblError"></p>
@@ -256,6 +256,8 @@
 	<s:iterator var="f" value="%{dropdownData.fundList}" status="stat">
 		fund_map[i++]= '<s:property value="%{id}"/>'+"_"+'<s:property value="%{chartofaccountsByPayglcodeid.glcode}"/>';
 	</s:iterator>	
+	
+	
 	
 	</script>
 

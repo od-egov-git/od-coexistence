@@ -232,6 +232,8 @@ public class JournalVoucherActionHelper {
             throws Exception {
         try {
         	LOGGER.info("Inside edit");
+        	System.out.println(":::::::::: "+voucherHeader.getBackdateentry());
+        	voucherHeader.setBackdateentry(voucherHeader.getBackdateentry());
             voucherHeader = voucherService.updateVoucherHeader(voucherHeader, voucherTypeBean);
             LOGGER.info("after update");
             voucherService.deleteGLDetailByVHId(voucherHeader.getId());

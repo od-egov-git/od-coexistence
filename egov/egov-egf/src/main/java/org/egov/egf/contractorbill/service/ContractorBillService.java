@@ -309,14 +309,7 @@ public class ContractorBillService {
             updatedegBillregister = contractorBillRepository.save(egBillregister);
 
             egBillregister.getEgBillregistermis().setBudgetaryAppnumber(null);
-            List<DocumentUpload> files = egBillregister.getDocumentDetail() == null ? null : egBillregister.getDocumentDetail();
-            final List<DocumentUpload> documentDetails;
-            documentDetails = financialUtils.getDocumentDetails(files, updatedegBillregister,
-                    FinancialConstants.FILESTORE_MODULEOBJECT);
-            if (!documentDetails.isEmpty()) {
-            	updatedegBillregister.setDocumentDetail(documentDetails);
-                persistDocuments(documentDetails);
-            }
+
             // commented as budget check was disabled
             // try {
             // checkBudgetAndGenerateBANumber(egBillregister);
@@ -456,7 +449,24 @@ public class ContractorBillService {
                         null, additionalRule, currState, null);
 
                 if (stateValue.isEmpty())
-                    stateValue = wfmatrix.getNextState();
+                {
+                	if(!wfmatrix.getNextState().equalsIgnoreCase(FinancialConstants.WF_STATE_FINAL_APPROVAL_PENDING) && !wfmatrix.getNextState().equalsIgnoreCase("NEW"))
+                	{
+                		stateValue = wfmatrix.getNextState()+ " "+designation.getName().toUpperCase();
+                	}
+                	else if(wfmatrix.getNextState().equalsIgnoreCase("NEW"))
+                	{
+                		stateValue = "Pending With "+ designation.getName().toUpperCase();
+                	}
+                	else
+                	{
+                		stateValue = wfmatrix.getNextState();
+                		//egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
+                          //      FinancialConstants.CONTINGENCYBILL_PENDING_FINANCE));
+                		
+                	}
+                    
+                }
 
 				/*
 				 * egBillregister.transition().start().withSenderName(user.getUsername() + "::"
@@ -511,7 +521,24 @@ public class ContractorBillService {
                         null, additionalRule, egBillregister.getCurrentState().getValue(), null);
 
                 if (stateValue.isEmpty())
-                    stateValue = wfmatrix.getNextState();
+                {
+                	if(!wfmatrix.getNextState().equalsIgnoreCase(FinancialConstants.WF_STATE_FINAL_APPROVAL_PENDING) && !wfmatrix.getNextState().equalsIgnoreCase("NEW"))
+                	{
+                		stateValue = wfmatrix.getNextState()+ " "+designation.getName().toUpperCase();
+                	}
+                	else if(wfmatrix.getNextState().equalsIgnoreCase("NEW"))
+                	{
+                		stateValue = "Pending With "+ designation.getName().toUpperCase();
+                	}
+                	else
+                	{
+                		stateValue = wfmatrix.getNextState();
+                		//egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
+                          //      FinancialConstants.CONTINGENCYBILL_PENDING_FINANCE));
+                		
+                	}
+                    
+                }
                 
                 if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
             	{
@@ -522,12 +549,23 @@ public class ContractorBillService {
 					int size=egBillregister.getStateHistory().size();//added abhishek on 12042021
 					Position owenrPosName = new Position();
 					owenrPosName.setId(approvalPosition);
-					if(size>1)
+					HashMap<Long, Long> positionmap = new HashMap<>();
+					for(int i=0;i<size;i++)
 					{
-						Long owenrPos1=(long) egBillregister.getState().getPreviousOwner();
+						positionmap.put(egBillregister.getStateHistory().get(i).getOwnerPosition(),
+								egBillregister.getStateHistory().get(i).getPreviousownerposition());
+					}
+					if(size>0)
+					{
+						Long owenrPos1=0l;
+						if(positionmap.containsKey(user.getId()))
+							owenrPos1=positionmap.get(user.getId());
+						else
+							owenrPos1=(long) egBillregister.getStateHistory().get(size-1).getOwnerPosition();
+						
+						if(owenrPos1==null || owenrPos1.equals(""))
+							owenrPos1=(long) egBillregister.getCreatedBy();
 						owenrPosName.setId(owenrPos1);
-						if(owenrPos1==90)
-							owenrPos1=315l;
 						
 						System.out.println("C owner position "+owenrPos1);
 						owenrPos.setId(owenrPos1);
@@ -537,10 +575,9 @@ public class ContractorBillService {
 						owenrPos.setId(egBillregister.getState().getCreatedBy());
 						if(owenrPos.getId()==315)
 							owenrPosName.setId(90l);
-						else
-							owenrPosName.setId(egBillregister.getState().getCreatedBy());
+						
 					}
-		            System.out.println("ownerPostion id- "+owenrPos);
+					System.out.println("ownerPostion id- "+owenrPos);
 		            System.out.println("ownerPostion Nameid- "+owenrPosName);
 					stateValue = FinancialConstants.WORKFLOW_STATE_REJECTED;
 		            egBillregister.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())

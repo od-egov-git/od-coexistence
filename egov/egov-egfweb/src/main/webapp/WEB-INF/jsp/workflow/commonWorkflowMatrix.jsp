@@ -53,6 +53,13 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
 <script>
+window.onload=function(){
+	document.getElementById("approverDepartment").value="DEPT_25";
+	loadDesignationFromMatrix1();
+	//setDesignation1();
+	//document.getElementById('approverPositionId').value="-1";
+	
+}
 	function getUsersByDesignationAndDept() {
 		populateapproverPositionId({
 			approverDepartmentId : document
@@ -109,7 +116,19 @@
 		loadDesignationByDeptAndType(stateType, dept, currentState, amountRule,
 				additionalRule, pendingAction);
 	}
-
+	function loadDesignationFromMatrix1() {
+		var e = dom.get('approverDepartment');
+		var dept = e.options[e.selectedIndex].text;
+		var currentState = dom.get('currentState').value;
+		var amountRule = dom.get('amountRule').value;
+		var additionalRule = dom.get('additionalRule').value;
+		var pendingAction = document.getElementById('pendingActions').value;
+		var stateType = '<s:property value="%{stateType}"/>';
+		document.getElementById("approverDesignation").value="-1";
+		loadDesignationByDeptAndType(stateType, dept, currentState, amountRule,
+				additionalRule, pendingAction);
+	}
+	
 	function populateApprover() {
 		getUsersByDesignationAndDept();
 	}
@@ -117,6 +136,11 @@
 	function setDesignation() {
 		document.getElementById("approverDesignation").value = '<s:property value="%{approverDesignation}"/>';
 		populateApprover();
+	}
+	function setDesignation1() {
+		document.getElementById("approverDesignation").value = '<s:property value="%{approverDesignation}"/>';
+		document.getElementById('approverPositionId').value="-1";
+		//populateApprover();
 	}
 
 	function setApprover() {
@@ -160,8 +184,8 @@
 		<tr>
 			<td class="${approverOddCSS}" width="5%">&nbsp;</td>
 			<td class="${approverOddCSS}" id="deptLabel" width="14%"><s:text name="wf.approver.department" />:</td>
-			<td class="${approverOddTextCss}" width="14%"><s:select name="approverDepartment" id="approverDepartment" list="dropdownData.approverDepartmentList" listKey="code" listValue="name" headerKey="-1" headerValue="----Choose----" value="%{approverDepartment}" onchange="loadDesignationFromMatrix();" cssClass="dropDownCss" />
-			<egov:ajaxdropdown fields="['Text','Value']" url="workflow/ajaxWorkFlow-getDesignationsByObjectType.action"  id="approverDesignation" dropdownId="approverDesignation" contextToBeUsed="/services/eis" afterSuccess="setDesignation();" /></td>
+			<td class="${approverOddTextCss}" width="14%"><s:select name="approverDepartment" id="approverDepartment" list="dropdownData.approverDepartmentList" listKey="code" listValue="name" headerKey="-1" headerValue="----Choose----" value="%{approverDepartment}" onchange="loadDesignationFromMatrix();" disabled="true" cssClass="dropDownCss" />
+			<egov:ajaxdropdown fields="['Text','Value']" url="workflow/ajaxWorkFlow-getDesignationsByObjectType.action"  id="approverDesignation" dropdownId="approverDesignation" contextToBeUsed="/services/eis" afterSuccess="setDesignation();"  /></td>
 			<td class="${approverOddCSS}" width="14%"><s:text name="wf.approver.designation" />:</td>
 			<td class="${approverOddTextCss}" width="14%"><s:select id="approverDesignation" name="approverDesignation" list="dropdownData.designationList" listKey="code" headerKey="-1" listValue="value" headerValue="----Choose----" onchange="populateApprover();" onfocus="callAlertForDepartment();" cssClass="dropDownCss" /> 
 			<egov:ajaxdropdown id="approverPositionId" fields="['Text','Value']" dropdownId="approverPositionId" url="workflow/ajaxWorkFlow-getPositionByPassingDesigId.action" contextToBeUsed="/services/eis" afterSuccess="setApprover();" /></td>

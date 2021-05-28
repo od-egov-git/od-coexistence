@@ -150,8 +150,8 @@
 							<td style="width: 5%"></td>
 							<td class="greybox"><s:text name="backdated.entry" /><span
 								class="mandatory1">*</span></td>
-							<td class="greybox" colspan="3"><s:select name="backlogEntry" 
-																	headerKey="-1" headerValue="Select" value="%{backlogEntry}"
+							<td class="greybox" colspan="3"><s:select name="backdateentry" 
+																	headerKey="-1" headerValue="Select" value="%{backdateentry}"
 																	list="#{'Y':'Yes' ,'N':'No'}"
 																			id="backlogEntry" /></td>
 						</tr>
@@ -533,7 +533,7 @@ function validateJV()
 		    return false;
 		}
 		else{
-			alert(":::::Else:::: ");
+			//alert(":::::Else:::: ");
 			return false;
 		}
 		} 

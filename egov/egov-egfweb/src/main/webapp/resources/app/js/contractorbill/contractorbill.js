@@ -193,7 +193,7 @@ function debitGlcode_initialize() {
   var dt = $('.debitGlcode').typeahead({
   	hint : true,
 		highlight : true,
-		minLength : 1
+		minLength : 3
 		
 	}, {
         displayKey: 'glcodesearch',
@@ -251,7 +251,7 @@ function creditGlcode_initialize() {
   $('.creditGlcode').typeahead({
   	hint : true,
 		highlight : true,
-		minLength : 1
+		minLength : 3
 		
 	}, {		    
         displayKey: 'glcodesearch',

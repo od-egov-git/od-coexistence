@@ -147,6 +147,8 @@ var postTypeFrom = {
 	success : function(o) {
 		var fromNarration = o.responseText;
 		// var index=fromNarration.indexOf("-");
+		////alert("fromNarration---"+fromNarration);
+		if(fromNarration!=null)
 		document.getElementById('fromAccnumnar').value = fromNarration;
 	},
 	failure : function(o) {

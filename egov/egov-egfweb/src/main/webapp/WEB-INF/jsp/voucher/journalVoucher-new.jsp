@@ -384,7 +384,7 @@
 	    var today = new Date();
 	    if (voucherDate > today) {
 	        bootbox.alert("<s:text name='msg.voucher.date.greater.than.today.date'/> ");
-	        return false
+	        return false;
 	    }
 		var vVoucherSubType = document.getElementById('vType').value;
 		if(vVoucherSubType != 'JVGeneral' && vVoucherSubType != '-1' )	{
@@ -403,7 +403,7 @@
 
 	    if (myBillDate > today) {
 	        bootbox.alert("<s:text name='msg.bill.date.greater.than.today.date'/> ");
-	        return false
+	        return false;
 	    }
 	    var partyBillDate = document.getElementById("partyBillDate").value;
 	    var partydate = partyBillDate.substring(0, 2);
@@ -413,7 +413,7 @@
 
 	    if (myPartyBillDate > today) {
 	        bootbox.alert("<s:text name='msg.party.bill.date.greater.than.today.date'/> ");
-	        return false
+	        return false;
 	    }
 		
 	// Javascript validation of the MIS Manadate attributes.

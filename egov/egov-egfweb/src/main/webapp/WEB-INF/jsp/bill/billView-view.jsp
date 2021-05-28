@@ -103,7 +103,7 @@
 					<td width="23%" class="bluebox"><s:date name="billdate"
 							format="dd/MM/yyyy" /></td>
 					<td width="17%" class="bluebox"><s:text name="bill.number" /></td>
-					<td width="33%" class="bluebox"><s:property value="billnumber" /></td>
+					<td width="33%" class="bluebox"><s:property id="billnumber" value="billnumber" /></td>
 				</tr>
 				<tr>
 					<td class="greybox"><s:text name="bill.search.fund" /></td>

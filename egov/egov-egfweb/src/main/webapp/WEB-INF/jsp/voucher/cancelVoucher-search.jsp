@@ -229,6 +229,7 @@ function loadNamesForSelectedType()
 
 	function validateVouchers()
 	{
+		bootbox.alert("Voucher Will be Cancelled.");
 		var objLen=<s:property value="%{voucherSearchList.size()}"/>;
 		var queryParams="";
 		var index;

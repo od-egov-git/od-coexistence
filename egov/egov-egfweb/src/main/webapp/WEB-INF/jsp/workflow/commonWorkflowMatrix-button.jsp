@@ -71,6 +71,7 @@
 	    		return  onSubmitDraft();
 	    	}
 	    var approverPosId = document.getElementById("approverPositionId");
+	    var approverDesId = document.getElementById("approverDesignation");
 	    if(approverPosId && approverPosId.value != -1 && approverPosId.value != "") {
 			var approver = approverPosId.options[approverPosId.selectedIndex].text; 
 			document.getElementById("approverName").value= approver.split('~')[0];
@@ -92,6 +93,10 @@
 		<s:if test="%{getNextAction()!='END'}">
 	    if((name=="Forward" || name=="forward") && approverPosId && (approverPosId.value == -1 || approverPosId.value == "")) {
 	    	bootbox.alert("<s:text name='msg.please.select.approver'/> ");
+			return false;
+	    }
+	    if((name=="Forward" || name=="forward") && approverDesId && (approverDesId.value == -1 || approverDesId.value == "")) {
+	    	bootbox.alert("Please Select Approver Designation. ");
 			return false;
 	    }
 	    if((name=="Create And Approve")) {
