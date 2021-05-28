@@ -561,8 +561,7 @@ public class SupplierBillService {
 					else
 					{
 						owenrPos.setId(egBillregister.getState().getCreatedBy());
-						if(owenrPos.getId()==315)
-							owenrPosName.setId(90l);
+						
 						
 					}
 		            System.out.println("ownerPostion id- "+owenrPos);
