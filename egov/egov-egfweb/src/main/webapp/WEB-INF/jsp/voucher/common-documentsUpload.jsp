@@ -41,17 +41,17 @@
     
     </div>
 				 <div>
-            <table width=60%">
+            <table width=80%">
                         <tbody>
                         <tr>
                             <td valign="top">
-                                <table id="uploadertbl" width="80%"><tbody>
+                                <table id="uploadertbl" width="30%"><tbody>
                                 <tr id="row1">
                                     <td>
                                         <input type="file" name="file" id="file1" onchange="isValidFile(this.id)" class="padding-10">
-                                     </td>
-                                     <td>   
-                                     <input type="button" id="button" value="X" class="padding-10">
+                                    </td>
+                                    <td>
+                                    	<input type="button" name="remove" id="remove" value ="Remove" onclick="deleteFileInputField(this.row)">
                                     </td>
                                 </tr>
                                 </tbody></table>

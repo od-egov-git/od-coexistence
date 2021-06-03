@@ -146,6 +146,7 @@ import org.egov.utils.Constants;
 import org.egov.utils.FinancialConstants;
 import org.egov.utils.VoucherHelper;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
@@ -724,7 +725,8 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
              // set to binary type if MIME mapping not found
              mimeType = "application/octet-stream";
          return SUCCESS;
-
+    }
+        
          // set content attributes for the response
         /* serResponse.setContentType(mimeType);
          serResponse.setContentLength((int) downloadFile.length());
@@ -747,7 +749,7 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
          inputStream.close();
          outStream.close();*/
 
-}
+
     /*
      * @SkipValidation public List<String> getValidActions() { if
      * (FinancialConstants.STANDARD_VOUCHER_TYPE_CONTRA.equals(parameters.get( "from")[0])) return null; else return null; }

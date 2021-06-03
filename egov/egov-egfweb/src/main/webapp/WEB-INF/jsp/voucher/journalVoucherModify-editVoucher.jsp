@@ -72,7 +72,7 @@
 </head>
 
 <body
-	onload="loadDropDownCodes();loadDropDownCodesFunction();onLoadTask();">
+	onload="loadDropDownCodes();loadDropDownCodesFunction();onLoadTask();documentdep()">
 
 	<s:form theme="simple" name="jvmodifyform" enctype ="multipart/form-data">
 		<s:push value="model">
@@ -286,6 +286,14 @@ function onSubmitDraft()
 	}
 	
 }
+
+function deleteDocument(objid,id){
+	//alert("::::::"+objid+":::::"+id)
+	//url='/services/EGF/voucher/journalVoucherModify-deleteVoucherDoc.action?voucherHeaderId='+objid+'&fileid='+id;
+	document.forms[0].action='/services/EGF/voucher/journalVoucherModify-deleteVoucherDoc.action?voucherHeaderId='+objid+'&fileid='+id;
+	document.forms[0].submit();
+}
+
 /*function validateAndSubmitJV()
 {
 	if(validateJV()){
@@ -399,6 +407,12 @@ function validateAccDtls()
 	 
 	
 	return true;
+}
+function printJV()
+{		
+		var voucherHeaderId = '<s:property value="voucherHeader.id"/>';
+		window.location="${pageContext.request.contextPath}/voucher/journalVoucherPrint-print.action?id="+voucherHeaderId;		
+		//document.forms[0].submit();
 }
 function validateJV()
 {

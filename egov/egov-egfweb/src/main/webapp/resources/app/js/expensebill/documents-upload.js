@@ -70,9 +70,23 @@ function addFileInputField() {
     inputFile.setAttribute("id", "file" + trNo);
     inputFile.setAttribute("class", "padding-10");
     inputFile.setAttribute("onchange", "isValidFile(this.id)");
-    td.appendChild(inputFile);
-    tr.appendChild(td);
-    tbody.appendChild(tr);
+    var bt = document.createElement("input");//addedd
+    bt.setAttribute("type", "button");
+     bt.setAttribute("id", "row"+trNo);
+     //bt.setAttribute("name", "button"+trNo);
+    bt.setAttribute("value", "Remove");
+     
+    bt.setAttribute("onclick", "deleteFileInputField1(this.id)");
+     td.appendChild(inputFile);
+     tr.appendChild(td);
+  tr.appendChild(bt);
+     
+     tbody.appendChild(tr);
+}
+
+function deleteFileInputField1(id){
+	//alert("id "+id);
+	document.getElementById(id).remove();
 }
 
 function getTotalFileSize() {
@@ -110,4 +124,21 @@ function deleteFileInputField(id){
 function addSelectedFiles() {
     var uploaderTbl = $("#uploadertbl");
     window.opener.$("#documentDetails").append($(uploaderTbl));
+}
+function deletedoc(billid,docid){
+	//alert(":::::bill::"+billid+"::::docid::::"+docid);
+	$.ajax({
+		
+			type:"GET",
+			data:"html",
+			url:"/services/EGF/expensebill/deleteVoucherDoc/"+docid,
+			success:function(result){
+				if(result=="success"){
+					location.reload();
+				}
+				else{
+					bootbox.alert("Fill not Deleted.");
+				}
+			}
+	});
 }

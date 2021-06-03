@@ -62,6 +62,7 @@ import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.convention.annotation.Results;
 import org.apache.struts2.interceptor.validation.SkipValidation;
+import org.egov.commons.CVoucherHeader;
 import org.egov.commons.EgwStatus;
 import org.egov.commons.Fund;
 import org.egov.egf.dashboard.event.FinanceEventType;
@@ -92,7 +93,9 @@ public class CancelBillAction extends BaseFormAction {
 	private String fromDate;
 	private String toDate;
 	private Fund fund = new Fund();
+	private String reasoncancel;
 	private Department deptImpl = new Department();
+	private EgBillregister egBillregister = new EgBillregister();
 	private String expType;
 	private List<BillRegisterBean> billListDisplay = new ArrayList<BillRegisterBean>();
 	private boolean afterSearch = false;
@@ -154,6 +157,14 @@ public class CancelBillAction extends BaseFormAction {
 
 	public String getExpType() {
 		return expType;
+	}
+
+	public String getReasoncancel() {
+		return reasoncancel;
+	}
+
+	public void setReasoncancel(String reasoncancel) {
+		this.reasoncancel = reasoncancel;
 	}
 
 	@SuppressWarnings("deprecation")
@@ -326,7 +337,9 @@ public class CancelBillAction extends BaseFormAction {
 		int i = 0, idListLength = 0;
 		String idString = "";
 		final StringBuilder statusQuery = new StringBuilder("from EgwStatus where ");
-		final StringBuilder cancelQuery = new StringBuilder("Update eg_billregister set ");
+		final StringBuilder cancelQuery = new StringBuilder("Update eg_billregister set reasoncancel=:reasoncancel ,");
+		//System.out.println(":::::::::::reason:::::"+egBillregister.getReasoncancel());
+		System.out.println(":::::::::::getReasoncancel():::::"+getReasoncancel());
 		for (final BillRegisterBean billRgistrBean : billListDisplay)
 			if (billRgistrBean.getIsSelected()) {
 			    idSet.add(Long.parseLong(billRgistrBean.getId()));
@@ -371,6 +384,7 @@ public class CancelBillAction extends BaseFormAction {
 			totalSQLQuery.setLong("statusId", status.getId());
 			totalSQLQuery.setLong("lastModifiedby", ApplicationThreadLocals.getUserId());
 			totalSQLQuery.setTimestamp("lastModifiedDate", date);
+			totalSQLQuery.setString("reasoncancel", getReasoncancel());
 			if (!idSet.isEmpty()){
 			    totalSQLQuery.executeUpdate();
 			}

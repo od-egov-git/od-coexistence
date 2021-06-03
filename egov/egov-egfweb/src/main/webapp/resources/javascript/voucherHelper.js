@@ -142,14 +142,14 @@ function createTextFieldFormatterJV(prefix,suffix,type){
 	
     return function(el, oRecord, oColumn, oData) {
 		var value = (YAHOO.lang.isValue(oData))?oData:"";
-		el.innerHTML = " <input type='"+type+"' id='"+prefix+"["+billDetailTableIndex+"]"+suffix+"' name='"+prefix+"["+billDetailTableIndex+"]"+suffix+"' style='width:100%;' onkeypress='autocompletecode(this,event)' autocomplete='off' onblur='fillNeibrAfterSplitGlcode(this);'/>";
+		el.innerHTML = " <input type='"+type+"' id='"+prefix+"["+billDetailTableIndex+"]"+suffix+"' name='"+prefix+"["+billDetailTableIndex+"]"+suffix+"' style='width:100%;' onkeyup='autocompletecode(this,event)' autocomplete='off' onblur='fillNeibrAfterSplitGlcode(this);'/>";
 		
 	}
 }
 function createTextFieldFormatterForFunctionJV(prefix,suffix,type){
     return function(el, oRecord, oColumn, oData) {
 		var value = (YAHOO.lang.isValue(oData))?oData:"";
-		el.innerHTML = "<input type='"+type+"'  id='"+prefix+"["+billDetailTableIndex+"]"+suffix+"' name='"+prefix+"["+billDetailTableIndex+"]"+suffix+"' style='width:90px;' onkeypress='autocompletecodeFunction(this,event)' autocomplete='off' onblur='fillNeibrAfterSplitFunction(this)'/>";
+		el.innerHTML = "<input type='"+type+"'  id='"+prefix+"["+billDetailTableIndex+"]"+suffix+"' name='"+prefix+"["+billDetailTableIndex+"]"+suffix+"' style='width:90px;' onkeyup='autocompletecodeFunction(this,event)' autocomplete='off' onblur='fillNeibrAfterSplitFunction(this)'/>";
 		
 	}
 		
@@ -427,6 +427,7 @@ function loadCoa(id){
 
 function loadDropDownCodes()
 {
+	//alert("::loadDropDownCodes::");
 	var	url = "/services/EGF/voucher/common-ajaxGetAllCoaCodes.action";
 	var req2 = initiateRequest();
 	req2.onreadystatechange = function()
@@ -840,6 +841,7 @@ var funcObj;
 var funcArray;
 function loadDropDownCodesFunction()
 {
+	//alert("::loadDropDownCodesFunction:::");
 	var url = "/services/EGF/voucher/common-ajaxGetAllFunctionName.action";
 	var req2 = initiateRequest();
 	req2.onreadystatechange = function()

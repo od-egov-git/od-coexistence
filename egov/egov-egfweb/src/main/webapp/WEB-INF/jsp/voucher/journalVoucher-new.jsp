@@ -68,7 +68,7 @@
 </head>
 
 <body
-	onload="loadDropDownCodes();loadDropDownCodesFunction();onloadtask()">
+	onload="loadDropDownCodes();loadDropDownCodesFunction();onloadtask();documentdep()">
 
 	<s:form action="journalVoucher" theme="simple" name="jvcreateform"  enctype = "multipart/form-data">
 		<s:token />
@@ -216,10 +216,20 @@
 	<s:hidden name="targetvalue" value="%{target}" id="targetvalue" />
 	<s:hidden name="functionValue" id="functionValue" />
 	<s:hidden name="functionId" id="functionId" />
+	<s:hidden name="messagevalue" value="%{message}" id="messagevalue" />
 	<script type="text/javascript">
-		
+	/* window.onload=function(){
+		loadDropDownCodes();
+		loadDropDownCodesFunction();
+		document.getElementById("approverDepartment").value="DEPT_25";
+		loadDesignationFromMatrix1();
+	} */
+	
 			if(dom.get('targetvalue').value=='success')
 			{
+				var message=document.getElementById('messagevalue').value;
+				//bootbox.alert(message);
+				//showMessage(message);
 				document.getElementById('voucherDate').value=""; 
 				if(document.getElementById('voucherNumber')){
 					document.getElementById('voucherNumber').value="";
@@ -594,6 +604,7 @@ bootbox.alert("Please enter the voucher date");
 	function loadBank(fund){
 	}
 function onloadtask(){
+	
 	var VTypeFromBean = '<s:property value="voucherTypeBean.voucherSubType"/>';
 	if(VTypeFromBean == "") 
 		VTypeFromBean = '-1';
@@ -608,7 +619,8 @@ function onloadtask(){
 	//document.getElementById('vouchermis.function').style.display="none";
 	//document.getElementById('functionnametext').style.display="none";
 
-	var message = '<s:property value="message"/>';
+
+	var message = '<s:property value="message"/>';//commented 
 	if(message != null && message != '')
 		showMessage(message);
 	<s:if test="%{voucherTypeBean.voucherNumType == null}">
@@ -627,13 +639,14 @@ function onloadtask(){
 		
   }
 function showMessage(message){
+	//alert(":::message::");
 	var buttonValue = '<s:property value="buttonValue"/>';
 	for(var i=0;i<document.forms[0].length;i++)
 	{
 		if( document.forms[0].elements[i].id!='Close')
 		document.forms[0].elements[i].disabled =true;
 	} 
-	//bootbox.alert(message);
+	//bootbox.alert(message);//uncommented
 	bootbox.alert(message, function() {
 		var voucherHeaderId = '<s:property value="voucherHeader.id"/>';
 		var fileStoreId = '<s:property value="voucherHeader.documentDetail.fileStore.fileStoreId"/>';
@@ -656,21 +669,14 @@ function checkdate()
 	backlogEntry
 	var backlog=document.getElementById('backlogEntry').value;
 	var date2=document.getElementById('voucherDate').value;
-	//alert(":::::::voucher Date efore split:: "+date2);
 	var parts = date2.split("/");
 	   var date = new Date(parts[1] + "/" + parts[0] + "/" + parts[2]);
-	   //alert(":::::Backlog:: "+backlog);
-//alert(":::Voucher  Date after split::: "+date);
-	var curdate = new Date();
-	//alert("::::Current date:: "+curdate);
+var curdate = new Date();
 	if(backlog!='Y'){
 	if(date.setHours(0,0,0,0) == curdate.setHours(0,0,0,0)) {
-	    // Date equals today's date
-	   // alert("date is equal:::");
-	    return true;
+	   return true;
 	}
 	else{
-		//alert(":::::Else:::: ");
 		return false;
 	}
 	}

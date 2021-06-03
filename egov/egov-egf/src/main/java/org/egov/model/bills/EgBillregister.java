@@ -97,6 +97,7 @@ public class EgBillregister extends StateAware implements java.io.Serializable {
     private Boolean isactive;
     private Date billpasseddate;
     private Date workorderdate;
+    private String reasoncancel;
     @ManyToOne
     @JoinColumn(name = "statusid")
     private EgwStatus status;
@@ -488,5 +489,13 @@ public class EgBillregister extends StateAware implements java.io.Serializable {
 
 	public void setSanctionnumber(String sanctionnumber) {
 		this.sanctionnumber = sanctionnumber;
+	}
+
+	public String getReasoncancel() {
+		return reasoncancel;
+	}
+
+	public void setReasoncancel(String reasoncancel) {
+		this.reasoncancel = reasoncancel;
 	}
 }

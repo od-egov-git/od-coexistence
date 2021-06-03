@@ -71,25 +71,34 @@
                 <spring:message code="lbl.view.documents" text="Documents"/>
         </div>
     <c:if test="${egBillregister.documentDetail != null &&  !egBillregister.documentDetail.isEmpty()}">
+    <table>
         <c:forEach items="${egBillregister.documentDetail }" var="documentDetials">
-            <a href="/services/EGF/expensebill/downloadBillDoc?egBillRegisterId=${egBillregister.id }&fileStoreId=${documentDetials.fileStore.fileStoreId }">${documentDetials.fileStore.fileName }</a><br />
+        <tr>    
+        	<td class="padding-10"><a href="/services/EGF/expensebill/downloadBillDoc?egBillRegisterId=${egBillregister.id }&fileStoreId=${documentDetials.fileStore.fileStoreId }">${documentDetials.fileStore.fileName }</a></td>
+        	<td class="padding-10"><span><input type="button" id="remove"
+				style="background: #265988" value="Remove"
+				onclick="deletedoc(${egBillregister.id },${documentDetials.id });"></span></td>
+		</tr><br>	
         </c:forEach>
+        </table>
     </c:if>
     <br>
-    <br>
+    
     </div>
     <input type="hidden" value="${fn:length(egBillregister.documentDetail)}" id="documentsSize">
     <c:if test="${mode != 'readOnly' }">
         <div>
             <table width="100%">
-            	<c:if test="${egBillregister.documentDetail.isEmpty()}">
                         <tbody>
                         <tr>
                             <td valign="top">
-                                <table id="uploadertbl" width="100%"><tbody>
+                                <table id="uploadertbl" width="40%"><tbody>
                                 <tr id="row1">
                                     <td>
                                         <input type="file" name="file" id="file1" onchange="isValidFile(this.id)" class="padding-10">
+                                    </td>
+                                    <td>
+                                    	<input type="button" name="remove" id="remove" value ="Remove" onclick="deleteFileInputField(this.row)">
                                     </td>
                                 </tr>
                                 </tbody></table>
@@ -101,7 +110,6 @@
                             </td>
                         </tr>
                         </tbody>
-            	</c:if>            
             </table>
         </div>
     </c:if>

@@ -480,8 +480,8 @@ public class UpdateSupplierBillController extends BaseBillController {
         	}
             else if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONREJECT))
         	{
-            	if(approvalPosition==90)
-            		approvalPosition=315l;
+            	/*if(approvalPosition==90)
+            		approvalPosition=315l;*/
         		approverName =getEmployeeName(approvalPosition);
         	}
             final String approverDetails = financialUtils.getApproverDetails(workFlowAction,

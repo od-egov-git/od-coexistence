@@ -297,22 +297,21 @@ function	onLoadTask_new()
 				return false;
 			}
 			var dept = document.getElementById('vouchermis.departmentid').value;
-			//var dept = dom.get('voucher.department').value;
-			//alert(":::::1:::"+dept);
+			
 			var bankid = document.getElementById('fromAccountNumber').value;
-			alert(":::::bankID::"+bankid);
+			
 				
 			if(dom.get('voucher.department') && dom.get('voucher.department').value==-1)
 			{
-				//alert(":::::2:::"+dept);
+				
 				bootbox.alert('<s:text name="msg.select.cheque.issued.dept"/>');
 				obj.value='';
 				return false;
 			}
 			
-			//alert(":::::3:::"+dept);
+			
 			var url = '${pageContext.request.contextPath}/voucher/common-ajaxValidateReassignSurrenderChequeNumber1.action?bankaccountId='+document.getElementById('fromAccountNumber').value+'&chequeNumber='+obj.value+'&departmentId='+dept;
-			//alert(url);
+			
 			var transaction = YAHOO.util.Connect.asyncRequest('POST', url, callbackReassign, null);
 		}
 		var callback = {
@@ -337,7 +336,7 @@ function	onLoadTask_new()
 				res = res.split('~');
 				if(res[1]=='false')
 				{
-					bootbox.alert("Cheque No. Already Used.");     
+					bootbox.alert("Cheque No. is Already Used or not in Range.");     
 					document.getElementById('chequeNumber'+parseInt(res[0])).value='';
 				}
 		    },

@@ -53,13 +53,15 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
 <script>
-window.onload=function(){
+function documentdep(){
 	document.getElementById("approverDepartment").value="DEPT_25";
 	loadDesignationFromMatrix1();
+	var con=document.getElementById("approverDepartment");
+	con.disabled = true;
 	//setDesignation1();
 	//document.getElementById('approverPositionId').value="-1";
 	
-}
+}  
 	function getUsersByDesignationAndDept() {
 		populateapproverPositionId({
 			approverDepartmentId : document
@@ -184,7 +186,7 @@ window.onload=function(){
 		<tr>
 			<td class="${approverOddCSS}" width="5%">&nbsp;</td>
 			<td class="${approverOddCSS}" id="deptLabel" width="14%"><s:text name="wf.approver.department" />:</td>
-			<td class="${approverOddTextCss}" width="14%"><s:select name="approverDepartment" id="approverDepartment" list="dropdownData.approverDepartmentList" listKey="code" listValue="name" headerKey="-1" headerValue="----Choose----" value="%{approverDepartment}" onchange="loadDesignationFromMatrix();" disabled="true" cssClass="dropDownCss" />
+			<td class="${approverOddTextCss}" width="14%"><s:select name="approverDepartment" id="approverDepartment" list="dropdownData.approverDepartmentList" listKey="code" listValue="name" headerKey="-1" headerValue="----Choose----" value="%{approverDepartment}" onchange="loadDesignationFromMatrix();"  cssClass="dropDownCss" />
 			<egov:ajaxdropdown fields="['Text','Value']" url="workflow/ajaxWorkFlow-getDesignationsByObjectType.action"  id="approverDesignation" dropdownId="approverDesignation" contextToBeUsed="/services/eis" afterSuccess="setDesignation();"  /></td>
 			<td class="${approverOddCSS}" width="14%"><s:text name="wf.approver.designation" />:</td>
 			<td class="${approverOddTextCss}" width="14%"><s:select id="approverDesignation" name="approverDesignation" list="dropdownData.designationList" listKey="code" headerKey="-1" listValue="value" headerValue="----Choose----" onchange="populateApprover();" onfocus="callAlertForDepartment();" cssClass="dropDownCss" /> 

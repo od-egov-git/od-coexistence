@@ -1248,7 +1248,8 @@ function validate(){
 	
 	if(!$netPayableAccountCodeId)
 	{
-		bootbox.alert($.i18n.prop('msg.please.select.one.net.payable.account.detail'));
+		//bootbox.alert($.i18n.prop('msg.please.select.one.net.payable.account.detail'));
+		bootbox.alert("Please select sub-ledger account deatil");
 		return false;
 	}
 	return true;

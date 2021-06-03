@@ -72,7 +72,7 @@
 				test="%{isFieldMandatory('department')}">
 				<span class="bluebox"><span class="mandatory1">*</span></span>
 			</s:if></td>
-		<td class="greybox"><s:select name="vouchermis.departmentcode"
+		<td class="greybox"><s:select name="vouchermis.departmentcode" 
 				id="vouchermis.departmentid" list="dropdownData.departmentList"
 				listKey="code" listValue="name" headerKey="-1"
 				headerValue="%{getText('lbl.choose.options')}"

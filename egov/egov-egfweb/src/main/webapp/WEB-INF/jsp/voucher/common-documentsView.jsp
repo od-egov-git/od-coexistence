@@ -12,6 +12,11 @@
 <link rel="stylesheet" type="text/css" media="screen"
 	href="../resources/css/jquery/ui.jqgrid.css" />--%>
 <script src="<cdn:url value='/resources/app/js/common/commondocumentupload.js?rnd=${app_release_no}' context='/services/EGF'/>"></script>
+<script type="text/javascript">
+function check(){
+	alert("check");
+}
+</script>
 
 
 <style>
@@ -39,8 +44,10 @@
 				   		          <s:iterator var="p" value="%{voucherHeader.documentDetail}" status="s">
 				   		         <tr>
 				                    <td> 
-				                      <a target="_blank" href="/services/EGF/voucher/preApprovedVoucher-downloadVoucherDoc.action?voucherHeaderId=<s:property value='%{objectId}'/>&fileStoreId=<s:property value='%{fileStore.fileStoreId}'/>"><s:property value="fileStore.fileName"/></a><br />
+				                      <a target="_blank" href="/services/EGF/voucher/preApprovedVoucher-downloadVoucherDoc.action?voucherHeaderId=<s:property value='%{objectId}'/>&fileStoreId=<s:property value='%{fileStore.fileStoreId}'/>"><s:property value="fileStore.fileName"/></a>
+				                      <span><a href="/services/EGF/voucher/journalVoucherModify-deleteVoucherDoc.action?voucherHeaderId=<s:property value='%{objectId}'/>&fileid=<s:property value='%{id}'/>">Remove</a></span><br />
 				                    </td>
+				                    
 				                 </tr>
 				                  </s:iterator>
 				      </s:if>

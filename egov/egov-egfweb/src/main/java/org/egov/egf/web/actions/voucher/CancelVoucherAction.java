@@ -151,6 +151,7 @@ public class CancelVoucherAction extends BaseFormAction {
 	@Autowired
 	private EgovMasterDataCaching masterDataCache;
 	private Department deptImpl = new Department();
+	private String reason="";
 	
 	@Autowired
 	FinanceDashboardService finDashboardService;
@@ -420,15 +421,18 @@ public class CancelVoucherAction extends BaseFormAction {
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("Inside CancelVoucher| cancelVoucherSubmit | Selected No of Vouchers for cancellation  ="
 					+ selectedVhs.length);
+		System.out.println(":::getReasoncancel::::"+voucherHeader.getReasoncancel());
+		
+		
 		final String cancelVhQuery = "Update CVoucherHeader vh set vh.status="
 				+ FinancialConstants.CANCELLEDVOUCHERSTATUS
-				+ ",vh.lastModifiedBy=:modifiedby, vh.lastModifiedDate=:modifiedDate   where vh.id=:vhId";
+				+ ",vh.lastModifiedBy=:modifiedby, vh.lastModifiedDate=:modifiedDate, vh.reasoncancel=:reasoncancel  where vh.id=:vhId";
 		final String cancelVhByCGNQuery = "Update CVoucherHeader vh set vh.status="
 				+ FinancialConstants.CANCELLEDVOUCHERSTATUS
-				+ ",vh.lastModifiedBy=:modifiedby , vh.lastModifiedDate=:modifiedDate where vh.refvhId=:vhId";
+				+ ",vh.lastModifiedBy=:modifiedby , vh.lastModifiedDate=:modifiedDate, vh.reasoncancel=:reasoncancel where vh.refvhId=:vhId";
 		final String cancelVhByRefCGNQuery = "Update CVoucherHeader vh set vh.status="
 				+ FinancialConstants.CANCELLEDVOUCHERSTATUS
-				+ ",vh.lastModifiedBy=:modifiedby , vh.lastModifiedDate=:modifiedDate where vh.voucherNumber=:vhNum";
+				+ ",vh.lastModifiedBy=:modifiedby , vh.lastModifiedDate=:modifiedDate, vh.reasoncancel=:reasoncancel where vh.voucherNumber=:vhNum";
 		String voucherId = "";
 		Set<Long> ids = new HashSet<>();
 		final Session session = persistenceService.getSession();
@@ -437,13 +441,13 @@ public class CancelVoucherAction extends BaseFormAction {
 					selectedVhs[i]);
 			ids.add(selectedVhs[i]);
 			// Need to do this change as configurable
-			/*
-			 * final boolean value =
+			
+			/* * final boolean value =
 			 * cancelBillAndVoucher.canCancelVoucher(voucherObj);
 			 * 
 			 * if (!value) { addActionMessage(getText(
-			 * "Vouchers Cancelled Failure")); continue; }
-			 */
+			 * "Vouchers Cancelled Failure")); continue; }*/
+			 
 			voucherId = voucherObj.getId().toString();
 			switch (voucherObj.getType()) {
 
@@ -453,6 +457,7 @@ public class CancelVoucherAction extends BaseFormAction {
 				query.setLong("modifiedby", loggedInUser);
 				query.setTimestamp("modifiedDate", modifiedDate);
 				query.setLong("vhId", selectedVhs[i]);
+				query.setString("reasoncancel", voucherHeader.getReasoncancel());
 				query.executeUpdate();
 				
 				
@@ -467,6 +472,7 @@ public class CancelVoucherAction extends BaseFormAction {
 				query.setLong("vhId", selectedVhs[i]);
 				query.setLong("modifiedby", loggedInUser);
 				query.setTimestamp("modifiedDate", modifiedDate);
+				query.setString("reasoncancel", voucherHeader.getReasoncancel());
 				query.executeUpdate();
 				if (FinancialConstants.PAYMENTVOUCHER_NAME_REMITTANCE.equalsIgnoreCase(voucherObj.getName())) {
 					int count = paymentService.backUpdateRemittanceDateInGL(voucherHeader.getId());
@@ -478,6 +484,7 @@ public class CancelVoucherAction extends BaseFormAction {
 				query.setLong("vhId", selectedVhs[i]);
 				query.setLong("modifiedby", loggedInUser);
 				query.setTimestamp("modifiedDate", modifiedDate);
+				query.setString("reasoncancel", voucherHeader.getReasoncancel());
 				query.executeUpdate();
 				if (FinancialConstants.CONTRAVOUCHER_NAME_INTERFUND.equalsIgnoreCase(voucherObj.getName())) {
 					Long vhId;
@@ -495,6 +502,7 @@ public class CancelVoucherAction extends BaseFormAction {
 				query.setLong("vhId", selectedVhs[i]);
 				query.setLong("modifiedby", loggedInUser);
 				query.setTimestamp("modifiedDate", modifiedDate);
+				query.setString("reasoncancel", voucherHeader.getReasoncancel());
 				query.executeUpdate();
 				break;
 			}
@@ -821,5 +829,13 @@ public class CancelVoucherAction extends BaseFormAction {
 	public void setVoucherNumber(String voucherNumber) {
 	        this.voucherNumber = voucherNumber;
 	  }
+
+	public String getReason() {
+		return reason;
+	}
+
+	public void setReason(String reason) {
+		this.reason = reason;
+	}
 
 }

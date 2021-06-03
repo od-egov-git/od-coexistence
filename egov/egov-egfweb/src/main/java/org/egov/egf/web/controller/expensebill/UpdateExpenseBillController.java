@@ -59,8 +59,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.struts2.ServletActionContext;
 import org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper;
 import org.apache.struts2.dispatcher.multipart.UploadedFile;
 import org.egov.commons.CChartOfAccounts;
@@ -89,6 +91,7 @@ import org.egov.model.bills.DocumentUpload;
 import org.egov.model.bills.EgBilldetails;
 import org.egov.model.bills.EgBillregister;
 import org.egov.utils.FinancialConstants;
+import org.hibernate.SQLQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -96,9 +99,11 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -381,8 +386,8 @@ public class UpdateExpenseBillController extends BaseBillController {
         	}
             else if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONREJECT))
         	{
-            	if(approvalPosition==90)
-            		approvalPosition=315l;
+            	/*if(approvalPosition==90)
+            		approvalPosition=315l;*/
         		approverName =getEmployeeName(approvalPosition);
         	}
             model.addAttribute(BILL_TYPES, BillType.values());
@@ -393,6 +398,7 @@ public class UpdateExpenseBillController extends BaseBillController {
                     + updatedEgBillregister.getBillnumber();
         }
     }
+    
 
 	@RequestMapping(value = "/view/{billId}", method = RequestMethod.GET)
     public String view(final Model model, @PathVariable String billId,
@@ -517,5 +523,14 @@ public class UpdateExpenseBillController extends BaseBillController {
         
         return microServiceUtil.getEmployee(empId, null, null, null).get(0).getUser().getName();
      }
+    public int deletedoc(Long docid) {
+    	String deletefile="delete from egf_documents where id="+Long.valueOf(docid);
+        final SQLQuery totalSQLQuery = persistenceService.getSession().createSQLQuery(deletefile.toString());
+      
+      System.out.println(":::query: "+deletefile);
+     int de = totalSQLQuery.executeUpdate();
+     System.out.println(":::::::::Delete files:::"+de);
+    return de;
+    }
  	
 }

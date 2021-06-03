@@ -306,6 +306,14 @@ public class SupplierBillService {
                 egBillregister.getEgBillregistermis().setSubScheme(null);
 
             updatedegBillregister = supplierBillRepository.save(egBillregister);
+            List<DocumentUpload> files = egBillregister.getDocumentDetail() == null ? null : egBillregister.getDocumentDetail();
+            final List<DocumentUpload> documentDetails;
+            documentDetails = financialUtils.getDocumentDetails(files, updatedegBillregister,
+                    FinancialConstants.FILESTORE_MODULEOBJECT);
+            if (!documentDetails.isEmpty()) {
+            	updatedegBillregister.setDocumentDetail(documentDetails);
+                persistDocuments(documentDetails);
+            }
 
             egBillregister.getEgBillregistermis().setBudgetaryAppnumber(null);
 

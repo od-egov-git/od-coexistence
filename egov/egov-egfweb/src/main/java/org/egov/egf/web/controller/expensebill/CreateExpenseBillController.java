@@ -78,15 +78,18 @@ import org.egov.egf.web.controller.microservice.FinanceController;
 import org.egov.eis.web.contract.WorkflowContainer;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
+import org.egov.infra.exception.ApplicationException;
 import org.egov.infra.filestore.service.FileStoreService;
 import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
 import org.egov.infra.microservice.models.EmployeeInfo;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.validation.exception.ValidationException;
+import org.egov.infstr.services.PersistenceService;
 import org.egov.model.bills.BillType;
 import org.egov.model.bills.DocumentUpload;
 import org.egov.model.bills.EgBillregister;
 import org.egov.utils.FinancialConstants;
+import org.hibernate.SQLQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
@@ -94,9 +97,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 
 /**
@@ -140,6 +145,9 @@ public class CreateExpenseBillController extends BaseBillController {
 	private AutonumberServiceBeanResolver beanResolver;
 	@Autowired
     private MicroserviceUtils microserviceUtils;
+	@Autowired
+    @Qualifier("persistenceService")
+    private PersistenceService persistenceService;
     
     
 
@@ -369,6 +377,22 @@ public class CreateExpenseBillController extends BaseBillController {
         return message;
     }
 
+    @RequestMapping(value="/deleteVoucherDoc/{docid}", method = RequestMethod.GET)
+    public @ResponseBody String deleteVoucherDoc(@PathVariable("docid") String docid) throws ApplicationException, IOException {
+        System.out.println("::::::::::::");
+             System.out.println("::::::::  :::::: "+docid);
+             String deletefile="delete from egf_documents where id="+Long.valueOf(docid);
+             final SQLQuery totalSQLQuery = persistenceService.getSession().createSQLQuery(deletefile.toString());
+           
+           System.out.println(":::query: "+deletefile);
+          int de = totalSQLQuery.executeUpdate();
+          System.out.println(":::::::::Delete files:::"+de);
+          if(de==1) {
+        	  return "success";
+          }
+          return "fail";
+    }
+    
     @RequestMapping(value = "/downloadBillDoc", method = RequestMethod.GET)
     public void getBillDoc(final HttpServletRequest request, final HttpServletResponse response)
             throws IOException {

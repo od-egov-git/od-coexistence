@@ -70,9 +70,21 @@ function addFileInputField() {
     inputFile.setAttribute("id", "file" + trNo);
     inputFile.setAttribute("class", "padding-10");
     inputFile.setAttribute("onchange", "isValidFile(this.id)");
+    var bt = document.createElement("input");//addedd
+    bt.setAttribute("type", "button");
+     bt.setAttribute("id", "row"+trNo);
+     //bt.setAttribute("name", "button"+trNo);
+    bt.setAttribute("value", "Remove");
+     
+    bt.setAttribute("onclick", "deleteFileInputField1(this.id)");
     td.appendChild(inputFile);
     tr.appendChild(td);
+    tr.appendChild(bt);
     tbody.appendChild(tr);
+}
+function deleteFileInputField1(id){
+	//alert("id "+id);
+	document.getElementById(id).remove();
 }
 
 function getTotalFileSize() {

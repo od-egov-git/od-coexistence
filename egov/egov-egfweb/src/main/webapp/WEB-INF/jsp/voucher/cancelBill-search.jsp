@@ -106,18 +106,27 @@ function resetSelectedRows()
 
 function validateCancel()
 {
-	bootbox.alert("Bill will be Cancelled.");
+	
 	var rows=parseInt(document.getElementById('selectedRows').value);
+	var resu = document.getElementById("reason").value;
 	console.log("rows : ",rows);
 	console.log("rows : ",rows == 0 || rows == "");
 	if(rows == 0 || rows == "")
 	{
 		bootbox.alert("<s:text name='msg.please.select.atleast.one.bill'/>");
 		return false;
-	}
+	}else{
+		if(resu !=""){
+			bootbox.alert("Bill will be Cancelled.");
 	document.billForm.action='/services/EGF/voucher/cancelBill-cancelBill.action';
 	document.billForm.submit();
+	
 	return true;
+		}else{
+			bootbox.alert("Please Fill Cancel Reason");
+			return false;
+		}
+	}
 }
 
 function viewBill(vid){
@@ -245,6 +254,17 @@ function viewBill(vid){
 						</c:choose>
 					</tr>
 				</s:iterator>
+				<div>
+				<tr>
+							<td style="width: 5%"></td>
+							<td class="greybox">Reason For Cancel<span
+								class="mandatory1">*</span></td>
+							<td class="greybox" colspan="3"><s:textarea id="reason"
+									name="reasoncancel" cols="100" rows="3"
+									 /></td>
+						</tr>
+				
+				</div>
 			</table>
 			<div class="buttonbottom">
 				<input type="button" value="<s:text name='lbl.cancel.bill'/>" id="cancelBill"
