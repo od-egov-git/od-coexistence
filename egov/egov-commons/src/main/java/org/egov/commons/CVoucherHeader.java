@@ -98,6 +98,7 @@ public class CVoucherHeader extends StateAware implements java.io.Serializable{
     private Long refvhId;
     private String cgvn;
     private Integer moduleId;
+    private String reasoncancel;
     @Transient
     private String voucherSubType;
     @Transient
@@ -611,5 +612,13 @@ public class CVoucherHeader extends StateAware implements java.io.Serializable{
 
 	public void setBackdateentry(String backdateentry) {
 		this.backdateentry = backdateentry;
+	}
+
+	public String getReasoncancel() {
+		return reasoncancel;
+	}
+
+	public void setReasoncancel(String reasoncancel) {
+		this.reasoncancel = reasoncancel;
 	}
 }

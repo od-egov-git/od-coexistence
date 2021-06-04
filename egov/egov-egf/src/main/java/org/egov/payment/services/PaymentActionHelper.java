@@ -583,7 +583,7 @@ public class PaymentActionHelper {
                 }
 
             }
-
+            if(subLedgerlist!=null) {
             for (final VoucherDetails voucherDetail : subLedgerlist) {
                 subledgertDetailMap = new HashMap<String, Object>();
                 final String amountType = glcodeMap.get(voucherDetail.getSubledgerCode()) != null ? glcodeMap.get(
@@ -596,6 +596,7 @@ public class PaymentActionHelper {
                 subledgertDetailMap.put(VoucherConstant.DETAILKEYID, voucherDetail.getDetailKeyId());
                 subledgertDetailMap.put(VoucherConstant.GLCODE, voucherDetail.getSubledgerCode());
                 subledgerDetails.add(subledgertDetailMap);
+            }
             }
 
             voucherHeader = createVoucher.createPreApprovedVoucher(headerDetails, accountdetails, subledgerDetails);

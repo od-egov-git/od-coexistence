@@ -47,8 +47,12 @@
  */
 package org.egov.egf.web.controller.contractor;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -60,6 +64,8 @@ import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper;
+import org.apache.struts2.dispatcher.multipart.UploadedFile;
 import org.egov.commons.CChartOfAccountDetail;
 import org.egov.commons.CChartOfAccounts;
 import org.egov.commons.service.AccountdetailtypeService;
@@ -80,6 +86,7 @@ import org.egov.infra.microservice.models.EmployeeInfo;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.validation.exception.ValidationException;
 import org.egov.infstr.models.EgChecklists;
+import org.egov.model.bills.BillType;
 import org.egov.model.bills.DocumentUpload;
 import org.egov.model.bills.EgBillPayeedetails;
 import org.egov.model.bills.EgBilldetails;
@@ -108,6 +115,8 @@ public class UpdateContractorBillController extends BaseBillController {
     private static final String APPROVAL_COMENT = "approvalComent";
 
     private static final String CONTRACTOR = "Contractor";
+   
+    private static final String FILE = "file";
 
     private static final String WORK_ORDER = "WorkOrder";
 
@@ -206,7 +215,14 @@ public class UpdateContractorBillController extends BaseBillController {
                 model.addAttribute(NET_PAYABLE_AMOUNT, details.getCreditamount());
             }
         prepareCheckListForEdit(egBillregister, model);
-        
+        	List<String> billtype=new ArrayList<>();
+    	
+    	for(BillType bill:BillType.values()) {
+    		billtype.add(bill.getValue());
+    		//System.out.println("::::::::: "+bill.getValue());
+    	}
+    	model.addAttribute("billTypes", billtype);
+    	egBillregister.setBilltype(egBillregister.getBilltype());
         String department = this.getDepartmentName(egBillregister.getEgBillregistermis().getDepartmentcode());
 
         if (department != null)
@@ -361,7 +377,25 @@ public class UpdateContractorBillController extends BaseBillController {
 
         String mode = "";
         EgBillregister updatedEgBillregister = null;
+        //adding file upload
+        String[] contentType = ((MultiPartRequestWrapper) request).getContentTypes(FILE);
+        List<DocumentUpload> list = new ArrayList<>();
+        UploadedFile[] uploadedFiles = ((MultiPartRequestWrapper) request).getFiles(FILE);
+        String[] fileName = ((MultiPartRequestWrapper) request).getFileNames(FILE);
+        if (uploadedFiles != null)
+            for (int i = 0; i < uploadedFiles.length; i++) {
 
+                Path path = Paths.get(uploadedFiles[i].getAbsolutePath());
+                byte[] fileBytes = Files.readAllBytes(path);
+                ByteArrayInputStream bios = new ByteArrayInputStream(fileBytes);
+                DocumentUpload upload = new DocumentUpload();
+                upload.setInputStream(bios);
+                upload.setFileName(fileName[i]);
+                upload.setContentType(contentType[i]);
+                list.add(upload);
+            }
+
+        egBillregister.setDocumentDetail(list);
         if (request.getParameter("mode") != null)
             mode = request.getParameter("mode");
 
@@ -455,8 +489,8 @@ public class UpdateContractorBillController extends BaseBillController {
         	}
             else if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONREJECT))
         	{
-            	if(approvalPosition==90)
-            		approvalPosition=315l;
+            	/*if(approvalPosition==90)
+            		approvalPosition=315l;*/
         		approverName =getEmployeeName(approvalPosition);
         	}
             final String approverDetails = financialUtils.getApproverDetails(workFlowAction,

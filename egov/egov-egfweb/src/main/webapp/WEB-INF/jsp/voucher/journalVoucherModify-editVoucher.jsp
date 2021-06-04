@@ -72,11 +72,11 @@
 </head>
 
 <body
-	onload="loadDropDownCodes();loadDropDownCodesFunction();onLoadTask()">
+	onload="loadDropDownCodes();loadDropDownCodesFunction();onLoadTask();documentdep()">
 
 	<s:form theme="simple" name="jvmodifyform" enctype ="multipart/form-data">
 		<s:push value="model">
-			<div id="loading"
+			<div 
 				style="position: absolute; left: 25%; top: 70%; padding: 2px; z-index: 20001; height: auto; width: 500px; display: none;">
 				<div class="loading-indicator"
 					style="background: white; color: #444; font: bold 13px tohoma, arial, helvetica; padding: 10px; margin: 0; height: auto;">
@@ -101,7 +101,7 @@
 						<font style='color: red; font-weight: bold'>
 							<p class="error-block" id="lblError"></p>
 						</font> <input type="hidden" name="selectedDate" id="selectedDate" />
-
+							
 						<table border="0" width="100%">
 							<tr>
 								<td class="greybox">&nbsp;</td>
@@ -111,6 +111,7 @@
 									<td class="greybox"><input type="text"
 										name="voucherNumberPrefix" id="voucherNumberPrefix"
 										readonly="true" style="width: 100%" /></td>
+										
 									<td class="greybox"><s:textfield name="voucherNumber"
 											id="voucherNumber" /></td>
 								</s:if>
@@ -145,6 +146,15 @@
 										name="description" style="width:580px"
 										onblur="checkVoucherNarrationLen(this)" /></td>
 							</tr>
+							<tr>
+							<td style="width: 5%"></td>
+							<td class="greybox"><s:text name="backdated.entry" /><span
+								class="mandatory1">*</span></td>
+							<td class="greybox" colspan="3"><s:select name="backdateentry" 
+																	headerKey="-1" headerValue="Select" value="%{backdateentry}"
+																	list="#{'Y':'Yes' ,'N':'No'}"
+																			id="backlogEntry" /></td>
+						</tr>
 						</table>
 					</div>
 					<br />
@@ -245,6 +255,8 @@ function validateApproverUser(name,value){
 }
 function onSubmit()
 {
+	//alert(":::modify forward onsubmit::");
+	if(checkdate()){
 	if(validateJV())
 		{
 		document.forms[0].action='${pageContext.request.contextPath}/voucher/journalVoucherModify-update.action';
@@ -255,16 +267,33 @@ function onSubmit()
 			
 			return false;
 }
+	}else{
+		bootbox.alert("Please select back dated entry option correctly");
+		return false;
+	}
 			
 }
 //jayanta for save as draft
 function onSubmitDraft()
 {
-	
+	//alert(":::modify save as draftonsubmit::");
+	if(checkdate()){
 	document.forms[0].action='${pageContext.request.contextPath}/voucher/journalVoucherModify-update.action';
 	document.forms[0].submit();
-			
+	}else{
+		bootbox.alert("Please select back dated entry option correctly");
+		return false;
+	}
+	
 }
+
+function deleteDocument(objid,id){
+	//alert("::::::"+objid+":::::"+id)
+	//url='/services/EGF/voucher/journalVoucherModify-deleteVoucherDoc.action?voucherHeaderId='+objid+'&fileid='+id;
+	document.forms[0].action='/services/EGF/voucher/journalVoucherModify-deleteVoucherDoc.action?voucherHeaderId='+objid+'&fileid='+id;
+	document.forms[0].submit();
+}
+
 /*function validateAndSubmitJV()
 {
 	if(validateJV()){
@@ -316,7 +345,8 @@ function validateAccDtls()
 		  creditAmt= parseFloat(creditAmt);
 		  if(accountCode == '')				  
 		    {
-			     document.getElementById('lblError').innerHTML ="Account code  is missing for credit or debit supplied field in account grid : "+(i+1);
+			  bootbox.alert("Account code  is missing for credit or debit supplied field in account grid : "+(i+1));
+			     //document.getElementById('lblError').innerHTML ="Account code  is missing for credit or debit supplied field in account grid : "+(i+1);
 				return false;
 				
 		    }
@@ -326,7 +356,8 @@ function validateAccDtls()
 		 
 			  if(!inAccountCodeArray(accountCode,accountCodeArray))
 				  {
-				  document.getElementById('lblError').innerHTML ="Function is missing for the repeated account code,check account code : "+accountCode;
+				  bootbox.alert("Function is missing for the repeated account code,check account code : "+accountCode);
+				  //document.getElementById('lblError').innerHTML ="Function is missing for the repeated account code,check account code : "+accountCode;
 					return false;
 				     
 				  }else{
@@ -336,13 +367,14 @@ function validateAccDtls()
 			 
 			  if(debitAmt > 0 && creditAmt >0)
 				  {
-				  				 
-				    document.getElementById('lblError').innerHTML = "One account can have only credit or debit for the account code :"+accountCode;
+				  	bootbox.alert("One account can have only credit or debit for the account code :"+accountCode);			 
+				   // document.getElementById('lblError').innerHTML = "One account can have only credit or debit for the account code :"+accountCode;
 					return false;
 				  }
 			  if(debitAmt == 0 && creditAmt == 0)
-				  {				 
-				    document.getElementById('lblError').innerHTML ="Enter debit/credit amount for the account code : "+accountCode;
+				  {	
+				  bootbox.alert("Enter debit/credit amount for the account code : "+accountCode);
+				    //document.getElementById('lblError').innerHTML ="Enter debit/credit amount for the account code : "+accountCode;
 					return false;
 				  }
 			  if(debitAmt > 0 && creditAmt == 0)
@@ -367,6 +399,7 @@ function validateAccDtls()
 
 	if(totalDebitAmt != totalCreditAmt)
 		{
+		bootbox.alert("Total Credit and Total Debit amount must be same");
 		document.getElementById('lblError').innerHTML = "Total Credit and Total Debit amount must be same";
 		alert("return false");
 		return false;
@@ -374,6 +407,12 @@ function validateAccDtls()
 	 
 	
 	return true;
+}
+function printJV()
+{		
+		var voucherHeaderId = '<s:property value="voucherHeader.id"/>';
+		window.location="${pageContext.request.contextPath}/voucher/journalVoucherPrint-print.action?id="+voucherHeaderId;		
+		//document.forms[0].submit();
 }
 function validateJV()
 {
@@ -388,7 +427,8 @@ function validateJV()
 	var restrictionDate = typeDate.split(",") */
 
 	if(vhDate == '' )	{
-		document.getElementById('lblError').innerHTML = "Please enter a voucher date ";
+		bootbox.alert("Please enter a voucher date ");
+		//document.getElementById('lblError').innerHTML = "Please enter a voucher date ";
 		document.getElementById('voucherDate').focus();
 		return false;
 	}
@@ -409,7 +449,8 @@ function validateJV()
 	var varVType = document.getElementById('vType').value;
 	if( varVType != 'JVGeneral' && varVType != '-1' )	{
 		if(document.getElementById('voucherTypeBean.partyName').value == '' ) {
-			document.getElementById('lblError').innerHTML = "Please enter a Party Name ";
+			bootbox.alert("Please enter a Party Name ");
+			//document.getElementById('lblError').innerHTML = "Please enter a Party Name ";
 			document.getElementById('voucherTypeBean.partyName').focus();
 			return false;
 		}
@@ -432,6 +473,7 @@ function validateJV()
 }
 	function onLoadTask()
 	{
+		
 		//loadSlFunction();
 		//getSlAccountCodes();
 		// code- JV subtype - starts
@@ -439,9 +481,9 @@ function validateJV()
 		if('<s:property value="voucherTypeBean.voucherSubType"/>' == 'JVGeneral' ){
 			document.getElementById('voucherTypeBean.partyBillNum').readOnly=true;
 			document.getElementById('voucherTypeBean.partyName').readOnly=true;
-			document.getElementById('partyBillDate').readOnly=true;
+			//document.getElementById('partyBillDate').readOnly=true;
 			document.getElementById('voucherTypeBean.billNum').readOnly=true;
-			document.getElementById('billDate').readOnly=true;
+			//document.getElementById('billDate').readOnly=true;
 		}
 		var varVType = document.getElementById('vType').value;
 		if(varVType == 'JVGeneral' || varVType == '-1') {
@@ -479,6 +521,40 @@ function validateJV()
 	}
 
 	function loadBank(fund){
+	}
+	
+	function checkdate()
+	{
+		//alert(":::::::test modify::");
+		 var backlog=document.getElementById('backlogEntry').value;
+		var date2=document.getElementById('voucherDate').value;
+		//alert(":::::::voucher Date efore split:: "+date2);
+		var parts = date2.split("/");
+		   var date = new Date(parts[1] + "/" + parts[0] + "/" + parts[2]);
+		  // alert(":::::Backlog:: "+backlog);
+	//alert(":::Voucher  Date after split::: "+date);
+		var curdate = new Date();
+		//alert("::::Current date:: "+curdate);
+		
+		if(backlog!='Y'){
+		if(date.setHours(0,0,0,0) == curdate.setHours(0,0,0,0)) {
+		    // Date equals today's date
+		   //alert("date is equal:::");
+		    if(backlog == 'N'){
+		    	//alert(":in N:");
+		    	return true;
+		    }
+		    return false;
+		}
+		else{
+			//alert(":::::Else:::: ");
+			return false;
+		}
+		} 
+		else{
+			return true;
+		}
+		
 	}
 
 </script>

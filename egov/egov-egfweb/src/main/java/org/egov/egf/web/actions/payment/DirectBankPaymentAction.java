@@ -154,6 +154,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
     private static final String MDP_RTGS = FinancialConstants.MODEOFPAYMENT_RTGS;
     private static final String MDP_CASH = FinancialConstants.MODEOFPAYMENT_CASH;
     private static final String MDP_PEX = FinancialConstants.MODEOFPAYMENT_PEX;
+																					 
     private String button;
     private VoucherService voucherService;
     private static final Logger LOGGER = Logger.getLogger(DirectBankPaymentAction.class);
@@ -187,6 +188,8 @@ public class DirectBankPaymentAction extends BasePaymentAction {
     private String firstsignatory="-1";
     private String secondsignatory="-1";
     private String backlogEntry="";
+	
+	private String paymentChequeNo=null;									
 
     public BigDecimal getBalance() {
         return balance;
@@ -211,7 +214,8 @@ public class DirectBankPaymentAction extends BasePaymentAction {
         modeOfPaymentMap = new LinkedHashMap<String, String>();
         modeOfPaymentMap.put(MDP_CHEQUE, getText(MDP_CHEQUE));
         //modeOfPaymentMap.put(MDP_CASH, getText(MDP_CASH));
-        modeOfPaymentMap.put(MDP_RTGS, getText(MDP_RTGS));
+       // modeOfPaymentMap.put(MDP_RTGS, getText(MDP_RTGS));
+															  
         //modeOfPaymentMap.put(MDP_PEX, getText(MDP_PEX));
 
         addDropdownData("designationList", Collections.EMPTY_LIST);
@@ -243,7 +247,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
             }
         voucherHeader.reset();
         commonBean.reset();
-        commonBean.setModeOfPayment(MDP_PEX);
+        //commonBean.setModeOfPayment(MDP_PEX);
         voucherHeader.setVouchermis(new Vouchermis());
         // voucherHeader.getVouchermis().setDepartmentid((Department)paymentService.getAssignment().getDeptId());
         billDetailslist = new ArrayList<VoucherDetails>();
@@ -276,19 +280,37 @@ public class DirectBankPaymentAction extends BasePaymentAction {
     @ValidationErrorPage(value = NEW)
     @Action(value = "/payment/directBankPayment-create")
     public String create() {
-        CVoucherHeader billVhId = null;
+		System.out.println(paymentChequeNo);
+    	System.out.println(commonBean.getModeOfPayment());
+    	
+    	 
+    		 if(null!=paymentChequeNo) {
+             	paymentheader.setPaymentChequeNo(paymentChequeNo);
+             	
+             	System.out.println(paymentheader.getPaymentChequeNo());
+             	
+             }
+    	
+    	
+    	System.out.println(firstsignatory);								 
+		CVoucherHeader billVhId = null;
         voucherHeader.setType(FinancialConstants.STANDARD_VOUCHER_TYPE_PAYMENT);
         loadAjaxedDropDowns();
         removeEmptyRowsAccoutDetail(billDetailslist);
-        removeEmptyRowsSubledger(subLedgerlist);
+		if(subLedgerlist!=null)					   
+			removeEmptyRowsSubledger(subLedgerlist);
         final String voucherDate = formatter1.format(voucherHeader.getVoucherDate());
         String cutOffDate1 = null;
+		
+																			
         try {
             if (!validateDBPData(billDetailslist, subLedgerlist)) {
                 if (commonBean.getModeOfPayment().equalsIgnoreCase(FinancialConstants.MODEOFPAYMENT_RTGS)) {
                     if (LOGGER.isInfoEnabled())
                         LOGGER.info("calling Validate RTGS");
                     validateRTGS();
+																			  
+					
                 }
 
                 if (showMode != null && showMode.equalsIgnoreCase("nonbillPayment"))
@@ -303,6 +325,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
                 showMode = "create";
 
                 if (!cutOffDate.isEmpty() && cutOffDate != null)
+													 
                     try {
                         date = sdf.parse(cutOffDate);
                         cutOffDate1 = formatter1.format(date);
@@ -311,47 +334,72 @@ public class DirectBankPaymentAction extends BasePaymentAction {
                     }
                 if (cutOffDate1 != null && voucherDate.compareTo(cutOffDate1) <= 0
                         && FinancialConstants.CREATEANDAPPROVE.equalsIgnoreCase(workflowBean.getWorkFlowAction())) {
+													 
                     if (paymentheader.getVoucherheader().getVouchermis().getBudgetaryAppnumber() == null)
+					 
                         addActionMessage(getText("directbankpayment.transaction.success")
                                 + paymentheader.getVoucherheader().getVoucherNumber());
+					 
+					   
                     else
+														 
                         addActionMessage(getText("directbankpayment.transaction.success")
                                 + paymentheader.getVoucherheader().getVoucherNumber() + " and "
                                 + getText("budget.recheck.sucessful", new String[] {
                                         paymentheader.getVoucherheader().getVouchermis().getBudgetaryAppnumber() }));
+					 
+						
                 } else {
+													 
                     if (paymentheader.getVoucherheader().getVouchermis().getBudgetaryAppnumber() == null)
+														 
                         addActionMessage(getText("directbankpayment.transaction.success")
                                 + paymentheader.getVoucherheader().getVoucherNumber());
                     else
+						
+						  
+														 
                         addActionMessage(getText("directbankpayment.transaction.success")
                                 + paymentheader.getVoucherheader().getVoucherNumber() + " and "
                                 + getText("budget.recheck.sucessful", new String[] {
                                         paymentheader.getVoucherheader().getVouchermis().getBudgetaryAppnumber() }));
                     addActionMessage(getText("payment.voucher.approved", new String[] {  this.getEmployeeName(paymentheader.getState()
                             .getOwnerPosition())  }));
+					 
+					   
                 }
             } else
+												 
                 throw new ValidationException(
                         Arrays.asList(new ValidationError("engine.validation.failed", "Validation Faild")));
+			 
+			   
 
         } catch (final ValidationException e) {
+																	   
+							 
             LOGGER.error(e.getMessage(), e);
             final List<ValidationError> errors = new ArrayList<ValidationError>();
             errors.add(new ValidationError("exp", e.getErrors().get(0).getMessage()));
             throw new ValidationException(errors);
         } catch (final NumberFormatException e) {
+																				  
+							 
             LOGGER.error(e.getMessage(), e);
             throw e;
         } catch (final ApplicationRuntimeException e) {
+																						
+							 
             LOGGER.error(e.getMessage(), e);
             throw e;
 
         } finally {
-            if (subLedgerlist.size() == 0)
-                subLedgerlist.add(new VoucherDetails());
+            //if (subLedgerlist.size() == 0)
+                //subLedgerlist.add(new VoucherDetails());
             // loadApproverUser(FinancialConstants.STANDARD_VOUCHER_TYPE_PAYMENT);
         }
+		
+													
         return VIEW;
     }
 
@@ -863,9 +911,13 @@ public class DirectBankPaymentAction extends BasePaymentAction {
             addActionError(getText("journalvoucher.accdetail.drcrmatch"));
             isValFailed = true;
         }
-
-        else if (!isValFailed)
-            isValFailed = validateSubledgerDetails(billDetailslist, subLedgerList);
+//Changed By Bikash
+		
+		/*
+		 * else if (!isValFailed) isValFailed =
+		 * validateSubledgerDetails(billDetailslist, subLedgerList);
+		 */
+   
 
         return isValFailed;
     }
@@ -1182,4 +1234,20 @@ public class DirectBankPaymentAction extends BasePaymentAction {
 	public void setBacklogEntry(String backlogEntry) {
 		this.backlogEntry = backlogEntry;
 	}
+
+	public String getPaymentChequeNo() {
+		return paymentChequeNo;
+	}
+
+	public void setPaymentChequeNo(String paymentChequeNo) {
+		this.paymentChequeNo = paymentChequeNo;
+	}								 
+						 
+  
+
+														 
+										 
+  
+ 
+ 
 }

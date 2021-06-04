@@ -52,35 +52,38 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <style>
-.position_alert {
-	position: fixed;
-	z-index: 9999;
-	top: 50px;
-	right: 20px;
-	background: #F2DEDE;
-	padding: 10px 20px;
-	border-radius: 5px;
-}
+    .position_alert {
+        position: fixed;
+        z-index: 9999;
+        top: 5px;
+        right: 20px;
+        background: #265988;
+        padding: 10px 20px;
+        border-radius: 5px;
+        color : white;
+    }
 
-.position_alert1 {
-	position: fixed;
-	z-index: 9999;
-	top: 50px;
-	right: 520px;
-	background: #F2DEDE;
-	padding: 10px 20px;
-	border-radius: 5px;
-}
+    .position_alert1 {
+        position: fixed;
+        z-index: 9999;
+        top: 5px;
+        right: 520px;
+        background: #265988;
+        padding: 10px 20px;
+        border-radius: 5px;
+        color : white;
+    }
 
-.position_alert2 {
-	position: fixed;
-	z-index: 9999;
-	top: 50px;
-	right: 270px;
-	background: #F2DEDE;
-	padding: 10px 20px;
-	border-radius: 5px;
-}
+    .position_alert2 {
+        position: fixed;
+        z-index: 9999;
+        top: 5px;
+        right: 270px;
+        background: #265988;
+        padding: 10px 20px;
+        border-radius: 5px;
+        color : white;
+    }
 </style>
 <form:form name="supplierBillForm" role="form"
 	modelAttribute="egBillregister" id="egBillregister"

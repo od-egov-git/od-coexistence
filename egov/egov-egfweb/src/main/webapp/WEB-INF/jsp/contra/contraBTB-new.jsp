@@ -162,7 +162,7 @@ function	onLoadTask_new()
 		
 	if(button=="Save_Close")
 	{
-		bootbox.alert('<s:text name="contra.transaction.succcess"/>');
+		//bootbox.alert('<s:text name="contra.transaction.succcess"/>');
 		document.forms[0].button.value='';
         document.forms[0].action = "${pageContext.request.contextPath}/contra/contraBTB-create.action";
  		document.forms[0].submit();
@@ -177,7 +177,7 @@ function	onLoadTask_new()
 	}
 	else if(button=="Save_New")
 	{   
-		bootbox.alert('<s:text name="contra.transaction.succcess"/>');
+		//bootbox.alert('<s:text name="contra.transaction.succcess"/>');
 		document.forms[0].button.value='';
 	        document.forms[0].action = "${pageContext.request.contextPath}/contra/contraBTB-create.action";
 	 		document.forms[0].submit();
@@ -204,23 +204,23 @@ function	onLoadTask_new()
 	function toggleChequeAndRefNumber(obj) {
 			jQuery('#chequeNum').val('');
 			document.getElementById('chequeNumberlblError').innerHTML='';
-			if (obj.value == "RTGS/NEFT") {
+			/* if (obj.value == "RTGS/NEFT") {
 			document.getElementById("chequeGrid").style.visibility="visible";
 			document.getElementById("mdcNumber").innerHTML = '<s:text name="contra.refNumber" />';
 			document.getElementById("mdcDate").innerHTML = '<s:text name="contra.refDate" />';
 		} else if(obj.value == "pex") {
 			 document.getElementById("chequeGrid").style.visibility="hidden";
-		} else {
-		<s:if test="egovCommon.isShowChequeNumber()">
-		 document.getElementById("chequeGrid").style.visibility="visible";
-		 </s:if>
+		} else { */
+		//<s:if test="egovCommon.isShowChequeNumber()">
+		 //document.getElementById("chequeGrid").style.visibility="visible";
+		 /* </s:if>
 		 <s:else>
 		 document.getElementById("chequeGrid").style.visibility="hidden";
-		 </s:else>
+		 </s:else> */
 			document.getElementById("mdcNumber").innerHTML = '<s:text name="contra.chequeNumber" />';
 			document.getElementById("mdcDate").innerHTML = '<s:text name="contra.chequeDate" />';
 			
-		}
+		//}
 	}
 
 	
@@ -266,6 +266,85 @@ function	onLoadTask_new()
 		jQuery(document).ready(function() {
 			jQuery("#voucherDate").datepicker().datepicker("setDate", new Date());
 			});
+	function viewdept(){
+		var dept = document.getElementById('vouchermis.departmentid').value;
+		//var dept = dom.get('voucher.department').value;
+		//alert(":::::DepID::"+dept);
+		var bankid = document.getElementById('fromAccountNumber').value;
+		//alert(":::::bankID::"+bankid);
+	}
+		function validateReassignSurrenderChequeNumber(obj)
+		{
+			if(isNaN(obj.value))
+			{
+				bootbox.alert('Only Number is allowed."/>');
+				obj.value='';
+				return false;
+			}
+			if(obj.value.length!=6)
+			{
+				bootbox.alert("Cheque No. must be six Digit.");
+				obj.value='';
+				return false;
+			}
+			//Cheque number might contain . or - which is not handled by isNaN
+			var pattPeriod=/\./i;
+			var pattNegative=/-/i;
+			if(obj.value.match(pattPeriod)!=null || obj.value.match(pattNegative)!=null )
+			{
+				bootbox.alert('<s:text name="msg.cheque.num.should.contaain.only.number"/>');
+				obj.value='';
+				return false;
+			}
+			var dept = document.getElementById('vouchermis.departmentid').value;
+			
+			var bankid = document.getElementById('fromAccountNumber').value;
+			
+				
+			if(dom.get('voucher.department') && dom.get('voucher.department').value==-1)
+			{
+				
+				bootbox.alert('<s:text name="msg.select.cheque.issued.dept"/>');
+				obj.value='';
+				return false;
+			}
+			
+			
+			var url = '${pageContext.request.contextPath}/voucher/common-ajaxValidateReassignSurrenderChequeNumber1.action?bankaccountId='+document.getElementById('fromAccountNumber').value+'&chequeNumber='+obj.value+'&departmentId='+dept;
+			
+			var transaction = YAHOO.util.Connect.asyncRequest('POST', url, callbackReassign, null);
+		}
+		var callback = {
+			success: function(o) {  
+				var res=o.responseText;
+				res = res.split('~');
+				if(res[1]=='false')
+				{
+					bootbox.alert('<s:text name="msg.enter.valid.cheque.number.or.cheque.already.used"/>', function() {
+						return true;
+					});
+					document.getElementById('chequeNumber'+parseInt(res[0])).value='';
+				}
+		    },
+		    failure: function(o) {
+		    	bootbox.alert('failure');
+		    }
+		}
+			var callbackReassign = {
+			success: function(o) {
+				var res=o.responseText;
+				res = res.split('~');
+				if(res[1]=='false')
+				{
+					bootbox.alert("Cheque No. is Already Used or not in Range.");     
+					document.getElementById('chequeNumber'+parseInt(res[0])).value='';
+				}
+		    },
+		    failure: function(o) {
+		    	bootbox.alert('failure');
+		    }
+		}
+		
 </script>
 </body>
 </html>

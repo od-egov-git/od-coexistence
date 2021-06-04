@@ -212,7 +212,21 @@ function loadNamesForSelectedType()
 						</c:choose>
 					</tr>
 				</s:iterator>
+				
 			</table>
+			<table align="center">
+			<div>
+				<tr>
+							<td style="width: 5%"></td>
+							<td class="greybox">Reason For Cancel<span
+								class="mandatory1">*</span></td>
+							<td class="greybox" colspan="3"><s:textarea id="reason"
+									name="reasoncancel" cols="100" rows="5"
+									 /></td>
+						</tr>
+				
+				</div>
+				</table>
 			<div class="buttonbottom" align="center">
 				<input type="button" Class="buttonsubmit" value="<s:text name='lbl.cancel.voucher'/>" onclick="return validateVouchers();" />
 			</div>
@@ -230,6 +244,8 @@ function loadNamesForSelectedType()
 	function validateVouchers()
 	{
 		var objLen=<s:property value="%{voucherSearchList.size()}"/>;
+		var resu = document.getElementById("reason").value;
+		
 		var queryParams="";
 		var index;
 		 <s:iterator var="p" value="voucherSearchList" status="s">
@@ -246,9 +262,17 @@ function loadNamesForSelectedType()
 		if(queryParams==""){
 			bootbox.alert("<s:text name='msg.please.select.atleast.one.voucher'/>");
 			return false;
-		}else{            
+		}else{  
+			if(resu !=""){
+				bootbox.alert("Voucher Will be Cancelled.");
 			document.cancelVoucher.action = "${pageContext.request.contextPath}/voucher/cancelVoucher-update.action?"+queryParams;
 			document.cancelVoucher.submit();
+			//bootbox.alert("Voucher Will be Cancelled.");
+			
+			}else{
+				bootbox.alert("Please Fill Cancel Reason");
+				return false;
+			}
 		}          
 	 return true;
     }                     

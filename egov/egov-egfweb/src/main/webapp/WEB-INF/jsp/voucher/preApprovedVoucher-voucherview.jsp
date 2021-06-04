@@ -107,7 +107,7 @@ function onSubmit()
 <title><s:property value="type" /> Journal Voucher Approval</title>
 </head>
 
-<body onload="refreshInbox()">
+<body onload="refreshInbox();documentdep();">
 	<s:form action="preApprovedVoucher" theme="simple" enctype = "multipart/form-data">
 		<jsp:include page="../budget/budgetHeader.jsp">
 			<jsp:param name="heading" value="PJV-Approval" />

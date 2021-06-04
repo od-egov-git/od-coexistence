@@ -75,7 +75,7 @@
 	<td class="greybox"><s:text name="contra.fromBankAccount" /> <span
 		class="greybox"><span class="mandatory1">*</span></span></td>
 	<td class="greybox"><s:select name="contraBean.fromBankAccountId"
-			value="%{contraBean.fromBankAccountId}" id="fromAccountNumber"
+			value="%{contraBean.fromBankAccountId}" id="fromAccountNumber" 
 			list="dropdownData.fromAccNumList" listKey="id"
 			listValue="accountnumber" headerKey="-1" headerValue="----Choose----"
 			onChange="populatefromNarration(this);loadFromBalance(this)" /> 
@@ -124,7 +124,7 @@
 				<span class="bluebox"><span class="mandatory1">*</span></span>
 			</s:if></td>
 		<td id="interFundRow2" style="visibility: hidden" class="greybox"><s:select
-				name="contraBean.toDepartment" id="contraBean.toDepartment"
+				name="contraBean.toDepartment" id="contraBean.toDepartment" 
 				list="dropdownData.departmentList" listKey="code" listValue="name"
 				headerKey="" headerValue="----Choose----"
 				value="voucherHeader.vouchermis.departmentcode"
@@ -202,8 +202,8 @@
 	<td class="bluebox"><s:text name="contra.modeOfCollection" /> <span
 		class="bluebox"><span class="mandatory1">*</span></span></td>
 	<td class="bluebox"><s:radio name="contraBean.modeOfCollection"
-			id="modeOfCollection" list="%{modeOfCollectionMap}"
-			onclick="toggleChequeAndRefNumber(this)"/></td>
+			id="modeOfCollection" list="#{'cheque':'Cheque'}"
+			 value="cheque" checked="checked"/></td>
 	<td class="bluebox"></td>
 	<td class="bluebox"></td>
 </tr>
@@ -211,10 +211,10 @@
 <tr id="chequeGrid">
 	<td class="greybox"></td>
 	<td class="greybox"><span id="mdcNumber"><s:text
-				name="contra.refNumber" /></span> <span class="greybox"><span
+				name="contra.chequeNumber" /></span> <span class="greybox"><span
 			class="mandatory1">*</span></span></td>
 	<td class="greybox"><s:textfield name="contraBean.chequeNumber"
-			id="chequeNum" value="%{contraBean.chequeNumber}" onblur="validateChequeNumber(this)" onkeyup="decimalvalue(this)"/>
+			id="chequeNum" value="%{contraBean.chequeNumber}" onblur="validateChequeNumber(this)" onchange="validateReassignSurrenderChequeNumber(this)"/>
 				<span>
 					<font style='color: red;'>
 						<p class="error-block" id="chequeNumberlblError"></p>
@@ -222,7 +222,7 @@
 				</span>		
 	</td>
 	<td class="greybox"><span id="mdcDate"><s:text
-				name="contra.refDate" /></span></td>
+				name="contra.chequeDate" /></span></td>
 	<td class="greybox"><s:textfield id="chequeDate"
 			name="contraBean.chequeDate" data-date-end-date="0d"
 			onkeyup="DateFormat(this,this.value,event,false,'3')"
@@ -236,7 +236,7 @@
 	<td class="bluebox"><s:text name="contra.amount" /> (Rs.) <span
 		class="bluebox"><span class="mandatory1">*</span></span></td>
 	<td class="bluebox"><s:textfield name="amount" id="amount"
-			cssStyle="text-align:right" /></td>
+			cssStyle="text-align:right" cssClass="form-control patternvalidation" data-pattern="number"/></td>
 	<td class="bluebox"></td>
 	<td class="bluebox"></td>
 </tr>
@@ -256,6 +256,8 @@
 	<s:iterator var="f" value="%{dropdownData.fundList}" status="stat">
 		fund_map[i++]= '<s:property value="%{id}"/>'+"_"+'<s:property value="%{chartofaccountsByPayglcodeid.glcode}"/>';
 	</s:iterator>	
+	
+	
 	
 	</script>
 

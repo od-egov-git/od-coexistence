@@ -106,6 +106,16 @@
 		id="paidTo" maxlength="250" data-pattern="alphanumericwithspaceanddot"
 			cssStyle="text-align:right"/></td>
 </tr>
+
+<!--bikash   -->
+<tr class="payemnttr" id="payemnttr" >
+	<td class="greybox"></td>
+	<td class="greybox">Payment Cheque Number <%-- <span
+	class="greybox"><span class="mandatory1">*</span></span> --%></td>
+	<td class="greybox"><s:textfield name="paymentChequeNo" id="paymentChequeNo"/> </td>
+
+</tr>	 
+
 <%-- <tr>
 	<td class="bluebox"></td>
 	<td class="bluebox"><s:text name="link.ref.number" /><span
@@ -262,7 +272,7 @@
 
 <div id="codescontainer"></div>
 
-<div id="labelSL" align="center">
+<%-- <div id="labelSL" align="center">
 	<div id="budgetSearchGrid">
 		<div align="center">
 			<br>
@@ -292,6 +302,6 @@
 			</table>
 		</div>
 	</div>
-</div>
+</div> --%>
 
 

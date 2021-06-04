@@ -106,17 +106,33 @@ function resetSelectedRows()
 
 function validateCancel()
 {
+	
 	var rows=parseInt(document.getElementById('selectedRows').value);
+	var resu = document.getElementById("reason").value;
 	console.log("rows : ",rows);
 	console.log("rows : ",rows == 0 || rows == "");
 	if(rows == 0 || rows == "")
 	{
 		bootbox.alert("<s:text name='msg.please.select.atleast.one.bill'/>");
 		return false;
-	}
+	}else{
+		if(resu !=""){
+			bootbox.alert("Bill will be Cancelled.");
 	document.billForm.action='/services/EGF/voucher/cancelBill-cancelBill.action';
 	document.billForm.submit();
+	
 	return true;
+		}else{
+			bootbox.alert("Please Fill Cancel Reason");
+			return false;
+		}
+	}
+}
+
+function viewBill(vid){
+	
+	var url = '../supplierbill/view/'+vid;
+	window.open(url,'',' width=900, height=700');
 }
 </script>
 <body onload="resetSelectedRows()">
@@ -203,8 +219,9 @@ function validateCancel()
 						<td style="text-align: center" class="<c:out value="${trclass}"/>">
 							<s:hidden id="billNumber"
 								name="billListDisplay[%{#s.index}].billNumber"
-								value="%{billNumber}" />
-							<s:property value="%{billNumber}" />
+								value="%{billNumber}" /><a href="javascript:void(0);"
+							onclick='viewBill(<s:property value="%{id}"/>);'>
+							<s:property value="%{billNumber}" /></a>&nbsp;
 						</td>
 						<td style="text-align: center" class="<c:out value="${trclass}"/>">
 							<s:hidden id="billDeptName"
@@ -238,6 +255,18 @@ function validateCancel()
 					</tr>
 				</s:iterator>
 			</table>
+			<table align="center">
+			<div>
+				<tr>
+							<td style="width: 5%"></td>
+							<td class="greybox">Reason For Cancel<span
+								class="mandatory1">*</span></td>
+							<td class="greybox" colspan="3"><s:textarea id="reason"
+									name="reasoncancel" cols="100" rows="5"
+									 /></td>
+						</tr>
+				</div>
+				</table>
 			<div class="buttonbottom">
 				<input type="button" value="<s:text name='lbl.cancel.bill'/>" id="cancelBill"
 					onclick="return validateCancel();" class="buttonsubmit" />

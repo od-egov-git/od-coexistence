@@ -208,7 +208,7 @@
 	<label class="col-sm-2 control-label text-right" for="adharnumber"> <spring:message code="contractor.adhaar" text='Adhaar Number'/>
 	</label>
 	<div class="col-sm-3 add-margin">
-		<form:input path="adharnumber" id="adharnumber" minlength="11" maxlength="11" cssClass="form-control patternvalidation" data-pattern="alphanumericwithspace" />
+		<form:input path="adharnumber" id="adharnumber" minlength="12" maxlength="12" cssClass="form-control patternvalidation" data-pattern="number" />
 		<form:errors path="adharnumber" cssClass="add-margin error-msg" />
 	</div>
 </div>

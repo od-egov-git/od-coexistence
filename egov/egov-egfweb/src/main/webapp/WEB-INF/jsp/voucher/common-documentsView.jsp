@@ -12,6 +12,11 @@
 <link rel="stylesheet" type="text/css" media="screen"
 	href="../resources/css/jquery/ui.jqgrid.css" />--%>
 <script src="<cdn:url value='/resources/app/js/common/commondocumentupload.js?rnd=${app_release_no}' context='/services/EGF'/>"></script>
+<script type="text/javascript">
+function check(){
+	//alert("check");
+}
+</script>
 
 
 <style>
@@ -38,10 +43,14 @@
 					  <s:if test="%{voucherHeader.documentDetail.size()>0}">
 				   		          <s:iterator var="p" value="%{voucherHeader.documentDetail}" status="s">
 				   		         <tr>
-				                    <td> 
-				                      <a target="_blank" href="/services/EGF/voucher/preApprovedVoucher-downloadVoucherDoc.action?voucherHeaderId=<s:property value='%{objectId}'/>&fileStoreId=<s:property value='%{fileStore.fileStoreId}'/>"><s:property value="fileStore.fileName"/></a><br />
+				                    <td class="padding-10"> 
+				                      <a target="_blank" href="/services/EGF/voucher/preApprovedVoucher-downloadVoucherDoc.action?voucherHeaderId=<s:property value='%{objectId}'/>&fileStoreId=<s:property value='%{fileStore.fileStoreId}'/>"><s:property value="fileStore.fileName"/></a>
 				                    </td>
-				                 </tr>
+				                    <td class="padding-10">
+				                      <span><a href="/services/EGF/voucher/journalVoucherModify-deleteVoucherDoc.action?voucherHeaderId=<s:property value='%{objectId}'/>&fileid=<s:property value='%{id}'/> ">Remove</a></span>
+				                    </td>
+				                    
+				                 </tr><br />
 				                  </s:iterator>
 				      </s:if>
 

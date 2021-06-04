@@ -152,6 +152,11 @@ else{
 		return false;
 	}
 }
+function onSubmitDraft()
+{
+	alert("::Save as Draft :::");
+	onSubmit();
+}
 function onSubmit()
 {
 	var voucherdate =document.getElementById('voucherDate').value ;
@@ -159,7 +164,7 @@ function onSubmit()
 	if(voucherdate!=null && voucherdate!=""){
 		console.log("backlog  ::: "+backlog.value);
 		//document.preApprovedVoucher.action='${pageContext.request.contextPath}/voucher/preApprovedVoucher-save.action';
-		document.preApprovedVoucher.action='${pageContext.request.contextPath}/voucher/preApprovedVoucher-save.action?backlogEntry='+backlog.value;;
+		document.preApprovedVoucher.action='${pageContext.request.contextPath}/voucher/preApprovedVoucher-save.action?backlogEntry='+backlog.value;
 		return true;
 	}else{
 		bootbox.alert("<s:text name='msg.please.select.voucher.date'/> ");

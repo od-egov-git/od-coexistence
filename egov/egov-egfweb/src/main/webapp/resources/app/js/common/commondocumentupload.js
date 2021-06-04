@@ -30,10 +30,32 @@ function addFileInputField() {
     inputFile.setAttribute("id", "file" + trNo);
     inputFile.setAttribute("class", "padding-10");
     inputFile.setAttribute("onchange", "isValidFile(this.id)");
-    td.appendChild(inputFile);
-    tr.appendChild(td);
-    tbody.appendChild(tr);
+    
+    var bt = document.createElement("input");//addedd
+    bt.setAttribute("type", "button");
+     bt.setAttribute("id", "row"+trNo);
+     //bt.setAttribute("name", "button"+trNo);
+    bt.setAttribute("value", "Remove");
+     
+    bt.setAttribute("onclick", "deleteFileInputField1(this.id)");
+     td.appendChild(inputFile);
+     tr.appendChild(td);
+  tr.appendChild(bt);
+     
+     tbody.appendChild(tr);
+    
 }
+
+function deleteFileInputField(id){
+	//alert("id "+id);
+    var uploaderTbl = document.getElementById("uploadertbl");
+    uploaderTbl.deleteRow(document.getElementById(id));
+}
+function deleteFileInputField1(id){
+	//alert("id "+id);
+	document.getElementById(id).remove();
+}
+
 
 function getTotalFileSize() {
     var uploaderTbl = document.getElementById("uploadertbl");
@@ -63,12 +85,10 @@ function isValidFile(id) {
     }
 }
 
-function deleteFileInputField(id){
-    var uploaderTbl = document.getElementById("uploadertbl");
-    uploaderTbl.deleteRow(document.getElementById(id));
-}
+
 
 function addSelectedFiles() {
     var uploaderTbl = $("#uploadertbl");
     window.opener.$("#documentDetails").append($(uploaderTbl));
 }
+

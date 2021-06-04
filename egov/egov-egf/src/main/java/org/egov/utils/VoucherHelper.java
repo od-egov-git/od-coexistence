@@ -197,7 +197,7 @@ public class VoucherHelper {
 		if (null != egBillRegister && null != egBillRegister.getEgBillregistermis()) {
 
 			if (null != egBillRegister.getEgBillregistermis().getFund())
-				misQuery.append(" and billmis.fund.id=")
+				misQuery.append(" and billmis.fundid=")
 						.append(egBillRegister.getEgBillregistermis().getFund().getId());
 
 			if (null != egBillRegister.getEgBillregistermis().getDepartmentcode() && !egBillRegister.getEgBillregistermis().getDepartmentcode().equals("-1")) {

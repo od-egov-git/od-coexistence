@@ -373,6 +373,54 @@
 		<s:token />
 	</s:form>
 	<script type="text/javascript">
+	
+	
+	var val=false;
+	 var paymentChequeNo=null;
+	 /* 
+	jQuery("#modeOfPaymentrtgs").change(function(){
+   if( $(this).is(":checked") ){ 
+      val = $(this).val(); 
+      
+   }
+   if(val==true){
+   	jQuery("#payemnttr").show();
+   }
+   else{
+   	jQuery("#payemnttr").hide();
+   	val=false;
+   }
+	}); */
+	
+	
+	jQuery("#paymentChequeNo").change(function(){
+		
+		paymentChequeNo = jQuery("#paymentChequeNo").val();
+		
+		if(null==paymentChequeNo||paymentChequeNo=="")
+		{
+			bootbox.alert('Please Enter Payment Cheque Number');
+			jQuery("#paymentChequeNo").val("");
+			undoLoadingMask();
+			
+			return false;
+		}
+		else if(!/^[0-9]+$/.test(paymentChequeNo)){
+			bootbox.alert('Please Enter valid Payment Cheque Number (Allowed input:0-9)');
+			jQuery("#paymentChequeNo").val("");
+			undoLoadingMask();
+		return false;
+		}
+		else if(paymentChequeNo.length!=6){
+			bootbox.alert('Please insert 6 Digit Cheque Number');
+			jQuery("#paymentChequeNo").val("");
+			undoLoadingMask();
+		return false;			
+	}
+		
+   });
+	
+	
 function onLoadTask_new()
 {
 	//bootbox.alert(showMode);                                                      
@@ -439,6 +487,8 @@ function populateAccNum(branch){
 }
 function onSubmit()
 {
+	if(checkdate())
+	{
 	enableAll();
 	var balanceCheckMandatory='<s:text name="payment.mandatory"/>';
 	var balanceCheckWarning='<s:text name="payment.warning"/>';
@@ -467,6 +517,20 @@ function onSubmit()
 	{ */
 		secondsignatory=document.getElementById('secondsignatory').value;
 	//}
+ 
+		if(document.getElementById("modeOfPaymentcheque").checked == true || document.getElementById("modeOfPaymentonline").checked == true){
+			paymentChequeNo = jQuery("#paymentChequeNo").val();
+			
+			if(null==paymentChequeNo||paymentChequeNo=="")
+			{
+				bootbox.alert('Payment Cheque Number is mandatory for RTGS payment');
+				jQuery("#paymentChequeNo").val("");
+				undoLoadingMask();
+				return false;
+			}
+		}
+		
+	
 	if(document.getElementById('backlogEntry') == null || document.getElementById('backlogEntry').value == '-1')
 	{
 		bootbox.alert("Please select whether it is backdated entry");
@@ -482,25 +546,28 @@ function onSubmit()
 		bootbox.alert("<s:text name='msg.payment.narration.mandatory'/>");
 		 return false;
 		}
+	var submiturl='/services/EGF/payment/directBankPayment-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory+'&backlogEntry='+backlogEntry;																																									
+ 
+ 
 	if (!validateForm_directBankPayment()) {
+					
 		undoLoadingMask();
 		return false;
 	}
 	else if (!updateAndCheckAmount()) {
+				  
 		undoLoadingMask();
 		return false;
 	}
 	else if(jQuery("#bankBalanceCheck").val()==noBalanceCheck)
 		{
-		if(document.getElementById("modeOfPaymentrtgs").checked == true || document.getElementById("modeOfPaymentpex").checked == true)
+					
+		if(document.getElementById("modeOfPaymentcheque").checked == true)
 			{
-				if(document.getElementById("subLedgerlist[0].glcode.id") == null  || document.getElementById("subLedgerlist[0].glcode.id").value == '0' || document.getElementById("subLedgerlist[0].detailType.id") == null || document.getElementById("subLedgerlist[0].detailType.id").value == '0' ||  document.getElementById("subLedgerlist[0].detailCode") == null || document.getElementById("subLedgerlist[0].detailCode").value == ''  || document.getElementById("subLedgerlist[0].amount") == null  || document.getElementById("subLedgerlist[0].amount").value == '')
-					{
-					bootbox.alert("<s:text name='msg.sub.ledger.mandatory'/>");
-					 return false;
-					}
+				
 			}
-		document.dbpform.action = '/services/EGF/payment/directBankPayment-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory+'&backlogEntry='+backlogEntry;
+									  
+		document.dbpform.action = submiturl;					  
 		return true;
 		}
 	else if(!balanceCheck() && jQuery("#bankBalanceCheck").val()==balanceCheckMandatory){
@@ -508,37 +575,39 @@ function onSubmit()
 			 return false;
 			}
 	else if(!balanceCheck() && jQuery("#bankBalanceCheck").val()==balanceCheckWarning){
-		if(document.getElementById("modeOfPaymentrtgs").checked == true || document.getElementById("modeOfPaymentpex").checked == true)
+		if(document.getElementById("modeOfPaymentcheque").checked == true)
 		{
-			if(document.getElementById("subLedgerlist[0].glcode.id") == null  || document.getElementById("subLedgerlist[0].glcode.id").value == '0' || document.getElementById("subLedgerlist[0].detailType.id") == null || document.getElementById("subLedgerlist[0].detailType.id").value == '0' ||  document.getElementById("subLedgerlist[0].detailCode") == null || document.getElementById("subLedgerlist[0].detailCode").value == ''  || document.getElementById("subLedgerlist[0].amount") == null  || document.getElementById("subLedgerlist[0].amount").value == '')
-				{
-				bootbox.alert("<s:text name='msg.sub.ledger.mandatory'/>");
-				 return false;
-				}
+			
 		}
 		 var msg = confirm("<s:text name='msg.insuff.bank.bal.do.you.want.to.process'/>");
 		 if (msg == true) {
 			 document.dbpform.action = '/services/EGF/payment/directBankPayment-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory+'&backlogEntry='+backlogEntry;
+					 
+										
 			 document.dbpform.submit();
 			return true;
 		 } else {
+						
 			 undoLoadingMask();
 		   	return false;
 			}
 		}
 	else{
-		if(document.getElementById("modeOfPaymentrtgs").checked == true || document.getElementById("modeOfPaymentpex").checked == true)
+
+				 
+		if(document.getElementById("modeOfPaymentcheque").checked == true)
 		{
-			if(document.getElementById("subLedgerlist[0].glcode.id") == null  || document.getElementById("subLedgerlist[0].glcode.id").value == '0' || document.getElementById("subLedgerlist[0].detailType.id") == null || document.getElementById("subLedgerlist[0].detailType.id").value == '0' ||  document.getElementById("subLedgerlist[0].detailCode") == null || document.getElementById("subLedgerlist[0].detailCode").value == ''  || document.getElementById("subLedgerlist[0].amount") == null  || document.getElementById("subLedgerlist[0].amount").value == '')
-				{
-				bootbox.alert("<s:text name='msg.sub.ledger.mandatory'/>");
-				 return false;
-				}
+			
 		}
 		document.dbpform.action = '/services/EGF/payment/directBankPayment-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory+'&backlogEntry='+backlogEntry;
 		document.dbpform.submit();
 	}
-		
+	}
+	else{
+		bootbox.alert("Please select back dated entry option correctly");
+		return false;
+	}
+  
 }
 
 function validateCutOff()
@@ -560,6 +629,51 @@ else{
 		return false;
 	}
 }
+
+function checkdate()
+{
+	backlogEntry
+	var backlog=document.getElementById('backlogEntry').value;
+	var date2=document.getElementById('voucherDate').value;
+	//alert(":::::::voucher Date efore split:: "+date2);
+	var parts = date2.split("/");
+	   var date = new Date(parts[1] + "/" + parts[0] + "/" + parts[2]);
+	   //alert(":::::Backlog:: "+backlog);
+//alert(":::Voucher  Date after split::: "+date);
+	var curdate = new Date();
+	//alert("::::Current date:: "+curdate);
+	if(backlog!='Y'){
+	if(date.setHours(0,0,0,0) == curdate.setHours(0,0,0,0)) {
+	    // Date equals today's date
+	   // alert("date is equal:::");
+		if(backlog == 'N'){
+	    	//alert(":in N:");
+	    	return true;
+	    }
+	    return false;
+	}
+	else{
+		//alert(":::::Else:::: ");
+		return false;
+	}
+	}else{
+		return true;
+	}
+	
+	//alert("::::::::"+date3);
+	/* if(date3>curdate){
+		alert("greater");
+	}
+	if(date3=curdate){
+		alert("date is equal");
+	}
+	if(date3!=curdate){
+		alert("Date are different");
+	} */
+	
+	
+}
+
 
 </SCRIPT>
 </body>

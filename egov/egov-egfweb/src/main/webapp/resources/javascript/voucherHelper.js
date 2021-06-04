@@ -427,6 +427,7 @@ function loadCoa(id){
 
 function loadDropDownCodes()
 {
+	//alert("::loadDropDownCodes::");
 	var	url = "/services/EGF/voucher/common-ajaxGetAllCoaCodes.action";
 	var req2 = initiateRequest();
 	req2.onreadystatechange = function()
@@ -777,6 +778,7 @@ function autocompletecode(obj,myEvent)
 				oAutoComp.useShadow = true;
 				oAutoComp.maxResultsDisplayed = 15;
 				oAutoComp.useIFrame = true;
+				
 				codeObj.applyLocalFilter = true;
 				codeObj.queryMatchContains = true;
 				oAutoComp.minQueryLength = 0;
@@ -839,6 +841,7 @@ var funcObj;
 var funcArray;
 function loadDropDownCodesFunction()
 {
+	//alert("::loadDropDownCodesFunction:::");
 	var url = "/services/EGF/voucher/common-ajaxGetAllFunctionName.action";
 	var req2 = initiateRequest();
 	req2.onreadystatechange = function()

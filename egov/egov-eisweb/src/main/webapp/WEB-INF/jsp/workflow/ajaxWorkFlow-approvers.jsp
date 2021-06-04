@@ -53,7 +53,7 @@
     "Result":[
     <s:iterator var="s" value="approverList" status="status">
     {"Text":"<s:property value="%{employeeName}"/>",
-    "Value":"<s:property value="%{position}" />"  
+    "Value":"<s:property value="%{empId}" />"  
     }<s:if test="!#status.last">,</s:if>
     </s:iterator>       
     ]

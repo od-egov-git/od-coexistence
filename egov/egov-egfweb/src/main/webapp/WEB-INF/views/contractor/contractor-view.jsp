@@ -162,6 +162,10 @@
               <spring:message code="contractor.vigilance" text="Vigilance Case"/>
             </div>
             <div class="col-sm-3 add-margin view-content">${contractor.vigilance}</div>
+            <div class="col-xs-3 add-margin">
+              <spring:message code="contractor.adhaar" text="Aadhar Number"/>
+            </div>
+            <div class="col-sm-3 add-margin view-content">${contractor.adharnumber}</div>
           </div>
         </div>
       </div>

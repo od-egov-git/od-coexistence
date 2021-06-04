@@ -107,6 +107,7 @@ import org.egov.utils.Constants;
 import org.egov.utils.FinancialConstants;
 import org.egov.utils.VoucherHelper;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -192,10 +193,11 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("JournalVoucherModifyAction | loadvouchers | Start ");
         if (voucherHeader != null && voucherHeader.getId() != null)
-            voucherHeaderId = voucherHeader.getId().toString();
+       voucherHeaderId = voucherHeader.getId().toString();
         else
-            voucherHeaderId = parameters.get("voucherId")[0];
-        isOneFunctionCenter = voucherHeader.getIsRestrictedtoOneFunctionCenter();
+        	 voucherHeaderId = parameters.get("voucherId")[0];
+         isOneFunctionCenter = voucherHeader.getIsRestrictedtoOneFunctionCenter();
+       
         if (voucherHeaderId != null)
             voucherHeader = (CVoucherHeader) getPersistenceService().find(VOUCHERQUERY, Long.valueOf(voucherHeaderId));
         final Map<String, Object> vhInfoMap = voucherService.getVoucherInfo(voucherHeader.getId());
@@ -203,6 +205,8 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
         List<DocumentUploads> voucherDocList = voucherService.findByObjectIdAndObjectType(voucherHeader.getId(), CommonConstants.JOURNAL_VOUCHER_OBJECT);
         voucherHeader.setDocumentDetail(voucherDocList);
         voucherHeader.setDocumentMode(CommonConstants.DOCUMENT_ADD_VIEW_MODE);
+        System.out.println("::::BackdateEntry::"+voucherHeader.getBackdateentry());
+       // voucherHeader.setBackdateentry(voucherHeader.getBackdateentry());
         try {
             if (voucherHeader != null && voucherHeader.getState() != null)
                 if (voucherHeader.getState().getValue().contains("Rejected")) {
@@ -314,6 +318,92 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
 
     }
 
+    @SkipValidation
+    @Action(value = "/voucher/journalVoucherModify-deleteVoucherDoc")
+    public String deleteVoucherDoc() throws ApplicationException, IOException {
+    final ServletContext context = ServletActionContext.getServletContext();
+        final Long fileStoreId =Long.valueOf(parameters.get("fileid")[0]);      
+         final Long objectid=Long.valueOf(parameters.get("voucherHeaderId")[0]);
+         
+         System.out.println(":::::::: "+objectid+" :::::: "+fileStoreId);
+         String deletefile="delete from egf_documents where objectid="+objectid+" and id="+fileStoreId;
+         final SQLQuery totalSQLQuery = persistenceService.getSession().createSQLQuery(deletefile.toString());
+       
+       System.out.println(":::query: "+deletefile);
+      int de = totalSQLQuery.executeUpdate();
+      System.out.println(":::::::::Delete files:::"+de);
+       //beforeModifydoc(objectid); 
+       Long voucherHeaderId = null;
+       List<Position> positionsForUser = null;
+       if (LOGGER.isDebugEnabled())
+           LOGGER.debug("JournalVoucherModifyAction | loadvouchers | Start ");
+       
+      
+       	 voucherHeaderId = objectid;
+        isOneFunctionCenter = voucherHeader.getIsRestrictedtoOneFunctionCenter();
+      
+       if (voucherHeaderId != null)
+           voucherHeader = (CVoucherHeader) getPersistenceService().find(VOUCHERQUERY, voucherHeaderId);
+       final Map<String, Object> vhInfoMap = voucherService.getVoucherInfo(voucherHeader.getId());
+       voucherHeader = (CVoucherHeader) vhInfoMap.get(Constants.VOUCHERHEADER);
+       List<DocumentUploads> voucherDocList = voucherService.findByObjectIdAndObjectType(voucherHeader.getId(), CommonConstants.JOURNAL_VOUCHER_OBJECT);
+       voucherHeader.setDocumentDetail(voucherDocList);
+       voucherHeader.setDocumentMode(CommonConstants.DOCUMENT_ADD_VIEW_MODE);
+       System.out.println("::::BackdateEntry::"+voucherHeader.getBackdateentry());
+      // voucherHeader.setBackdateentry(voucherHeader.getBackdateentry());
+       try {
+           if (voucherHeader != null && voucherHeader.getState() != null)
+               if (voucherHeader.getState().getValue().contains("Rejected")) {
+                   positionsForUser = eisService.getPositionsForUser(ApplicationThreadLocals.getUserId(), new Date());
+               }
+               else if (voucherHeader.getState().getValue().contains("Closed")) {
+                   if (LOGGER.isDebugEnabled())
+                       LOGGER.debug("Valid Owner :return true");
+               }
+				else if (voucherHeader.getState().getValue().contains("SaveAsDraft")) {
+               	positionsForUser = eisService.getPositionsForUser(ApplicationThreadLocals.getUserId(), new Date());
+               }
+				else if (parameters.get("showMode")[0].equalsIgnoreCase("view")) {
+                   if (LOGGER.isDebugEnabled())
+                       LOGGER.debug("Valid Owner :return true");
+               } else
+                   throw new ApplicationRuntimeException("Invalid Aceess");
+           setOneFunctionCenterValue();
+       } catch (final ApplicationRuntimeException e) {
+           final List<ValidationError> errors = new ArrayList<ValidationError>();
+           errors.add(new ValidationError("exp", "Invalid Aceess"));
+           throw new ValidationException(errors);
+       }
+       billDetailslist = (List<VoucherDetails>) vhInfoMap.get(Constants.GLDEATILLIST);
+       subLedgerlist = (List<VoucherDetails>) vhInfoMap.get("subLedgerDetail");
+       if (voucherHeader.getState().getValue().contains("SaveAsDraft")) {
+           if(billDetailslist==null || billDetailslist.size()==0)
+           {
+               
+               
+                 billDetailslist = voucherService.getVoucherDraftInfo(voucherHeader.getVoucherNumber());
+                
+                  
+           }
+           if(subLedgerlist==null || subLedgerlist.size()==0)
+           {
+               
+                   subLedgerlist = new ArrayList<VoucherDetails>();                  
+                   subLedgerlist.add(new VoucherDetails());
+           }
+           
+       }
+       getBillInfo();
+       loadSchemeSubscheme();
+       loadFundSource();
+       // loadApproverUser("default");
+       if (null != parameters.get("showMode") && parameters.get("showMode")[0].equalsIgnoreCase("view")) {
+           return "view";
+       }
+
+       return "editVoucher";
+    }
+    
     @ValidationErrorPage(value = "editVoucher")
     @SuppressWarnings("deprecation")
     @Action(value = "/voucher/journalVoucherModify-update")
@@ -332,6 +422,7 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
         File[] uploadedFiles = getFile();
         String[] fileName = getFileFileName();
         String[] contentType = getFileContentType();
+        
         if (FinancialConstants.BUTTONCANCEL.equalsIgnoreCase(workflowBean.getWorkFlowAction())) {
             voucherHeader = (CVoucherHeader) voucherService.findById(Long.parseLong(parameters.get(VHID)[0]), false);
             sendForApproval();
@@ -339,8 +430,11 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
         }
         if (null != voucherNumManual && StringUtils.isNotEmpty(voucherNumManual))
             voucherHeader.setVoucherNumber(voucherNumManual);
+        try {
         voucherHeader.setIsRestrictedtoOneFunctionCenter(isOneFunctionCenter);
-
+        }catch(Exception e){
+        	e.printStackTrace();
+        }
         //removeEmptyRowsAccoutDetail(billDetailslist);
         // jayanta for save as draft
         // removeEmptyRowsAccoutDetail(billDetailslist);
@@ -350,6 +444,7 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
         removeEmptyRowsAccoutDetail(billDetailslist);
         removeEmptyRowsSubledger(subLedgerlist);
         LOGGER.info("before Submit");
+        
         try {
         	 // if (!workFlowAction.equalsIgnoreCase("Save As Draft")) 
             // {
@@ -370,7 +465,8 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
  	                    documentDetail.add(upload);
  	                }
                  }
-                
+            	 System.out.println(":::::::: "+voucherHeader.getBackdateentry());
+                 voucherHeader.setBackdateentry(voucherHeader.getBackdateentry());
                 voucherHeader = journalVoucherActionHelper.editVoucher(billDetailslist, subLedgerlist, voucherHeader,
                         voucherTypeBean, workflowBean, parameters.get("totaldbamount")[0]);
                 voucherHeader.setDocumentDetail(documentDetail);
@@ -393,7 +489,7 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
                         new String[] { this.getEmployeeName(voucherHeader.getState()
                                 .getOwnerPosition()) }));
             }
-			if ("Save As Draft".equalsIgnoreCase(workflowBean.getWorkFlowAction())){               
+			if ("Save As Draft".equalsIgnoreCase(workflowBean.getWorkFlowAction()) || "SaveAsDraft".equalsIgnoreCase(workflowBean.getWorkFlowAction())){               
             	 addActionMessage(getText("msg.expense.bill.saveasdraft.success",
                          new String[] { voucherHeader.getVoucherNumber() }));
             }
@@ -504,6 +600,8 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
         }
         return validButtons;
     }
+    
+   
 
     @SuppressWarnings("unchecked")
     private void loadApproverUser(final String type) {

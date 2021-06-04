@@ -93,6 +93,7 @@ import org.egov.services.voucher.VoucherService;
 import org.egov.utils.Constants;
 import org.egov.utils.FinancialConstants;
 import org.hibernate.HibernateException;
+import org.hibernate.SQLQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -272,27 +273,75 @@ public class ContraBTBAction extends BaseVoucherAction {
 			LOGGER.debug("Starting Bank to Bank Transfer ...");
 		try {
 			getHibObjectsFromContraBean();
-			boolean valid=true;
-			if (egovCommon.isShowChequeNumber())
-				if (contraBean.getModeOfCollection() != null && contraBean.getModeOfCollection().equalsIgnoreCase(MDC_CHEQUE))
-					valid=validateChqNumber(contraBean.getChequeNumber(), contraVoucher.getFromBankAccountId().getId(),voucherHeader);
-			
-			if(valid==true)
-			{
-				voucherHeader = contraBTBActionHelper.create(contraBean, contraVoucher, voucherHeader);
-				addActionMessage("Bank to Bank Transfer " + getText("transaction.success") + " with Voucher number: "
-					+ voucherHeader.getVoucherNumber());
-				setVhId(voucherHeader.getId());
-				LoadAjaxedDropDowns();
-			}
-			else
-			{
-				addActionMessage("Invalid Cheque Number");
+			final StringBuffer query1 = new StringBuffer(500);
+			List<Object[]> list1= null;
+	    	SQLQuery queryMain =  null;
+	    	query1
+	        .append("select ac.fromchequenumber,ac.tochequenumber from egf_account_cheques ac,cheque_dept_mapping cd " + 
+	        		"where ac.id = cd.id and ac.id="+contraVoucher.getFromBankAccountId().getId()+ " "+
+	        		" and cd.allotedTo ='"+voucherHeader.getVouchermis().getDepartmentcode()+"'");
+	    	LOGGER.info("Query 1 :: "+query1.toString());
+	    	queryMain=this.persistenceService.getSession().createSQLQuery(query1.toString());
+	    	list1 = queryMain.list();
+	    	if(list1!=null)
+	    	{
+	    		int start=0,end=0,chqNo;
+	    		for (final Object[] object : list1)
+	    		{
+	    			start=Integer.parseInt(object[0].toString());
+	    			end=Integer.parseInt(object[1].toString());
+	    		}
+	    		chqNo=Integer.parseInt(contraBean.getChequeNumber());
+	    		if(end>=chqNo && chqNo>=start){
+	    			System.out.println("correct cheque no");
+	    		boolean valid=true;
+				if (egovCommon.isShowChequeNumber())
+				{
+					if (contraBean.getModeOfCollection() != null && contraBean.getModeOfCollection().equalsIgnoreCase(MDC_CHEQUE))
+						valid=validateChqNumber(contraBean.getChequeNumber(), contraVoucher.getFromBankAccountId().getId(),voucherHeader);
+				
+					if(valid==true)
+					{
+						voucherHeader = contraBTBActionHelper.create(contraBean, contraVoucher, voucherHeader);
+						addActionMessage("Bank to Bank Transfer " + getText("transaction.success") + " with Voucher number: "
+							+ voucherHeader.getVoucherNumber());
+						setVhId(voucherHeader.getId());
+						LoadAjaxedDropDowns();
+					}
+					else
+					{
+						addActionMessage("Duplicate Cheque Number");
+						return NEW;
+					}
+				}}
+	    		else
+	    		{	addActionMessage("Cheque Number not in range,enter cheque number between "+start+" to "+end );
+					return NEW;
+	    		}
+	    	}
+	    	else
+	    	{
+	    		addActionMessage("No Cheque Number Range Found");
 				return NEW;
-			}
+	    	}
+			/*
+			 * boolean valid=true; if (egovCommon.isShowChequeNumber()) if
+			 * (contraBean.getModeOfCollection() != null &&
+			 * contraBean.getModeOfCollection().equalsIgnoreCase(MDC_CHEQUE))
+			 * valid=validateChqNumber(contraBean.getChequeNumber(),
+			 * contraVoucher.getFromBankAccountId().getId(),voucherHeader);
+			 * 
+			 * if(valid==true) { voucherHeader = contraBTBActionHelper.create(contraBean,
+			 * contraVoucher, voucherHeader); addActionMessage("Bank to Bank Transfer " +
+			 * getText("transaction.success") + " with Voucher number: " +
+			 * voucherHeader.getVoucherNumber()); setVhId(voucherHeader.getId());
+			 * LoadAjaxedDropDowns(); } else { addActionMessage("Duplicate Cheque Number");
+			 * return NEW; }
+			 */
 			
 			if (LOGGER.isDebugEnabled())
 				LOGGER.debug("Completed Bank to Bank Transfer .");
+	    	
 		} catch (final ValidationException e) {
 			LoadAjaxedDropDowns();
 			e.printStackTrace();

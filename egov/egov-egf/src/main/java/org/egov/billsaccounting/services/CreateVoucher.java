@@ -553,6 +553,252 @@ public class CreateVoucher {
 		return vh.getId().longValue();
 	}
 
+	public long createVoucherFromBillNew(final int billId, String voucherStatus, final String voucherNumber,
+			final Date voucherDate,CVoucherHeader voucherHeader) throws ApplicationRuntimeException, SQLException, TaskFailedException {
+		CVoucherHeader vh = null;
+		try {
+			if (voucherStatus == null) {
+				final List vStatusList = appConfigValuesService.getConfigValuesByModuleAndKey(
+						FinancialConstants.MODULE_NAME_APPCONFIG, "PREAPPROVEDVOUCHERSTATUS");
+
+				if (!vStatusList.isEmpty() && vStatusList.size() == 1) {
+					final AppConfigValues appVal = (AppConfigValues) vStatusList.get(0);
+					voucherStatus = appVal.getValue();
+				} else
+					throw new ApplicationRuntimeException("PREAPPROVEDVOUCHERSTATUS"
+							+ "is not defined in AppConfig values cannot proceed creating voucher");
+			}
+			if (LOGGER.isDebugEnabled())
+				LOGGER.debug(" ---------------Generating Voucher for Bill-------");
+			EgBillregister egBillregister = null;
+			egBillregister = billsService.getBillRegisterById(Integer.valueOf(billId));
+			/*
+			 * identify the bill type and delegate get the fund and fundsource
+			 * check for mandatory fields for implementation if missing throw
+			 * exception department is mandatory for implementation type fund is
+			 * mandatory for all implementations
+			 */
+			final EgBillregistermis billMis = egBillregister.getEgBillregistermis();
+			// checking voucher already exists or not for this bill
+			try {
+				CVoucherHeader result;
+				if (billMis.getVoucherHeader() != null) {
+					result = (CVoucherHeader) voucherService.find(
+							"select vh from CVoucherHeader vh where vh.id = ? and vh.status!=?",
+							billMis.getVoucherHeader().getId(), FinancialConstants.CANCELLEDVOUCHERSTATUS);
+					if (result != null)
+						throw new ApplicationRuntimeException(
+								"Voucher " + result.getVoucherNumber() + " already exists for this bill ");
+				}
+			} catch (final Exception e) {
+				throw new ApplicationRuntimeException(e.getMessage());
+			}
+			final Fund fund = billMis.getFund();
+			if (fund == null) {
+				LOGGER.error(FUNDMISSINGMSG);
+				throw new ApplicationRuntimeException(FUNDMISSINGMSG);
+			} else
+				fund.getId();
+			final String deptMandatory = EGovConfig.getProperty("egf_config.xml", "deptRequired", "", "general");
+			if (deptMandatory.equalsIgnoreCase("Y"))
+				if (billMis.getDepartmentcode() == null)
+					throw new ApplicationRuntimeException(DEPTMISSINGMSG);
+
+			final Fundsource fundSrc = billMis.getFundsource();
+			if (fundSrc != null)
+				Integer.valueOf(fundSrc.getId().toString());
+
+			if (billMis.getScheme() != null)
+				billMis.getScheme().getId();
+			if (billMis.getSubScheme() != null)
+				billMis.getSubScheme().getId();
+			final String expType = egBillregister.getExpendituretype();
+			String voucherType = null;
+			String voucherSubType = null;
+			String name = "";
+			if (expType.equalsIgnoreCase(CONBILL)) {
+				name = "Contractor Journal";
+				voucherSubType = FinancialConstants.JOURNALVOUCHER_NAME_CONTRACTORJOURNAL;
+			} else if (expType.equalsIgnoreCase(SUPBILL)) {
+				name = "Supplier Journal";
+				if (null != billMis.getEgBillSubType()
+						&& billMis.getEgBillSubType().getName().equalsIgnoreCase("Fixed Asset"))
+					voucherSubType = FinancialConstants.JOURNALVOUCHER_NAME_FIXEDASSETJOURNAL;
+				else
+					voucherSubType = FinancialConstants.JOURNALVOUCHER_NAME_PURCHASEJOURNAL;
+			} else if (expType.equalsIgnoreCase(SALBILL)) {
+				name = "Salary Journal";
+				voucherSubType = FinancialConstants.JOURNALVOUCHER_NAME_SALARYJOURNAL;
+			}
+			// Pension,Gratuity are saved as Expense Bill
+			else if (expType.equalsIgnoreCase(FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT)) {
+				name = FinancialConstants.JOURNALVOUCHER_NAME_EXPENSEJOURNAL;
+				voucherSubType = FinancialConstants.JOURNALVOUCHER_NAME_EXPENSEJOURNAL;
+			} else if (expType.equalsIgnoreCase(PENSBILL)) {
+				name = "Pension Journal";
+				voucherSubType = FinancialConstants.JOURNALVOUCHER_NAME_PENSIONJOURNAL;
+			} else if (expType.equalsIgnoreCase(GRATBILL)) {
+				name = "Gratuity Journal";
+				voucherSubType = FinancialConstants.CBILL_VOUCHERNO_TYPE;
+			} else {
+				name = "JVGeneral";
+				voucherSubType = FinancialConstants.STANDARD_VOUCHER_TYPE_JOURNAL;
+			}
+			voucherType = FinancialConstants.STANDARD_VOUCHER_TYPE_JOURNAL;
+			final HashMap<String, Object> headerDetails = new HashMap<String, Object>();
+			HashMap<String, Object> detailMap = null;
+			HashMap<String, Object> subledgertDetailMap = null;
+			Set<EgBillPayeedetails> subLedgerlist;
+			final List<HashMap<String, Object>> accountdetails = new ArrayList<HashMap<String, Object>>();
+			final List<HashMap<String, Object>> subledgerDetails = new ArrayList<HashMap<String, Object>>();
+			final Set<EgBilldetails> billDetailslist = egBillregister.getEgBilldetailes();
+			detailMap = new HashMap<String, Object>();
+			new HashMap<String, Object>();
+
+			headerDetails.put(VoucherConstant.VOUCHERNAME, name);
+			headerDetails.put(VoucherConstant.VOUCHERTYPE, voucherType);
+			headerDetails.put("vouchersubtype", voucherSubType);
+			headerDetails.put(VoucherConstant.BILLNUMBER, egBillregister.getBillnumber());
+			new SimpleDateFormat(DD_MMM_YYYY);
+			headerDetails.put(VoucherConstant.VOUCHERNUMBER, voucherNumber == null ? "" : voucherNumber);
+			Date dt = new Date();
+			Date vdt;
+			String purposeValueVN = "";
+			final String purposeValue = "";
+
+			/**
+			 * Starting to check for voucher date First check if the value needs
+			 * to be read from the UI. If YES, check if the value is passed from
+			 * the UI, and then set data if present and throw error else. If NO,
+			 * check if the value needs to be read from the bill If YES, set the
+			 * voucher date same as that of bill date. If NO, set the value as
+			 * system date
+			 **/
+			try {
+				final List<AppConfigValues> configValues = appConfigValuesService
+						.getConfigValuesByModuleAndKey(FinancialConstants.MODULE_NAME_APPCONFIG, "VOUCHERDATE_FROM_UI");
+
+				for (final AppConfigValues appConfigVal : configValues)
+					purposeValueVN = appConfigVal.getValue();
+			} catch (final Exception e) {
+				throw new ApplicationRuntimeException(
+						"Appconfig value for VOUCHERDATE_FROM_UI is not defined in the system");
+			}
+			if (purposeValueVN.equals("Y")) {
+				if (voucherDate == null)
+					throw new ValidationException(Arrays.asList(new ValidationError(
+							"Voucherdate Should be entered by user", "voucherfrombill.voucherdate.mandatory")));
+				else {
+					dt = voucherDate;
+					vdt = dt;
+				}
+
+			} else {
+
+				try {
+					final List<AppConfigValues> configValues = appConfigValuesService.getConfigValuesByModuleAndKey(
+							FinancialConstants.MODULE_NAME_APPCONFIG, "USE BILLDATE IN CREATE VOUCHER FROM BILL");
+
+					for (final AppConfigValues appConfigVal : configValues)
+						purposeValueVN = appConfigVal.getValue();
+				} catch (final Exception e) {
+					throw new ApplicationRuntimeException(
+							"Appconfig value for USE BILLDATE IN CREATE VOUCHER FROM BILL is not defined in the system");
+				}
+				if (purposeValue.equals("Y")) {
+					vdt = egBillregister.getBilldate();
+					dt = egBillregister.getBilldate();
+				} else
+					vdt = dt;
+			}
+			headerDetails.put(VoucherConstant.VOUCHERDATE, vdt);
+			if (egBillregister.getId() != null)
+				headerDetails.put("billid", egBillregister.getId());
+			if(voucherHeader.getDescription()!=null)
+					headerDetails.put(VoucherConstant.NARRATION, voucherHeader.getDescription());
+			if (billMis.getSourcePath() != null)
+				headerDetails.put(VoucherConstant.SOURCEPATH, billMis.getSourcePath());
+			if (billMis.getDepartmentcode() != null) {
+				headerDetails.put(VoucherConstant.DEPARTMENTCODE, billMis.getDepartmentcode());
+			}
+			if (billMis.getFund() != null)
+				headerDetails.put(VoucherConstant.FUNDCODE, billMis.getFund().getCode());
+			if (billMis.getScheme() != null)
+				headerDetails.put(VoucherConstant.SCHEMECODE, billMis.getScheme().getCode());
+			if (billMis.getSubScheme() != null)
+				headerDetails.put(VoucherConstant.SUBSCHEMECODE, billMis.getSubScheme().getCode());
+			if (billMis.getFundsource() != null)
+				headerDetails.put(VoucherConstant.FUNDSOURCECODE, billMis.getFundsource().getCode());
+			if (billMis.getFieldid() != null)
+				if (billMis.getFieldid().getId() != null)
+					headerDetails.put(VoucherConstant.DIVISIONID, billMis.getFieldid().getId().toString());
+			if (billMis.getFunctionaryid() != null)
+				headerDetails.put(VoucherConstant.FUNCTIONARYCODE, billMis.getFunctionaryid().getCode());
+			// TODO- read the fnction from billdetails. We can remove this
+			if (billMis.getFunction() != null)
+				headerDetails.put(VoucherConstant.FUNCTIONCODE, billMis.getFunction().getCode());
+			if (billMis.getBudgetaryAppnumber() != null)
+				headerDetails.put(VoucherConstant.BUDGETARYAPPNUMBER, billMis.getBudgetaryAppnumber());
+			if (voucherHeader.getBackdateentry()!=null)
+				headerDetails.put(VoucherConstant.BACKDATE, voucherHeader.getBackdateentry());
+			for (final EgBilldetails egBilldetails : billDetailslist) {
+
+				// persistenceService.setSessionFactory(new SessionFactory());
+				detailMap = new HashMap<String, Object>();
+				if (null != egBilldetails.getFunctionid()) {
+					/*
+					 * CFunction function = (CFunction)
+					 * persistenceService.getSession().load(CFunction.class,
+					 * (egBilldetails.getFunctionid()).longValue());
+					 * detailMap.put(VoucherConstant.FUNCTIONCODE,
+					 * function.getCode());
+					 */
+				}
+				detailMap.put(VoucherConstant.DEBITAMOUNT,
+						egBilldetails.getDebitamount() == null ? BigDecimal.ZERO : egBilldetails.getDebitamount());
+				detailMap.put(VoucherConstant.CREDITAMOUNT,
+						egBilldetails.getCreditamount() == null ? BigDecimal.ZERO : egBilldetails.getCreditamount());
+				final String glcode = persistenceService.getSession().createQuery(
+						"select glcode from CChartOfAccounts where id = " + egBilldetails.getGlcodeid().longValue())
+						.list().get(0).toString();
+				detailMap.put(VoucherConstant.GLCODE, glcode);
+				accountdetails.add(detailMap);
+				subLedgerlist = egBilldetails.getEgBillPaydetailes();
+				for (final EgBillPayeedetails egBillPayeedetails : subLedgerlist) {
+					subledgertDetailMap = new HashMap<>();
+					if (chartOfAccountDetailService.getByGlcodeIdAndDetailTypeId(
+							egBillPayeedetails.getEgBilldetailsId().getGlcodeid().longValue(),
+							egBillPayeedetails.getAccountDetailTypeId().intValue()) != null) {
+						subledgertDetailMap.put(VoucherConstant.DEBITAMOUNT, egBillPayeedetails.getDebitAmount() == null
+								? BigDecimal.ZERO : egBillPayeedetails.getDebitAmount());
+						subledgertDetailMap.put(VoucherConstant.CREDITAMOUNT,
+								egBillPayeedetails.getCreditAmount() == null ? BigDecimal.ZERO
+										: egBillPayeedetails.getCreditAmount());
+						subledgertDetailMap.put(VoucherConstant.DETAILTYPEID,
+								egBillPayeedetails.getAccountDetailTypeId());
+						subledgertDetailMap.put(VoucherConstant.DETAILKEYID,
+								egBillPayeedetails.getAccountDetailKeyId());
+						subledgertDetailMap.put(VoucherConstant.GLCODE, glcode);
+						subledgerDetails.add(subledgertDetailMap);
+					}
+				}
+			}
+			
+			vh = createPreApprovedVoucher(headerDetails, accountdetails, subledgerDetails);
+			egBillregister.getEgBillregistermis().setVoucherHeader(vh);
+
+		} catch (final ValidationException e) {
+			LOGGER.error(e.getErrors());
+			final List<ValidationError> errors = new ArrayList<ValidationError>();
+			errors.add(new ValidationError("exp", e.getErrors().get(0).getMessage()));
+			throw new ValidationException(errors);
+		} catch (final Exception e) {
+			LOGGER.error("Error in create voucher from bill" + e.getMessage());
+			throw new ApplicationRuntimeException(e.getMessage());
+		}
+		return vh.getId().longValue();
+	}
+
 	/**
 	 * creates voucher From billId
 	 * 
@@ -1138,7 +1384,8 @@ public class CreateVoucher {
 		        validateMandateFields(headerdetails);
 			validateLength(headerdetails);
 			validateVoucherMIS(headerdetails);
-			validateTransaction(accountcodedetails, subledgerdetails,check);
+			if(subledgerdetails!=null)
+				validateTransaction(accountcodedetails, subledgerdetails,check);
 			validateFunction(headerdetails, accountcodedetails);
 			vh = createVoucherHeader(headerdetails);
 			mis = createVouchermis(headerdetails);
@@ -2169,6 +2416,7 @@ public class CreateVoucher {
 					transaction.setBillId((Long) headerdetails.get("billid"));
 
 				final ArrayList reqParams = new ArrayList();
+				if(subledgerdetails!=null) {
 				for (final HashMap<String, Object> sublegDetailMap : subledgerdetails) {
 
 					final String detailGlCode = sublegDetailMap.get(VoucherConstant.GLCODE).toString();
@@ -2217,6 +2465,7 @@ public class CreateVoucher {
 						reqParams.add(reqData);
 					}
 
+				}
 				}
 				if (reqParams != null && reqParams.size() > 0)
 					transaction.setTransaxtionParam(reqParams);

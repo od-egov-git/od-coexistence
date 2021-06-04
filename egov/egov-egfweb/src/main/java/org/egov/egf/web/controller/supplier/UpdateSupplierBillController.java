@@ -47,8 +47,12 @@
  */
 package org.egov.egf.web.controller.supplier;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -60,6 +64,8 @@ import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper;
+import org.apache.struts2.dispatcher.multipart.UploadedFile;
 import org.egov.commons.CChartOfAccountDetail;
 import org.egov.commons.CChartOfAccounts;
 import org.egov.commons.service.AccountdetailtypeService;
@@ -108,6 +114,8 @@ public class UpdateSupplierBillController extends BaseBillController {
     private static final String APPROVAL_COMENT = "approvalComent";
 
     private static final String SUPPLIER = "Supplier";
+    
+    private static final String FILE = "file";
 
     private static final String PURCHASE_ORDER = "PurchaseOrder";
 
@@ -360,7 +368,25 @@ public class UpdateSupplierBillController extends BaseBillController {
 
         String mode = "";
         EgBillregister updatedEgBillregister = null;
+//adding upload file
+        String[] contentType = ((MultiPartRequestWrapper) request).getContentTypes(FILE);
+        List<DocumentUpload> list = new ArrayList<>();
+        UploadedFile[] uploadedFiles = ((MultiPartRequestWrapper) request).getFiles(FILE);
+        String[] fileName = ((MultiPartRequestWrapper) request).getFileNames(FILE);
+        if (uploadedFiles != null)
+            for (int i = 0; i < uploadedFiles.length; i++) {
 
+                Path path = Paths.get(uploadedFiles[i].getAbsolutePath());
+                byte[] fileBytes = Files.readAllBytes(path);
+                ByteArrayInputStream bios = new ByteArrayInputStream(fileBytes);
+                DocumentUpload upload = new DocumentUpload();
+                upload.setInputStream(bios);
+                upload.setFileName(fileName[i]);
+                upload.setContentType(contentType[i]);
+                list.add(upload);
+            }
+
+        egBillregister.setDocumentDetail(list);
         if (request.getParameter("mode") != null)
             mode = request.getParameter("mode");
 
@@ -454,8 +480,8 @@ public class UpdateSupplierBillController extends BaseBillController {
         	}
             else if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONREJECT))
         	{
-            	if(approvalPosition==90)
-            		approvalPosition=315l;
+            	/*if(approvalPosition==90)
+            		approvalPosition=315l;*/
         		approverName =getEmployeeName(approvalPosition);
         	}
             final String approverDetails = financialUtils.getApproverDetails(workFlowAction,

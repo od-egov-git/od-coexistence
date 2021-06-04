@@ -75,7 +75,7 @@ function callAjaxSearch() {
 					"data" : getFormData(jQuery('form'))         
 				},
 				"bDestroy" : true,
-				dom: "<'row'<'col-xs-12 pull-right'f>r>t<'row buttons-margin'<'col-md-3 col-xs-6'i><'col-md-3  col-xs-6'l><'col-md-3 col-xs-6'B><'col-md-3 col-xs-6 text-right'p>>",
+				dom : "<'row'<'col-xs-12 pull-right'f>r>t<'row buttons-margin'<'col-md-3 col-xs-6'i><'col-md-3 col-xs-6'l><'col-md-6 col-xs-3'B><'col-md-6 col-xs-6 text-right'p>>",
 				buttons: [
 						  {
 						    extend: 'print',

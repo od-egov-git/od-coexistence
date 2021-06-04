@@ -198,6 +198,12 @@ public class CreateSupplierBillController extends BaseBillController {
     @Override
     protected void setDropDownValues(final Model model) {
         super.setDropDownValues(model);
+										
+	 
+										   
+									
+														 
+	  
         //model.addAttribute(BILL_TYPES, BillType.values());
         model.addAttribute(SUPPLIERS, supplierService.getAllActiveSuppliers());
         model.addAttribute(NET_PAYABLE_CODES, chartOfAccountsService.getSupplierNetPayableAccountCodes());
@@ -218,6 +224,12 @@ public class CreateSupplierBillController extends BaseBillController {
     		   
     	   }
     	}
+										  
+	 
+										   
+									
+														 
+		
     	//end
     	setDropDownValues(model);
         model.addAttribute("billNumberGenerationAuto", supplierBillService.isBillNumberGenerationAuto());
@@ -225,6 +237,7 @@ public class CreateSupplierBillController extends BaseBillController {
         prepareWorkflow(model, egBillregister, new WorkflowContainer());
         prepareValidActionListByCutOffDate(model);
         model.addAttribute("validActionList", validActions);
+												   
         if(isBillDateDefaultValue){
             egBillregister.setBilldate(new Date());            
         }
@@ -483,6 +496,12 @@ public class CreateSupplierBillController extends BaseBillController {
 
         final EgBillregister supplierBill = supplierBillService.getByBillnumber(billNumber);
 
+																																				   
+																																					 
+																	  
+			   
+																			   
+		 
         final String message = getMessageByStatus(supplierBill, approverName, nextDesign);
 
         model.addAttribute("message", message);

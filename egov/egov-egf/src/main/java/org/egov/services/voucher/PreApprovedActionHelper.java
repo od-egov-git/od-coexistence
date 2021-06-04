@@ -123,8 +123,12 @@ public class PreApprovedActionHelper {
     public CVoucherHeader createVoucherFromBill(CVoucherHeader voucherHeader, WorkflowBean workflowBean, Long billId,
             String voucherNumber, Date voucherDate) throws ApplicationRuntimeException, SQLException, TaskFailedException {
         try {
-            Long voucherHeaderId = createVoucher.createVoucherFromBill(billId.intValue(), null,
-                    voucherNumber, voucherDate);
+			/*
+			 * Long voucherHeaderId = createVoucher.createVoucherFromBill(billId.intValue(),
+			 * null, voucherNumber, voucherDate);
+			 */
+            Long voucherHeaderId = createVoucher.createVoucherFromBillNew(billId.intValue(), null,
+                    voucherNumber, voucherDate,voucherHeader);
             voucherHeader = voucherService.findById(voucherHeaderId, false);
             voucherHeader = sendForApproval(voucherHeader, workflowBean);
         }catch (final ValidationException e) {

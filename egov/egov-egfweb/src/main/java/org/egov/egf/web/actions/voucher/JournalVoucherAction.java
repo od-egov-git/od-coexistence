@@ -263,7 +263,7 @@ public class JournalVoucherAction extends BaseVoucherAction
                     documentDetail.add(upload);
                 }
                 }
-                voucherHeader.setBackdateentry(backlogEntry);
+                voucherHeader.setBackdateentry(getBacklogEntry());
                 System.out.println("before save");
               //  voucherHeader = journalVoucherActionHelper.createVcouher(billDetailslist, subLedgerlist, voucherHeader,
                //         voucherTypeBean, workflowBean);
@@ -317,6 +317,7 @@ public class JournalVoucherAction extends BaseVoucherAction
 						if(voucherHeader.getState().getValue()!=null && voucherHeader.getState().getValue().equalsIgnoreCase(FinancialConstants.WORKFLOW_STATE_SAVEASDRAFT))
 						{
 							message = "Voucher  " + voucherHeader.getVoucherNumber() + " Save As Draft Sucessfully" ;
+							System.out.println("::::::::messaage:::::: "+message);
 							target = "success";
 						}
 						else
@@ -333,6 +334,7 @@ public class JournalVoucherAction extends BaseVoucherAction
                     	if(voucherHeader.getState().getValue()!=null && voucherHeader.getState().getValue().equalsIgnoreCase(FinancialConstants.WORKFLOW_STATE_SAVEASDRAFT))
                     	{
                     	message = "Voucher  " + voucherHeader.getVoucherNumber() + " Save As Draft Sucessfully" ;
+                    	System.out.println("::::::::messaage:::::: "+message);
                     	target = "success";
                     	}
                     	else
@@ -552,7 +554,11 @@ public class JournalVoucherAction extends BaseVoucherAction
         return message;
     }
 
-    public String getButtonValue() {
+    public void setMessage(String message) {
+		this.message = message;
+	}
+
+	public String getButtonValue() {
         return buttonValue;
     }
 

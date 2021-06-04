@@ -195,6 +195,12 @@ public class CreateContractorBillController extends BaseBillController {
     @Override
     protected void setDropDownValues(final Model model) {
         super.setDropDownValues(model);
+										
+	 
+										   
+									
+														 
+	  
         //model.addAttribute(BILL_TYPES, BillType.get);
         model.addAttribute(CONTRACTORS, contractorService.getAllActiveContractors());
         model.addAttribute(NET_PAYABLE_CODES, chartOfAccountsService.getContractorNetPayableAccountCodes());
@@ -215,6 +221,12 @@ public class CreateContractorBillController extends BaseBillController {
     		   
     	   }
     	}
+											   
+	 
+										   
+									
+														 
+		
     	//end
         setDropDownValues(model);
         //model.addAttribute("billNumberGenerationAuto", contractorBillService.isBillNumberGenerationAuto());
@@ -222,6 +234,7 @@ public class CreateContractorBillController extends BaseBillController {
         prepareWorkflow(model, egBillregister, new WorkflowContainer());
         prepareValidActionListByCutOffDate(model);
         model.addAttribute("validActionList", validActions);
+												   
         if(isBillDateDefaultValue){
             egBillregister.setBilldate(new Date());            
         }
@@ -480,7 +493,14 @@ public class CreateContractorBillController extends BaseBillController {
 
         final EgBillregister contractorBill = contractorBillService.getByBillnumber(billNumber);
 
+																																					   
+																																						
+									
+			   
         final String message = getMessageByStatus(contractorBill, approverName, nextDesign);
+		 
+			
+																				  
 
         model.addAttribute("message", message);
 

@@ -72,9 +72,13 @@
                 <spring:message code="lbl.view.documents" text="Documents"/>
         </div>
     <c:if test="${contractor.documentDetail != null &&  !contractor.documentDetail.isEmpty()}">
+    <table>
         <c:forEach items="${contractor.documentDetail }" var="documentDetials">
-            <a href="/services/EGF/contractor/downloadBillDoc?contractorId=${contractor.id }&fileStoreId=${documentDetials.fileStore.fileStoreId }">${documentDetials.fileStore.fileName }</a><br />
+        <tr>    
+        	<td class="padding-10"><a href="/services/EGF/contractor/downloadBillDoc?contractorId=${contractor.id }&fileStoreId=${documentDetials.fileStore.fileStoreId }">${documentDetials.fileStore.fileName }</a></td>
+        </tr><br />
         </c:forEach>
+        </table>
     </c:if>
     <br>
     <br>
@@ -86,10 +90,13 @@
                         <tbody>
                         <tr>
                             <td valign="top">
-                                <table id="uploadertbl" width="100%"><tbody>
+                                <table id="uploadertbl" width="40"><tbody>
                                 <tr id="row1">
                                     <td>
                                         <input type="file" name="file" id="file1" onchange="isValidFile(this.id)" class="padding-10">
+                                    </td>
+                                    <td>
+                                    	<input type="button" name="remove" id="remove" value ="Remove" onclick="deleteFileInputField(this.row)">
                                     </td>
                                 </tr>
                                 </tbody></table>

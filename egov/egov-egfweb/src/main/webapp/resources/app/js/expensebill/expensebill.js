@@ -1248,7 +1248,8 @@ function validate(){
 	
 	if(!$netPayableAccountCodeId)
 	{
-		bootbox.alert($.i18n.prop('msg.please.select.one.net.payable.account.detail'));
+		//bootbox.alert($.i18n.prop('msg.please.select.one.net.payable.account.detail'));
+		bootbox.alert("Please select sub-ledger account deatil");
 		return false;
 	}
 	return true;
@@ -1379,9 +1380,13 @@ function validateWorkFlowApprover(name) {
 		$('#approvalComent').removeAttr('required');
 	}
 	if (button != null && button == 'Reject') {
-		$('#approvalDepartment').attr('required', 'required');
-		$('#approvalDesignation').attr('required', 'required');
-		$('#approvalPosition').attr('required', 'required');
+		$('#approvalDepartment').val("");
+		$('#approvalDesignation').val("");
+		$('#approvalPosition').val("");
+		
+		$('#approvalDepartment').removeAttr('required');
+        $('#approvalDesignation').removeAttr('required');
+        $('#approvalPosition').removeAttr('required');
 		$('#approvalComent').attr('required', 'required');
 	}
 	 if (button != null && button == 'SaveAsDraft') {

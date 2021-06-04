@@ -836,6 +836,7 @@ public class MicroserviceUtils {
         for (EmployeeInfo ei : employeeInfos) {
             for (Assignment a : ei.getAssignments()) {
                 a.setEmployeeName(ei.getUser().getName());
+                a.setEmpId(ei.getUser().getId());
             }
             assignmentList.addAll(ei.getAssignments());
         }

@@ -57,6 +57,7 @@ import org.egov.commons.CChartOfAccounts;
 import org.egov.commons.CFunction;
 import org.egov.commons.utils.EntityType;
 import org.egov.egf.commons.EgovCommon;
+import org.egov.egf.supplierbill.service.SupplierBillService;
 import org.egov.egf.web.actions.voucher.VoucherSearchAction;
 import org.egov.infra.exception.ApplicationException;
 import org.egov.infra.validation.exception.ValidationError;
@@ -86,8 +87,14 @@ public class BillViewAction extends BaseFormAction
     EgBillregister egBillRegister = new EgBillregister();
     List<Map<String, Object>> billDetailsList = new ArrayList<Map<String, Object>>();
     List<Map<String, Object>> subledgerList = new ArrayList<Map<String, Object>>();
+    private static final String BillID = "billid";
     @Autowired
     private EgovCommon egovCommon;
+    
+    @Autowired
+    private SupplierBillService supplierBillService;
+    private String billnumber;
+    
     public List<Map<String, Object>> getSubledgerList() {
         return subledgerList;
     }
@@ -187,6 +194,74 @@ public class BillViewAction extends BaseFormAction
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("-----------End of loadBillDetails()-----------");
     }
+    @Action(value = "/bill/billView-viewid")
+    public String viewid() throws ApplicationException, ParseException
+    {
+        System.out.println("billId "+Long.valueOf(parameters.get(BillID)[0]));
+        loadBillDetailsById();
+        return Constants.VIEW;
+    }
+    private void loadBillDetailsById() {
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("-----------Start of loadBillDetails()-----------");
+        Map<String, Object> temp = null;
+        Map<String, Object> subLedgerTemp = null;
+        System.out.println("billId "+Long.valueOf(parameters.get(BillID)[0]));
+        if(Long.valueOf(parameters.get(BillID)[0])!=null)
+		{
+        	EgBillregister egBillregister = supplierBillService.getById(Long.valueOf(parameters.get(BillID)[0]));
+        	setBillnumber(egBillregister.getBillnumber());
+        	System.out.println("billno "+billnumber);
+			final List<EgBilldetails> billDetList = persistenceService.findAllBy(
+		            " from EgBilldetails where egBillregister.id=? ",
+//                   egBillRegister.getId()); 
+            Long.valueOf(parameters.get(BillID)[0]));
+            for (final EgBilldetails billDetail : billDetList)
+            {
+                final CChartOfAccounts coa = (CChartOfAccounts) persistenceService.find(" from CChartOfAccounts where id=?  ",
+                        billDetail.getGlcodeid().longValue());
+                temp = new HashMap<String, Object>();
+                if (billDetail.getFunctionid() != null)
+                {
+                    final CFunction function = (CFunction) getPersistenceService().find("from CFunction where id=?",
+                            billDetail.getFunctionid().longValue());
+                    temp.put(Constants.FUNCTION, function.getName());
+                } else
+                    temp.put(Constants.FUNCTION, "");
+
+                temp.put("glcode", coa.getGlcode());
+                temp.put("accountHead", coa.getName());
+                temp.put("debitAmount", billDetail.getDebitamount() == null ? 0 : billDetail.getDebitamount().longValue());
+                temp.put("creditAmount", billDetail.getCreditamount() == null ? 0 : billDetail.getCreditamount().longValue());
+
+                billDetailsList.add(temp);
+                
+                
+                for (final EgBillPayeedetails payeeDetails : billDetail.getEgBillPaydetailes())
+                {
+                    final Accountdetailtype detailtype = (Accountdetailtype) persistenceService.find(
+                            " from Accountdetailtype where id=?", payeeDetails.getAccountDetailTypeId());
+                    subLedgerTemp = new HashMap<String, Object>();
+                    try {
+                        subLedgerTemp = getAccountDetails(detailtype, payeeDetails.getAccountDetailKeyId(), subLedgerTemp);
+                    } catch (final ApplicationException e) {
+                        final List<ValidationError> errors = new ArrayList<ValidationError>();
+                        errors.add(new ValidationError("exp", e.getMessage()));
+                        throw new ValidationException(errors);
+                    }
+                    subLedgerTemp.put(Constants.FUNCTION, temp.get(Constants.FUNCTION));
+                    subLedgerTemp.put("glcode", coa.getGlcode());
+                    if (payeeDetails.getDebitAmount() != null && payeeDetails.getDebitAmount().longValue() != 0)
+                        subLedgerTemp.put("amount", payeeDetails.getDebitAmount().longValue());
+                    else
+                        subLedgerTemp.put("amount", payeeDetails.getCreditAmount().longValue());
+                    subledgerList.add(subLedgerTemp);
+                }
+            }
+		}
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("-----------End of loadBillDetails()-----------");
+    }
 
     public Map<String, Object> getAccountDetails(final Accountdetailtype detailtype, final Integer detailkeyid,
             final Map<String, Object> tempMap) throws ApplicationException
@@ -222,5 +297,13 @@ public class BillViewAction extends BaseFormAction
     public void setBillId(final long billId) {
         egBillRegister = (EgBillregister) persistenceService.find(" from EgBillregister where id = ?", billId);
     }
+
+	public String getBillnumber() {
+		return billnumber;
+	}
+
+	public void setBillnumber(String billnumber) {
+		this.billnumber = billnumber;
+	}
 
 }

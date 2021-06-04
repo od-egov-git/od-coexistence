@@ -71,7 +71,7 @@
 				<c:when test="${egBillregister.creditDetails.size() == 0}">
 					<tr id="creditdetailsrow">
 						<td>
-							<input type="text" id="creditDetails[0].creditGlcode" name="creditDetails[0].creditGlcode" class="form-control table-input creditDetailGlcode creditGlcode"  data-errormsg="Account Code is mandatory!" data-idx="0" data-optional="0"   placeholder="Type first 3 letters of Account code" >
+							<input type="text" id="creditDetails[0].creditGlcode" name="creditDetails[0].creditGlcode" class="form-control table-input creditDetailGlcode creditGlcode"  data-errormsg="Account Code is mandatory!" data-idx="0" data-optional="0"   placeholder="Type any letters of Account code" >
 							<form:hidden path="creditDetails[0].glcodeid" id="creditDetails[0].glcodeid"  class="form-control table-input hidden-input creditdetailid"/>
 						</td>
 						<td>

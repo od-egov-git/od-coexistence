@@ -68,7 +68,7 @@
 </head>
 
 <body
-	onload="loadDropDownCodes();loadDropDownCodesFunction();onloadtask()">
+	onload="loadDropDownCodes();loadDropDownCodesFunction();onloadtask();documentdep()">
 
 	<s:form action="journalVoucher" theme="simple" name="jvcreateform"  enctype = "multipart/form-data">
 		<s:token />
@@ -130,7 +130,7 @@
 							<td style="width: 5%"></td>
 							<td class="greybox"><s:text name="backdated.entry" /><span
 								class="mandatory1">*</span></td>
-							<td class="greybox" colspan="3"><s:select name="backlogEntry"
+							<td class="greybox" colspan="3"><s:select name="backlogEntry" 
 																	headerKey="-1" headerValue="Select" value="%{backlogEntry}"
 																	list="#{'Y':'Yes' ,'N':'No'}"
 																			id="backlogEntry" /></td>
@@ -216,10 +216,20 @@
 	<s:hidden name="targetvalue" value="%{target}" id="targetvalue" />
 	<s:hidden name="functionValue" id="functionValue" />
 	<s:hidden name="functionId" id="functionId" />
+	<s:hidden name="messagevalue" value="%{message}" id="messagevalue" />
 	<script type="text/javascript">
-		
+	/* window.onload=function(){
+		loadDropDownCodes();
+		loadDropDownCodesFunction();
+		document.getElementById("approverDepartment").value="DEPT_25";
+		loadDesignationFromMatrix1();
+	} */
+	
 			if(dom.get('targetvalue').value=='success')
 			{
+				var message=document.getElementById('messagevalue').value;
+				//bootbox.alert(message);
+				//showMessage(message);
 				document.getElementById('voucherDate').value=""; 
 				if(document.getElementById('voucherNumber')){
 					document.getElementById('voucherNumber').value="";
@@ -261,6 +271,8 @@
 			}
 	function onSubmit()
 	{
+		if(checkdate())
+		{
 		var backlog=document.getElementById('backlogEntry');
 		if(validateJV()){
 			console.log("backlog  ::: "+backlog.value);
@@ -270,14 +282,26 @@
 		}else{
 			return false;
 		}
+		}
+		else{
+			bootbox.alert("Please select back dated entry option correctly");
+			return false;
+			}
+		
 	}
 	
 	// jayanta for save as draft
 	function onSubmitDraft()
 	{
+		if(checkdate())
+		{
 		var backlog=document.getElementById('backlogEntry');
 			document.jvcreateform.action='/services/EGF/voucher/journalVoucher-create.action?backlogEntry='+backlog.value;
 	    	return true;
+		}else{
+			bootbox.alert("Please select back dated entry option correctly");
+			return false;	
+		}
 		
 	}
 
@@ -330,30 +354,35 @@
 		console.log(vhType);
 		
 		if(vhType =='-1' )	{
-			document.getElementById('lblError').innerHTML = "<s:text name='msg.please.select.voucher.sub.type'/> ";
+			bootbox.alert("Please select voucher sub type");
+			//document.getElementById('lblError').innerHTML = "<s:text name='msg.please.select.voucher.sub.type'/> ";
 			document.getElementById('voucherDate').focus();
 			return false;
 		}
 		if(vhDate == '' )	{
-			document.getElementById('lblError').innerHTML = "<s:text name='msg.please.enter.voucher.date'/> ";
+			bootbox.alert("Please enter the voucher date");
+			//document.getElementById('lblError').innerHTML = "<s:text name='msg.please.enter.voucher.date'/> ";
 			document.getElementById('voucherDate').focus();
 			return false;
 		}
 		if(narration == null || narration.value == '')
 			{
-			document.getElementById('lblError').innerHTML = "<s:text name='msg.please.enter.voucher.narration'/> ";
+			bootbox.alert("Please enter Narration");
+			//document.getElementById('lblError').innerHTML = "<s:text name='msg.please.enter.voucher.narration'/> ";
 			document.getElementById('narration').focus();
 			return false;
 			}
 		if(backlog == null || backlog.value == '-1')
 		{
-		document.getElementById('lblError').innerHTML = "Please select whether it is a backlog entry";
+			bootbox.alert("Please select whether it is a backlog entry");
+		//document.getElementById('lblError').innerHTML = "Please select whether it is a backlog entry";
 		document.getElementById('voucherDate').focus();
 		return false;
 		}
 		if(document.getElementById('vouchermis.function') == null || document.getElementById('vouchermis.function').value == '-1')
 		{
-		document.getElementById('lblError').innerHTML = 'Please select Function';
+			bootbox.alert("Please select Function");
+		//document.getElementById('lblError').innerHTML = 'Please select Function';
 		document.getElementById('vouchermis.function').focus();
 		return false;
 		}
@@ -365,12 +394,13 @@
 	    var today = new Date();
 	    if (voucherDate > today) {
 	        bootbox.alert("<s:text name='msg.voucher.date.greater.than.today.date'/> ");
-	        return false
+	        return false;
 	    }
 		var vVoucherSubType = document.getElementById('vType').value;
 		if(vVoucherSubType != 'JVGeneral' && vVoucherSubType != '-1' )	{
 			if(document.getElementById('voucherTypeBean.partyName').value == '' ) {
-				document.getElementById('lblError').innerHTML = "<s:text name='msg.please.enter.party.name'/> ";
+				bootbox.alert("Please enter a Party Name");
+				//document.getElementById('lblError').innerHTML = "<s:text name='msg.please.enter.party.name'/> ";
 				document.getElementById('voucherTypeBean.partyName').focus();
 				return false;
 			}
@@ -383,7 +413,7 @@
 
 	    if (myBillDate > today) {
 	        bootbox.alert("<s:text name='msg.bill.date.greater.than.today.date'/> ");
-	        return false
+	        return false;
 	    }
 	    var partyBillDate = document.getElementById("partyBillDate").value;
 	    var partydate = partyBillDate.substring(0, 2);
@@ -393,48 +423,52 @@
 
 	    if (myPartyBillDate > today) {
 	        bootbox.alert("<s:text name='msg.party.bill.date.greater.than.today.date'/> ");
-	        return false
+	        return false;
 	    }
 		
 	// Javascript validation of the MIS Manadate attributes.
 		<s:if test="%{isFieldMandatory('vouchernumber')}"> 
 			 if(null != document.getElementById('voucherNumber') && document.getElementById('voucherNumber').value.trim().length == 0 ){
-
-				document.getElementById('lblError').innerHTML = "<s:text name='msg.please.enter.voucher.number'/>";
+bootbox.alert("Please enter a voucher number");
+				//document.getElementById('lblError').innerHTML = "<s:text name='msg.please.enter.voucher.number'/>";
 				return false;
 			 }
 		 </s:if>
 		 <s:if test="%{isFieldMandatory('voucherdate')}"> 
 				 if(null != document.getElementById('voucherDate') && document.getElementById('voucherDate').value.trim().length == 0){
-
-					document.getElementById('lblError').innerHTML = "<s:text name='msg.please.enter.voucher.date'/>";
+bootbox.alert("Please enter the voucher date");
+					//document.getElementById('lblError').innerHTML = "<s:text name='msg.please.enter.voucher.date'/>";
 					return false;
 				 }
 			 </s:if>    
 		 	<s:if test="%{isFieldMandatory('fund')}"> 
 				 if(null != document.getElementById('fundId') && document.getElementById('fundId').value == -1){
-					document.getElementById('lblError').innerHTML = "<s:text name='msg.please.select.fund'/>";
+					 bootbox.alert("Please Select a fund");
+					//document.getElementById('lblError').innerHTML = "<s:text name='msg.please.select.fund'/>";
 					return false;
 				 }    
 			 </s:if>   
 			 <s:if test="%{isFieldMandatory('function')}">                        
 			 if(null != document.getElementById('vouchermis.function') && document.getElementById('vouchermis.function').value == -1){
-
-				document.getElementById('lblError').innerHTML = "<s:text name='msg.please.select.function'/>";
+					alert("function");
+					bootbox.alert("msg.please.select.function")
+				//document.getElementById('lblError').innerHTML = "<s:text name='msg.please.select.function'/>";
 				return false;
 			 }
 		 </s:if>
 			<s:if test="%{isFieldMandatory('department')}"> 
 				 if(null!= document.getElementById('vouchermis.departmentid') && document.getElementById('vouchermis.departmentid').value == -1){
-
-					document.getElementById('lblError').innerHTML = "<s:text name='msg.please.select.department'/>";
+					alert("dep11");
+					bootbox.alert("Please select a department");
+					/* document.getElementById('lblError').innerHTML = "<s:text name='msg.please.select.department'/>"; */
 					return false;
 				 }
 			</s:if>
 			<s:if test="%{isFieldMandatory('scheme')}"> 
 				 if(null!=document.getElementById('schemeid') &&  document.getElementById('schemeid').value == -1){
-
-					document.getElementById('lblError').innerHTML = "<s:text name='msg.please.select.scheme'/>";
+					 alert("scheme11");
+						bootbox.alert("Please select a scheme");
+					/* document.getElementById('lblError').innerHTML = "<s:text name='msg.please.select.scheme'/>"; */
 					return false;
 				 }
 			</s:if>
@@ -447,29 +481,29 @@
 			</s:if>
 			<s:if test="%{isFieldMandatory('functionary')}"> 
 				 if(null!=document.getElementById('vouchermis.functionary') &&  document.getElementById('vouchermis.functionary').value == -1){
-
+					bootbox.alert("Please select a functionary");
 					document.getElementById('lblError').innerHTML = "<s:text name='msg.please.select.functionary'/>";
 					return false;
 				 }
 			</s:if>
 			<s:if test="%{isFieldMandatory('fundsource')}"> 
 				 if(null !=document.getElementById('fundsourceId') &&  document.getElementById('fundsourceId').value == -1){
-
-					document.getElementById('lblError').innerHTML = "<s:text name='msg.please.select.fundsource'/>";
+					bootbox.alert("Please select a fundsource");
+					//document.getElementById('lblError').innerHTML = "<s:text name='msg.please.select.fundsource'/>";
 					return false;
 				}
 			</s:if>
 			<s:if test="%{isFieldMandatory('field')}"> 
 				 if(null!= document.getElementById('vouchermis.divisionid') && document.getElementById('vouchermis.divisionid').value == -1){
-
-					document.getElementById('lblError').innerHTML = "<s:text name='msg.please.select.field'/>";
+					 bootbox.alert("Please select a field");
+					//document.getElementById('lblError').innerHTML = "<s:text name='msg.please.select.field'/>";
 					return false;
 				 }
 			</s:if>
 
 			if(null!= document.getElementById('vouchermis.divisionid') && document.getElementById('vouchermis.divisionid').value == -1){
-
-				document.getElementById('lblError').innerHTML = "<s:text name='msg.please.select.field'/>";
+				bootbox.alert("Please select a field");
+				//document.getElementById('lblError').innerHTML = "<s:text name='msg.please.select.field'/>";
 				return false;
 			 }	
 			
@@ -499,7 +533,8 @@
 				  creditAmt= parseFloat(creditAmt);
 				  if(accountCode == '')				  
 				    {
-					     document.getElementById('lblError').innerHTML ="Account code  is missing for credit or debit supplied field in account grid : "+(i+1);
+					  bootbox.alert("Account code  is missing for credit or debit supplied field in account grid : "+(i+1));
+					    // document.getElementById('lblError').innerHTML ="Account code  is missing for credit or debit supplied field in account grid : "+(i+1);
 						return false;
 						
 				    }
@@ -509,7 +544,8 @@
 				 
 					  if(!inAccountCodeArray(accountCode,accountCodeArray))
 						  {
-						  document.getElementById('lblError').innerHTML ="Function is missing for the repeated account code,check account code : "+accountCode;
+						  bootbox.alert("Function is missing for the repeated account code,check account code : "+accountCode);
+						 // document.getElementById('lblError').innerHTML ="Function is missing for the repeated account code,check account code : "+accountCode;
 							return false;
 						     
 						  }else{
@@ -519,13 +555,14 @@
 					  
 					  if(debitAmt > 0 && creditAmt >0)
 						  {
-						  				 
-						    document.getElementById('lblError').innerHTML = "One account can have only credit or debit for the account code :"+accountCode;
+						  	bootbox.alert("One account can have only credit or debit for the account code :"+accountCode);			 
+						   // document.getElementById('lblError').innerHTML = "One account can have only credit or debit for the account code :"+accountCode;
 							return false;
 						  }
 					  if(debitAmt == 0 && creditAmt == 0)
-						  {				 
-						    document.getElementById('lblError').innerHTML ="Enter debit/credit amount for the account code : "+accountCode;
+						  {		
+						  bootbox.alert("Enter debit/credit amount for the account code : "+accountCode);
+						   // document.getElementById('lblError').innerHTML ="Enter debit/credit amount for the account code : "+accountCode;
 							return false;
 						  }
 					  if(debitAmt > 0 && creditAmt == 0)
@@ -550,7 +587,8 @@
 
 			if(totalDebitAmt != totalCreditAmt)
 				{
-				document.getElementById('lblError').innerHTML = "Total Credit and Total Debit amount must be same";
+				bootbox.alert("Total Credit and Total Debit amount must be same");
+				//document.getElementById('lblError').innerHTML = "Total Credit and Total Debit amount must be same";
 				return false;
 				}
 			
@@ -566,6 +604,7 @@
 	function loadBank(fund){
 	}
 function onloadtask(){
+	
 	var VTypeFromBean = '<s:property value="voucherTypeBean.voucherSubType"/>';
 	if(VTypeFromBean == "") 
 		VTypeFromBean = '-1';
@@ -573,14 +612,15 @@ function onloadtask(){
 	if('<s:property value="voucherTypeBean.voucherSubType"/>' == 'JVGeneral' || '<s:property value="voucherTypeBean.voucherSubType"/>'== ""){
 		document.getElementById('voucherTypeBean.partyBillNum').readOnly=true;
 		document.getElementById('voucherTypeBean.partyName').readOnly=true;
-		document.getElementById('partyBillDate').readOnly=true;
+	//document.getElementById('partyBillDate').readOnly=true;
 		document.getElementById('voucherTypeBean.billNum').readOnly=true;
-		document.getElementById('billDate').readOnly=true;
+		// document.getElementById('billDate').readOnly=true;
 	}
 	//document.getElementById('vouchermis.function').style.display="none";
 	//document.getElementById('functionnametext').style.display="none";
 
-	var message = '<s:property value="message"/>';
+
+	var message = '<s:property value="message"/>';//commented 
 	if(message != null && message != '')
 		showMessage(message);
 	<s:if test="%{voucherTypeBean.voucherNumType == null}">
@@ -599,13 +639,14 @@ function onloadtask(){
 		
   }
 function showMessage(message){
+	//alert(":::message::");
 	var buttonValue = '<s:property value="buttonValue"/>';
 	for(var i=0;i<document.forms[0].length;i++)
 	{
 		if( document.forms[0].elements[i].id!='Close')
 		document.forms[0].elements[i].disabled =true;
 	} 
-	//bootbox.alert(message);
+	//bootbox.alert(message);//uncommented
 	bootbox.alert(message, function() {
 		var voucherHeaderId = '<s:property value="voucherHeader.id"/>';
 		var fileStoreId = '<s:property value="voucherHeader.documentDetail.fileStore.fileStoreId"/>';
@@ -621,6 +662,30 @@ function printJV()
 		var voucherHeaderId = '<s:property value="voucherHeader.id"/>';
 		window.location="${pageContext.request.contextPath}/voucher/journalVoucherPrint-print.action?id="+voucherHeaderId;		
 		//document.forms[0].submit();
+}
+
+function checkdate()
+{
+	backlogEntry
+	var backlog=document.getElementById('backlogEntry').value;
+	var date2=document.getElementById('voucherDate').value;
+	var parts = date2.split("/");
+	   var date = new Date(parts[1] + "/" + parts[0] + "/" + parts[2]);
+var curdate = new Date();
+	if(backlog!='Y'){
+	if(date.setHours(0,0,0,0) == curdate.setHours(0,0,0,0)) {
+	   return true;
+	}
+	else{
+		return false;
+	}
+	}
+	else{
+		return true;
+	}
+	
+	
+	
 }
 
 </script>

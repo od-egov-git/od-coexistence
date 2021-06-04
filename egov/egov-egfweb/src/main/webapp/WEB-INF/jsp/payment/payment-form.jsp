@@ -337,7 +337,7 @@
 																	<td class="bluebox"><s:text name="backdated.entry" /><span
 																		class="mandatory1">*</span></td>
 																	<td class="bluebox"><s:select name="backlogEntry"
-																	headerKey="-1" headerValue="Select" value="%{backlogEntry}"
+																	headerKey="-1" headerValue="Select" value="%{backlogEntry}" 
 																	list="#{'Y':'Yes' ,'N':'No'}"
 																			id="backlogEntry" /></td>
 																	<td class="bluebox" width="15%">&nbsp;</td>
@@ -678,6 +678,7 @@
 		}
 		function onSubmit()
 		{
+			if (checkdate()){
 			doLoadingMask();
 			var balanceCheckMandatory='<s:text name="payment.mandatory"/>';
 			var balanceCheckWarning='<s:text name="payment.warning"/>';
@@ -813,6 +814,10 @@
 				document.forms[0].action = '${pageContext.request.contextPath}/payment/payment-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory+'&backlogEntry='+backlogEntry;
 				document.forms[0].submit();
 			}
+			}else{
+				bootbox.alert("Please select back dated entry option correctly");
+				return false;
+			}
 		}  
 		
 		function validateCutOff()
@@ -892,6 +897,40 @@
 						}	
 		}
 		
+		function checkdate()
+		{
+			
+			var backlog=document.getElementById('backlogEntry').value;
+			var date2=document.getElementById('voucherdate').value;
+			
+			var parts = date2.split("/");
+			   var date = new Date(parts[1] + "/" + parts[0] + "/" + parts[2]);
+			   //alert(":::::Backlog:: "+backlog);
+		//alert(":::Voucher  Date after split::: "+date);
+			var curdate = new Date();
+			//alert("::::Current date:: "+curdate);
+			if(backlog!='Y'){
+			if(date.setHours(0,0,0,0) == curdate.setHours(0,0,0,0)) {
+			    // Date equals today's date
+			   // alert("date is equal:::");
+				if(backlog == 'N'){
+			    	//alert(":in N:");
+			    	return true;
+			    }
+			    return false;
+			}
+			else{
+				//alert(":::::Else:::: ");
+				return false;
+			}
+			}else{
+				return true;
+			}
+			
+			
+			
+			
+		}
 	</script>
 		</div>
 	</s:form>

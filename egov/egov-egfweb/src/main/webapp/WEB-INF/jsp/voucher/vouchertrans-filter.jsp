@@ -72,7 +72,7 @@
 				test="%{isFieldMandatory('department')}">
 				<span class="bluebox"><span class="mandatory1">*</span></span>
 			</s:if></td>
-		<td class="greybox"><s:select name="vouchermis.departmentcode"
+		<td class="greybox"><s:select name="vouchermis.departmentcode" 
 				id="vouchermis.departmentid" list="dropdownData.departmentList"
 				listKey="code" listValue="name" headerKey="-1"
 				headerValue="%{getText('lbl.choose.options')}"
@@ -217,36 +217,37 @@ function validateMIS(){
 	// Javascript validation of the MIS Manadate attributes.
 			<s:if test="%{isFieldMandatory('vouchernumber')}"> 
 				 if(null != document.getElementById('voucherNumber') && document.getElementById('voucherNumber').value.trim().length == 0 ){
-
-					document.getElementById('lblError').innerHTML = "<s:text name='msg.please.enter.voucher.number'/> ";
+					 bootbox.alert("Please enter a voucher number");
+					//document.getElementById('lblError').innerHTML = "<s:text name='msg.please.enter.voucher.number'/> ";
 					return false;
 				 }
 			 </s:if>
 		 <s:if test="%{isFieldMandatory('voucherdate')}"> 
 				 if(null != document.getElementById('voucherDate') && document.getElementById('voucherDate').value.trim().length == 0){
-
-					document.getElementById('lblError').innerHTML = "<s:text name='msg.please.enter.voucher.date'/>";
+					 bootbox.alert("Please enter the voucher date");
+					//document.getElementById('lblError').innerHTML = "<s:text name='msg.please.enter.voucher.date'/>";
 					return false;
 				 }
 			 </s:if>
 		 <s:if test="%{isFieldMandatory('fund')}"> 
 				 if(null != document.getElementById('fundId') && document.getElementById('fundId').value == -1){
-
-					document.getElementById('lblError').innerHTML = "<s:text name='msg.please.select.fund'/>";
+					 bootbox.alert("Please Select a fund");
+					//document.getElementById('lblError').innerHTML = "<s:text name='msg.please.select.fund'/>";
 					return false;
 				 }
 			 </s:if>
 			<s:if test="%{isFieldMandatory('department')}"> 
 				 if(null!= document.getElementById('vouchermis.departmentid') && document.getElementById('vouchermis.departmentid').value == -1){
-
-					document.getElementById('lblError').innerHTML = "<s:text name='msg.please.select.department'/>";
+					 alert("dep2");
+						bootbox.alert("Please select a department");
+					//document.getElementById('lblError').innerHTML = "<s:text name='msg.please.select.department'/>";
 					return false;
 				 }
 			</s:if>
 			<s:if test="%{isFieldMandatory('scheme')}"> 
 				 if(null!=document.getElementById('schemeid') &&  document.getElementById('schemeid').value == -1){
-
-					document.getElementById('lblError').innerHTML = "<s:text name='msg.please.select.scheme'/>";
+					 bootbox.alert("Please select a scheme");
+					//document.getElementById('lblError').innerHTML = "<s:text name='msg.please.select.scheme'/>";
 					return false;
 				 }
 			</s:if>
@@ -259,28 +260,30 @@ function validateMIS(){
 			</s:if>
 			<s:if test="%{isFieldMandatory('functionary')}"> 
 				 if(null!=document.getElementById('vouchermis.functionary') &&  document.getElementById('vouchermis.functionary').value == -1){
-
-					document.getElementById('lblError').innerHTML = "<s:text name='msg.please.select.functionary'/>";
+					 bootbox.alert("Please select a functionary");
+					//document.getElementById('lblError').innerHTML = "<s:text name='msg.please.select.functionary'/>";
 					return false;
 				 }
 			</s:if>
 			<s:if test="%{isFieldMandatory('fundsource')}"> 
 				 if(null !=document.getElementById('fundsourceId') &&  document.getElementById('fundsourceId').value == -1){
-
-					document.getElementById('lblError').innerHTML = "<s:text name='msg.please.select.fundsource'/>";
+					 bootbox.alert("Please select a fundsource");
+					//document.getElementById('lblError').innerHTML = "<s:text name='msg.please.select.fundsource'/>";
 					return false;
 				}
 			</s:if>
 			<s:if test="%{isFieldMandatory('field')}"> 
 				 if(null!= document.getElementById('vouchermis.divisionid') && document.getElementById('vouchermis.divisionid').value == -1){
-
-					document.getElementById('lblError').innerHTML = "<s:text name='msg.please.select.field'/>";
+					 bootbox.alert("Please select a field");
+					//document.getElementById('lblError').innerHTML = "<s:text name='msg.please.select.field'/>";
 					return false;
 				 }
 			</s:if>
 			<s:if test="%{isFieldMandatory('function')}">                     
 				 if(null!= document.getElementById('functionId') && document.getElementById('functionId').value == -1){
-					document.getElementById('lblError').innerHTML = "<s:text name='msg.please.select.function'/>";                                   
+					 alert("function11");
+						bootbox.alert("msg.please.select.function")
+					// document.getElementById('lblError').innerHTML = "<s:text name='msg.please.select.function'/>";                                   
 					return false;
 				 }            
 			</s:if>

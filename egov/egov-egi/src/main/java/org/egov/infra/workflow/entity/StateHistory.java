@@ -118,7 +118,7 @@ public class StateHistory implements Serializable {
 	// @ManyToOne(targetEntity = OwnerGroup.class, fetch = FetchType.LAZY)
 	@Column(name = "INITIATOR_POS")
 	private Long initiatorPosition;
-
+	private Long previousownerposition;// added abhishek on 1505021
 	StateHistory() {
 	}
 
@@ -139,6 +139,7 @@ public class StateHistory implements Serializable {
 		extraDateInfo = state.getExtraDateInfo();
 		natureOfTask = state.getNatureOfTask();
 		initiatorPosition = state.getInitiatorPosition();
+		previousownerposition=state.getPreviousOwner();
 	}
 
 	public State getState() {
@@ -275,6 +276,14 @@ public class StateHistory implements Serializable {
 
 	public void setInitiatorPosition(Long initiatorPosition) {
 		this.initiatorPosition = initiatorPosition;
+	}
+
+	public Long getPreviousownerposition() {
+		return previousownerposition;
+	}
+
+	public void setPreviousownerposition(Long previousownerposition) {
+		this.previousownerposition = previousownerposition;
 	}
 
 }

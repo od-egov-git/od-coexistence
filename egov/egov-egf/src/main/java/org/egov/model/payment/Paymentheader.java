@@ -68,7 +68,7 @@ public class Paymentheader extends StateAware {
     private Bankaccount bankaccount;
     private BigDecimal paymentAmount;
     private DrawingOfficer drawingOfficer;
-
+    private String paymentChequeNo; 
     @Override
     public Long getId() {
         return id;
@@ -148,5 +148,13 @@ public class Paymentheader extends StateAware {
     public void setDrawingOfficer(final DrawingOfficer drawingOfficer) {
         this.drawingOfficer = drawingOfficer;
     }
+
+	public String getPaymentChequeNo() {
+		return paymentChequeNo;
+	}
+
+	public void setPaymentChequeNo(String paymentChequeNo) {
+		this.paymentChequeNo = paymentChequeNo;
+	}
 
 }

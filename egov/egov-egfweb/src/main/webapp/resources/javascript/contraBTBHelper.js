@@ -98,6 +98,7 @@ function loadFromAccNum(branch) {
 	var index = bankbranchId.indexOf("-");
 	var bankId = bankbranchId.substring(0, index);
 	var brId = bankbranchId.substring(index + 1, bankbranchId.length);
+	document.getElementById('fromBankBalance').value="";// added abhishek on 21052021
 	populatefromAccountNumber({
 		fundId : fundObj.options[fundObj.selectedIndex].value,
 		branchId : brId,
@@ -110,6 +111,7 @@ function loadToAccNum(branch) {
 	var index = bankbranchId.indexOf("-");
 	var bankId = bankbranchId.substring(0, index);
 	var brId = bankbranchId.substring(index + 1, bankbranchId.length);
+	document.getElementById('toBankBalance').value="";// added abhishek on 21052021
 	populatetoAccountNumber({
 		fundId : fundObj.options[fundObj.selectedIndex].value,
 		branchId : brId,
@@ -145,6 +147,8 @@ var postTypeFrom = {
 	success : function(o) {
 		var fromNarration = o.responseText;
 		// var index=fromNarration.indexOf("-");
+		////alert("fromNarration---"+fromNarration);
+		if(fromNarration!=null)
 		document.getElementById('fromAccnumnar').value = fromNarration;
 	},
 	failure : function(o) {
@@ -337,6 +341,13 @@ function validate() {
 		bootbox.alert("Amount should be greater than zero ");
 		return false;
 	}
+	var fromAccount=document.getElementById("fromAccountNumber").value;
+	var toAccount=document.getElementById("toAccountNumber").value;
+	if(fromAccount==toAccount){
+		bootbox.alert("Transfer within same account number is not allowed");
+		return false;
+	}
+		
 	document.cbtbform.action='/services/EGF/contra/contraBTB-create.action?firstsignatory='+firstsignatory+'&secondsignatory='+secondsignatory;
 	document.cbtbform.submit();
 	return true;

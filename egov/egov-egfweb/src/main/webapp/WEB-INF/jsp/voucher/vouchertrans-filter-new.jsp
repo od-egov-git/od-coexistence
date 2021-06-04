@@ -62,7 +62,7 @@
 				onChange="populateSchemes(this);loadBank(this);"
 				value="%{fundId.id}" /></td>
 	</s:if>
-	<s:if test="%{shouldShowHeaderField('scheme')}">
+	<%-- <s:if test="%{shouldShowHeaderField('scheme')}">
 		<egov:ajaxdropdown id="scheme" fields="['Text','Value']"
 			dropdownId="schemeid" url="voucher/common-ajaxLoadSchemes.action" />
 
@@ -75,9 +75,9 @@
 				listValue="name" headerKey="-1" headerValue="%{getText('lbl.choose.options')}"
 				onChange="populatesubSchemes(this)"
 				value="voucherHeader.vouchermis.schemeid.id" /></td>
-	</s:if>
+	</s:if> --%>
 </tr>
-<tr>
+<%-- <tr>
 	<td class="bluebox"></td>
 	<s:if test="%{shouldShowHeaderField('subscheme')}">
 		<egov:ajaxdropdown id="subscheme" fields="['Text','Value']"
@@ -106,7 +106,7 @@
 				listValue="name" headerKey="-1" headerValue="%{getText('lbl.choose.options')}"
 				value="voucherHeader.vouchermis.fundsource.id" /></td>
 	</s:if>
-</tr>
+</tr> --%>
 <tr>
 	<td class="greybox"></td>
 
@@ -116,7 +116,7 @@
 				<span class="bluebox"><span class="mandatory1">*</span></span>
 			</s:if></td>
 		<td class="greybox"><s:select name="vouchermis.departmentcode"
-				id="vouchermis.departmentid" list="dropdownData.departmentList"
+				id="vouchermis.departmentid" list="dropdownData.departmentList" 
 				listKey="code" listValue="name" headerKey=""
 				headerValue="%{getText('lbl.choose.options')}"
 				value="%{voucherHeader.vouchermis.departmentcode}"
@@ -211,20 +211,20 @@ function validateMIS(){
 					return false;
 				 }
 			</s:if>
-			<s:if test="%{isFieldMandatory('scheme')}"> 
+			/* <s:if test="%{isFieldMandatory('scheme')}"> 
 				 if(null!=document.getElementById('schemeid') &&  document.getElementById('schemeid').value ==""){
 
 					document.getElementById('lblError').innerHTML = "<s:text name='msg.please.select.scheme'/>";
 					return false;
 				 }
-			</s:if>
-			<s:if test="%{isFieldMandatory('subscheme')}"> 
+			</s:if> */
+			/* <s:if test="%{isFieldMandatory('subscheme')}"> 
 				 if(null!= document.getElementById('subschemeid') && document.getElementById('subschemeid').value ==""){
 
 					document.getElementById('lblError').innerHTML = "<s:text name='msg.please.select.sub.scheme'/>";
 					return false;
 				 }
-			</s:if>
+			</s:if> */
 			<s:if test="%{isFieldMandatory('functionary')}"> 
 				 if(null!=document.getElementById('vouchermis.functionary') &&  document.getElementById('vouchermis.functionary').value ==""){
 
@@ -232,13 +232,13 @@ function validateMIS(){
 					return false;
 				 }
 			</s:if>
-			<s:if test="%{isFieldMandatory('fundsource')}"> 
+			/* <s:if test="%{isFieldMandatory('fundsource')}"> 
 				 if(null !=document.getElementById('fundsourceId') &&  document.getElementById('fundsourceId').value ==""){
 
 					document.getElementById('lblError').innerHTML = "<s:text name='msg.please.select.fundsource'/>";
 					return false;
 				}
-			</s:if>
+			</s:if> */
 			<s:if test="%{isFieldMandatory('field')}"> 
 				 if(null!= document.getElementById('vouchermis.divisionid') && document.getElementById('vouchermis.divisionid').value ==""){
 

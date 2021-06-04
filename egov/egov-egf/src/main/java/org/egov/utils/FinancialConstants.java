@@ -112,12 +112,12 @@ public interface FinancialConstants {
 	public static final String SUPPLIERBILL_PAID_STATUS = "Paid";
 	public static final String SUPPLIERBILL_REJECTED_STATUS = "Rejected";
 	// Status for Contrator Bills
-	public static final String CONTRACTORBILL_CREATED_STATUS = "Created";
-	public static final String CONTRACTORBILL_CANCELLED_STATUS = "Cancelled";
+	public static final String CONTRACTORBILL_CREATED_STATUS = "CREATED";
+	public static final String CONTRACTORBILL_CANCELLED_STATUS = "CANCELLED";
 	public static final String CONTRACTORBILL_APPROVED_STATUS = "APPROVED";
-	public static final String CONTRACTORBILL_PASSED_STATUS = "Passed";
-	public static final String CONTRACTORBILL_PAID_STATUS = "Paid";
-	public static final String CONTRACTORBILL_REJECTED_STATUS = "Rejected";
+	public static final String CONTRACTORBILL_PASSED_STATUS = "PASSED";
+	public static final String CONTRACTORBILL_PAID_STATUS = "PAID";
+	public static final String CONTRACTORBILL_REJECTED_STATUS = "REJECTED";
 
 	// Status for Pension Bills
 	public static final String PENSIONBILL_CANCELLED_STATUS = "Cancelled";
@@ -248,6 +248,7 @@ public interface FinancialConstants {
 	public static final Integer CANCELLEDVOUCHERSTATUS = 4;
 	public static final Integer PREAPPROVEDVOUCHERSTATUS = 5;
 	public static final Integer CREATEDVOUCHERSTATUS = 0;
+	public static final Integer SAVEASDRAFT = 6;
 	// Receipt Names
 	public static final String RECEIPT_NAME_DIRECT = "Direct";
 	public static final String RECEIPT_NAME_REMITTANCE_PAYMENT = "Remittance Payment";
