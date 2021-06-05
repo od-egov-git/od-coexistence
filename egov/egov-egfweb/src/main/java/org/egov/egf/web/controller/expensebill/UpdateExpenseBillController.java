@@ -251,7 +251,7 @@ public class UpdateExpenseBillController extends BaseBillController {
                     && !egBillregister.getEgBillregistermis().getBudgetaryAppnumber().isEmpty()) {
                 budgetDetails = expenseBillService.getBudgetDetailsForBill(egBillregister);
             }
-            model.addAttribute("validActionList", validActions);
+            //model.addAttribute("validActionList", validActions);
             model.addAttribute("budgetDetails", budgetDetails);
             return EXPENSEBILL_UPDATE_WORKFLOW;
         }
