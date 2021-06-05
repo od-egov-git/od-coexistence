@@ -607,7 +607,6 @@ function onSubmit()
 		bootbox.alert("Please select back dated entry option correctly");
 		return false;
 	}
-  
 }
 
 function validateCutOff()

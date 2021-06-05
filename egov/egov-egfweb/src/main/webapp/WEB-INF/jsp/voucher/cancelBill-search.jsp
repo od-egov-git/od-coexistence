@@ -254,6 +254,17 @@ function viewBill(vid){
 						</c:choose>
 					</tr>
 				</s:iterator>
+				<div>
+				<tr>
+							<td style="width: 5%"></td>
+							<td class="greybox">Reason For Cancel<span
+								class="mandatory1">*</span></td>
+							<td class="greybox" colspan="3"><s:textarea id="reason"
+									name="reasoncancel" cols="100" rows="3"
+									 /></td>
+						</tr>
+				
+				</div>
 			</table>
 			<table align="center">
 			<div>

@@ -84,6 +84,7 @@
         border-radius: 5px;
         color : white;
     }
+
 </style>
 <form:form name="contractorBillForm" role="form"
 	modelAttribute="egBillregister" id="egBillregister"

@@ -212,7 +212,6 @@ function loadNamesForSelectedType()
 						</c:choose>
 					</tr>
 				</s:iterator>
-				
 			</table>
 			<table align="center">
 			<div>
@@ -224,9 +223,9 @@ function loadNamesForSelectedType()
 									name="reasoncancel" cols="100" rows="5"
 									 /></td>
 						</tr>
-				
 				</div>
 				</table>
+
 			<div class="buttonbottom" align="center">
 				<input type="button" Class="buttonsubmit" value="<s:text name='lbl.cancel.voucher'/>" onclick="return validateVouchers();" />
 			</div>

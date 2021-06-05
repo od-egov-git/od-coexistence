@@ -13,9 +13,7 @@
 	href="../resources/css/jquery/ui.jqgrid.css" />--%>
 <script src="<cdn:url value='/resources/app/js/common/commondocumentupload.js?rnd=${app_release_no}' context='/services/EGF'/>"></script>
 <script type="text/javascript">
-function check(){
-	//alert("check");
-}
+
 </script>
 
 
