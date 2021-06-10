@@ -73,7 +73,7 @@
   <TBODY>
               <TR>
                 <TD height=19>
-				<p align="center"><font size="4">Welcome to eGov Financial System</font></TR></TBODY></TABLE>
+				<p align="center"><font size="4">Welcome to Sujog Financial System</font></TR></TBODY></TABLE>
 
 <TABLE align=center cellSpacing=0 cellPadding=3  summary="" border=0 >
   <TBODY>

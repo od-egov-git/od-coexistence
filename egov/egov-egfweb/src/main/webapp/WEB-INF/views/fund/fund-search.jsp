@@ -81,7 +81,7 @@
                 <form:checkbox path="isnotleaf" />
                 <form:errors path="isnotleaf" cssClass="error-msg" />
               </div> --%>
-              <label class="col-sm-3 control-label text-right"><spring:message code="lbl.parentid" text="Parent Fund"/> </label>
+              <%-- <label class="col-sm-3 control-label text-right"><spring:message code="lbl.parentid" text="Parent Fund"/> </label>
               <div class="col-sm-3 add-margin">
                 <form:select path="parentId" id="parentId" cssClass="form-control"
                   cssErrorClass="form-control error">
@@ -91,7 +91,7 @@
                   <form:options items="${funds}" itemValue="id" itemLabel="name" />
                 </form:select>
                 <form:errors path="parentId" cssClass="error-msg" />
-              </div>
+              </div> --%>
               <label class="col-sm-3 control-label text-right"><spring:message code="lbl.isactive" text="Active"/> </label>
               <div class="col-sm-3 add-margin">
                 <form:checkbox path="isactive" />
@@ -123,9 +123,9 @@
         <tr>
           <th><spring:message code="lbl.name" text="Name"/></th>
           <th><spring:message code="lbl.code" text="Code"/></th>
-          <th><spring:message code="lbl.identifier" text="Identifier"/></th>
+          <%-- <th><spring:message code="lbl.identifier" text="Identifier"/></th> --%>
           <th><spring:message code="lbl.llevel" text="Level"/></th>
-          <th><spring:message code="lbl.parentid" text="Parent Fund"/></th>
+          <%-- <th><spring:message code="lbl.parentid" text="Parent Fund"/></th> --%>
           <th><spring:message code="lbl.isnotleaf" text="Isnotleaf"/></th>
           <th><spring:message code="lbl.isactive" text="Active"/></th>
         </tr>

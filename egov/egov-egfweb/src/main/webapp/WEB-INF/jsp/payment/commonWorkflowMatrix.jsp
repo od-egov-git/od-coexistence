@@ -53,6 +53,31 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
 <script type="text/javascript">
+function documentdep(){
+	//alert("hi");
+	document.getElementById("approverDepartment").value="DEPT_25";
+	loadDesignationFromMatrix1();
+	var con=document.getElementById("approverDepartment");
+	con.disabled = true;
+	//document.getElementById("approverDepartment").disabled=true;
+	//setDesignation1();
+	//document.getElementById('approverPositionId').value="-1";
+	
+}
+function loadDesignationFromMatrix1() {
+	var e = dom.get('approverDepartment');
+	var dept = e.options[e.selectedIndex].text;
+	var currentState = dom.get('currentState').value;
+	var amountRule = dom.get('amountRule').value;
+	var additionalRule = dom.get('additionalRule').value;
+	var pendingAction = document.getElementById('pendingActions').value;
+	//var stateType = '<s:property value="%{stateType}"/>';
+	var stateType = 'Paymentheader';
+	document.getElementById("approverDesignation").value="-1";
+	//alert(stateType+" "+dept+" "+currentState+" "+amountRule+" "+additionalRule+" "+pendingAction);
+	loadDesignationByDeptAndType(stateType, dept, currentState, amountRule,
+			additionalRule, pendingAction);
+}
 	function getUsersByDesignationAndDept() {
 		populateapproverPositionId({
 			approverDepartmentId : document
@@ -81,13 +106,14 @@
 
 	function loadDesignationByDeptAndType(typeValue, departmentValue,
 			currentStateValue, amountRuleValue, additionalRuleValue,
-			pendingActionsValue) {
+			pendingActionsValue) { 
+		//alert("3");
 		var designationObj = document.getElementById('approverDesignation');
 		designationObj.options.length = 0;
-		designationObj.options[0] = new Option("<s:text name='lbl.choose.options'/>", "-1");
+		designationObj.options[0] = new Option("----Choose----", "-1");
 		var approverObj = document.getElementById('approverPositionId');
 		approverObj.options.length = 0;
-		approverObj.options[0] = new Option("<s:text name='lbl.choose.options'/>", "-1");
+		approverObj.options[0] = new Option("----Choose----", "-1");
 		populateapproverDesignation({
 			departmentRule : departmentValue,
 			type : typeValue,

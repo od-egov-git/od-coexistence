@@ -129,6 +129,7 @@ public class ChequeDishonourController {
     @RequestMapping(method = {RequestMethod.GET}, value = "/_search")
     public @ResponseBody ResponseEntity getDishonorChequeSearch(@ModelAttribute DishonoredChequeBean model){
         try {
+        	
             return new ResponseEntity<>(getDishonorCheque(model), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
@@ -144,7 +145,7 @@ public class ChequeDishonourController {
     public String submit(@ModelAttribute DishonoredChequeBean chequeBean, final Model model, RedirectAttributes redAttribute){
         String returnPage = "dishonor_cheque_success";
         try {
-            //dishonorChequeService.processDishonor(chequeBean);                
+            dishonorChequeService.processDishonor(chequeBean);                
             model.addAttribute("dishonoredChequeModel", chequeBean);
             return returnPage;       
         } catch (Exception e) {
@@ -156,12 +157,12 @@ public class ChequeDishonourController {
     
     private List<DishonoredChequeBean> getDishonorCheque(DishonoredChequeBean model) throws Exception {
         List<DishonoredChequeBean> resultList = new ArrayList<>();
-        String bankBranch = null /*model.getBankBranch()*/;
+        String bankBranch = model.getBankBranch();
         String bankId = null;
         if(StringUtils.isNotBlank(bankBranch)){
             bankId = bankBranch.split("-")[0].trim();
         }
-        resultList = null /*dishonorChequeService.getCollectionListForDishonorInstrument(model.getInstrumentMode(), bankId, model.getAccountNumber(), model.getInstrumentNumber(), model.getTransactionDate())*/;
+        resultList =dishonorChequeService.getCollectionListForDishonorInstrument(model.getInstrumentMode(), bankId, model.getAccountNumber(), model.getInstrumentNumber(), model.getTransactionDate());
         return resultList;
     }
     
@@ -175,5 +176,6 @@ public class ChequeDishonourController {
         }
         return bankAccountMap;
     }
+    
     
 }

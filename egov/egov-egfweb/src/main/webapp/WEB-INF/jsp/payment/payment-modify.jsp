@@ -62,7 +62,7 @@
 	src="/services/EGF/resources/javascript/tabber2.js?rnd=${app_release_no}"></script>
 </head>
 
-<body>
+<body onload="documentdep();">
 	<br>
 	<s:form action="payment" theme="simple">
 		<jsp:include page="../budget/budgetHeader.jsp">

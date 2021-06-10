@@ -1404,6 +1404,12 @@ function disableSelectedRows()
 							<input name="paymentMode"
 							id="paymentModertgs" value="rtgs" type="radio"><label
 							for="paymentModertgs"><s:text name="lbl.rtgs"/></label>
+							
+							
+							
+							<input name="paymentMode"
+							id="paymentModeonline" value="online" type="radio"><label
+							for="paymentModeonline">Online</label>
 							</td>
 					</tr>
 					<tr>

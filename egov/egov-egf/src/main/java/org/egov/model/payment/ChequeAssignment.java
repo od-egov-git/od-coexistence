@@ -81,6 +81,9 @@ public class ChequeAssignment implements java.io.Serializable {
     private String drawingOfficerNameTAN;
     private BigDecimal receiptAmount;
     private BigDecimal deductedAmount;
+    private String online_reference_no;
+    private Date reference_date;
+    
 
     public String getSerialNo() {
         return serialNo;
@@ -321,4 +324,23 @@ public class ChequeAssignment implements java.io.Serializable {
     public void setBillId(Long billId) {
         this.billId = billId;
     }
+
+	public String getOnline_reference_no() {
+		return online_reference_no;
+	}
+
+	public void setOnline_reference_no(String online_reference_no) {
+		this.online_reference_no = online_reference_no;
+	}
+
+	public Date getReference_date() {
+		return reference_date;
+	}
+
+	public void setReference_date(Date reference_date) {
+		this.reference_date = reference_date;
+	}
+
+	
+    
 }

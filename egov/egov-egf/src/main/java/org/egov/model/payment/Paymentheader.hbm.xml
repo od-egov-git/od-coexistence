@@ -71,6 +71,7 @@
             <column name="concurrenceDate"  />
         </property>
         
+        
         <many-to-one name="state" class="org.egov.infra.workflow.entity.State" cascade="all">
             <column name="STATE_ID"/>
         </many-to-one>
@@ -82,5 +83,9 @@
 	   <many-to-one name="drawingOfficer" class="org.egov.eis.entity.DrawingOfficer" fetch="select">
           <column name="DRAWINGOFFICER_ID" precision="22" scale="0" />
        </many-to-one>
+       
+       <property name="paymentChequeNo" type="string">
+            <column name="paymentChequeNo" length="20"  />
+        </property>
     </class>
 </hibernate-mapping>

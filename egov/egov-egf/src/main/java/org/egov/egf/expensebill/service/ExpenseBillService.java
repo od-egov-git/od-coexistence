@@ -604,7 +604,7 @@ public class ExpenseBillService {
 					else
 					{
 						owenrPos.setId(egBillregister.getState().getCreatedBy());
-						
+						owenrPosName.setId(egBillregister.getState().getCreatedBy());
 						
 					}
 		            System.out.println("ownerPostion id- "+owenrPos);

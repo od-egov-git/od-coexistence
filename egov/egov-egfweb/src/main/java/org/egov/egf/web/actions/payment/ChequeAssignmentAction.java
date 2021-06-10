@@ -197,6 +197,7 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
             put("cheque", "Cheque");
             put("dd", "DD");
             put("PEX","PEX");
+            put("online","online");
         }
     };
     private Map instrumentModesMap;
@@ -207,7 +208,7 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
     private String bank_branch;
     private String bank_account;
     private String department;
-    public Map<String, String> modeOfPaymentMap;
+    public   Map<String, String> modeOfPaymentMap;
     private Date chequeDt;
     private boolean chequeNoGenerationAuto;
     private boolean rtgsNoGenerationAuto;
@@ -328,6 +329,19 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
     private String chequeFormat;
     private Long instHeaderId;
     private String selectedRowsId;
+    private String online_reference_no;
+    private Date reference_date;
+    
+    
+    ChequeAssignmentAction() {
+    	 modeOfPaymentMap = new LinkedHashMap<String, String>();
+        
+         
+         modeOfPaymentMap.put(FinancialConstants.MODEOFPAYMENT_CHEQUE, FinancialConstants.MODEOFPAYMENT_CHEQUE);
+         
+         modeOfPaymentMap.put(FinancialConstants.MODEOFPAYMENT_ONLINE, FinancialConstants.MODEOFPAYMENT_ONLINE);
+    }
+   
     @Autowired
     private InstrumentVoucherService instrumentVoucherService;
 
@@ -407,7 +421,16 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
     public String beforeSearch() {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Starting beforeSearch...");
-        paymentMode = FinancialConstants.MODEOFPAYMENT_CHEQUE;
+		/*
+		 * modeOfPaymentMap = new LinkedHashMap<String, String>(); paymentMode =
+		 * FinancialConstants.MODEOFPAYMENT_CHEQUE;
+		 * 
+		 * modeOfPaymentMap.put(FinancialConstants.MODEOFPAYMENT_CHEQUE,
+		 * FinancialConstants.MODEOFPAYMENT_CHEQUE);
+		 * 
+		 * modeOfPaymentMap.put(FinancialConstants.MODEOFPAYMENT_ONLINE,
+		 * FinancialConstants.MODEOFPAYMENT_ONLINE);
+		 */
         loadBillTypeMap();
         // typeOfAccount = FinancialConstants.TYPEOFACCOUNT_PAYMENTS+","+FinancialConstants.TYPEOFACCOUNT_RECEIPTS_PAYMENTS;
         if (LOGGER.isDebugEnabled())
@@ -855,9 +878,12 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
     public String search() throws ApplicationException, ParseException {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Starting search...");
+        modeOfPaymentMap = new LinkedHashMap<String, String>();
+        
         chequeSlNoMap = loadChequeSerialNo(bankaccount);
+        System.out.println("Payment Mode------------------>"+paymentMode);
         chequeAssignmentList = paymentService.getPaymentVoucherNotInInstrument(parameters, voucherHeader);
-        if (!paymentMode.equals(FinancialConstants.MODEOFPAYMENT_CHEQUE)) {
+        if ((!paymentMode.equals(FinancialConstants.MODEOFPAYMENT_CHEQUE))||(!paymentMode.equals(FinancialConstants.MODEOFPAYMENT_ONLINE))) {
             chequeDt = new Date();
             final List<AppConfigValues> appList = appConfigValuesService.getConfigValuesByModuleAndKey(Constants.EGF,
                     "cheque.assignment.infavourof");
@@ -1141,10 +1167,20 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
     {
 
         LOGGER.error("size--------" + parameters.size());
+        
+      
+        
         LOGGER.info("paymentMode :::: "+paymentMode);
         LOGGER.info("selectedRowsId ::: "+selectedRowsId);
-        if ((!paymentMode.equalsIgnoreCase("cash") && !paymentMode.equalsIgnoreCase("rtgs") && !paymentMode.equalsIgnoreCase("pex")))
-            prepareChequeAssignmentList();
+        if ((!paymentMode.equalsIgnoreCase("cash") && !paymentMode.equalsIgnoreCase("rtgs") && !paymentMode.equalsIgnoreCase("pex") 
+        		&& !paymentMode.equalsIgnoreCase("online"))) {
+        	 prepareChequeAssignmentList();
+        }
+        if(paymentMode.equalsIgnoreCase("online")) {
+        	
+        	prepareOnlineAssignmentList();
+        }
+           
         final List<AppConfigValues> printAvailConfig = appConfigValuesService
                 .getConfigValuesByModuleAndKey(FinancialConstants.MODULE_NAME_APPCONFIG, "chequeprintavailableat");
 
@@ -1240,6 +1276,7 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
                     instHeaderList = chequeAssignmentHelper.reassignInstrument(chequeAssignmentList, paymentMode, bankaccount,
                             parameters, voucherHeader.getVouchermis().getDepartmentcode());
                 else
+                	
                     instHeaderList = chequeAssignmentHelper.createInstrument(chequeAssignmentList, paymentMode, bankaccount,
                             parameters, voucherHeader.getVouchermis().getDepartmentcode());
                 selectedRows = paymentService.selectedRows;
@@ -1248,6 +1285,11 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
                 else if(paymentMode.equalsIgnoreCase(FinancialConstants.MODEOFPAYMENT_PEX))
                 {
                 	addActionMessage(getMessage("pex.transaction.success"));
+                }
+                
+                else if(paymentMode.equalsIgnoreCase(FinancialConstants.MODEOFPAYMENT_ONLINE))
+                {
+                	addActionMessage("Online Transaction Entry Completed Successfully");
                 }
                 else
                     addActionMessage(getMessage("chq.assignment.transaction.success"));
@@ -1269,15 +1311,32 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
             throw new ValidationException(errors);
         }
             LOGGER.info("Completed createInstrument.");
-        if(instHeaderList != null && !instHeaderList.isEmpty())
-        {
-        	
-        	for( InstrumentHeader row :instHeaderList)
-        	{
-        		final InstrumentVoucher instrumentHeaderDtl = instrumentVoucherService.getInstrumentVoucherByVoucherHeader(row.getId());
-        		row.setVoucherNumber(instrumentHeaderDtl.getVoucherHeaderId().getVoucherNumber());
-        	}
-        }
+        try {
+        	   System.out.println(instHeaderList.size());
+               if(instHeaderList != null && !instHeaderList.isEmpty())
+               {
+               	//if(!paymentMode.equalsIgnoreCase(FinancialConstants.MODEOFPAYMENT_ONLINE))
+               	for( InstrumentHeader row :instHeaderList)
+               	{
+               		 InstrumentVoucher instrumentHeaderDtl = new InstrumentVoucher();
+               		System.out.println("Voucher number------>>>>>>"+row.getVoucherNumber());
+               		System.out.println("row.getId()------- "+row.getId());
+					/*
+					 * if(paymentMode.equalsIgnoreCase(FinancialConstants.MODEOFPAYMENT_ONLINE))
+					 * instrumentHeaderDtl =
+					 * instrumentVoucherService.getInstrumentVoucherByVoucherHeader1(row.getId());
+					 * else
+					 */
+               			instrumentHeaderDtl = instrumentVoucherService.getInstrumentVoucherByVoucherHeader(row.getId());
+               		
+               		System.out.println("after voucher no---- "+instrumentHeaderDtl.getVoucherHeaderId().getVoucherNumber());
+               		row.setVoucherNumber(instrumentHeaderDtl.getVoucherHeaderId().getVoucherNumber());
+               	}
+               }
+        }catch(Exception ex) {
+        	ex.printStackTrace();
+        }    
+         
         System.out.println("done");
         return "view";
     }
@@ -1314,6 +1373,48 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
             chequeAssignmentList.add(chequeAssignment);
         }
         System.out.println("chequeAssignmentList.size() ::::"+chequeAssignmentList.size());
+        return chequeAssignmentList;
+    }
+    
+    
+    
+    public List<ChequeAssignment> prepareOnlineAssignmentList() {
+    	System.out.println("XXXX");
+        chequeAssignmentList = new ArrayList<>();
+        String[] selectedRowsIdArray;
+        if (selectedRowsId != null)
+            selectedRowsIdArray = selectedRowsId.split(";,");
+        else
+            selectedRowsIdArray = new String[0];
+        int length = selectedRowsIdArray.length;
+        System.out.println("length ::::"+length);
+        for (int i = 0; i < length; i++) {
+            ChequeAssignment chequeAssignment = new ChequeAssignment();
+            String[] items = selectedRowsIdArray[i].split("\\~");
+            chequeAssignment.setVoucherHeaderId(Long.valueOf(items[0]));
+            chequeAssignment.setPaidTo(items[1]);
+            chequeAssignment.setOnline_reference_no(items[2]);
+           
+            try {
+            	 chequeAssignment.setReference_date(formatter.parse(items[3]));
+            	 chequeAssignment.setVoucherDate(formatter.parse(items[5]));
+                
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            chequeAssignment.setVoucherNumber(items[4]);
+            String item = items[6];
+            if (item.contains(";"))
+                item = items[6].replace(";", "");
+            chequeAssignment.setPaidAmount(BigDecimal.valueOf(Double.valueOf(item)));
+            chequeAssignment.setIsSelected(true);
+            chequeAssignmentList.add(chequeAssignment);
+        }
+        System.out.println("chequeAssignmentList.size() ::::"+chequeAssignmentList.size());
+        for(ChequeAssignment a :chequeAssignmentList)
+        {
+        	System.out.println("HERE----->"+a.getVoucherNumber()+" "+a.getReference_date());
+        }
         return chequeAssignmentList;
     }
 
@@ -2235,7 +2336,28 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
                         chqNoMap.put(assignment.getChequeNumber(), assignment.getPaidTo());
                     i++;
                 }
-        } else  // cash or RTGS
+        }
+        
+		
+		  else if(paymentMode.equals(FinancialConstants.MODEOFPAYMENT_ONLINE)) {
+			  	
+			  
+			  for (final ChequeAssignment assignment : chequeAssignmentList) {
+				  if (assignment.getReference_date() == null) {
+
+                      addFieldError("Assigment Date is Empty", "Date is empty");
+                      break;
+                  }
+                  if (null == assignment.getOnline_reference_no() || "".equals(assignment.getOnline_reference_no())) {
+                      addFieldError("chequeAssignmentList[" + i + "].online_reference_no", "Reference No is empty");
+                      break;
+                  }
+			  }
+	               
+	                   
+		  }
+		 
+        else  // cash or RTGS
         {
             // / Validations are done for RTGS payment mode
             String chequedt = null;
@@ -3369,5 +3491,5 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Completed loadReasonsForSurrendaring.");
     }
-
+    
 }

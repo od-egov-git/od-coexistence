@@ -174,9 +174,9 @@ public class PaymentActionHelper {
         	voucherHeader.setSecondsignatory(secondsignatory);
             voucherHeader = createVoucherAndledger(voucherHeader, commonBean, billDetailslist, subLedgerlist);
             System.out.println("Part 2");
-            paymentheader = paymentService.createPaymentHeader(voucherHeader,
+            paymentheader = paymentService.createPaymentHeader2(voucherHeader,
                     Integer.valueOf(commonBean.getAccountNumberId()), commonBean
-                            .getModeOfPayment(), commonBean.getAmount());
+                            .getModeOfPayment(), commonBean.getAmount(),paymentheader.getPaymentChequeNo());
             System.out.println("Part 3");
             if (commonBean.getDocumentId() != null)
                 billVhId = (CVoucherHeader) persistenceService.getSession().load(CVoucherHeader.class,
@@ -598,7 +598,6 @@ public class PaymentActionHelper {
                 subledgerDetails.add(subledgertDetailMap);
             }
             }
-
             voucherHeader = createVoucher.createPreApprovedVoucher(headerDetails, accountdetails, subledgerDetails);
 
         } catch (final HibernateException e) {

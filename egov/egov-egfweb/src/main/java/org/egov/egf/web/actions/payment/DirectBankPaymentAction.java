@@ -154,7 +154,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
     private static final String MDP_RTGS = FinancialConstants.MODEOFPAYMENT_RTGS;
     private static final String MDP_CASH = FinancialConstants.MODEOFPAYMENT_CASH;
     private static final String MDP_PEX = FinancialConstants.MODEOFPAYMENT_PEX;
-																					 
+    private static final String MDP_ONLINE = FinancialConstants.MODEOFPAYMENT_ONLINE;
     private String button;
     private VoucherService voucherService;
     private static final Logger LOGGER = Logger.getLogger(DirectBankPaymentAction.class);
@@ -188,8 +188,8 @@ public class DirectBankPaymentAction extends BasePaymentAction {
     private String firstsignatory="-1";
     private String secondsignatory="-1";
     private String backlogEntry="";
-	
-	private String paymentChequeNo=null;									
+    
+    private String paymentChequeNo=null;
 
     public BigDecimal getBalance() {
         return balance;
@@ -215,7 +215,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
         modeOfPaymentMap.put(MDP_CHEQUE, getText(MDP_CHEQUE));
         //modeOfPaymentMap.put(MDP_CASH, getText(MDP_CASH));
        // modeOfPaymentMap.put(MDP_RTGS, getText(MDP_RTGS));
-															  
+        modeOfPaymentMap.put(MDP_ONLINE, getText(MDP_ONLINE));
         //modeOfPaymentMap.put(MDP_PEX, getText(MDP_PEX));
 
         addDropdownData("designationList", Collections.EMPTY_LIST);
@@ -280,7 +280,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
     @ValidationErrorPage(value = NEW)
     @Action(value = "/payment/directBankPayment-create")
     public String create() {
-		System.out.println(paymentChequeNo);
+    	System.out.println(paymentChequeNo);
     	System.out.println(commonBean.getModeOfPayment());
     	
     	 
@@ -292,13 +292,13 @@ public class DirectBankPaymentAction extends BasePaymentAction {
              }
     	
     	
-    	System.out.println(firstsignatory);								 
-		CVoucherHeader billVhId = null;
+    	System.out.println(firstsignatory);
+        CVoucherHeader billVhId = null;
         voucherHeader.setType(FinancialConstants.STANDARD_VOUCHER_TYPE_PAYMENT);
         loadAjaxedDropDowns();
         removeEmptyRowsAccoutDetail(billDetailslist);
-		if(subLedgerlist!=null)					   
-			removeEmptyRowsSubledger(subLedgerlist);
+        if(subLedgerlist!=null)
+        	removeEmptyRowsSubledger(subLedgerlist);
         final String voucherDate = formatter1.format(voucherHeader.getVoucherDate());
         String cutOffDate1 = null;
 		
@@ -626,6 +626,8 @@ public class DirectBankPaymentAction extends BasePaymentAction {
         commonBean.setAccountNumberId(paymentheader.getBankaccount().getId().toString());
         commonBean.setAccnumnar(paymentheader.getBankaccount().getNarration());
         
+		commonBean.setPaymentChequeNo(paymentheader.getPaymentChequeNo());
+        paymentChequeNo = paymentheader.getPaymentChequeNo();
         LOGGER.info("paymentheader.getPaymentAmount()  ::"+paymentheader.getPaymentAmount());
         LOGGER.info("paymentheader.getBankaccount().getId().toString()  ::"+paymentheader.getBankaccount().getId().toString());
         LOGGER.info("paymentheader.getBankaccount().getNarration()  ::"+paymentheader.getBankaccount().getNarration());

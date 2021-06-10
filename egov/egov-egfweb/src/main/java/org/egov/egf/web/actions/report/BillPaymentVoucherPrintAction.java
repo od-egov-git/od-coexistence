@@ -136,14 +136,20 @@ public class BillPaymentVoucherPrintAction extends BaseFormAction {
     
     @Autowired
     private CityService cityService;
+    private String paymentChequeNo =null;
 
+    	
 
-    public Map<String, Object> getParamMap() {
+   
+
+	public Map<String, Object> getParamMap() {
         final Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("paymentChequeNo",paymentChequeNo);
         paramMap.put("bpvNumber", getVoucherNumber());
         paramMap.put("voucherDate", getVoucherDate());
         paramMap.put("bankName", bankName);
         paramMap.put("bankAccountNumber", bankAccountNumber);
+        
 
         if (paymentHeader != null && paymentHeader.getState() != null)
             loadInboxHistoryData(paymentHeader.getStateHistory(), paramMap);
@@ -269,6 +275,13 @@ public class BillPaymentVoucherPrintAction extends BaseFormAction {
             chequeNosList = new ArrayList<>();
             final Long id = Long.valueOf(parameters.get("id")[0]);
             paymentHeader = persistenceService.getSession().get(Paymentheader.class, id);
+            
+            if(paymentHeader != null && (paymentHeader.getType().equalsIgnoreCase(FinancialConstants.MODEOFPAYMENT_RTGS))) {
+            	if(paymentHeader.getPaymentChequeNo()!=null && !paymentHeader.getPaymentChequeNo().isEmpty()) {
+            		paymentChequeNo = paymentHeader.getPaymentChequeNo();
+            	}
+            }
+            
             if (paymentHeader != null && (paymentHeader.getType().equalsIgnoreCase(FinancialConstants.MODEOFPAYMENT_RTGS) || paymentHeader.getType().equalsIgnoreCase(FinancialConstants.MODEOFPAYMENT_PEX))) {
                 paymentMode = "rtgs";
                 voucher = paymentHeader.getVoucherheader();
@@ -487,5 +500,13 @@ public class BillPaymentVoucherPrintAction extends BaseFormAction {
         return voucher == null || voucher.getDescription() == null ? ""
                 : voucher.getDescription();
     }
+    
+    public String getPaymentChequeNo() {
+		return paymentChequeNo;
+	}
+
+	public void setPaymentChequeNo(String paymentChequeNo) {
+		this.paymentChequeNo = paymentChequeNo;
+	}
 
 }

@@ -305,7 +305,7 @@
 
 </head>
 <body
-	onload="onLoadTask_new();loadDropDownCodesExcludingCashAndBank();loadDropDownCodesFunction();">
+	onload="onLoadTask_new();loadDropDownCodesExcludingCashAndBank();loadDropDownCodesFunction();documentdep();">
 	<s:form action="directBankPayment" theme="css_xhtml" name="dbpform"
 		validate="true">
 		<s:push value="model">
@@ -631,48 +631,27 @@ else{
 
 function checkdate()
 {
-	backlogEntry
+	//backlogEntry
 	var backlog=document.getElementById('backlogEntry').value;
 	var date2=document.getElementById('voucherDate').value;
-	//alert(":::::::voucher Date efore split:: "+date2);
 	var parts = date2.split("/");
-	   var date = new Date(parts[1] + "/" + parts[0] + "/" + parts[2]);
-	   //alert(":::::Backlog:: "+backlog);
-//alert(":::Voucher  Date after split::: "+date);
+	var date = new Date(parts[1] + "/" + parts[0] + "/" + parts[2]);
 	var curdate = new Date();
-	//alert("::::Current date:: "+curdate);
 	if(backlog!='Y'){
 	if(date.setHours(0,0,0,0) == curdate.setHours(0,0,0,0)) {
-	    // Date equals today's date
-	   // alert("date is equal:::");
 		if(backlog == 'N'){
-	    	//alert(":in N:");
 	    	return true;
 	    }
 	    return false;
 	}
 	else{
-		//alert(":::::Else:::: ");
 		return false;
 	}
 	}else{
 		return true;
 	}
-	
-	//alert("::::::::"+date3);
-	/* if(date3>curdate){
-		alert("greater");
-	}
-	if(date3=curdate){
-		alert("date is equal");
-	}
-	if(date3!=curdate){
-		alert("Date are different");
-	} */
-	
-	
+		
 }
-
 
 </SCRIPT>
 </body>

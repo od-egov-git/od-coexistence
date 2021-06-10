@@ -88,6 +88,8 @@ public class Instrument {
     private String payinSlipId;
 
     private BigDecimal reconciledAmount;
+    
+    private DishonorReasonContract dishonor;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private Date reconciledOn;
@@ -279,5 +281,15 @@ public class Instrument {
     public void setInstrumentStatus(String instrumentStatus) {
         this.instrumentStatus = instrumentStatus;
     }
+
+	public DishonorReasonContract getDishonor() {
+		return dishonor;
+	}
+
+	
+	public void setDishonor(DishonorReasonContract dishonorReasonContract) {
+		// TODO Auto-generated method stub
+		this.dishonor = dishonorReasonContract;
+	}
 
 }

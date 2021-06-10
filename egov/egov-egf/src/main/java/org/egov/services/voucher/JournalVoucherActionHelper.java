@@ -51,6 +51,7 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,6 +79,7 @@ import org.egov.infstr.services.PersistenceService;
 import org.egov.model.voucher.VoucherDetails;
 import org.egov.model.voucher.VoucherTypeBean;
 import org.egov.model.voucher.WorkflowBean;
+import org.egov.pims.commons.Position;
 import org.egov.utils.FinancialConstants;
 import org.hibernate.HibernateException;
 import org.joda.time.DateTime;
@@ -311,11 +313,48 @@ public class JournalVoucherActionHelper {
 
         if (FinancialConstants.BUTTONREJECT.equalsIgnoreCase(workflowBean.getWorkFlowAction())) {
             final String stateValue = FinancialConstants.WORKFLOW_STATE_REJECTED;
+            int size=voucherHeader.getStateHistory().size();//added abhishek on 12042021
+			Position owenrPosName = new Position();
+			Position owenrPos = new Position();
+	        owenrPos.setId(workflowBean.getApproverPositionId());
+			owenrPosName.setId(workflowBean.getApproverPositionId());
+			HashMap<Long, Long> positionmap = new HashMap<>();
+			for(int i=0;i<size;i++)
+			{
+				positionmap.put(voucherHeader.getStateHistory().get(i).getOwnerPosition(),
+						voucherHeader.getStateHistory().get(i).getPreviousownerposition());
+			}
+			if(size>0)
+			{
+				Long owenrPos1=0l;
+				if(positionmap.containsKey(user.getId()))
+					owenrPos1=positionmap.get(user.getId());
+				else
+					owenrPos1=(long) voucherHeader.getStateHistory().get(size-1).getOwnerPosition();
+				
+				if(owenrPos1==null|| owenrPos1.equals(""))
+					owenrPos1=(long) voucherHeader.getCreatedBy();
+				owenrPosName.setId(owenrPos1);
+				
+				System.out.println("E owner position "+owenrPos1);
+				owenrPos.setId(owenrPos1);
+			}
+			else
+			{
+				owenrPos.setId(voucherHeader.getState().getCreatedBy());
+				owenrPosName.setId(voucherHeader.getState().getCreatedBy());
+				
+			}
+            System.out.println("ownerPostion id- "+owenrPos);
+            System.out.println("ownerPostion Nameid- "+owenrPosName);
+			
             voucherHeader.transition().progressWithStateCopy().withSenderName(user.getName())
                     .withComments(workflowBean.getApproverComments())
                     .withStateValue(stateValue).withDateInfo(currentDate.toDate())
-                    .withOwner(voucherHeader.getState().getInitiatorPosition()).withOwnerName((voucherHeader.getState().getInitiatorPosition() != null && voucherHeader.getState().getInitiatorPosition() > 0L) ? getEmployeeName(voucherHeader.getState().getInitiatorPosition()):"")
-                    .withNextAction(FinancialConstants.WF_STATE_EOA_Approval_Pending);
+                    //.withOwner(voucherHeader.getState().getInitiatorPosition()).withOwnerName((voucherHeader.getState().getInitiatorPosition() != null && voucherHeader.getState().getInitiatorPosition() > 0L) ? getEmployeeName(voucherHeader.getState().getInitiatorPosition()):"")
+                    .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPosName).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
+                    //.withNextAction(FinancialConstants.WF_STATE_EOA_Approval_Pending);
+                    .withNextAction("");
 
         } else if (FinancialConstants.BUTTONAPPROVE.equalsIgnoreCase(workflowBean.getWorkFlowAction())) {
             final WorkFlowMatrix wfmatrix = voucherHeaderWorkflowService.getWfMatrix(voucherHeader.getStateType(), null,

@@ -347,7 +347,7 @@ function printVoucher(){
 
 	</script>
 </head>
-<body>
+<body onload="documentdep();">
 	<s:form action="directBankPayment" theme="simple" name="dbpform">
 	<div class="formmainbox">
 		<s:push value="model">

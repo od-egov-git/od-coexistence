@@ -239,10 +239,13 @@ public class PaymentAction extends BasePaymentAction {
     private String secondsignatory="-1";
     private String backlogEntry="N";//modified by abhishek on 09042021
  	List<HashMap<String, Object>> workflowHistory =new ArrayList<HashMap<String, Object>>(); 
+ 	private String paymentChequeNo;
    
     @Autowired
     private FinancialUtils financialUtils;
+    
     public PaymentAction() {
+    	
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("creating PaymentAction...");
         addRelatedEntity("paymentheader", Paymentheader.class);
@@ -848,6 +851,12 @@ public class PaymentAction extends BasePaymentAction {
             if (null != pensionList && !pensionList.isEmpty())
                 paymentList.addAll(pensionList);
 
+            
+
+            System.out.println("Payment Header Parameters------->");
+            System.out.println(parameters);
+            System.out.println("<<< ------------------------------------------->>");
+            
             if (rtgsDefaultMode != null && rtgsDefaultMode.equalsIgnoreCase("Y") && !paymentMd.equalsIgnoreCase("rtgs"))
                 if (paymentService.CheckForContractorSubledgerCodes(paymentList, rtgsModeRestrictionDateForCJV))
                     throw new ValidationException(Arrays.asList(new ValidationError(
@@ -877,6 +886,7 @@ public class PaymentAction extends BasePaymentAction {
                 setFunctionSel(billregister.getEgBillregistermis().getFunction().getId());
             loadbankBranch(billregister.getEgBillregistermis().getFund());
             miscount = billList.size();
+            LOGGER.info("Logger In Save Function Payment type::  "+parameters.get("paymentMode")[0]);
             if (parameters.get("paymentMode")[0].equalsIgnoreCase("RTGS")) {
                 paymentService.validateForRTGSPayment(contractorList, "Contractor");
                 paymentService.validateForRTGSPayment(supplierList, "Supplier");
@@ -1039,7 +1049,19 @@ public class PaymentAction extends BasePaymentAction {
     @SkipValidation
     @Action(value = "/payment/payment-create")
     public String create() {
+    	
+    	System.out.println("Cheque No------------>>>>"+paymentChequeNo);
+    	
+    	
+    	
+    	
         try {
+        	
+        	if(null!=paymentChequeNo) {
+        		String pcheque[]=new String[1];
+            	pcheque[0]=paymentChequeNo;
+                parameters.put("paymentChequeNo", pcheque);
+        	}
             contingentList = prepareBillTypeList(contingentList,selectedContingentRows);
             contractorList = prepareBillTypeList(contractorList,selectedContractorRows);
             supplierList = prepareBillTypeList(supplierList,selectedSupplierRows);
@@ -1057,11 +1079,23 @@ public class PaymentAction extends BasePaymentAction {
                     pb.setPaymentAmt(idToAmntMap.get(pb.getBillId()));
                 }
             }
-            final String vdate = parameters.get("voucherdate")[0];
+           final String vdate = parameters.get("voucherdate")[0];
+           
             final Date paymentVoucherDate = DateUtils.parseDate(vdate, "dd/MM/yyyy");
             final String voucherDate = formatter1.format(paymentVoucherDate);
             String cutOffDate1 = null;
-            validateBillVoucherDate(billList, paymentVoucherDate);
+            try {
+            	validateBillVoucherDate(billList, paymentVoucherDate);
+            }catch(Exception ex) {
+            	ex.printStackTrace();
+            }
+            
+            
+            
+            System.out.println("Payment Header Parameters------->");
+            System.out.println(parameters);
+            System.out.println("<<< ------------------------------------------->>");
+           
             paymentActionHelper.setbillRegisterFunction(billregister, cFunctionobj);
             if (LOGGER.isDebugEnabled())
                 LOGGER.debug("Starting createPayment...");
@@ -2636,6 +2670,14 @@ public String getBacklogEntry() {
 
 public void setBacklogEntry(String backlogEntry) {
 	this.backlogEntry = backlogEntry;
+}
+
+public String getPaymentChequeNo() {
+	return paymentChequeNo;
+}
+
+public void setPaymentChequeNo(String paymentChequeNo) {
+	this.paymentChequeNo = paymentChequeNo;
 }
 
 

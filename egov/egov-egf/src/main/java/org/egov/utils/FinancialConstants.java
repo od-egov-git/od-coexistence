@@ -259,6 +259,7 @@ public interface FinancialConstants {
 	public static final String MODEOFPAYMENT_CHEQUE = "cheque";
 	public static final String MODEOFPAYMENT_CASH = "cash";
 	public static final String MODEOFPAYMENT_RTGS = "rtgs";
+	public static final String MODEOFPAYMENT_ONLINE = "online";
 	// Receipt
 	public static final String MODEOFCOLLECTION_CHEQUE = "cheque";
 	public static final String MODEOFCOLLECTION_OTHER = "other";

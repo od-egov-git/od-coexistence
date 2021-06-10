@@ -154,26 +154,55 @@ else{
 }
 function onSubmitDraft()
 {
-	alert("::Save as Draft :::");
+	//alert("::Save as Draft :::");
 	onSubmit();
 }
 function onSubmit()
 {
-	var voucherdate =document.getElementById('voucherDate').value ;
-	var backlog=document.getElementById('backlogEntry');
-	if(voucherdate!=null && voucherdate!=""){
-		console.log("backlog  ::: "+backlog.value);
-		//document.preApprovedVoucher.action='${pageContext.request.contextPath}/voucher/preApprovedVoucher-save.action';
-		document.preApprovedVoucher.action='${pageContext.request.contextPath}/voucher/preApprovedVoucher-save.action?backlogEntry='+backlog.value;
-		return true;
-	}else{
-		bootbox.alert("<s:text name='msg.please.select.voucher.date'/> ");
+	if(checkdate())
+	{
+		var voucherdate =document.getElementById('voucherDate').value ;
+		var backlog=document.getElementById('backlogEntry');
+		if(voucherdate!=null && voucherdate!=""){
+			console.log("backlog  ::: "+backlog.value);
+			//document.preApprovedVoucher.action='${pageContext.request.contextPath}/voucher/preApprovedVoucher-save.action';
+			document.preApprovedVoucher.action='${pageContext.request.contextPath}/voucher/preApprovedVoucher-save.action?backlogEntry='+backlog.value;
+			return true;
+		}else{
+			bootbox.alert("<s:text name='msg.please.select.voucher.date'/> ");
+			return false;
+			}
+	}
+	else{
+		bootbox.alert("Please select back dated entry option correctly");
 		return false;
-		}
+	}
 }
-
+function checkdate()
+{
+	//backlogEntry
+	var backlog=document.getElementById('backlogEntry').value;
+	var date2=document.getElementById('voucherDate').value;
+	var parts = date2.split("/");
+	var date = new Date(parts[1] + "/" + parts[0] + "/" + parts[2]);
+	var curdate = new Date();
+	if(backlog!='Y'){
+	if(date.setHours(0,0,0,0) == curdate.setHours(0,0,0,0)) {
+		if(backlog == 'N'){
+	    	return true;
+	    }
+	    return false;
+	}
+	else{
+		return false;
+	}
+	}else{
+		return true;
+	}
+		
+}
 </script>
-<body onload="checkBillIdBillview()">
+<body onload="checkBillIdBillview();documentdep();">
 	<s:form action="preApprovedVoucher" theme="simple"
 		name="preApprovedVoucher" id="preApprovedVoucher">
 		<jsp:include page="../budget/budgetHeader.jsp">

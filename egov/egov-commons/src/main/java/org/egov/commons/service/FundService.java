@@ -138,7 +138,9 @@ public class FundService {
             predicates.add(cb.equal(funds.get("parentId"), fund.getParentId()));
 
         createQuery.where(predicates.toArray(new Predicate[] {}));
+        System.out.println("fund query "+createQuery);
         final TypedQuery<Fund> query = entityManager.createQuery(createQuery);
+        System.out.println("result "+query.getResultList());
         return query.getResultList();
 
     }

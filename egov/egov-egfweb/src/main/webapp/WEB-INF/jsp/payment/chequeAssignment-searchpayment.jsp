@@ -67,7 +67,7 @@
 		</span>
 		<div class="formmainbox">
 			<div class="subheadnew">
-				<s:text name="chq.assignment.heading.search" />
+				<s:text name="Cheque - Online Transaction Asssignment Search" />
 			</div>
 			<table align="center" width="100%" cellpadding="0" cellspacing="0"
 				id="paymentTable">
@@ -77,7 +77,7 @@
 							name="selectall" onclick="checkAll(this)" /></th>
 					<th class="bluebgheadtdnew"><s:text name="Sl No" /></th>
 
-					<s:if test="%{paymentMode=='cheque'}">
+					<s:if test="%{paymentMode=='cheque'|| paymentMode=='online'}">
 						<th class="bluebgheadtdnew"><s:text
 								name="chq.assignment.partycode" /></th>
 
@@ -109,6 +109,14 @@
 								name="chq.assignment.instrument.date" /><span
 							class="mandatory1">*</span><br>(dd/mm/yyyy)</th>
 					</s:elseif>
+					<!-- Bikash -->
+					<s:if test="%{paymentMode=='online'}">
+						<th class="bluebgheadtdnew" width="10%">Online Reference No.<span class="mandatory1">*</span></th>
+						<th class="bluebgheadtdnew">Reference Date<span
+							class="mandatory1">*</span><br>(dd/mm/yyyy)</th>
+					</s:if>
+					
+					
 				</tr>
 				<s:iterator var="p" value="chequeAssignmentList" status="s">
 					<tr>
@@ -122,7 +130,8 @@
 							class="blueborderfortdnew" />
 						<s:property value="#s.index+1" />
 						</td>
-						<s:if test="%{paymentMode=='cheque'}">
+						<!-- Bikash -->
+						<s:if test="%{paymentMode=='cheque'||paymentMode=='online'}">
 							<td style="text-align: center" class="blueborderfortdnew"><s:hidden
 									id="paidTo" name="chequeAssignmentList[%{#s.index}].paidTo"
 									value="%{paidTo}" /> <s:property value="%{paidTo}" /></td>
@@ -194,6 +203,26 @@
 									placeholder="DD/MM/YYYY" class="form-control datepicker"
 									data-inputmask="'mask': 'd/m/y'" /></td>
 						</s:elseif>
+						
+						<!-- Bikash -->
+						<s:if test="%{paymentMode=='online'}">
+							
+							<td style="text-align: center" class="blueborderfortdnew"><s:textfield
+									size="6" maxlength="6" id="online_reference_no%{#s.index}"
+									name="chequeAssignmentList[%{#s.index}].online_reference_no"
+									value="%{online_reference_no}"
+									onkeypress='return event.charCode >= 48 && event.charCode <= 57'
+									onchange="validateReassignSurrenderChequeNumber(this)" /></td>
+							<td style="text-align: center" class="blueborderfortdnew"><s:date
+									name="chequeDate" var="tempChequeDate" format="dd/MM/yyyy" />
+								<s:textfield id="reference_date%{#s.index}"
+									name="chequeAssignmentList[%{#s.index}].reference_date"
+									value="%{tempChequeDate}" data-date-end-date="0d"
+									onkeyup="DateFormat(this,this.value,event,false,'3')"
+									placeholder="DD/MM/YYYY" class="form-control datepicker"
+									data-inputmask="'mask': 'd/m/y'" /></td>
+						</s:if>
+						
 					</tr>
 				</s:iterator>
 			</table>
@@ -289,9 +318,11 @@
 					value="%{selectedRowsId}" />
 				<s:hidden id="selectedRows" name="selectedRows"
 					value="%{selectedRows}" />
+					
+					
 				<s:hidden id="paymentMode" name="paymentMode" value="%{paymentMode}" />
 				<s:hidden id="bankaccount" name="bankaccount" value="%{bankaccount}" />
-				<input type="button" class="buttonsubmit" value="<s:text name='lbl.assign.cheque'/>"  id="assignChequeBtn"  onclick="validate();" />
+				<input type="button" class="buttonsubmit" value="<s:text name='Submit Details'/>"  id="assignChequeBtn"  onclick="validate();" />
 				<input type="button" value="<s:text name='lbl.close'/>"
 					onclick="javascript:window.parent.postMessage('close','*');window.close();" class="button" />
 			</div>
@@ -312,16 +343,30 @@
 			
 			function validate()
 			{
+				//alert(1);
+				if(document.getElementById('paymentMode').value=='online'){
+				//	alert(2);
+					resetSelectedRowsIdForOnline();
+				}
 				
-				resetSelectedRowsId();
+				if(document.getElementById('paymentMode').value=='cheque'){
+			//		alert(6);
+					resetSelectedRowsId(); 
+				}
+		//	alert(10);
+			console.log(document.getElementById('selectedRowsId').value)
+		
+				
 				var result=true;
 				if(dom.get('departmentid') && dom.get('departmentid').options[dom.get('departmentid').selectedIndex].value==-1)
 				{
+			//		alert(11);
 					bootbox.alert('<s:text name="msg.select.cheque.issued.dept"/>');
 					return false;
 				}
 				if(document.getElementById('selectedRows').value=='' || document.getElementById('selectedRows').value==0)
 				{
+			//		alert(12);
 					bootbox.alert('<s:text name="msg.please.select.the.payment.voucher"/>');
 					return false;
 				}
@@ -336,13 +381,16 @@
 					return false;
 				}
 				}
+			//	alert(13);
 				</s:if>  
 				<s:if test="%{paymentMode=='rtgs'}">
+		//		alert(14);
 					result= validateForRtgsMode();  
 				</s:if>    
 				<s:if test="%{paymentMode=='cash'}">
 				if( document.getElementById('serialNo')==null || document.getElementById('serialNo').value=='' )
 				{
+				//	alert(15);
 					bootbox.alert('<s:text name="payment.yearcode.invalid"/>');
 					return false;
 				}
@@ -352,7 +400,13 @@
 				<s:if test="%{paymentMode=='cheque'}">
 					 result=validateChequeDateForChequeMode();
 				</s:if> 
-
+	
+				
+				if(document.getElementById("paymentMode").value=="online")
+				{
+				//	alert(document.getElementById("paymentMode").value);
+				}
+				
 				if(document.getElementById("paymentMode").value!="cash")
 					{
 				disableAll();
@@ -361,6 +415,7 @@
 						disableforCash();
 						
 						}
+				
 				dom.get('departmentid').disabled=false;  
 				document.forms[0].action='${pageContext.request.contextPath}/payment/chequeAssignment-create.action';
 		    	document.forms[0].submit();
@@ -604,9 +659,10 @@
 					document.getElementById("chequeNumber"+index).value = sRtn;
 			}
 			function resetSelectedRowsId(){
-				
+			//	alert(7);
 				if(document.getElementById("paymentMode").value!="cash")
 					{
+			//		alert(8);
 				var chequeSize='<s:property value ="%{chequeAssignmentList.size()}"/>';
 				   selectedRowsId = new Array();
 					for(var index=0;index<chequeSize;index++){
@@ -624,7 +680,42 @@
 							
 						}
 					}
+			//		alert(9);
+					
 					document.getElementById('selectedRowsId').value = selectedRowsId;
+					
+				//	alert(document.getElementById('selectedRowsId').value);
+					console.log(document.getElementById('selectedRowsId').value );
+			}
+			}
+			
+			
+function resetSelectedRowsIdForOnline(){
+			//	alert(3);
+				if(document.getElementById("paymentMode").value!="cash")
+					{
+			//		alert("##########");
+				var chequeSize='<s:property value ="%{chequeAssignmentList.size()}"/>';
+				   selectedRowsId = new Array();
+					for(var index=0;index<chequeSize;index++){
+						var obj = document.getElementById('isSelected'+index);
+						if(obj.checked == true){
+						selectedRowsId.push(document.getElementsByName("chequeAssignmentList["+index+"].voucherHeaderId")[0].value+"~"+
+									document.getElementsByName("chequeAssignmentList["+index+"].paidTo")[0].value+"~"+
+									document.getElementsByName("chequeAssignmentList["+index+"].online_reference_no")[0].value+"~"+
+									document.getElementsByName("chequeAssignmentList["+index+"].reference_date")[0].value+"~"+
+									document.getElementsByName("chequeAssignmentList["+index+"].voucherNumber")[0].value+"~"+
+									document.getElementsByName("chequeAssignmentList["+index+"].voucherDate")[0].value+"~"+
+									document.getElementsByName("chequeAssignmentList["+index+"].paidAmount")[0].value+";");
+							
+							
+						}
+					}
+				//	alert(5);
+					
+					document.getElementById('selectedRowsId').value = selectedRowsId;
+				//	alert(document.getElementById('selectedRowsId').value);
+					console.log(document.getElementById('selectedRowsId').value );
 			}
 			}
 			

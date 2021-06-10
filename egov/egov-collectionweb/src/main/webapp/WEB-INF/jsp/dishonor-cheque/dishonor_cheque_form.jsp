@@ -54,6 +54,10 @@
 
 <%@ include file="/includes/taglibs.jsp"%>
 
+<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha/js/bootstrap.js" data-modules="effect effect-bounce effect-blind effect-bounce effect-clip effect-drop effect-fold effect-slide"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css" />
 <style>
 .table thead:first-child>tr:first-child th {
     border-bottom: none;
@@ -348,3 +352,10 @@ var chequeDDDateMendatoryMessage = "<spring:message code='msg.please.select.cheq
 	src="<cdn:url value='/resources/global/js/jquery/plugins/jquery.validate.min.js' context='/services/egi'/>"></script>
 <script type="text/javascript"
 	src="<cdn:url value='/resources/js/dishonour_cheque.js?rnd=${app_release_no}'/>"></script>
+<script>
+$( "#instrumentDateId" ).datepicker({
+	  dateFormat: 'dd/mm/yy',//check change
+	  changeMonth: true,
+	  changeYear: true
+	});
+</script>

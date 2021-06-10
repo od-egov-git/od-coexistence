@@ -56,8 +56,12 @@
 		<spring:eval expression="@environment.getProperty('analytics.config')" scope="application"/>
 	</c:if>
  <%@ include file="/includes/meta.jsp" %>    
-		<title>eGov Financials <decorator:title/></title>
-		<link rel="icon" href="<cdn:url value='/resources/global/images/favicon.png' context='/services/egi'/>" sizes="32x32">
+		<title>Sujog Financials <decorator:title/></title>
+		
+		
+		<%-- <link rel="icon" href="<cdn:url value='/employee/browser-icon.png' context='/services/egi'/>" sizes="32x32"> --%>
+		
+	 <link rel="icon" href="<cdn:url value='/resources/global/images/favicon.png' context='/services/egi'/>" sizes="32x32"> 
 		<link href="<cdn:url value='/resources/css/budget.css?rnd=${app_release_no}'/>" rel="stylesheet" type="text/css" />
 		<link href="<cdn:url value='/resources/css/commonegovnew.css?rnd=${app_release_no}'/>" rel="stylesheet" type="text/css" />
 		<link href="${pageContext.request.contextPath}/resources/css/error.css?rnd=${app_release_no}" rel="stylesheet" type="text/css"></link>

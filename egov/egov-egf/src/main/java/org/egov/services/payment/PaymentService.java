@@ -155,6 +155,8 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
 
     @Autowired
     private MicroserviceUtils microserviceUtils;
+    
+    
     @Autowired
     private CreateVoucher createVoucher;
     public List<CChartOfAccounts> purchaseBillGlcodeList = new ArrayList<CChartOfAccounts>();
@@ -644,11 +646,18 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
             final Map<String, String[]> parameters) {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Starting createPaymentHeader...");
+        String paymentChequeNo=null;
         final Paymentheader paymentheader = new Paymentheader();
         paymentheader.setType(parameters.get("paymentMode")[0]);
         paymentheader.setVoucherheader(voucherHeader);
         paymentheader.setBankaccount(ba);
         paymentheader.setPaymentAmount(BigDecimal.valueOf(Double.valueOf(parameters.get("grandTotal")[0])));
+        if(null!=parameters.get("paymentMode")[0]&&!parameters.get("paymentMode")[0].isEmpty() && parameters.get("paymentMode")[0].equalsIgnoreCase("rtgs")) {
+        	if(null!=parameters.get("paymentChequeNo")[0]&&!parameters.get("paymentChequeNo")[0].isEmpty()) {
+        		paymentChequeNo = parameters.get("paymentChequeNo")[0];
+        	}
+        }
+        paymentheader.setPaymentChequeNo(paymentChequeNo);
         applyAuditing(paymentheader);
         persist(paymentheader);
         if (LOGGER.isDebugEnabled())
@@ -2109,7 +2118,9 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Starting getPaymentVoucherNotInInstrument...");
         List<ChequeAssignment> chequeAssignmentList = new ArrayList<ChequeAssignment>();
-        if (parameters.get("paymentMode")[0].equals(FinancialConstants.MODEOFPAYMENT_CHEQUE)) {
+        System.out.println("parameters.get(paymentMode)[0] "+parameters.get("paymentMode")[0]);
+        if (parameters.get("paymentMode")[0].equals(FinancialConstants.MODEOFPAYMENT_CHEQUE) ||
+        		parameters.get("paymentMode")[0].equals(FinancialConstants.MODEOFPAYMENT_ONLINE)) {
             final String billType = parameters.get("billType")[0];
             chequeAssignmentService.setStatusAndFilterValues(parameters, voucherHeader);
             if (voucherHeader.getName() != null)
@@ -2120,8 +2131,10 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
                     parameters.put("voucherName", voucherName);
                 }
             // parameters.put("voucherHeader", );
-            if (billType == null || billType.equalsIgnoreCase("-1") || billType.equalsIgnoreCase("0"))
-                chequeAssignmentList.addAll(chequeAssignmentService.getPaymentVoucherNotInInstrument(parameters));
+            if (billType == null || billType.equalsIgnoreCase("-1") || billType.equalsIgnoreCase("0")) {
+            	chequeAssignmentList.addAll(chequeAssignmentService.getPaymentVoucherNotInInstrument(parameters));
+            }
+                
             else if (billType.equalsIgnoreCase(FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT))
                 chequeAssignmentList.addAll(chequeAssignmentService.getExpenseBillPayments());
             else if (billType.equalsIgnoreCase(FinancialConstants.STANDARD_EXPENDITURETYPE_WORKS + "-"
@@ -2572,7 +2585,21 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
                 instrumentHeaderList.add(prepareInstrumentHeader(account, chequeNo,
                         FinancialConstants.MODEOFPAYMENT_CHEQUE.toLowerCase(), parameters.get("inFavourOf")[0],
                         totalPaidAmt, currentDate, "", null));
-            } else
+            }
+            
+            else if(paymentMode.equals(FinancialConstants.MODEOFPAYMENT_ONLINE))
+            {
+            		
+            	System.out.println(parameters.toString());
+            	for (final ChequeAssignment assignment : chequeAssignmentList) {
+            		Map<String, Object> instrumentHeaderMap = prepareInstrumentHeaderForOnline(
+                            account, assignment.getOnline_reference_no(), assignment.getPaidAmount(),assignment.getReference_date(), "",assignment.getVoucherNumber());
+            		
+                	instrumentHeaderList.add(instrumentHeaderMap);
+            	}
+            	
+            }
+            else
                 instrumentHeaderList.add(prepareInstrumentHeader(account, parameters.get("chequeNo")[0],
                         FinancialConstants.MODEOFPAYMENT_CHEQUE.toLowerCase(), parameters.get("inFavourOf")[0],
                         totalPaidAmt, formatter.parse(parameters.get("chequeDt")[0]), "",
@@ -2583,11 +2610,16 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
             final List<Paymentheader> paymentList = persistenceService.findAllByNamedQuery("getPaymentList",
                     selectedPaymentVHList);
             Map<String, Object> instrumentVoucherMap = null;
+            int i = 0;
             for (final Paymentheader paymentheader : paymentList) {
                 instrumentVoucherMap = new HashMap<String, Object>();
+                
+               
+                
                 instrumentVoucherMap.put(VoucherConstant.VOUCHER_HEADER, paymentheader.getVoucherheader());
-                instrumentVoucherMap.put(VoucherConstant.INSTRUMENT_HEADER, instHeaderList.get(0));
+                instrumentVoucherMap.put(VoucherConstant.INSTRUMENT_HEADER, instHeaderList.get(i));
                 instrumentVoucherList.add(instrumentVoucherMap);
+                i++;
             }
             instVoucherList = instrumentService.updateInstrumentVoucherReference(instrumentVoucherList);
         }
@@ -2955,6 +2987,8 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Starting createPaymentHeader...");
         Paymentheader paymentheader = new Paymentheader();
+        
+        
         paymentheader.setType(type);
         paymentheader.setVoucherheader(voucherHeader);
         final Bankaccount bankaccount = (Bankaccount) getSession().load(Bankaccount.class, bankaccountId.longValue());
@@ -2962,6 +2996,35 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
         paymentheader.setPaymentAmount(amount);
         applyAuditing(paymentheader);
         create(paymentheader);
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Completed createPaymentHeader.");
+        return paymentheader;
+    }
+    
+    
+    
+    @Transactional
+    public Paymentheader createPaymentHeader2(final CVoucherHeader voucherHeader, final Integer bankaccountId,
+            final String type, final BigDecimal amount,final String paymentChequeNo) {
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Starting createPaymentHeader...");
+        Paymentheader paymentheader = new Paymentheader();
+        
+        System.out.println("Executing TYPE ::::"+type);
+        System.out.println("Executing paymenCno:::"+paymentChequeNo);
+        if(null!=paymentChequeNo) {
+        		System.out.println("Executing paymenCno IF :::"+paymentChequeNo);
+        		paymentheader.setPaymentChequeNo(paymentChequeNo);
+        	}
+        paymentheader.setType(type);
+        paymentheader.setVoucherheader(voucherHeader);
+        final Bankaccount bankaccount = (Bankaccount) getSession().load(Bankaccount.class, bankaccountId.longValue());
+        paymentheader.setBankaccount(bankaccount);
+        paymentheader.setPaymentAmount(amount);
+        applyAuditing(paymentheader);
+        create(paymentheader);
+        
+        System.out.println("After Creation pheader::::"+paymentheader.getPaymentChequeNo());
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Completed createPaymentHeader.");
         return paymentheader;
@@ -3286,6 +3349,42 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
         }
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Completed prepareInstrumentHeaderForPex.");
+        return instrumentHeaderMap;
+    }
+    
+    
+    protected Map<String, Object> prepareInstrumentHeaderForOnline(
+            final Bankaccount account, final String txnNo,
+            final BigDecimal amount, final Date date, final String key,final String vno) {
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Starting prepareInstrumentHeaderForRtgs...");
+        final Map<String, Object> instrumentHeaderMap = new HashMap<String, Object>();
+        instrumentHeaderMap.put(VoucherConstant.IS_PAYCHECK, "0");
+        instrumentHeaderMap.put(VoucherConstant.INSTRUMENT_TYPE,
+                FinancialConstants.INSTRUMENT_TYPE_ONLINE);
+        instrumentHeaderMap.put(VoucherConstant.INSTRUMENT_AMOUNT, amount);
+        instrumentHeaderMap.put(VoucherConstant.TRANSACTION_NUMBER, txnNo);
+        instrumentHeaderMap.put(VoucherConstant.TRANSACTION_DATE, date);
+        instrumentHeaderMap.put(VoucherConstant.BANK_CODE, account
+                .getBankbranch().getBank().getCode());
+        
+        instrumentHeaderMap.put(VoucherConstant.VOUCHERNUMBER,vno);
+        // / instrumentHeaderMap.put(VoucherConstant.PAY_TO, partyName);
+        instrumentHeaderMap.put(VoucherConstant.BANKACCOUNTID, account.getId());
+        if (!key.equals("")) {
+            if (key.split(DELIMETER)[1] != null
+                    && !key.split(DELIMETER)[1].equals("")
+                    && !key.split(DELIMETER)[1].equals("null"))
+                instrumentHeaderMap.put(VoucherConstant.DETAIL_TYPE_ID,
+                        Integer.valueOf(key.split(DELIMETER)[1]));
+            if (key.split(DELIMETER)[2] != null
+                    && !key.split(DELIMETER)[2].equals("")
+                    && !key.split(DELIMETER)[2].equals("null"))
+                instrumentHeaderMap.put(VoucherConstant.DETAIL_KEY_ID,
+                        Long.valueOf(key.split(DELIMETER)[2]));
+        }
+        
+            LOGGER.info("Completed prepareInstrumentHeaderForOnline.");
         return instrumentHeaderMap;
     }
     public Paymentheader updatePaymentHeader(final Map<String, String[]> parameters, final List<PaymentBean> billList,

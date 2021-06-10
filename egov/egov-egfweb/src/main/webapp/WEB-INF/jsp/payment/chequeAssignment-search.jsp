@@ -65,7 +65,7 @@
 		</span>
 		<div class="formmainbox">
 			<div class="subheadnew">
-				<s:text name="chq.assignment.heading.search" />
+				<s:text name="Cheque - Online Transaction Asssignment Search" />
 			</div>
 			<table align="center" width="100%" cellpadding="0" cellspacing="0">
 				<tr>
@@ -79,7 +79,9 @@
 					<td class="greybox"></td>
 					<td class="greybox"><s:text name="payment.mode" /><span class="mandatory"></span></td>
 					<!-- <td class="greybox"><s:radio id="paymentMode" name="paymentMode" list="#{'cheque':'Cheque','cash':'Consolidated Cheque'}" onchange="enableOrDisableBillType(this)" value="%{paymentMode}" /></td>-->
-					<td class="greybox"><s:radio id="paymentMode" name="paymentMode" list="#{'cheque':'Cheque'}" onchange="enableOrDisableBillType(this)" value="%{paymentMode}" /></td> 
+					<%--  <td class="greybox"><s:radio name="modeOfPaymentMap" id="modeOfPaymentMap" list="%{modeOfPaymentMap}" /></td>  --%>
+					<%-- <td class="greybox"><s:radio id="paymentMode" name="paymentMode" list="#{'cheque':'Cheque'}" onchange="enableOrDisableBillType(this)" value="%{paymentMode}" /></td>  --%>
+					<td class="greybox"><s:radio id="paymentMode" name="paymentMode" list="%{modeOfPaymentMap}" onchange="enableOrDisableBillType(this)" /></td> 
 					<td class="greybox"><s:text name="chq.assignment.paymentvoucherno" /></td>
 					<td class="greybox"><s:textfield name="voucherNumber" id="voucherNumber" value="%{voucherNumber}" /></td>
 				</tr>
@@ -130,10 +132,8 @@
 		function enableOrDisableBillType(obj) {
 			var billTypeObj = document.getElementById('billType');
 			billTypeObj.options[0].selected = 1;
-			if (obj.value == 'cheque')
+			
 				billTypeObj.disabled = false;
-			else
-				billTypeObj.disabled = true;
 		}
 
 		function loadBank(obj) {

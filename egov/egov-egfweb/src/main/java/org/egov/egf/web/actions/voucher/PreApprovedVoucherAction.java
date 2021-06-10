@@ -1180,7 +1180,14 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
             else if ("budgetaryAppnumber".equals(name))
                 val = voucherHeader.getVouchermis().getBudgetaryAppnumber();
             else if ("backdateentry".equalsIgnoreCase(name) || "backlogEntry".equalsIgnoreCase(name))
+            {	
             	val=voucherHeader.getBackdateentry();
+            	if(val!=null||val!="") 
+            	{	
+            		char c=val.charAt(0);
+            		val=Character.toString(c);
+            	}
+            }
         } else if (name.equals("fund") && egBillregister.getEgBillregistermis().getFund() != null)
             val = egBillregister.getEgBillregistermis().getFund().getName();
         else if (name.equals("fundsource") && egBillregister.getEgBillregistermis().getFundsource() != null)

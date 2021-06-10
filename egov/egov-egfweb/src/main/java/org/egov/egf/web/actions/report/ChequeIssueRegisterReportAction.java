@@ -103,7 +103,10 @@ import net.sf.jasperreports.engine.JRException;
 				"no-cache;filename=ChequeIssueRegister.pdf" }),
 		@Result(name = "XLS", type = "stream", location = Constants.INPUT_STREAM, params = { Constants.INPUT_NAME,
 				Constants.INPUT_STREAM, Constants.CONTENT_TYPE, "application/xls", Constants.CONTENT_DISPOSITION,
-				"no-cache;filename=ChequeIssueRegister.xls" }) })
+				"no-cache;filename=ChequeIssueRegister.xls" }),
+		@Result(name = "online_search", location = "onlineIssueRegisterReport-form.jsp"),
+		@Result(name = "online_results", location = "onlineIssueRegisterReport-result.jsp")
+})
 @ParentPackage("egov")
 public class ChequeIssueRegisterReportAction extends BaseFormAction {
 	/**
@@ -222,6 +225,72 @@ public class ChequeIssueRegisterReportAction extends BaseFormAction {
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("--End  generateReport--");
 	}
+	
+	
+	
+	
+	
+	
+	public void generateReportOnline() throws JRException, IOException {
+		if (LOGGER.isDebugEnabled())
+			LOGGER.debug("----Inside generateReport---- ");
+
+		accountNumber = (Bankaccount) persistenceService.find("from Bankaccount where id=?", accountNumber.getId());
+		if (accountNumber.getChequeformat() != null && !accountNumber.getChequeformat().equals("")) {
+			chequeFormat = accountNumber.getChequeformat().getId().toString();
+		}
+
+		validateDates(fromDate, toDate);
+		if (LOGGER.isDebugEnabled())
+			LOGGER.debug("Querying to date range " + getFormattedDate(fromDate) + "to date "
+					+ getFormattedDate(getNextDate(toDate)));
+		// persistenceService.setType(InstrumentHeader.class);
+		final List<AppConfigValues> printAvailConfig = appConfigValuesService
+				.getConfigValuesByModuleAndKey(FinancialConstants.MODULE_NAME_APPCONFIG, "chequeprintavailableat");
+
+		chequePrintingEnabled = isChequePrintEnabled();
+
+		for (final AppConfigValues appConfigVal : printAvailConfig)
+			chequePrintAvailableAt = appConfigVal.getValue();
+
+		final Query query = persistenceService.getSession()
+				.createSQLQuery("select ih.transactionnumber as chequeNumber,ih.transactiondate as chequeDate,"
+						+ "ih.instrumentamount as chequeAmount,vh.vouchernumber as voucherNumber,vh.id as vhId,ih.serialno as serialNo,vh.voucherdate as voucherDate,vh.name as voucherName,ih.payto as payTo,mbd.billnumber as billNumber,"
+						+ "mbd.billDate as billDate,vh.type as type,es.DESCRIPTION as chequeStatus,ih.id as instrumentheaderid from egf_instrumentHeader ih,egf_instrumentvoucher iv,EGW_STATUS es,"
+						+ "voucherheader vh left outer join miscbilldetail mbd on  vh.id=mbd.PAYVHID ,vouchermis vmis where ih.transactiondate <'"
+						+ getFormattedDate(getNextDate(toDate)) + "' and ih.transactiondate>='"
+						+ getFormattedDate(fromDate) + "' and ih.isPayCheque='0' "
+						+ "and ih.INSTRUMENTTYPE=(select id from egf_instrumenttype where TYPE='online' ) and vh.status not in ("
+						+ getExcludeVoucherStatues() + ") and vh.id=iv.voucherheaderid and  bankAccountId="
+						+ accountNumber.getId() + " and ih.id=iv.instrumentheaderid and ih.id_status=es.id "
+						+ " and vmis.voucherheaderid=vh.id " + createQuery()
+						+ " order by ih.transactiondate,ih.transactionnumber ")
+				.addScalar("chequeNumber").addScalar("chequeDate", StandardBasicTypes.DATE)
+				.addScalar("chequeAmount", BigDecimalType.INSTANCE).addScalar("voucherNumber")
+				.addScalar("voucherDate", StandardBasicTypes.DATE).addScalar("voucherName").addScalar("payTo")
+				.addScalar("billNumber").addScalar("billDate", StandardBasicTypes.DATE).addScalar("type")
+				.addScalar("vhId", BigDecimalType.INSTANCE).addScalar("serialNo", LongType.INSTANCE)
+				.addScalar("chequeStatus").addScalar("instrumentHeaderId", LongType.INSTANCE)
+				.setResultTransformer(Transformers.aliasToBean(ChequeIssueRegisterDisplay.class));
+		if (LOGGER.isDebugEnabled())
+			LOGGER.debug("Search query" + query.getQueryString());
+		chequeIssueRegisterList = query.list();
+		if (chequeIssueRegisterList == null)
+			chequeIssueRegisterList = new ArrayList<ChequeIssueRegisterDisplay>();
+		if (LOGGER.isDebugEnabled())
+			LOGGER.debug("Got Cheque list| Size of list is" + chequeIssueRegisterList.size());
+		updateBillNumber();
+		updateVoucherNumber();
+		removeDuplicates();
+		if (LOGGER.isDebugEnabled())
+			LOGGER.debug("--End  generateReport--");
+	}
+	
+	
+	
+	
+	
+	
 
 	public boolean isChequePrintEnabled() {
 
@@ -350,6 +419,24 @@ public class ChequeIssueRegisterReportAction extends BaseFormAction {
 	public String ajaxPrint() throws JRException, IOException {
 		generateReport();
 		return "result";
+	}
+	
+	@ReadOnly
+	@Action(value = "/report/chequeIssueRegisterReport-online")
+	public String onlineSearch() {
+		prepare();
+		System.out.println("HERE");
+		return "online_search";
+	}
+	
+	
+	
+	@ReadOnly
+	@Action(value = "/report/chequeIssueRegisterReport-onlineResults")
+	public String onlineResults()throws JRException, IOException {
+		generateReportOnline();
+		System.out.println("HERE");
+		return "online_results";
 	}
 
 	@Override

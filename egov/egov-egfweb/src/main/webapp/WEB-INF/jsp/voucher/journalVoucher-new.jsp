@@ -68,7 +68,7 @@
 </head>
 
 <body
-	onload="loadDropDownCodes();loadDropDownCodesFunction();onloadtask();documentdep()">
+	onload="loadDropDownCodes();loadDropDownCodesFunction();onloadtask();documentdep();">
 
 	<s:form action="journalVoucher" theme="simple" name="jvcreateform"  enctype = "multipart/form-data">
 		<s:token />
@@ -273,35 +273,35 @@
 	{
 		if(checkdate())
 		{
-		var backlog=document.getElementById('backlogEntry');
-		if(validateJV()){
-			console.log("backlog  ::: "+backlog.value);
-			document.jvcreateform.action='/services/EGF/voucher/journalVoucher-create.action?backlogEntry='+backlog.value;
-	    	return true;
-				
-		}else{
-			return false;
-		}
+			var backlog=document.getElementById('backlogEntry');
+			if(validateJV()){
+				console.log("backlog  ::: "+backlog.value);
+				document.jvcreateform.action='/services/EGF/voucher/journalVoucher-create.action?backlogEntry='+backlog.value;
+		    	return true;
+					
+			}else{
+				return false;
+			}
 		}
 		else{
 			bootbox.alert("Please select back dated entry option correctly");
 			return false;
-			}
+		}
 		
 	}
 	
 	// jayanta for save as draft
 	function onSubmitDraft()
 	{
-		if(checkdate())
-		{
+		/* if(checkdate())
+		{ */
 		var backlog=document.getElementById('backlogEntry');
 			document.jvcreateform.action='/services/EGF/voucher/journalVoucher-create.action?backlogEntry='+backlog.value;
 	    	return true;
-		}else{
+		/* }else{
 			bootbox.alert("Please select back dated entry option correctly");
 			return false;	
-		}
+		} */
 		
 	}
 
@@ -666,7 +666,7 @@ function printJV()
 
 function checkdate()
 {
-	backlogEntry
+	//backlogEntry
 	var backlog=document.getElementById('backlogEntry').value;
 	var date2=document.getElementById('voucherDate').value;
 	var parts = date2.split("/");

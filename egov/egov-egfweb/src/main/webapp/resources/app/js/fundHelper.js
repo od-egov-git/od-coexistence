@@ -110,16 +110,16 @@ function callAjaxSearch() {
 				}, {
 					"data" : "code",
 					"sClass" : "text-left"
-				}, {
+				}, /*{
 					"data" : "identifier",
 					"sClass" : "text-right"
-				}, {
+				},*/ {
 					"data" : "llevel",
 					"sClass" : "text-right"
-				}, {
+				}, /*{
 					"data" : "parentId",
 					"sClass" : "text-left"
-				}, {
+				},*/ {
 					"data" : "isnotleaf",
 					"sClass" : "text-left"
 				}, {

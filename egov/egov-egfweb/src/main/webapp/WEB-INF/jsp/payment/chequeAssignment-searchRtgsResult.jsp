@@ -202,7 +202,39 @@
 		<s:token />
 	</s:form>
 	<script>
+	
+	
+	var rtgsAccountArray = [];
 			function update(obj)
+			{
+				//alert(obj)		
+ 				var id ="";
+ 				var index = "";
+				
+				var accountId;
+				if(obj.checked){
+					
+					 id = obj.id;
+					 index  = parseInt(id.replace("isSelected",""));					
+					 accountId = document.getElementsByName("rtgsList["+index+"].bankAccountId")[0].value;
+					rtgsAccountArray.push(accountId);
+					//sum = sum + parseInt(document.getElementsByName("pexList["+index+"].paidAmount")[0].value);
+					//document.getElementById("caltotalamount").value = sum;
+					document.getElementById('selectedRows').value=parseInt(document.getElementById('selectedRows').value)+1;
+				}
+				else{
+					 id = obj.id;
+					 index  = parseInt(id.replace("isSelected",""));
+					 accountId = document.getElementsByName("rtgsList["+index+"].bankAccountId")[0].value;
+					rtgsAccountArray.pop(accountId);
+					//sum = sum - parseInt(document.getElementsByName("pexList["+index+"].paidAmount")[0].value);
+					//document.getElementById("caltotalamount").value = sum;
+					document.getElementById('selectedRows').value=parseInt(document.getElementById('selectedRows').value)-1;
+				}
+			}
+	
+	//commented 
+			/* function update(obj)
 			{
 				if(obj.checked){
 					document.getElementById('selectedRows').value=parseInt(document.getElementById('selectedRows').value)+1;
@@ -210,7 +242,7 @@
 				else{
 					document.getElementById('selectedRows').value=parseInt(document.getElementById('selectedRows').value)-1;
 				}
-			}
+			} */
 			function updateDate(obj)
 			{
 				document.getElementById(obj).value=obj.value;         
@@ -224,12 +256,21 @@
 					bootbox.alert('<s:text name="msg.please.select.the.payment.voucher"/> ');
 					return false;
 				}
-				if(document.getElementById('rtgsdateMapId').value=='')
+				if(rtgsAccountArray.length>0){	
+					
+					for(var i=0; i<rtgsAccountArray.length;i++){  //pexdateMap
+					  if(document.getElementsByName("rtgsdateMap["+rtgsAccountArray[i]+"]")[0].value =='' || document.getElementsByName("rtgsdateMap["+rtgsAccountArray[i]+"]")[0].value==null){
+							  bootbox.alert('Please select RTGS Date ');
+						return false;
+					  }
+					}
+					}
+				/* if(document.getElementById('rtgsdateMapId').value=='')
 					{
 					
 					bootbox.alert('<s:text name="msg.please.select.rtgs.date"/> ');
 					return false;
-					}
+					} */
 				<s:if test="%{paymentMode=='rtgs'}">
 					//result= validateForRtgsMode();  
 				</s:if>    

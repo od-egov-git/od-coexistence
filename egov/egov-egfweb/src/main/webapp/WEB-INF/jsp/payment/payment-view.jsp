@@ -112,7 +112,7 @@ function openBudgetDtls()
 
 </head>
 
-<body onload="loadVoucherDate();">
+<body onload="loadVoucherDate();documentdep();">
 	<br>
 	<s:form action="payment" theme="simple">
 		<s:push value="model">

@@ -96,6 +96,8 @@ public class CommonBean {
     private String payto;
     private Long stateId;
     private String budgetReappNo;
+    
+    private String paymentChequeNo;
 
     public Long getRecoveryId() {
         return recoveryId;
@@ -506,4 +508,12 @@ public class CommonBean {
     public void setLinkReferenceNumber(final String linkReferenceNumber) {
         this.linkReferenceNumber = linkReferenceNumber;
     }
+
+	public String getPaymentChequeNo() {
+		return paymentChequeNo;
+	}
+
+	public void setPaymentChequeNo(String paymentChequeNo) {
+		this.paymentChequeNo = paymentChequeNo;
+	}
 }

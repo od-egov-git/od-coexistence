@@ -65,7 +65,7 @@
 		<span><font color="green"><s:actionmessage /></font></span>
 		<div class="formmainbox">
 			<div class="subheadnew">
-				<s:text name="chq.assignment.heading.generic.view" />
+				<s:text name="Cheque - Online Transaction Asssignment Search" />
 			</div>
 			<table align="center" width="100%" cellpadding="0" cellspacing="0">
 				<tr>
@@ -83,8 +83,8 @@
 								name="chq.assignment.instrument.date" /></th>
 						<th class="bluebgheadtdnew"><s:text
 								name="chq.assignment.instrument.status" /></th>
-						<th class="bluebgheadtdnew"><s:text
-								name="instrument.bankadvice" /></th>
+						<%-- <th class="bluebgheadtdnew"><s:text
+								name="instrument.bankadvice" /></th> --%>
 						<s:if
 							test="%{chequePrintingEnabled && chequePrintAvailableAt=='assignment'}">
 							<th class="bluebgheadtdnew"></th>
@@ -102,8 +102,8 @@
 								name="chq.assignment.generic.date" /></th>
 						<th class="bluebgheadtdnew"><s:text
 								name="chq.assignment.instrument.status" /></th>
-						<th class="bluebgheadtdnew"><s:text
-								name="chq.assignment.instrument.action" /></th>
+						<%-- <th class="bluebgheadtdnew"><s:text
+								name="chq.assignment.instrument.action" /></th> --%>
 					</s:else>
 
 				</tr>
@@ -124,7 +124,7 @@
 									name="%{instrumentDate}" format="dd/MM/yyyy" /></td>
 							<td style="text-align: center" class="blueborderfortdnew"><s:property
 									value="%{statusId.description}" /></td>
-							<td class="blueborderfortd"><div align="center">
+							<%-- <td class="blueborderfortd"><div align="center">
 									<a
 										href='/services/EGF/payment/chequeAssignment-bankAdviceExcel.action?instHeaderId=<s:property value="id"/>'>
 										<s:text name="instrument.bankadvice" />
@@ -138,7 +138,7 @@
 						value="%{id}" />);"
 									class="button" />
 								</td>
-							</s:if>
+							</s:if> --%>
 							<input type="hidden" name='chequeFormatId' id="chequeFormatId"
 								value="<s:property value="chequeFormat"/>" />
 
@@ -182,6 +182,19 @@
 								value="%{bankAccountId.bankbranch.id}" />','<s:property
 								value="%{bankAccountId.id}" />','<s:property value="id"/>')" >Pdf</a> 
 							</s:if>
+							
+							
+							<s:if test="%{paymentMode=='online'}">
+							<%--  <a href="#" onclick="return printAdviceExcelOnline('<s:property
+							value="%{bankId.id}" />','<s:property
+								value="%{bankAccountId.bankbranch.id}" />','<s:property
+								value="%{bankAccountId.id}" />','<s:property value="id"/>')" >Excel</a> 
+								&nbsp;&nbsp;
+					 <a href="#" onclick="return printAdvicePdfOnline('<s:property
+							value="%{bankId.id}" />','<s:property
+								value="%{bankAccountId.bankbranch.id}" />','<s:property
+								value="%{bankAccountId.id}" />','<s:property value="id"/>')" >Pdf</a>  --%>
+							</s:if>
 							</td>
 						</tr>
 					</s:iterator>
@@ -216,6 +229,23 @@ function printAdvicePdf(bank,bankbranch,bankaccount,instrumentnumber){
 function printAdvicePdfPex(bank,bankbranch,bankaccount,instrumentnumber){
 	 var url="${pageContext.request.contextPath}/report/bankAdviceReport-exportPDFPex.action?bank.id="+
 	 			bank+"&bankbranch.id="+bankbranch+"&bankaccount.id="+bankaccount+"&instrumentnumber.id="+instrumentnumber;
+	 window.open(url,'','height=650,width=980,scrollbars=yes,left=0,top=0,status=yes');
+}
+
+
+
+function printAdvicePdfOnline(bank,bankbranch,bankaccount,instrumentnumber){
+	 var url="${pageContext.request.contextPath}/report/bankAdviceReport-exportPDFPex.action?bank.id="+
+	 			bank+"&bankbranch.id="+bankbranch+"&bankaccount.id="+bankaccount+"&instrumentnumber.id="+instrumentnumber;
+	 alert(url);
+	 window.open(url,'','height=650,width=980,scrollbars=yes,left=0,top=0,status=yes');
+}
+
+function printAdviceExcelOnline(bank,bankbranch,bankaccount,instrumentnumber){
+	 var url="${pageContext.request.contextPath}/report/bankAdviceReport-exportExcelPex.action?bank.id="+
+	 			bank+"&bankbranch.id="+bankbranch+"&bankaccount.id="+bankaccount+"&instrumentnumber.id="+instrumentnumber;
+	 
+	 alert(url);
 	 window.open(url,'','height=650,width=980,scrollbars=yes,left=0,top=0,status=yes');
 }
 

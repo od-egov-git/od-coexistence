@@ -68,20 +68,20 @@
             <div class="col-sm-3 add-margin view-content">${fund.code}</div>
           </div>
           <div class="row add-border">
-            <div class="col-xs-3 add-margin">
+            <%-- <div class="col-xs-3 add-margin">
               <spring:message code="lbl.identifier" text="Identifier"/>
             </div>
-            <div class="col-sm-3 add-margin view-content">${fund.identifier}</div>
+            <div class="col-sm-3 add-margin view-content">${fund.identifier}</div> --%>
             <div class="col-xs-3 add-margin">
               <spring:message code="lbl.llevel" text="Level"/>
             </div>
             <div class="col-sm-3 add-margin view-content">${fund.llevel}</div>
           </div>
           <div class="row add-border">
-            <div class="col-xs-3 add-margin">
+            <%-- <div class="col-xs-3 add-margin">
               <spring:message code="lbl.parentid" text="Parent Fund"/>
             </div>
-            <div class="col-sm-3 add-margin view-content">${fund.parentId.name}</div>
+            <div class="col-sm-3 add-margin view-content">${fund.parentId.name}</div> --%>
             <div class="col-xs-3 add-margin">
               <spring:message code="lbl.isnotleaf" text="Isnotleaf"/>
             </div>

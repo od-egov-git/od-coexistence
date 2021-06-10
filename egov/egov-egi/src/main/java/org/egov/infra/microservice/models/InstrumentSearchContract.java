@@ -16,6 +16,7 @@ public class InstrumentSearchContract {
     private Date transactionDate;
     private String bankAccountNumber;
     private TransactionType transactionType;
+    private String bankId;
     public InstrumentSearchContract() {
         // TODO Auto-generated constructor stub
     }
@@ -113,5 +114,11 @@ public class InstrumentSearchContract {
     public void setTransactionType(TransactionType transactionType) {
         this.transactionType = transactionType;
     }
+	public String getBankId() {
+		return bankId;
+	}
+	public void setBankId(String bankId) {
+		this.bankId = bankId;
+	}
     
 }

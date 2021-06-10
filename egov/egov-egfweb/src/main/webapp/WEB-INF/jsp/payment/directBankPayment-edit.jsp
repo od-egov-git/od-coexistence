@@ -288,7 +288,7 @@
 	</script>
 </head>
 <body
-	onload="onLoadTask_edit();loadDropDownCodesExcludingCashAndBank();loadDropDownCodesFunction();">
+	onload="onLoadTask_edit();loadDropDownCodesExcludingCashAndBank();loadDropDownCodesFunction();documentdep();">
 	<s:form action="directBankPayment" theme="css_xhtml" name="dbpform"
 		validate="true">
 		<s:push value="model">

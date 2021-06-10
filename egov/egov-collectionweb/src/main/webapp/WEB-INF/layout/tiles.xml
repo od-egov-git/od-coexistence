@@ -64,7 +64,10 @@
         <put-attribute name="body" value=""/>
         <put-attribute name="footer" value="/WEB-INF/views/template/footer.jsp"/>
     </definition>
-
+<definition name="dishonour-cheque-form" extends="base_layout">
+        <put-attribute name="page-title" value="title.dishonour.surrender.cheque" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/jsp/dishonor-cheque/dishonor_cheque_form.jsp"/>
+    </definition>
     <definition name="error/*" extends="error">
         <put-attribute name="body" value="/WEB-INF/views/error/{1}.jsp"/>
     </definition>

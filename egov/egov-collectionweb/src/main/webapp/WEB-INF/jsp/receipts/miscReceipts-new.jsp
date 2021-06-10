@@ -962,7 +962,7 @@ var totaldbamt=0,totalcramt=0;
 						</table>
 					</td>
 				</tr>
-				<tr>
+				<!-- <tr>
 					<td width="4%" class="bluebox2">&nbsp;</td>
 					<td class="bluebox" width="21%"><s:text
 							name="misc.receipt.sub.divison" /><span class="mandatory1">*</span></td>
@@ -973,7 +973,7 @@ var totaldbamt=0,totalcramt=0;
 							name="misc.receipt.gst.no" /></td>
 					<td width="24%" class="bluebox2"><s:textfield label="gstno" id="gstno"
 							maxlength="50" name="gstno" value="%{gstno}" /></td>
-				</tr>
+				</tr> -->
 				
 			</table>
 		</td>
