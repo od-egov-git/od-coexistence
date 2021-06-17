@@ -571,9 +571,9 @@ public class BankAdviceReportAction extends BaseFormAction {
         return Constants.DDMMYYYYFORMAT2.format(instrumentHeader.getTransactionDate());
     }
 
-    @ValidationErrorPage(NEW)
-    @Action(value = "/report/bankAdviceReport-exportPDF")
-    public String exportPDF() {
+    @ValidationErrorPage(NEW)//remove old whilewant to run this method
+    @Action(value = "/report/bankAdviceReport-exportPDF_old")
+    public String exportPDF_old() {
         final Map<String, Object> reportParams = new HashMap<String, Object>();
         final StringBuffer letterContext = new StringBuffer();
         letterContext
@@ -601,6 +601,70 @@ public class BankAdviceReportAction extends BaseFormAction {
         return "reportview";
     }
     
+    @ValidationErrorPage(NEW)//added abhishek on 10062021 
+    @Action(value = "/report/bankAdviceReport-exportPDF")
+    public String exportPDF() {
+        final Map<String, Object> reportParams = new HashMap<String, Object>();
+        final StringBuffer letterContext = new StringBuffer();
+        letterContext
+                .append("             I request you to transfer the amount indicated below through RTGS duly debiting from the")
+                .append("  Current Account No: ")
+                .append(getBankAccountNumber(bankaccount.getId()) != null ? getBankAccountNumber(bankaccount.getId()) : " ")
+                .append("  under your bank to the following bank accounts:");
+        reportParams.put("bankName", getBankName(bank.getId()));
+        reportParams.put("branchName", getBankBranchName(bankbranch.getId()));
+        reportParams.put("letterContext", letterContext.toString());
+        reportParams.put("accountNumber", getBankAccountNumber(bankaccount.getId()));
+        reportParams.put("chequeNumber", "RTGS Ref. No: " + getInstrumentNumber(instrumentnumber.getId()));
+        reportParams.put("chequeDate", getInstrumentDate(instrumentnumber.getId()));
+        reportParams.put("instrumentType", "RTGS");
+        final List<BankAdviceReportInfo> subLedgerList = getBankAdviceReportList();
+        reportParams.put("totalAmount", totalAmount);
+        System.out.println("AmountWords "+EnglishNumberToWords.convertNumberToWords(totalAmount));
+        reportParams.put("amtInWords", "Rupees "+EnglishNumberToWords.convertNumberToWords(totalAmount)+" Only");
+        String firstsignatory="";
+        List<Object[]> list  =getSignatory(instrumentnumber.getId());
+        
+		  if(list != null && !list.isEmpty())
+		  {
+			  for(Object[] element : list) 
+			  {
+				  if(element[0] != null && !element[0].toString().isEmpty())
+				  {
+					  firstsignatory=(element[0].toString()).split(",")[0];
+				  }
+				  else
+				  {
+					  firstsignatory="Additional Commissioner";
+				  }
+			  }
+		  }
+		  else
+		  {
+			  firstsignatory="Additional Commissioner";
+		  }
+		  reportParams.put("firstSignatory",firstsignatory);
+		list=null;
+		String ulbName="";
+		List list1  = new ArrayList();
+		list1=getULBName();
+		if(list1 != null && !list1.isEmpty())
+		{
+			ulbName=list1.get(0).toString();
+		}
+		reportParams.put("ulbName",ulbName);
+        final ReportRequest reportInput = new ReportRequest("bankAdviceReport", subLedgerList, reportParams);
+        reportInput.setReportFormat(ReportFormat.PDF);
+        contentType = ReportViewerUtil.getContentType(ReportFormat.PDF);
+        fileName = "BankAdviceReport." + ReportFormat.PDF.toString().toLowerCase();
+        final ReportOutput reportOutput = reportService.createReport(reportInput);
+        if (reportOutput != null && reportOutput.getReportOutputData() != null)
+            inputStream = new ByteArrayInputStream(reportOutput.getReportOutputData());
+
+        return "reportview";
+    }
+
+   
     @ValidationErrorPage(NEW)
     @Action(value = "/report/bankAdviceReport-exportPDFPex")
     public String exportPDFPex() {
@@ -1163,6 +1227,20 @@ public class BankAdviceReportAction extends BaseFormAction {
     	{
     		query = this.persistenceService.getSession().createSQLQuery("select vh.firstsignatory,vh.secondsignatory from voucherheader vh where vh.id in (select voucherheaderid from egf_instrumentvoucher egf where egf.instrumentheaderid =:instId)");
     	    query.setLong("instId", insId);
+    	    rows = query.list();
+    	    
+    	}catch (Exception e) {
+			e.printStackTrace();
+		}
+	    return rows;
+    }
+	
+	private List<Object[]> getULBName() {
+    	SQLQuery query =  null;
+    	List<Object[]> rows = null;
+    	try
+    	{
+    		query = this.persistenceService.getSession().createSQLQuery("select e.municipalityname from eg_citypreferences e");
     	    rows = query.list();
     	    
     	}catch (Exception e) {

@@ -237,8 +237,8 @@
 		class="bluebox"><span class="mandatory1">*</span></span></td>
 	<td class="bluebox"><s:textfield name="amount" id="amount"
 			cssStyle="text-align:right" cssClass="form-control patternvalidation" data-pattern="number"/></td>
-	<td class="bluebox"></td>
-	<td class="bluebox"></td>
+	<td class="bluebox">File No</td>
+	<td class="bluebox"><s:textfield name="fileNo" id="fileNo"/></td>
 </tr>
 
 <tr>

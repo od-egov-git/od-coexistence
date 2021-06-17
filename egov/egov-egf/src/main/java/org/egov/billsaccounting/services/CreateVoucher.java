@@ -73,6 +73,7 @@ import org.egov.commons.CFunction;
 import org.egov.commons.CGeneralLedger;
 import org.egov.commons.CGeneralLedgerDetail;
 import org.egov.commons.CVoucherHeader;
+import org.egov.commons.EgwStatus;
 import org.egov.commons.Functionary;
 import org.egov.commons.Fund;
 import org.egov.commons.Fundsource;
@@ -83,6 +84,7 @@ import org.egov.commons.dao.AccountdetailtypeHibernateDAO;
 import org.egov.commons.dao.BankHibernateDAO;
 import org.egov.commons.dao.BankaccountHibernateDAO;
 import org.egov.commons.dao.ChartOfAccountsHibernateDAO;
+import org.egov.commons.dao.EgwStatusHibernateDAO;
 import org.egov.commons.dao.FinancialYearDAO;
 import org.egov.commons.dao.FiscalPeriodHibernateDAO;
 import org.egov.commons.dao.FunctionDAO;
@@ -139,6 +141,7 @@ import org.egov.services.voucher.VoucherService;
 import org.egov.utils.FinancialConstants;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -196,6 +199,9 @@ public class CreateVoucher {
 
 	@Autowired
 	private AutonumberServiceBeanResolver beanResolver;
+	
+	@Autowired
+	private EgwStatusHibernateDAO egwStatusHibernateDAO;
 
 	// add here for other bills
 
@@ -616,6 +622,9 @@ public class CreateVoucher {
 			String voucherType = null;
 			String voucherSubType = null;
 			String name = "";
+			//Bikash
+			int nextStatusForEbillRegister=0;
+			
 			if (expType.equalsIgnoreCase(CONBILL)) {
 				name = "Contractor Journal";
 				voucherSubType = FinancialConstants.JOURNALVOUCHER_NAME_CONTRACTORJOURNAL;
@@ -632,6 +641,11 @@ public class CreateVoucher {
 			}
 			// Pension,Gratuity are saved as Expense Bill
 			else if (expType.equalsIgnoreCase(FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT)) {
+				//Cahnged Status
+				egBillregister.setStatus(egwStatusHibernateDAO.getEgwStatusByCodeAndModuleType("EXPENSEBILL" ,"Voucher Created"));
+				
+				System.out.println(egBillregister.getStatus().getCode());
+				
 				name = FinancialConstants.JOURNALVOUCHER_NAME_EXPENSEJOURNAL;
 				voucherSubType = FinancialConstants.JOURNALVOUCHER_NAME_EXPENSEJOURNAL;
 			} else if (expType.equalsIgnoreCase(PENSBILL)) {
@@ -785,8 +799,10 @@ public class CreateVoucher {
 			}
 			
 			vh = createPreApprovedVoucher(headerDetails, accountdetails, subledgerDetails);
+			
+			
 			egBillregister.getEgBillregistermis().setVoucherHeader(vh);
-
+			
 		} catch (final ValidationException e) {
 			LOGGER.error(e.getErrors());
 			final List<ValidationError> errors = new ArrayList<ValidationError>();
@@ -1860,6 +1876,11 @@ public class CreateVoucher {
 					&& null != headerdetails.get("backdateentry"))
 			{
 				cVoucherHeader.setBackdateentry(headerdetails.get("backdateentry").toString());
+			}
+			if(headerdetails.containsKey("fileNo")
+					&& null != headerdetails.get("fileNo"))
+			{
+				cVoucherHeader.setFileNo(headerdetails.get("fileNo").toString());
 			}
 			// -- Voucher Type checking. --START
 			if (FinancialConstants.STANDARD_VOUCHER_TYPE_JOURNAL.equalsIgnoreCase(voucherType))
@@ -3577,6 +3598,22 @@ public class CreateVoucher {
 			        
 				       return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
 				    }
-
+				public Object[] getStatus() {
+					Object[] id = null ;
+					List<Object[]> list1= null;
+			    	SQLQuery queryMain =  null;
+			    	String query1="select  es.id from egw_status es where es.moduletype ='EXPENSEBILL' and es.code ='Voucher Created' ";
+			    	LOGGER.info("Query 1 :: "+query1.toString());
+			    	queryMain=this.persistenceService.getSession().createSQLQuery(query1.toString());
+			    	list1 = queryMain.list();
+			    	if(list1!=null)
+			    	{
+			    		
+			    		id=list1.get(0);
+			    			System.out.println("new status id "+id);
+			    		
+			    	}
+			    	return id;
+				}
 
 }

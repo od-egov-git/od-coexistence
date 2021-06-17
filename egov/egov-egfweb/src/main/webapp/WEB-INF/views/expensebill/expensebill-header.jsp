@@ -105,7 +105,7 @@
 			<form:select path="egBillregistermis.function" id="egBillregistermis.function"  required="required" class="form-control">
 				<form:option value="">-Select-</form:option>
 				<form:options items="${cFunctions}" itemValue="id" itemLabel="name"/>  
-				</form:select>
+			</form:select>
 			<!--<form:hidden path="egBillregistermis.function" name="egBillregistermis.function" id="egBillregistermis.function" class="form-control table-input hidden-input cfunction"/>-->
 		</div>
 				
@@ -146,6 +146,11 @@
 			</form:select>
 			<form:errors path="egBillregistermis.egBillSubType" cssClass="add-margin error-msg" />
 		</div>
+		<label class="col-sm-2 control-label text-right">File No
+		</label>
+			<div class="col-sm-3 add-margin">
+			<form:input path="fileno" id="fileno" class="form-control" maxlength="50" ></form:input>
+			</div>
 	</div>
 	
 </div>

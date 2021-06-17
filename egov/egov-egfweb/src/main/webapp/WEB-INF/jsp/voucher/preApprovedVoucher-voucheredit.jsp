@@ -268,7 +268,7 @@ function validate(name,value){
 }
 	</script>
 <body
-	onload="loadDropDownCodes();loadDropDownCodesFunction();checkBillId();refreshInbox()">
+	onload="loadDropDownCodes();loadDropDownCodesFunction();checkBillId();documentdep();refreshInbox();">
 	<s:form action="preApprovedVoucher" theme="simple">
 		<s:token />
 		<jsp:include page="../budget/budgetHeader.jsp">

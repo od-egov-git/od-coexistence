@@ -48,6 +48,10 @@
 
 package org.egov.infra.web.controller;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+
+import java.util.List;
+
 import org.egov.infra.web.support.ui.Inbox;
 import org.egov.infra.workflow.entity.StateAware;
 import org.egov.infra.workflow.inbox.InboxRenderServiceDelegate;
@@ -58,16 +62,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.List;
-
-import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
-
 @Controller
 @RequestMapping("/inbox")
 public class InboxController {
 
     @Autowired
     private InboxRenderServiceDelegate<StateAware> inboxRenderServiceDelegate;
+    
+    
 
 
     @GetMapping(produces = APPLICATION_JSON_UTF8_VALUE)
@@ -93,4 +95,9 @@ public class InboxController {
     public List<Inbox> showInboxHistory(@RequestParam Long stateId) {
         return inboxRenderServiceDelegate.getWorkflowHistoryItems(stateId);
     }
+    
+    
+   
+    
+    
 }

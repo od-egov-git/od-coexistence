@@ -275,5 +275,42 @@ public class EgBillRegisterService extends PersistenceService<EgBillregister, Lo
         
         return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
      }
+    
+    
+    
+    public EgBillregister getBillsByWorkBillNo(String billno) {
+        Query qry = this.getCurrentSession()
+                .createQuery("from EgBillregister br where br.billnumber =:billno");
+        qry.setString("billno", billno);
+        return (EgBillregister) qry.list().get(0);
+    }
+    
+    
+    public EgBillregister getBillsById(Long billno) {
+        Query qry = this.getCurrentSession()
+                .createQuery("from EgBillregister br where br.id =:billno");
+        qry.setLong("billno", billno);
+        return (EgBillregister) qry.list().get(0);
+    }
+    
+    
+    
+    @Transactional
+    public EgBillregister  updateEbill(EgBillregister bill) {
+        try {
+           
+           
+            update(bill);
+
+        } catch (final Exception e) {
+
+            final List<ValidationError> errors = new ArrayList<ValidationError>();
+            errors.add(new ValidationError("exp", e.getMessage()));
+            throw new ValidationException(errors);
+        }
+        return bill;
+    }
+    
+    
 
 }

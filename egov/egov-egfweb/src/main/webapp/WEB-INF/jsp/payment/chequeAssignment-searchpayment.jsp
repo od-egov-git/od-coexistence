@@ -212,7 +212,7 @@
 									name="chequeAssignmentList[%{#s.index}].online_reference_no"
 									value="%{online_reference_no}"
 									onkeypress='return event.charCode >= 48 && event.charCode <= 57'
-									onchange="validateReassignSurrenderChequeNumber(this)" /></td>
+									onchange="validateOnlineNumber(this)" /></td>
 							<td style="text-align: center" class="blueborderfortdnew"><s:date
 									name="chequeDate" var="tempChequeDate" format="dd/MM/yyyy" />
 								<s:textfield id="reference_date%{#s.index}"
@@ -571,6 +571,54 @@
 				}
 				return true;
 			}
+
+
+
+
+function validateOnlineNumber(obj)
+			{
+				var pattPeriod=/\./i;
+				var pattNegative=/-/i;
+				var index = obj.id.substring(19,obj.id.length);
+				console.log(obj);
+				console.log(index);
+				var dept = dom.get('departmentid').options[dom.get('departmentid').selectedIndex].value;
+				var name=obj.name;
+			
+				if(obj.value=='')
+					return true;
+				else if(isNaN(obj.value))
+				{
+					bootbox.alert('<s:text name="msg.number.date.contains.alpha.char"/>', function() {
+						obj.value='';
+						return true;
+					});
+				}else if(obj.value.length!=6)
+				{
+					bootbox.alert("<s:text name='msg.cheque.number.must.be.six.digit.long'/>", function() {
+						obj.value='';
+						return true;
+					});
+					
+				}
+				else if(obj.value.match(pattPeriod)!=null || obj.value.match(pattNegative)!=null )
+				{
+					bootbox.alert('<s:text name="msg.cheque.num.should.contaain.only.number"/>', function() {
+						obj.value='';
+						return true;
+					});
+				}
+				
+			
+				else {
+			
+				var url = '${pageContext.request.contextPath}/voucher/common-ajaxValidateReferenceNumber.action?bankaccountId='+document.getElementById('bankaccount').value+'&chequeNumber='+obj.value+'&index='+index;
+				var transaction = YAHOO.util.Connect.asyncRequest('POST', url,callbackonline , null);
+				}
+				return true;
+			}
+			
+
 			
 			function validateReassignSurrenderChequeNumber(obj)
 			{
@@ -636,6 +684,26 @@
 			    	bootbox.alert('failure');
 			    }
 			}
+
+
+			var callbackonline = {
+				success: function(o) {  
+					var res=o.responseText;
+					res = res.split('~');
+					if(res[1]=='false')
+					{
+						bootbox.alert('Refrence Number is already in use', function() {
+							return true;
+						});
+						document.getElementById('online_reference_no'+parseInt(res[0])).value='';
+					}
+			    },
+			    failure: function(o) {
+			    	bootbox.alert('failure');
+			    }
+			}
+
+
 				var callbackReassign = {
 				success: function(o) {
 					var res=o.responseText;

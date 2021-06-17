@@ -155,6 +155,7 @@ function onSubmit()
 							<td width="25%"></td>
 						</tr>
 					</table>
+					<s:hidden id="billid" name="billid" value="%{getMasterName('billnumber')}" />
 					<s:hidden id="vhid" name="vhid" value="%{voucherHeader.id}" />
 					<s:hidden id="id" name="id" value="%{voucherHeader.id}" />
 

@@ -149,7 +149,7 @@ public class CreateExpenseBillController extends BaseBillController {
     @Qualifier("persistenceService")
     private PersistenceService persistenceService;
     
-    
+    //private String fileNo;
 
     public CreateExpenseBillController(final AppConfigValueService appConfigValuesService) {
         super(appConfigValuesService);
@@ -270,7 +270,10 @@ public class CreateExpenseBillController extends BaseBillController {
             EgBillregister savedEgBillregister;
             egBillregister.setDocumentDetail(list);
             try {
-
+				
+				  System.out.println(egBillregister.getFileno());
+				  
+				 
                 savedEgBillregister = expenseBillService.create(egBillregister, approvalPosition, approvalComment, null, 
                         workFlowAction,approvalDesignation);
             } catch (ValidationException e) {
@@ -469,5 +472,7 @@ public class CreateExpenseBillController extends BaseBillController {
     	}
 		return empName;
 	}
+
+	
 
 }

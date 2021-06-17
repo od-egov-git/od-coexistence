@@ -137,6 +137,7 @@ import org.egov.pims.commons.Position;
 import org.egov.pims.model.PersonalInformation;
 import org.egov.pims.service.EisUtilService;
 import org.egov.services.bills.BillsService;
+import org.egov.services.bills.EgBillRegisterService;
 import org.egov.services.contra.ContraService;
 import org.egov.services.instrument.InstrumentHeaderService;
 import org.egov.services.instrument.InstrumentVoucherService;
@@ -214,6 +215,8 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
     @Autowired
 	@Qualifier("instrumentHeaderService")
 	private InstrumentHeaderService instrumentHeaderService;
+    
+    
 
     private static final Logger LOGGER = Logger.getLogger(PreApprovedVoucherAction.class);
     protected FinancialYearHibernateDAO financialYearDAO;
@@ -950,8 +953,12 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
     @Action(value = "/voucher/preApprovedVoucher-update")
     public String update() throws ValidationException {
         if (LOGGER.isDebugEnabled())
-            LOGGER.debug("voucher id=======" + parameters.get(VHID)[0]);
+        {    LOGGER.debug("voucher id=======" + parameters.get(VHID)[0]);
+        LOGGER.debug("bill id=======" + parameters.get(BILLID)[0]);
+        }
         methodName = "update";
+        String bno = parameters.get(BILLID)[0];
+        
         try {
         	 File[] uploadedFiles = getFile();
              String[] fileName = getFileFileName();
@@ -974,7 +981,10 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
             
             voucherHeader = (CVoucherHeader) voucherService.findById(Long.parseLong(parameters.get(VHID)[0]), false);
             populateWorkflowBean();
+            voucherHeader.setBillNumber(bno);
+          
             voucherHeader = preApprovedActionHelper.sendForApproval(voucherHeader, workflowBean);
+            
             voucherHeader.setDocumentDetail(documentDetail);
             preApprovedActionHelper.saveDocuments(voucherHeader);
             type = billsService.getBillTypeforVoucher(voucherHeader);
@@ -1172,7 +1182,6 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
                 val = voucherHeader.getVouchermis().getFunctionary().getName();
             else if ("narration".equals(name))
                 val = voucherHeader.getDescription();
-            //val=egBillregister.getEgBillregistermis().getNarration();
             else if ("billnumber".equals(name))
                 val = ((EgBillregister) getPersistenceService()
                         .find(" from EgBillregister br where br.egBillregistermis.voucherHeader=?", voucherHeader))
@@ -1188,6 +1197,8 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
             		val=Character.toString(c);
             	}
             }
+            else if ("fileno".equals(name))
+                val = voucherHeader.getFileNo();
         } else if (name.equals("fund") && egBillregister.getEgBillregistermis().getFund() != null)
             val = egBillregister.getEgBillregistermis().getFund().getName();
         else if (name.equals("fundsource") && egBillregister.getEgBillregistermis().getFundsource() != null)
@@ -1210,6 +1221,8 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
             val = egBillregister.getBillnumber();
         else if ("budgetaryAppnumber".equals(name))
             val = egBillregister.getEgBillregistermis().getBudgetaryAppnumber();
+        else if ("fileno".equals(name))
+            val = egBillregister.getFileno();
         return val;
     }
 
@@ -1255,6 +1268,7 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
                     }
                 }
                 names.put("tempList", tempList);
+                names.put("fileno", "fileno");
             }
         }
         if (LOGGER.isDebugEnabled())

@@ -204,15 +204,12 @@
 			<td width="10%" class="<c:out value='${tdclass}' />"><s:text name="backdatedentry"/> :
 				&nbsp;</td>
 			<td colspan="3" class="<c:out value='${tdclass}' />"><s:property
-					value="%{getMasterName('backlogEntry')}" /></td>
-			<c:choose>
-				<c:when test="${tdclass == 'bluebox'}">
-					<c:set var="tdclass" value="greybox" scope="request" />
-				</c:when>
-				<c:otherwise>
-					<c:set var="tdclass" value="bluebox" scope="request" />
-				</c:otherwise>
-			</c:choose>		
+					value="%{get1asterName('backlogEntry')}" /></td>
+			<td width="10%" class="<c:out value='${tdclass}' />"><s:text name="File No"/> :
+				&nbsp;</td>
+			<td colspan="3" class="<c:out value='${tdclass}' />">
+				<s:property value="%{getMasterName('fileno')}" /> 
+			</td>	
 		</tr>
 	</table>
 </div>

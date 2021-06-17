@@ -69,7 +69,7 @@ public class Paymentheader extends StateAware {
     private BigDecimal paymentAmount;
     private DrawingOfficer drawingOfficer;
     private String paymentChequeNo;
-
+    private String fileNo;
     @Override
     public Long getId() {
         return id;
@@ -156,6 +156,14 @@ public class Paymentheader extends StateAware {
 
 	public void setPaymentChequeNo(String paymentChequeNo) {
 		this.paymentChequeNo = paymentChequeNo;
+	}
+
+	public String getFileNo() {
+		return fileNo;
+	}
+
+	public void setFileNo(String fileNo) {
+		this.fileNo = fileNo;
 	}
     
     

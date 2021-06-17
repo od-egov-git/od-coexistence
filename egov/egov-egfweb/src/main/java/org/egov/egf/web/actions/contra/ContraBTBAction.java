@@ -145,7 +145,7 @@ public class ContraBTBAction extends BaseVoucherAction {
 	private String sourceGlcode;
 	private String destinationGlcode;
 	private ContraJournalVoucher contraVoucher;
-
+	private String fileNo;
 	@Autowired
 	@Qualifier("persistenceService")
 	private PersistenceService persistenceService;
@@ -302,6 +302,11 @@ public class ContraBTBAction extends BaseVoucherAction {
 				
 					if(valid==true)
 					{
+						System.out.println("fileNo "+fileNo);
+						if(fileNo!=null)
+						{
+							voucherHeader.setFileNo(fileNo);
+						}
 						voucherHeader = contraBTBActionHelper.create(contraBean, contraVoucher, voucherHeader);
 						addActionMessage("Bank to Bank Transfer " + getText("transaction.success") + " with Voucher number: "
 							+ voucherHeader.getVoucherNumber());
@@ -407,7 +412,7 @@ public class ContraBTBAction extends BaseVoucherAction {
 			voucherHeader4.setType(voucherHeader2.getType());
 			voucherHeader4.setVouchermis(voucherHeader2.getVouchermis());
 			voucherHeader4.setVoucherDate(voucherDate);
-
+			voucherHeader4.setFileNo(voucherHeader2.getFileNo());
 			voucherTypeBean.setVoucherName(FinancialConstants.CONTRAVOUCHER_NAME_INTERFUND);
 			oldVoucher2 = voucherService.updateVoucherHeader(voucherHeader4, voucherTypeBean);
 
@@ -1715,4 +1720,13 @@ public class ContraBTBAction extends BaseVoucherAction {
 	public void setSecondsignatory(String secondsignatory) {
 		this.secondsignatory = secondsignatory;
 	}
+
+	public String getFileNo() {
+		return fileNo;
+	}
+
+	public void setFileNo(String fileNo) {
+		this.fileNo = fileNo;
+	}
+	
 }

@@ -61,9 +61,11 @@ package org.egov.dao.bills;
  */
 
 import org.egov.model.bills.EgBilldetails;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+
 
 public interface EgBilldetailsDAO {
     public BigDecimal getOtherBillsAmount(Long minGlCodeId, Long maxGlCodeId, Long majGlCodeId, String finYearID,

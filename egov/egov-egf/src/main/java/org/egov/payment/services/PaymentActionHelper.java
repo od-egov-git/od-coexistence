@@ -643,6 +643,10 @@ public class PaymentActionHelper {
         {
         	headerdetails.put("backdateentry", voucherHeader.getBackdateentry());
         }
+        if(voucherHeader.getFileNo() != null && !voucherHeader.getFileNo().isEmpty() && !voucherHeader.getFileNo().equalsIgnoreCase(""))
+        {
+        	headerdetails.put("fileNo", voucherHeader.getFileNo());
+        }
         if (voucherHeader.getVouchermis().getDepartmentcode() != null)
             headerdetails.put(VoucherConstant.DEPARTMENTCODE,voucherHeader.getVouchermis().getDepartmentcode());
         if (voucherHeader.getFundId() != null)

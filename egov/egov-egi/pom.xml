@@ -66,7 +66,11 @@
             <artifactId>egov-config</artifactId>
             <version>3.0.0-COE-SNAPSHOT</version>
         </dependency>
-
+        
+        <!-- Added By Bikash For EBillRegister -->
+        
+        
+	
         <dependency>
             <groupId>org.egov</groupId>
             <artifactId>egov-config</artifactId>

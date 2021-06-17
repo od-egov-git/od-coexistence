@@ -63,6 +63,7 @@ import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.ParentPackage;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.convention.annotation.Results;
+import org.apache.struts2.interceptor.validation.SkipValidation;
 import org.egov.commons.EgwStatus;
 import org.egov.commons.Functionary;
 import org.egov.commons.Fund;
@@ -70,14 +71,20 @@ import org.egov.commons.Fundsource;
 import org.egov.commons.Scheme;
 import org.egov.commons.SubScheme;
 import org.egov.egf.model.VoucherDetailMain;
+import org.egov.egf.utils.FinancialUtils;
 import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.entity.Boundary;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.web.struts.actions.BaseFormAction;
+import org.egov.infra.web.support.ui.Inbox;
 import org.egov.infstr.services.PersistenceService;
 import org.egov.infstr.utils.EgovMasterDataCaching;
 import org.egov.model.bills.EgBillregister;
 import org.egov.model.bills.EgBillregistermis;
+import org.egov.model.bills.Miscbilldetail;
+import org.egov.model.payment.Paymentheader;
+import org.egov.services.bills.EgBillRegisterService;
+import org.egov.services.payment.MiscbilldetailService;
 import org.egov.utils.FinancialConstants;
 import org.egov.utils.VoucherHelper;
 import org.hibernate.Query;
@@ -111,7 +118,14 @@ public class BillRegisterSearchAction extends BaseFormAction {
     private String amount;
     private String partyName;
     
+    private String billregisterid;
+    @Autowired
+    private FinancialUtils financialUtils;
+    @Autowired
+    private EgBillRegisterService egbillregisterservice;
    
+    @Autowired
+    private MiscbilldetailService miscbilldetailService;
  @Autowired
  @Qualifier("persistenceService")
  private PersistenceService persistenceService;
@@ -311,7 +325,7 @@ public class BillRegisterSearchAction extends BaseFormAction {
                 else
                     billMap.put("sourcepath",
                             "/services/EGF/bill/billView-view.action?billId=" + object[8].toString());
-                // If bill is created from create bill screen
+                // If bill is created from create bill screen6666
                 if (object[11] != null)
                 {
                     if (!(getStringValue(object[10]).equalsIgnoreCase(FinancialConstants.CONTINGENCYBILL_APPROVED_STATUS) || getStringValue(
@@ -324,13 +338,106 @@ public class BillRegisterSearchAction extends BaseFormAction {
                         billMap.put("ownerName", "-");
                 } else
                     billMap.put("ownerName", "-");
+                
+                billMap.put("stateid", object[10]);
+                billMap.put("billid", object[8]);
                 billList.add(billMap);
             }
         } else
             billList = new ArrayList<Map<String, Object>>();
         return NEW;
     }
+    
+    
+    @SkipValidation
+    @Action(value = "/bill/billregisterhistory")
+    public List<Inbox> billRegisterHistory() {
+    	System.out.println(billregisterid);
+    	String billid=billregisterid;
+    	List<HashMap<String, Object>> result;
+    	List<HashMap<String, Object>> voucherresult;
+    	List<HashMap<String, Object>> paymentresult;
+    	Miscbilldetail miscdata = new Miscbilldetail();
+    	miscdata= null;
+    	
+    	List<Inbox> inboxFinalList = new ArrayList<Inbox>();
+    	
+    	EgBillregister e=new EgBillregister();
+    	e = null;
+    	e = egbillregisterservice.getBillsById(Long.parseLong(billid));
+    	if(null!=e) {
+    		 result=financialUtils.getBillRegisterHistory(e.getState(), e.getStateHistory());
+    		 if(result!=null && result.size()>0) {
+    			 inboxFinalList.addAll(getgetBillRegisterListData(result));
+    		 }
+    		
+    		 if(e.getEgBillregistermis().getVoucherHeader()!=null) {
+    			 voucherresult=financialUtils.getBillRegisterHistory(e.getEgBillregistermis().getVoucherHeader().getState(), e.getEgBillregistermis().getVoucherHeader().getStateHistory());
+    			
+    			 if(voucherresult!=null && voucherresult.size()>0) {
+    				 inboxFinalList.addAll(getgetBillRegisterListData(voucherresult));
+    			 }
+    			
+    			 miscdata =  miscbilldetailService.getBillsById(e.getEgBillregistermis().getVoucherHeader().getId());
+    			 if(null!=miscdata && miscdata.getPayVoucherHeader()!=null) {
+    				 paymentresult =  financialUtils.getBillRegisterHistory(miscdata.getPayVoucherHeader().getState(), miscdata.getPayVoucherHeader().getStateHistory());
+    				 if(paymentresult!=null && paymentresult.size()>0) {
+    					 inboxFinalList.addAll(getgetBillRegisterListData(paymentresult));
+    				 }
+    				 
+    				
+    			 }
+    		 }
+    		  	
+    	}
+    	
+    	
+       return inboxFinalList;
+    }
+    
+    
+    
+    private List<Inbox> getgetBillRegisterListData(List<HashMap<String, Object>> result){
+    	List<Inbox>  inboxList = new ArrayList<Inbox>();
+    	   for(HashMap<String, Object> l:result) {
+   	    	String date ="";
+   	    	String comments = "";
+   	    	String status = "";
+   	    	String sender = "";
+   	    	String task = "";
+   	    	Inbox i =new Inbox();
+   	    				if(null!=l.get("date")) {
+   	    					try {
+   	    	    	    		 date =l.get("date").toString();
+   	    					}
+   	    					catch(Exception e)
+   	    					{
+   	    						System.out.println("error "+e.getMessage());
+   	    					}
+   	    	    	    	}
 
+   	    	    	    	if(null!=l.get("comments")) {
+   	    	    	    		 comments =l.get("comments").toString();
+   	    	    	    	}
+   	    	    	    	if(null!=l.get("status")) {
+   	    	    	    		 status =l.get("status").toString();
+   	    	    	    	}
+   	    	    	    	if(null!=l.get("sender")) {
+   	    	    	    		 sender =l.get("sender").toString();
+   	    	    	    	}
+   	    	    	    	if(null!=l.get("task")) {
+   	    	    	    		 task =l.get("task").toString();
+   	    	    	    	}
+   	    	    	    	
+   	    	    	    	i.setDate(date);
+   	    	    	    	i.setSender(sender);
+   	    	    	    	i.setTask(task);
+   	    	    	    	i.setDetails(comments);
+   	    	    	    	i.setStatus(status);
+   	    	    	    inboxList.add(i);
+   	    }
+    	   return inboxList;
+    }
     private boolean checkAmount(String amount, String amount2) {
 		BigDecimal a=new BigDecimal(amount);
 		BigDecimal b=new BigDecimal(amount2);
@@ -506,4 +613,14 @@ public class BillRegisterSearchAction extends BaseFormAction {
 	public void setPartyName(String partyName) {
 		this.partyName = partyName;
 	}
+
+	public String getBillregisterid() {
+		return billregisterid;
+	}
+
+	public void setBillregisterid(String billregisterid) {
+		this.billregisterid = billregisterid;
+	}
+	
+	
 }

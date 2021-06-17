@@ -1,56 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  ~    eGov  SmartCity eGovernance suite aims to improve the internal efficiency,transparency,
-  ~    accountability and the service delivery of the government  organizations.
-  ~
-  ~     Copyright (C) 2017  eGovernments Foundation
-  ~
-  ~     The updated version of eGov suite of products as by eGovernments Foundation
-  ~     is available at http://www.egovernments.org
-  ~
-  ~     This program is free software: you can redistribute it and/or modify
-  ~     it under the terms of the GNU General Public License as published by
-  ~     the Free Software Foundation, either version 3 of the License, or
-  ~     any later version.
-  ~
-  ~     This program is distributed in the hope that it will be useful,
-  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  ~     GNU General Public License for more details.
-  ~
-  ~     You should have received a copy of the GNU General Public License
-  ~     along with this program. If not, see http://www.gnu.org/licenses/ or
-  ~     http://www.gnu.org/licenses/gpl.html .
-  ~
-  ~     In addition to the terms of the GPL license to be adhered to in using this
-  ~     program, the following additional terms are to be complied with:
-  ~
-  ~         1) All versions of this program, verbatim or modified must carry this
-  ~            Legal Notice.
-  ~            Further, all user interfaces, including but not limited to citizen facing interfaces,
-  ~            Urban Local Bodies interfaces, dashboards, mobile applications, of the program and any
-  ~            derived works should carry eGovernments Foundation logo on the top right corner.
-  ~
-  ~            For the logo, please refer http://egovernments.org/html/logo/egov_logo.png.
-  ~            For any further queries on attribution, including queries on brand guidelines,
-  ~            please contact contact@egovernments.org
-  ~
-  ~         2) Any misrepresentation of the origin of the material is prohibited. It
-  ~            is required that all modified versions of this material be marked in
-  ~            reasonable ways as different from the original version.
-  ~
-  ~         3) This license does not grant any rights to any user of the program
-  ~            with regards to rights under trademark law for use of the trade names
-  ~            or trademarks of eGovernments Foundation.
-  ~
-  ~   In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
-  ~
-  -->
-<!-- Created with Jaspersoft Studio version 6.2.0.final using JasperReports Library version 6.2.0  -->
-<!-- 2016-08-25T11:04:19 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="bankAdviceReport" printOrder="Horizontal" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="752" leftMargin="72" rightMargin="18" topMargin="18" bottomMargin="18" isFloatColumnFooter="true" uuid="e977129d-8063-4dc8-acc3-8e8fecf2dd1e">
-	<property name="ireport.zoom" value="1.0"/>
-	<property name="ireport.x" value="0"/>
+	<property name="ireport.zoom" value="1.3310000000000004"/>
+	<property name="ireport.x" value="46"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="bankName" class="java.lang.String"/>
 	<parameter name="branchName" class="java.lang.String"/>
@@ -59,6 +10,10 @@
 	<parameter name="chequeDate" class="java.lang.String"/>
 	<parameter name="letterContext" class="java.lang.String"/>
 	<parameter name="totalAmount" class="java.math.BigDecimal"/>
+	<parameter name="ulbName" class="java.lang.String"/>
+	<parameter name="rtgsRefNo" class="java.lang.String"/>
+	<parameter name="amtInWords" class="java.lang.String"/>
+	<parameter name="firstSignatory" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[]]>
 	</queryString>
@@ -68,73 +23,67 @@
 	<field name="ifscCode" class="java.lang.String"/>
 	<field name="bank" class="java.lang.String"/>
 	<title>
-		<band height="244" splitType="Stretch">
+		<band height="246" splitType="Stretch">
 			<staticText>
-				<reportElement x="0" y="0" width="476" height="91" uuid="55231097-300b-4426-963a-1fe9b036b03b"/>
-				<textElement>
-					<font size="11"/>
-				</textElement>
-				<text><![CDATA[From
-
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="554" y="0" width="198" height="32" uuid="5fadac95-5bd1-4189-9b19-b241adf70f50"/>
+				<reportElement x="0" y="42" width="198" height="32" uuid="5fadac95-5bd1-4189-9b19-b241adf70f50"/>
 				<textElement>
 					<font size="11"/>
 				</textElement>
 				<text><![CDATA[To
-The Manager,
+       The Bank Manager,
 ]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="554" y="32" width="198" height="17" uuid="284bd69b-eb27-4460-bfa3-8ac393d8f3d5"/>
+				<reportElement x="25" y="74" width="222" height="17" uuid="284bd69b-eb27-4460-bfa3-8ac393d8f3d5"/>
 				<textFieldExpression><![CDATA[$P{bankName}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="554" y="49" width="198" height="21" uuid="4ef74e37-30d1-4dc5-99fc-6749540dd79a"/>
+				<reportElement x="25" y="91" width="222" height="21" uuid="4ef74e37-30d1-4dc5-99fc-6749540dd79a"/>
 				<textFieldExpression><![CDATA[$P{branchName}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="0" y="154" width="752" height="31" uuid="9b690481-23e2-402d-8d1b-6005426435cb"/>
+				<reportElement x="0" y="148" width="752" height="31" uuid="9b690481-23e2-402d-8d1b-6005426435cb"/>
 				<text><![CDATA[Sir,
-            SUB:   Transfer of amount through RTGS - Requested – Regarding.
+            SUB:   Transfer of amount through RTGS
 ]]></text>
 			</staticText>
-			<textField>
-				<reportElement x="0" y="127" width="435" height="27" uuid="9fd252ac-6668-437d-a6b7-d66ae1511cda"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$P{chequeNumber}]]></textFieldExpression>
-			</textField>
 			<staticText>
-				<reportElement x="520" y="127" width="85" height="27" uuid="823ad213-e4cb-4661-b404-bc18dcdec7a8"/>
+				<reportElement x="520" y="117" width="85" height="20" uuid="823ad213-e4cb-4661-b404-bc18dcdec7a8"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle"/>
 				<text><![CDATA[Dated:]]></text>
 			</staticText>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" x="0" y="185" width="752" height="41" uuid="c6427eb5-71f3-426b-bfc4-65ad65c9e907"/>
+				<reportElement stretchType="RelativeToTallestObject" x="37" y="179" width="715" height="49" uuid="c6427eb5-71f3-426b-bfc4-65ad65c9e907"/>
 				<textElement textAlignment="Justified" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$P{letterContext}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="605" y="127" width="146" height="27" uuid="881a8b92-90ec-41ff-af26-e3b687f15015"/>
+				<reportElement x="605" y="117" width="146" height="20" uuid="881a8b92-90ec-41ff-af26-e3b687f15015"/>
 				<box leftPadding="2"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$P{chequeDate}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="0" y="226" width="751" height="18" uuid="4c9e5cfa-4daa-4e18-98d6-a02b6ee2f804"/>
+				<reportElement x="1" y="228" width="751" height="18" uuid="4c9e5cfa-4daa-4e18-98d6-a02b6ee2f804"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font pdfFontName="Helvetica-Bold"/>
 				</textElement>
 				<text><![CDATA[*****]]></text>
 			</staticText>
-			<staticText>
-				<reportElement x="0" y="91" width="751" height="36" uuid="7dd4f65b-e4be-4bb1-9797-4d7af1500512"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<text><![CDATA[File No. : ]]></text>
-			</staticText>
+			<textField>
+				<reportElement x="0" y="5" width="752" height="37" uuid="cd08d692-5446-4571-a9b5-314966ba10f3"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{ulbName}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement positionType="Float" x="27" y="117" width="220" height="20" uuid="1e4e0703-9a0a-4ddd-83ab-3f9b9da628e8"/>
+				<textElement>
+					<font size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA["RTGS Ref. No: "+$P{rtgsRefNo}]]></textFieldExpression>
+			</textField>
 		</band>
 	</title>
 	<pageHeader>
@@ -357,14 +306,7 @@ The Manager,
 		</band>
 	</pageFooter>
 	<summary>
-		<band height="118">
-			<staticText>
-				<reportElement x="605" y="103" width="146" height="15" uuid="d6a1fe81-653c-46ff-8d0d-90450d03721e"/>
-				<textElement textAlignment="Right" verticalAlignment="Bottom">
-					<font isBold="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
-				</textElement>
-				<text><![CDATA[For Financial Adviser]]></text>
-			</staticText>
+		<band height="151">
 			<staticText>
 				<reportElement positionType="Float" x="0" y="2" width="532" height="24" uuid="6119aaa1-1b13-4395-aded-99cbbe990fa5"/>
 				<box rightPadding="3">
@@ -390,6 +332,27 @@ The Manager,
 				</box>
 				<textElement textAlignment="Right" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$P{totalAmount}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="1" y="26" width="701" height="31" uuid="28e6ae70-c032-45bb-87fa-279bbe7c61be"/>
+				<textElement textAlignment="Right">
+					<font size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{amtInWords}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="422" y="99" width="318" height="20" uuid="221b2803-73c0-4482-969d-cf34b4544c45"/>
+				<textElement textAlignment="Right">
+					<font size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{firstSignatory}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="422" y="122" width="318" height="29" uuid="cb25b0af-00af-44ac-8836-fc91fa15aa91"/>
+				<textElement textAlignment="Right">
+					<font size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{ulbName}]]></textFieldExpression>
 			</textField>
 		</band>
 	</summary>

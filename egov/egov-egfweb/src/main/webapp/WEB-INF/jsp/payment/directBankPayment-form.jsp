@@ -176,8 +176,8 @@
 	<td class="greybox"><s:select name="backlogEntry" headerKey="-1"
 			headerValue="Select" value="%{backlogEntry}"
 			list="#{'Y':'Yes' ,'N':'No'}" id="backlogEntry" /></td>
-	<td class="greybox"></td>
-	<td class="greybox"></td>
+	<td class="bluebox">File No</td>
+	<td class="bluebox"><s:textfield name="fileNo" id="fileNo" value="%{fileNo}"/></td>
 </tr>
 </table>
 <div id="budgetSearchGrid">

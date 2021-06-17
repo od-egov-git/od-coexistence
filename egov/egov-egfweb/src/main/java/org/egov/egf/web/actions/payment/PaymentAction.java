@@ -108,6 +108,7 @@ import org.egov.model.payment.PaymentBean;
 import org.egov.model.payment.Paymentheader;
 import org.egov.model.voucher.WorkflowBean;
 import org.egov.payment.services.PaymentActionHelper;
+import org.egov.services.bills.EgBillRegisterService;
 import org.egov.services.payment.PaymentService;
 import org.egov.services.voucher.VoucherService;
 import org.egov.utils.Constants;
@@ -240,9 +241,17 @@ public class PaymentAction extends BasePaymentAction {
     private String backlogEntry="N";//modified by abhishek on 09042021
  	List<HashMap<String, Object>> workflowHistory =new ArrayList<HashMap<String, Object>>(); 
  	private String paymentChequeNo;
+ 	private String billregisterhistory;
    
     @Autowired
     private FinancialUtils financialUtils;
+    
+   
+    @Autowired
+    EgBillRegisterService egBillRegisterService;;
+    
+ 
+    
     
     public PaymentAction() {
     	
@@ -588,9 +597,10 @@ public class PaymentAction extends BasePaymentAction {
                                                                                                    // expense
                                                                                                    // bills
             final EgwStatus egwStatus2 = egwStatusHibernateDAO.getStatusByModuleAndCode("EXPENSEBILL", "Bill Payment Approved"); // for 481
-            final String cBillSql = cBillmainquery + " and bill.status in ("+egwStatus.getId()+","+egwStatus2.getId()+") " + sql.toString()
+            final EgwStatus egwStatus3 = egwStatusHibernateDAO.getStatusByModuleAndCode("EXPENSEBILL", "Voucher Approved"); // for 481
+            final String cBillSql = cBillmainquery + " and bill.status in ("+egwStatus.getId()+","+egwStatus2.getId()+","+egwStatus3.getId()+") " + sql.toString()
                     + " order by bill.billdate desc";
-            final String cBillSql1 = cBillmainquery1 + " and bill.status in ("+egwStatus.getId()+","+egwStatus2.getId()+") " + sql.toString()
+            final String cBillSql1 = cBillmainquery1 + " and bill.status in ("+egwStatus.getId()+","+egwStatus2.getId()+","+egwStatus3.getId()+") " + sql.toString()
                     + " order by bill.billdate desc";
             try
             {
@@ -1139,7 +1149,11 @@ public class PaymentAction extends BasePaymentAction {
                 if (FinancialConstants.BUTTONFORWARD.equalsIgnoreCase(workflowBean.getWorkFlowAction()))
                     addActionMessage(
                             getMessage("payment.voucher.approved", new String[] { approverName }));
-
+                EgBillregister expenseBill = null; 
+  			  expenseBill=egBillRegisterService.getBillsById(billregister.getId());
+  			 
+  			  expenseBill.setStatus(egwStatusHibernateDAO.getStatusByModuleAndCode("EXPENSEBILL" ,"Bill Payment Created"));
+  			  egBillRegisterService.update(expenseBill);
             }
 
         } catch (final ValidationException e) {
@@ -1187,6 +1201,8 @@ public class PaymentAction extends BasePaymentAction {
         if (paymentheader.getId() == null)
             paymentheader = getPayment();
         
+        
+       
         LOGGER.info("StartingupdatePayment...before populate workflowbean");
         populateWorkflowBean();
         billList = paymentService.getMiscBillListForPaymentHeader(paymentheader);
@@ -1265,12 +1281,25 @@ public class PaymentAction extends BasePaymentAction {
             addActionMessage(getText("payment.voucher.rejected", new String[] {this.getEmployeeName(paymentheader.getState()
                     .getInitiatorPosition())}));
         if (FinancialConstants.BUTTONFORWARD.equalsIgnoreCase(workflowBean.getWorkFlowAction()))
-            addActionMessage(getMessage("payment.voucher.approved", new String[] {this.getEmployeeName(paymentheader.getState()
+            {
+        	addActionMessage(getMessage("payment.voucher.approved", new String[] {this.getEmployeeName(paymentheader.getState()
             		.getOwnerPosition()) }));
+        	EgBillregister expenseBill = null; 
+			  expenseBill=egBillRegisterService.getBillsById(billregister.getId());
+			 
+			  expenseBill.setStatus(egwStatusHibernateDAO.getStatusByModuleAndCode("EXPENSEBILL" ,"Bill Payment Created"));
+			  egBillRegisterService.update(expenseBill);
+        }
         if (FinancialConstants.BUTTONCANCEL.equalsIgnoreCase(workflowBean.getWorkFlowAction()))
             addActionMessage(getText("payment.voucher.cancelled"));
-        else if (FinancialConstants.BUTTONAPPROVE.equalsIgnoreCase(workflowBean.getWorkFlowAction()))
+        else if (FinancialConstants.BUTTONAPPROVE.equalsIgnoreCase(workflowBean.getWorkFlowAction())) {
             addActionMessage(getMessage("payment.voucher.final.approval"));
+			  EgBillregister expenseBill = null; 
+			  expenseBill=egBillRegisterService.getBillsById(billregister.getId());
+			 
+			  expenseBill.setStatus(egwStatusHibernateDAO.getStatusByModuleAndCode("EXPENSEBILL" ,"Bill Payment Approved"));
+			  egBillRegisterService.update(expenseBill);
+        }
         if (Constants.ADVANCE_PAYMENT.equalsIgnoreCase(paymentheader.getVoucherheader().getName())) {
             advanceRequisitionList.addAll(paymentActionHelper.getAdvanceRequisitionDetails(paymentheader));
             return "advancePaymentView";
@@ -1310,6 +1339,15 @@ public class PaymentAction extends BasePaymentAction {
         
         paymentheader = getPayment();
         workflowHistory.addAll(financialUtils.getWorkflowHistory(paymentheader.getState(), paymentheader.getStateHistory()));
+			
+			/*
+			 * EgBillregister expenseBill = null;
+			 * expenseBill=egBillRegisterService.getBillsById(billregister.getId());
+			 * 
+			 * expenseBill.setStatus(egwStatusHibernateDAO.getStatusByModuleAndCode(
+			 * "EXPENSEBILL" ,"Bill Payment Approved"));
+			 * egBillRegisterService.update(expenseBill);
+			 */
         }
         catch(Exception e)
         {
@@ -1813,7 +1851,10 @@ public class PaymentAction extends BasePaymentAction {
             LOGGER.debug("Completed updateAdvancePayment.");
         return "advancePaymentView";
     }
-
+    
+    
+    
+    
     private void validateAdvancePayment() throws ValidationException, ApplicationException, ParseException {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Starting validateAdvancePayment...");

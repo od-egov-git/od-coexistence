@@ -54,6 +54,41 @@
 <head>
 <title><s:text name="bill.search.heading"></s:text></title>
 </head>
+<script>
+/* $("#billresult").on('click', 'tbody tr td i.inbox-history', function (e) {
+    $('.history-inbox').modal('show');
+    historyTableContainer = $("#historyDetailTable");
+    historyTableContainer.DataTable({
+        "sDom": "<'row'<'col-xs-12 hidden col-right'f>r>t<'row buttons-margin'<'col-md-6 col-xs-12'i>" +
+        "<'col-md-3 col-xs-6'l><'col-md-3 col-xs-6 text-right'p>>",
+        //"aLengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+        "autoWidth": false,
+        "paging": false,
+        "destroy": true,
+        "aaSorting": [],
+        "oLanguage": {
+            "sInfo": ""
+        },
+        "ajax": {
+            "url": "inbox/history?stateId=" + tableContainer1.dataTable().fnGetData($(this).parent().parent(), 7),
+            "dataSrc": ""
+        },
+        "columns": [
+            {"data": "date", "width": "20%"},
+            {"data": "sender", "width": "15%"},
+            {"data": "task", "width": "20%"},
+            {"data": "status", "width": "20%"},
+            {"data": "details", "width": "20%"},
+            {"data": "id", "visible": false, "searchable": false},
+            {"data": "link", "visible": false, "searchable": false}
+
+        ]
+    });
+
+    e.stopPropagation();
+}); */
+
+</script>
 <body onload="changeMandatoryField()">
 	<s:form name="billRegisterForm" action="billRegisterSearch"
 		theme="simple">
@@ -120,7 +155,7 @@
 		<s:if test="%{billList.size!=0 || billList!=null}">
 			<div id="listid" style="display: block">
 				<table width="100%" align="center" cellpadding="0" cellspacing="0"
-					class="setborder" style="border-collapse: inherit;">
+					class="setborder" style="border-collapse: inherit;" id="billresult">
 					<tr>
 						<th class="bluebgheadtd"><s:text name="lbl.sr.no"/>.</th>
 						<th class="bluebgheadtd"><s:text name="lbl.expenditure.type"/></th>
@@ -131,6 +166,7 @@
 						<th class="bluebgheadtd"><s:text name="lbl.passed.amount"/></th>
 						<th class="bluebgheadtd"><s:text name="lbl.bill.status"/></th>
 						<th class="bluebgheadtd"><s:text name="lbl.pending.with"/></th>
+						<!-- <th class="bluebgheadtd">History</th> -->
 					</tr>
 
 					<s:iterator var="p" value="billList" status="s">
@@ -168,11 +204,47 @@
 							<td style="text-align: center"
 								class="text-center bluebox setborder "><s:property
 									value="%{ownerName}" /></td>
+							<%-- <td>			
+                			<button type="button" class="btn" value="<s:property
+									value="%{billid}" />" onclick="getdata(this);"><i class="fa fa-history inbox-history history-size" class="tooltip-secondary" data-toggle="tooltip" title="History"></i>
+                			</button>
+           						</td> --%>
 						</tr>
 					</s:iterator>
 				</table>
 			</div>
 		</s:if>
+<div class="modal fade history-inbox" id="mymodal">
+    <div class="modal-dialog history">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true" id="close_top">&times;</button>
+                <h4 class="modal-title" align="center">Task History</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <table id="historyDetailTable" class="table table-bordered datatable dataTable no-footer">
+                            <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Sender</th>
+                                <th>Nature Of Task</th>
+                                <th>Status</th>
+                                <th>Comments</th>
+                            </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" id="close_btm">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
 		<div id="msgdiv" style="display: none">
 			<table align="center" class="tablebottom" width="80%">
 				<tr>
@@ -190,6 +262,55 @@
 
 	</s:form>
 	<script>
+	
+	
+	
+	jQuery("#close_btm,#close_top").on("click",function(){
+		jQuery("#historyDetailTable tbody").empty();
+	});
+	function getdata(obj){
+		jQuery('#mymodal').modal('show');
+		console.log(obj);
+		var billid= obj.value;
+		jQuery("#historyDetailTable tbody").empty();
+		var url="${pageContext.request.contextPath}/bill/billregisterhistory.action?billregisterid="+billid;
+		if(null!=billid){
+			
+			jQuery.get( url, function( data ) {
+						var mydata  =  data[0];
+						console.log("mydata: "+mydata);
+						console.log("data: "+data);
+						for(var i =0;i<=data.length;i++){
+						
+							data = data[i];
+							console.log("data[i] "+data);
+							if(null!=data || data!=""){
+								jQuery("#historyDetailTable tbody").append('<tr>'+'<td>'+data.date+'</td>'
+										+'<td>'+data.sender+'</td>'
+										+'<td>'+data.task+'</td>'
+										+'<td>'+data.status+'</td>'
+										+'<td>'+data.details+'</td>'
+										+'</tr>');
+							}
+								
+								//});
+						}
+						
+						
+					
+						
+						jQuery('#mymodal').modal('show');
+						jQuery('#mymodal').show();
+						//document.getElementById("history-inbox").style.display="none";
+				});
+			
+			
+		}
+		
+	}
+	
+	
+	
 	 function validateFormAndSubmit(){
 		 var amount=document.getElementById('amount').value;
 		 var party=document.getElementById('partyName').value;

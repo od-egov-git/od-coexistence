@@ -112,5 +112,13 @@ public class EgwStatusHibernateDAO {
     public EgwStatus findById(final Integer integer, final boolean b) {
         return (EgwStatus) getCurrentSession().get(EgwStatus.class, integer);
     }
+    
+    
+    public EgwStatus getEgwStatusByCodeAndModuleType(String moduleType,String code) {
+        Query qry = this.getCurrentSession().createQuery("from EgwStatus S where S.code =:code and S.moduletype=:moduleType ");
+        qry.setString("code", code);
+        qry.setString("moduleType", moduleType);
+        return (EgwStatus) qry.uniqueResult();
+    }
 
 }

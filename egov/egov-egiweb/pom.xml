@@ -67,7 +67,13 @@
             <artifactId>egov-egi</artifactId>
             <version>3.0.0-COE-SNAPSHOT</version>
         </dependency>
+        
+        
+       
 
+       
+     
+       
         <dependency>
             <groupId>org.egov</groupId>
             <artifactId>egov-config</artifactId>

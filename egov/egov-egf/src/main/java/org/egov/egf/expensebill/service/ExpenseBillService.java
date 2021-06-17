@@ -229,6 +229,7 @@ public class ExpenseBillService {
         else
             egBillregister.getEgBillregistermis().setSubScheme(null);
 
+        System.out.println("in service fileno "+egBillregister.getFileno());
         if (isBillNumberGenerationAuto())
             egBillregister.setBillnumber(getNextBillNumber(egBillregister));
 
@@ -274,7 +275,7 @@ public class ExpenseBillService {
             savedEgBillregister.getEgBillregistermis().setSourcePath(
                     "/services/EGF/expensebill/view/" + savedEgBillregister.getId().toString());
 
-
+        System.out.println(savedEgBillregister.getFileno());
         EgBillregister egbillReg = expenseBillRepository.save(savedEgBillregister);
         System.out.println("id before:-"+egbillReg.getId());
         

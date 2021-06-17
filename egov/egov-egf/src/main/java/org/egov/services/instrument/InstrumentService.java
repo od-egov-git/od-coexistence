@@ -983,6 +983,21 @@ public class InstrumentService {
             return false;
         return true;
     }
+   
+   
+   
+   
+   public boolean isRefrenceNumberUnique(final String chequeNumber) {
+       final InstrumentType instrumentType = getInstrumentTypeByType("cheque");
+       List<InstrumentHeader> list = new ArrayList<InstrumentHeader>();
+      
+           list = instrumentHeaderService
+                   .findAllBy(
+                           "from InstrumentHeader where transactionNumber=? ",chequeNumber);
+       if (list != null && list.size() > 0)
+           return false;
+       return true;
+   }
 
    public  boolean isRtgsNumberUnique(final String chequeNumber,
             final Long bankAccountId) {

@@ -173,7 +173,7 @@
 			<td width="10%" class="<c:out value='${tdclass}' />"><s:text name="voucher.narration"/> :
 				&nbsp;</td>
 			<td colspan="3" class="<c:out value='${tdclass}' />">
-				<s:textfield name="narration" value="%{getMasterName('narration')}" /> 
+				<s:textarea name="narration" value="%{getMasterName('narration')}" /> 
 			</td>
 			<c:choose>
 				<c:when test="${tdclass == 'bluebox'}">
@@ -207,6 +207,11 @@
 												value="%{backlogEntry}"
 												list="#{'N':'No','Y':'Yes'}"
 												id="backlogEntry" /></td>
+			<td width="10%" class="<c:out value='${tdclass}' />"><s:text name="File No"/> :
+				&nbsp;</td>
+			<td colspan="3" class="<c:out value='${tdclass}' />">
+				<s:textfield name="fileno" value="%{getMasterName('fileno')}" readonly="true"/> 
+			</td>
 		</tr>
 	</table>
 </div>

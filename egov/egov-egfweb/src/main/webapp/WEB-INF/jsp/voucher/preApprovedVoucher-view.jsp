@@ -292,7 +292,7 @@
 			</s:if>	
 			
 		</div>
-		
+		<s:hidden id="billid" name="billid" value="%{egBillregister.id}" />
 		<s:hidden id="vhid" name="vhid" value="%{voucherHeader.id}" />
 		<s:hidden id="id" name="id" value="%{voucherHeader.id}" />
 		<s:hidden id="contraId" name="contraId" value="%{contraVoucher.id}" />

@@ -335,6 +335,86 @@ public class FinancialUtils {
         }
         return historyTable;
     }
+    
+    
+    
+    
+    public List<HashMap<String, Object>> getBillRegisterHistory(final State state, final List<StateHistory> history) {
+        User user = null;
+        EmployeeInfo ownerobj = null;
+        final List<HashMap<String, Object>> historyTable = new ArrayList<>();
+        final HashMap<String, Object> map = new HashMap<>(0);
+        if (null != state) {
+            if (!history.isEmpty() && history != null)
+                Collections.reverse(history);
+            for (final StateHistory stateHistory : history) {
+                final HashMap<String, Object> workflowHistory = new HashMap<>(0);
+                workflowHistory.put("date", stateHistory.getDateInfo());
+                workflowHistory.put("comments", stateHistory.getComments());
+                workflowHistory.put("updatedBy", this.microServiceUtil.getEmployeeByPositionId(stateHistory.getLastModifiedBy()));
+                workflowHistory.put("status", stateHistory.getValue());
+                workflowHistory.put("task", stateHistory.getNatureOfTask());
+                workflowHistory.put("sender", stateHistory.getSenderName());
+                final Long owner = stateHistory.getOwnerPosition();
+                final State _sowner = stateHistory.getState();
+               ownerobj=    this.microServiceUtil.getEmployeeByPositionId(owner);
+                // user = stateHistory.getOwnerUser();
+                if (null != ownerobj) {
+//                    workflowHistory.put("user", user.getUsername() + "::" + user.getName());
+                    workflowHistory.put("user",ownerobj.getUser().getUserName()+"::"+ownerobj.getUser().getName());
+                    Department department=   this.microServiceUtil.getDepartmentByCode(ownerobj.getAssignments().get(0).getDepartment());
+                    if(null != department)
+                        workflowHistory.put("department", department.getName());
+//                    workflowHistory.put("department",
+//                            null != eisCommonService.getDepartmentForUser(user.getId()) ? eisCommonService
+//                                    .getDepartmentForUser(user.getId()).getName() : "");
+                } else if (null != _sowner && null != _sowner.getDeptName()) {
+                    user = eisCommonService.getUserForPosition(owner, new Date());
+                    workflowHistory
+                            .put("user", null != user.getUsername() ? user.getUsername() + "::" + user.getName() : "");
+                    workflowHistory.put("department", null != _sowner.getDeptName() ? _sowner.getDeptName() : "");
+                }
+                historyTable.add(workflowHistory);
+            }
+            map.put("date", state.getDateInfo());
+            map.put("comments", state.getComments() != null ? state.getComments() : "");
+            map.put("updatedBy", this.microServiceUtil.getEmployeeByPositionId(state.getLastModifiedBy()));
+            map.put("status", state.getValue());
+            map.put("task", state.getNatureOfTask());
+            map.put("sender", state.getOwnerName());
+            final Long ownerPosition = state.getOwnerPosition();
+            // user = state.getOwnerUser();
+            ownerobj=    this.microServiceUtil.getEmployeeByPositionId(ownerPosition);
+            
+//            if (null != user) {
+            if(null != ownerobj){
+                map.put("user", ownerobj.getUser().getUserName() + "::" + ownerobj.getUser().getName());
+              Department department=   this.microServiceUtil.getDepartmentByCode(ownerobj.getAssignments().get(0).getDepartment());
+              if(null != department)
+                  map.put("department", department.getName());
+              //                map.put("department", null != eisCommonService.getDepartmentForUser(user.getId()) ? eisCommonService
+//                        .getDepartmentForUser(user.getId()).getName() : "");
+            } else if (null != ownerPosition && null != state.getDeptName()) {
+                user = eisCommonService.getUserForPosition(ownerPosition, new Date());
+                map.put("user", null != user.getUsername() ? user.getUsername() + "::" + user.getName() : "");
+                map.put("department", null != state.getDeptName() ? state.getDeptName() : "");
+            }
+            historyTable.add(map);
+            Collections.sort(historyTable, new Comparator<Map<String, Object>> () {
+
+                public int compare(Map<String, Object> mapObject1, Map<String, Object> mapObject2) {
+
+                    return ((java.sql.Timestamp) mapObject1.get("date")).compareTo((java.sql.Timestamp) mapObject2.get("date")); //ascending order
+
+                    //return ((java.sql.Timestamp) mapObject1.get("num")).compareTo((java.sql.Timestamp) mapObject1.get("num")); //descending order
+
+                }
+
+            });
+        }
+        return historyTable;
+    }
+    
     public List<HashMap<String, Object>> getWorkflowHistory(final State state, final List<StateHistory> history) {
         org.egov.infra.microservice.models.User user = null;
         EmployeeInfo ownerobj = null;

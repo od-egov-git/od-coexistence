@@ -1325,6 +1325,19 @@ public class CommonAction extends BaseFormAction {
             LOGGER.debug("Completed ajaxValidateChequeNumber.");
         return "result";
     }
+    
+    
+    @Action(value = "/voucher/common-ajaxValidateReferenceNumber")
+    public String ajaxValidateReferenceNumber() {
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Starting ajaxValidateChequeNumber...");
+        final String index = parameters.get("index")[0];
+        value = instrumentService.isRefrenceNumberUnique(chequeNumber) == true ? index
+                + "~true" : index + "~false";
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Completed ajaxValidateChequeNumber.");
+        return "result";
+    }
 
     public String ajaxValidateRtgsNumber() {
         if (LOGGER.isDebugEnabled())

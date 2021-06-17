@@ -188,8 +188,17 @@ public class DirectBankPaymentAction extends BasePaymentAction {
     private String firstsignatory="-1";
     private String secondsignatory="-1";
     private String backlogEntry="";
+    private String fileNo="";
     
-    private String paymentChequeNo=null;
+    public String getFileNo() {
+		return fileNo;
+	}
+
+	public void setFileNo(String fileNo) {
+		this.fileNo = fileNo;
+	}
+
+	private String paymentChequeNo=null;
 
     public BigDecimal getBalance() {
         return balance;
@@ -320,6 +329,8 @@ public class DirectBankPaymentAction extends BasePaymentAction {
                 voucherHeader.setId(null);
                 populateWorkflowBean();
                 voucherHeader.setBackdateentry(backlogEntry);
+                voucherHeader.setFileNo(fileNo);
+                paymentheader.setFileNo(fileNo);
                 paymentheader = paymentActionHelper.createDirectBankPayment(paymentheader, voucherHeader, billVhId,
                         commonBean, billDetailslist, subLedgerlist, workflowBean,firstsignatory,secondsignatory);
                 showMode = "create";
@@ -625,7 +636,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
         commonBean.setAmount(paymentheader.getPaymentAmount());
         commonBean.setAccountNumberId(paymentheader.getBankaccount().getId().toString());
         commonBean.setAccnumnar(paymentheader.getBankaccount().getNarration());
-        
+        commonBean.setFileNo(voucherHeader.getFileNo());
 		commonBean.setPaymentChequeNo(paymentheader.getPaymentChequeNo());
         paymentChequeNo = paymentheader.getPaymentChequeNo();
         LOGGER.info("paymentheader.getPaymentAmount()  ::"+paymentheader.getPaymentAmount());

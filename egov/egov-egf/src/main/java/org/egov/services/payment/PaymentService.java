@@ -3012,6 +3012,8 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
         
         System.out.println("Executing TYPE ::::"+type);
         System.out.println("Executing paymenCno:::"+paymentChequeNo);
+        System.out.println("fileNo voucher "+voucherHeader.getFileNo());
+        paymentheader.setFileNo(voucherHeader.getFileNo());
         if(null!=paymentChequeNo) {
         		System.out.println("Executing paymenCno IF :::"+paymentChequeNo);
         		paymentheader.setPaymentChequeNo(paymentChequeNo);

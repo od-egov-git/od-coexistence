@@ -112,6 +112,8 @@ public class InboxRenderServiceDelegate<T extends StateAware> {
 
     @Autowired
     private StateService stateService;
+    
+   
 
 //    @Autowired
 //    @Qualifier("eisService")
@@ -125,6 +127,9 @@ public class InboxRenderServiceDelegate<T extends StateAware> {
 
     @Autowired
     private MicroserviceUtils microserviceUtils;
+    
+   // @Autowired
+   // private EgBilldetailsHibernateDAO efdfd;
 
     @ReadOnly
     public List<Inbox> getCurrentUserInboxItems() {
@@ -316,4 +321,9 @@ public class InboxRenderServiceDelegate<T extends StateAware> {
 //                .map(OwnerGroup::getId)
 //                .collect(Collectors.toList());
     }
+    
+    List<Inbox> getHistoryForBillRegister(Long billid){
+    	return null;
+    }
+    
 }

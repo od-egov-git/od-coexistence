@@ -99,7 +99,7 @@
 		<form:textarea path="narration" cols="35" cssClass="form-control textfieldsvalidate" id="narration" maxlength = "250" />
 		<form:errors path="narration" cssClass="add-margin error-msg" />
 	</div>
-	<label class="col-sm-2 control-label text-right" for="mobileNumber"> <spring:message code="lbl.mobile" text="Mobile Number"/><span class="mandatory"></span> 
+	<label class="col-sm-2 control-label text-right" for="mobileNumber"> <spring:message code="lbl.mobile" text="Mobile Number"/> 
 	</label>
 	<div class="col-sm-3 add-margin">
 		<form:input path="mobileNumber" id="mobileNumber" maxlength="10" cssClass="form-control patternvalidation" data-pattern="number" required="required" />

@@ -58,7 +58,7 @@
 <title><s:property value="type" /> JV-Create</title>
 </head>
 <script>
- window.onload=function(){
+ function vdate(){
 	 var cDate = new Date();
 		var date=cDate.getDate();
 		if(date<10)
@@ -70,7 +70,6 @@
 		currDate=currDate+month;
 	    var year=cDate.getFullYear();
 		currDate=currDate+"/"+year;
-		
 	document.getElementById('voucherDate').value=currDate;
 	
 }
@@ -92,8 +91,7 @@
 		}else{
 			document.getElementById('print').disabled=false;
 		}
-		if(document.getElementById('approverDepartment'))
-			document.getElementById('approverDepartment').value = "-1";
+		alert("2");
 	}
 	
 	function checkLength(obj){
@@ -202,7 +200,7 @@ function checkdate()
 		
 }
 </script>
-<body onload="checkBillIdBillview();documentdep();">
+<body onload="vdate();documentdep();">
 	<s:form action="preApprovedVoucher" theme="simple"
 		name="preApprovedVoucher" id="preApprovedVoucher">
 		<jsp:include page="../budget/budgetHeader.jsp">
@@ -226,7 +224,7 @@ function checkdate()
 					<div align="center">
 						<table border="0" width="100%" cellspacing="0">
 							<tr>
-								<td class="greybox" width="15%"><s:text name="voucher.date" /><span
+								<td class="greybox" width="14%"><s:text name="voucher.date" /><span
 									class="mandatory1">*</span></td>
 								<%-- <td class="greybox" width="25%">
 									<div name="daterow">

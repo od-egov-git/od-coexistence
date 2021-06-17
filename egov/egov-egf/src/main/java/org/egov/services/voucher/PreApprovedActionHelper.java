@@ -73,6 +73,7 @@ import org.egov.infstr.services.PersistenceService;
 import org.egov.model.bills.EgBillregister;
 import org.egov.model.bills.Miscbilldetail;
 import org.egov.model.voucher.WorkflowBean;
+import org.egov.services.bills.EgBillRegisterService;
 import org.egov.services.payment.MiscbilldetailService;
 import org.egov.utils.FinancialConstants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,6 +95,13 @@ public class PreApprovedActionHelper {
     @Autowired
     @Qualifier("createVoucher")
     private CreateVoucher createVoucher;
+    
+    
+    @Autowired
+    EgBillRegisterService egBillRegisterService;
+    
+    @Autowired
+    EgwStatusHibernateDAO egwStatusHibernateDAO;
 
 //    @Autowired
 //    PositionMasterService positionMasterService;
@@ -149,7 +157,10 @@ public class PreApprovedActionHelper {
     @Transactional
     public CVoucherHeader sendForApproval(CVoucherHeader voucherHeader, WorkflowBean workflowBean)
     {
+    	 
+         
     	EgBillregister expenseBill = null;
+    	expenseBill =  egBillRegisterService.getBillsByWorkBillNo(voucherHeader.getBillNumber());
         try {
 
             if (FinancialConstants.CREATEANDAPPROVE.equalsIgnoreCase(workflowBean.getWorkFlowAction())
@@ -174,6 +185,11 @@ public class PreApprovedActionHelper {
             	{
             		voucherHeader.setVoucherDate(currentDate);
             	}
+            	
+            	
+            	expenseBill.setStatus(egwStatusHibernateDAO.getEgwStatusByCodeAndModuleType("EXPENSEBILL" ,"Voucher Approved"));
+				
+				System.out.println(expenseBill.getStatus().getCode());
             }
             voucherService.persist(voucherHeader);
         } catch (final ValidationException e) {

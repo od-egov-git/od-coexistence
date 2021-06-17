@@ -105,21 +105,16 @@
 <head>
 
 <link rel="stylesheet"
-
 	href="/services/EGF/resources/css/tabber.css?rnd=${app_release_no}"
-
 	TYPE="text/css">
 
 <script type="text/javascript"
-
 	src="${pageContext.request.contextPath}/resources/javascript/voucherHelper.js?rnd=${app_release_no}"></script>
 
 <script type="text/javascript"
-
 	src="/services/EGF/resources/javascript/tabber.js?rnd=${app_release_no}"></script>
 
 <script type="text/javascript"
-
 	src="/services/EGF/resources/javascript/tabber2.js?rnd=${app_release_no}"></script>
 
 </head>
@@ -156,9 +151,12 @@
 
 			</span>
 
-			<div class="subheadnew"><s:text name="lbl.bill.payment"/> </div>
+			<div class="subheadnew">
+				<s:text name="lbl.bill.payment" />
+			</div>
 
-			<div id="budgetSearchGrid" style="display: block; width: 100%; margin-top:-25px">
+			<div id="budgetSearchGrid"
+				style="display: block; width: 100%; margin-top: -25px">
 
 				<table width="100%" cellpadding="0" cellspacing="0" border="0">
 
@@ -180,34 +178,33 @@
 
 												<div class="tabbertab">
 
-													<h3 style="margin-left:25px"><s:text name="payment.heading"/> </h3>
+													<h3 style="margin-left: 25px">
+														<s:text name="payment.heading" />
+													</h3>
 
 													<span>
 
 														<table width="100%" border="0" cellspacing="0"
-
 															cellpadding="0">
 
 															<tr>
 
 																<td colspan="6"><div class="subheadsmallnew"
-
-																		style="border: 0;"><s:text name="payment.heading"/></div></td>
+																		style="border: 0;">
+																		<s:text name="payment.heading" />
+																	</div></td>
 
 															</tr>
 
 															<tr>
 
 																<td width="9%" class="bluebox"><s:hidden
-
 																		name="billregister.id" /></td>
 
 																<s:if test="%{shouldShowHeaderField('fund')}">
 
 																	<td width="12%" class="bluebox"><strong><s:text
-
 																				name="voucher.fund" /></strong> <s:if
-
 																			test="%{isFieldMandatory('fund')}">
 
 																			<span class="bluebox"><span class="mandatory1">*</span></span>
@@ -215,25 +212,21 @@
 																		</s:if></td>
 
 																	<td width="20%" class="bluebox"><s:textfield
-
-																			value="%{billregister.egBillregistermis.fund.name}" readonly="true"/></td>
+																			value="%{billregister.egBillregistermis.fund.name}"
+																			readonly="true" /></td>
 
 																</s:if>
 
 																<s:else>
 
 																	<td class="greybox">
-
 																	<td class="greybox">
-
 																</s:else>
 
 																<s:if test="%{shouldShowHeaderField('fundsource')}">
 
 																	<td width="17%" class="bluebox"><strong><s:text
-
 																				name="voucher.fundsource" /></strong> <s:if
-
 																			test="%{isFieldMandatory('fundsource')}">
 
 																			<span class="bluebox"><span class="mandatory1">*</span></span>
@@ -241,17 +234,15 @@
 																		</s:if></td>
 
 																	<td width="33%" class="bluebox"><s:textfield
-
-																			value="%{billregister.egBillregistermis.fundsource.name}" readonly="true" /></td>
+																			value="%{billregister.egBillregistermis.fundsource.name}"
+																			readonly="true" /></td>
 
 																</s:if>
 
 																<s:else>
 
 																	<td class="greybox">
-
 																	<td class="greybox">
-
 																</s:else>
 
 															</tr>
@@ -263,9 +254,7 @@
 																<s:if test="%{shouldShowHeaderField('department')}">
 
 																	<td class="greybox"><strong><s:text
-
 																				name="voucher.department" /></strong> <s:if
-
 																			test="%{isFieldMandatory('department')}">
 
 																			<span class="bluebox"><span class="mandatory1">*</span></span>
@@ -273,14 +262,11 @@
 																		</s:if></td>
 
 																	<td class="greybox"><s:select name="department"
-
 																			id="department" list="dropdownData.departmentList"
-
 																			listKey="code" listValue="name" headerKey="-1"
-
 																			headerValue="%{getText('lbl.choose.options')}"
-
-																			value="%{billregister.egBillregistermis.departmentcode}" disabled="true"/></td>
+																			value="%{billregister.egBillregistermis.departmentcode}"
+																			disabled="true" /></td>
 
 																	<%-- <s:property
 
@@ -291,17 +277,13 @@
 																<s:else>
 
 																	<td class="greybox">
-
 																	<td class="greybox">
-
 																</s:else>
 
 																<s:if test="%{shouldShowHeaderField('functionary')}">
 
 																	<td class="greybox"><strong><s:text
-
 																				name="voucher.functionary" /></strong> <s:if
-
 																			test="%{isFieldMandatory('functionary')}">
 
 																			<span class="bluebox"><span class="mandatory1">*</span></span>
@@ -309,17 +291,15 @@
 																		</s:if></td>
 
 																	<td class="greybox" colspan="4"><s:textfield
-
-																			value="%{billregister.egBillregistermis.functionaryid.name}" readonly="true"  /></td>
+																			value="%{billregister.egBillregistermis.functionaryid.name}"
+																			readonly="true" /></td>
 
 																</s:if>
 
 																<s:else>
 
 																	<td class="greybox">
-
 																	<td class="greybox">
-
 																</s:else>
 
 															</tr>
@@ -331,9 +311,7 @@
 																<s:if test="%{shouldShowHeaderField('scheme')}">
 
 																	<td class="bluebox"><strong><s:text
-
 																				name="voucher.scheme" /></strong> <s:if
-
 																			test="%{isFieldMandatory('scheme')}">
 
 																			<span class="mandatory1">*</span>
@@ -341,25 +319,21 @@
 																		</s:if></td>
 
 																	<td class="bluebox"><s:textfield
-
-																			value="%{billregister.egBillregistermis.scheme.name}" readonly="true" /></td>
+																			value="%{billregister.egBillregistermis.scheme.name}"
+																			readonly="true" /></td>
 
 																</s:if>
 
 																<s:else>
 
 																	<td class="greybox">
-
 																	<td class="greybox">
-
 																</s:else>
 
 																<s:if test="%{shouldShowHeaderField('subscheme')}">
 
 																	<td class="bluebox"><strong><s:text
-
 																				name="voucher.subscheme" /></strong> <s:if
-
 																			test="%{isFieldMandatory('subscheme')}">
 
 																			<span class="mandatory1">*</span>
@@ -367,17 +341,15 @@
 																		</s:if></td>
 
 																	<td class="bluebox"><s:textfield
-
-																			value="%{billregister.egBillregistermis.subScheme.name}" readonly="true" /></td>
+																			value="%{billregister.egBillregistermis.subScheme.name}"
+																			readonly="true" /></td>
 
 																</s:if>
 
 																<s:else>
 
 																	<td class="greybox">
-
 																	<td class="greybox">
-
 																</s:else>
 
 															</tr>
@@ -389,9 +361,7 @@
 																<s:if test="%{shouldShowHeaderField('function')}">
 
 																	<td class="greybox"><strong><s:text
-
 																				name="voucher.function" /></strong> <s:if
-
 																			test="%{isFieldMandatory('function')}">
 
 																			<span class="mandatory1">*</span>
@@ -399,16 +369,11 @@
 																		</s:if></td>
 
 																	<td class="greybox"><s:select name="function"
-
 																			id="function" list="dropdownData.functionList"
-
 																			listKey="id" listValue="name" headerKey="-1"
-
 																			headerValue="%{getText('lbl.choose.options')}"
-
-																			value="%{billregister.egBillregistermis.function.id}" disabled="true" />
-
-																		<%--  <s:property
+																			value="%{billregister.egBillregistermis.function.id}"
+																			disabled="true" /> <%--  <s:property
 
 																		value="%{billregister.egBillregistermis.function.name}" /> --%></td>
 
@@ -417,9 +382,7 @@
 																<s:else>
 
 																	<td class="greybox">
-
 																	<td class="greybox">
-
 																</s:else>
 
 																<td class="greybox">&nbsp;</td>
@@ -427,9 +390,7 @@
 																<s:if test="%{shouldShowHeaderField('field')}">
 
 																	<td class="greybox"><strong><s:text
-
 																				name="voucher.field" /></strong> <s:if
-
 																			test="%{isFieldMandatory('field')}">
 
 																			<span class="mandatory1">*</span>
@@ -437,17 +398,15 @@
 																		</s:if></td>
 
 																	<td class="greybox" colspan="4"><s:textfield
-
-																			value="%{billregister.egBillregistermis.fieldid.name}" readonly="true"/></td>
+																			value="%{billregister.egBillregistermis.fieldid.name}"
+																			readonly="true" /></td>
 
 																</s:if>
 
 																<s:else>
 
 																	<td class="greybox">
-
 																	<td class="greybox">
-
 																</s:else>
 
 															</tr>
@@ -457,64 +416,51 @@
 																<td class="bluebox">&nbsp;</td>
 
 																<td class="bluebox"><strong><s:text
-
 																			name="payment.mode" /></strong></td>
 
 																<td class="bluebox"><s:if
-
 																		test="%{paymentMode == 'cash' || paymentMode == 'Cash'}">
 
 																		<s:text name="cash.consolidated.cheque" />
 
 																	</s:if> <s:else>
 
-																		<s:textfield name="paymentMode" id="paymentMode" value="%{paymentMode}" readonly="true"/>
+																		<s:textfield name="paymentMode" id="paymentMode"
+																			value="%{paymentMode}" readonly="true" />
 
 																	</s:else></td>
 
-				 
-
-				 
-
-				 
-
-				 
-
-				  
-
-				 
-
-																<td class="bluebox"><strong><s:text
-
++																<td class="bluebox"><strong><s:text
 																			name="payment.amount" /></strong></td>
 
-																<td class="bluebox" colspan="2"><s:textfield name="paymentAmountspan" id="paymentAmountspan" value="" readonly="true"/></td>
+																<td class="bluebox" colspan="2"><s:textfield
+																		name="paymentAmountspan" id="paymentAmountspan"
+																		value="" readonly="true" /></td>
 
 															</tr>
 
 															<!-- Bikash Updated Start -->
 
-															<s:if test="%{paymentMode == 'rtgs' || paymentMode == 'Rtgs'}">
+															<s:if
+																test="%{paymentMode == 'rtgs' || paymentMode == 'Rtgs'}">
 
-															<tr>
+																<tr>
 
-																<td class="bluebox">&nbsp;</td>
+																	<td class="bluebox">&nbsp;</td>
 
-																<td class="bluebox"><strong><s:text
+																	<td class="bluebox"><strong><s:text
+																				name="Cheque Number" /></strong> <span class="mandatory1">*</span></td>
 
-																			name="Cheque Number" /></strong> <span
+																	<td class="bluebox"><s:textfield
+																			name="paymentChequeNo" id="paymentChequeNo" /></td>
 
-																		class="mandatory1">*</span></td>
+																</tr>
 
-																<td class="bluebox"><s:textfield name="paymentChequeNo" id="paymentChequeNo" /></td>
 
-															</tr>
 
-				  
+															</s:if>
 
-					  </s:if>
-
-															<!-- Bikash Updated End--> 
+															<!-- Bikash Updated End-->
 
 															<tr>
 
@@ -523,13 +469,10 @@
 																<s:if test="%{shouldShowHeaderField('vouchernumber')}">
 
 																	<td class="greybox"><s:text
-
 																			name="payment.voucherno" /><span class="mandatory1">*</span></td>
 
 																	<td class="greybox"><s:textfield
-
 																			name="vouchernumber" id="vouchernumber"
-
 																			value="%{vouchernumber}" readonly="true" /></td>
 
 																</s:if>
@@ -543,15 +486,11 @@
 																</s:else>
 
 																<td class="greybox"><s:text
-
 																		name="payment.voucherdate" /><span class="mandatory1">*</span></td>
 
 																<td class="greybox" colspan="2"><s:textfield
-
 																		id="voucherdate" name="voucherdate"
-
 																		value="%{voucherdate}" data-date-end-date="0d"
-
 																		data-inputmask="'mask': 'd/m/y'" readonly="true" /></td>
 
 															</tr>
@@ -563,21 +502,16 @@
 																	<td class="bluebox">&nbsp;</td>
 
 																	<td class="bluebox"><s:text name="payment.bank" /><span
-
 																		class="mandatory1">*</span></td>
 
 																	<td class="bluebox"><s:property
-
 																			value="%{bank_branch}" /></td>
 
 																	<td class="bluebox"><s:text
-
 																			name="payment.bankaccount" /><span
-
 																		class="mandatory1">*</span></td>
 
 																	<td class="bluebox"><s:property
-
 																			value="%{bank_account}" /></td>
 
 																	<s:hidden name="bankbranch" id="bankbranch" />
@@ -599,51 +533,35 @@
 																	<td class="bluebox">&nbsp;</td>
 
 																	<td class="bluebox"><s:text name="payment.bank" /><span
-
 																		class="mandatory1">*</span></td>
 
 																	<td class="bluebox"><s:select name="bankbranch"
-
 																			id="bankbranch" list="dropdownData.bankbranchList"
-
 																			listKey="id" listValue="bank.name+'-'+branchname"
-
-																			headerKey="-1" headerValue="%{getText('lbl.choose.options')}"
-
+																			headerKey="-1"
+																			headerValue="%{getText('lbl.choose.options')}"
 																			onchange="loadBankAccount(this)"
-
 																			value="%{bankbranch}" /></td>
 
 																	<egov:ajaxdropdown id="bankaccount"
-
 																		fields="['Text','Value']" dropdownId="bankaccount"
-
 																		url="voucher/common-ajaxLoadBankAccounts.action" />
 
 																	<td class="bluebox"><s:text
-
 																			name="payment.bankaccount" /><span
-
 																		class="mandatory1">*</span></td>
 
 																	<td class="bluebox" colspan="2"><s:select
-
 																			name="bankaccount" id="bankaccount"
-
 																			list="dropdownData.bankaccountList" listKey="id"
-
 																			listValue="accountnumber+'---'+accounttype"
-
-																			headerKey="-1" headerValue="%{getText('lbl.choose.options')}"
-
+																			headerKey="-1"
+																			headerValue="%{getText('lbl.choose.options')}"
 																			onChange="populateAvailableBalance(this);"
-
 																			value="%{bankaccount}" /></td>
 
 																	<egov:updatevalues id="availableBalance"
-
 																		fields="['Text']"
-
 																		url="payment/payment-ajaxGetAccountBalance.action" />
 
 																</tr>
@@ -652,20 +570,16 @@
 
 																	<td class="bluebox">&nbsp;</td>
 
-																	<td class="bluebox"><s:text
+																	<td class="bluebox"><s:text name="bank.onlinelink" /></td>
 
-																				name="bank.onlinelink" /></td>
-
-																	<td class="bluebox"><a id="onlineLink" href="#" target="_blank" style="font-size: 15px;">Click</a></td>
+																	<td class="bluebox"><a id="onlineLink" href="#"
+																		target="_blank" style="font-size: 15px;">Click</a></td>
 
 																	<td class="bluebox" width="15%"><strong><s:text
-
 																				name="payment.balance" />(Rs)</strong></td>
 
 																	<td class="bluebox" colspan="4"><s:textfield
-
 																			name="availableBalance" id="availableBalance"
-
 																			readonly="true" style="text-align:right" /></td>
 
 																</tr>
@@ -674,72 +588,58 @@
 
 															<tr>
 
-																	<td class="bluebox">&nbsp;</td>
+																<td class="bluebox">&nbsp;</td>
 
-																	<td class="bluebox"><s:text name="payment.firstsignatory" /><span
+																<td class="bluebox"><s:text
+																		name="payment.firstsignatory" /><span
+																	class="mandatory1">*</span></td>
 
-																		class="mandatory1">*</span></td>
+																<td class="bluebox"><s:select name="firstsignatory"
+																		headerKey="-1" headerValue="Select First Signatory"
+																		value="%{firstsignatory}"
+																		list="#{'Commissioner':'Commissioner' ,'Additional Commissioner':'Additional Commissioner' ,'Deputy Commissioner':'Deputy Commissioner','Executive Officer':'Executive Officer'}"
+																		id="firstsignatory" /></td>
 
-																	<td class="bluebox"><s:select name="firstsignatory"
+																<td class="bluebox" width="15%"><s:text
+																		name="payment.secondsignatory" /></td>
 
-																	headerKey="-1" headerValue="Select First Signatory" value="%{firstsignatory}"
+																<td class="bluebox" colspan="4"><s:select
+																		name="secondsignatory" headerKey="-1"
+																		headerValue="Select Second Signatory"
+																		list="#{'Commissioner':'Commissioner' ,'Additional Commissioner':'Additional Commissioner' ,'Deputy Commissioner':'Deputy Commissioner','Executive Officer':'Executive Officer','Accounts Officer':'Accounts Officer'}"
+																		id="secondsignatory" /></td>
 
-																	list="#{'Commissioner':'Commissioner' ,'Additional Commissioner':'Additional Commissioner' ,'Deputy Commissioner':'Deputy Commissioner','Executive Officer':'Executive Officer'}"
+															</tr>
 
-																			id="firstsignatory" />
+															<tr>
 
-																	</td>
+																<td class="bluebox">&nbsp;</td>
 
-																	<td class="bluebox" width="15%"><s:text name="payment.secondsignatory" /></td>
+																<td class="bluebox"><s:text name="backdated.entry" /><span
+																	class="mandatory1">*</span></td>
 
-																	<td class="bluebox" colspan="4"><s:select name="secondsignatory"
+																<td class="bluebox"><s:select name="backlogEntry"
+																		headerKey="-1" headerValue="Select"
+																		value="%{backlogEntry}" list="#{'Y':'Yes' ,'N':'No'}"
+																		id="backlogEntry" /></td>
 
-																	headerKey="-1" headerValue="Select Second Signatory"
+																<td class="bluebox" width="15%">&nbsp;</td>
 
-																	list="#{'Commissioner':'Commissioner' ,'Additional Commissioner':'Additional Commissioner' ,'Deputy Commissioner':'Deputy Commissioner','Executive Officer':'Executive Officer','Accounts Officer':'Accounts Officer'}"
+																<td class="bluebox" colspan="4">&nbsp;</td>
 
-																			id="secondsignatory" /></td>
+															</tr>
 
-																</tr>
 
-																<tr>
-
-																	<td class="bluebox">&nbsp;</td>
-
-																	<td class="bluebox"><s:text name="backdated.entry" /><span
-
-																		class="mandatory1">*</span></td>
-
-																	<td class="bluebox"><s:select name="backlogEntry"
-
-																	headerKey="-1" headerValue="Select" value="%{backlogEntry}" 
-
-																	list="#{'Y':'Yes' ,'N':'No'}"
-
-																			id="backlogEntry" /></td>
-
-																	<td class="bluebox" width="15%">&nbsp;</td>
-
-																	<td class="bluebox" colspan="4">&nbsp;</td>
-
-																</tr>
-
-																
 
 															<tr>
 
 																<td class="greybox">&nbsp;</td>
 
 																<td class="greybox" width="15%"><s:text
-
-																		name="payment.narration" /><span
-
-																		class="mandatory1">*</span></td>
+																		name="payment.narration" /><span class="mandatory1">*</span></td>
 
 																<td class="greybox" colspan="4"><s:textarea
-
 																		name="description" id="description" cols="70" rows="4"
-
 																		onblur="checkLength(this)" /></td>
 
 															</tr>
@@ -749,15 +649,12 @@
 																<td class="bluebox">&nbsp;</td>
 
 																<td class="bluebox" style="visibility: hidden"><s:text
-
 																		name="payment.balance" /></td>
 
 																<td class="bluebox"><s:hidden name="balance"
-
 																		id="balance" readonly="true" style="text-align:right" /></td>
 
 																<s:hidden name="functionSel" id="functionSel"
-
 																	value="%{functionSel}" />
 
 
@@ -773,27 +670,21 @@
 																		<s:hidden name="hiddenText" id="hiddenText" />
 
 																		<s:hidden name="paymentMode" id="paymentMode"
-
 																			value="%{paymentMode}" />
 
 																		<s:hidden name="contractorIds" id="contractorIds"
-
 																			value="%{contractorIds}" />
 
 																		<s:hidden name="supplierIds" id="supplierIds"
-
 																			value="%{supplierIds}" />
 
 																		<s:hidden name="contingentIds" id="contingentIds"
-
 																			value="%{contingentIds}" />
 
 																		<s:hidden name="salaryIds" id="salaryIds"
-
 																			value="%{salaryIds}" />
 
 																		<s:hidden name="pensionIds" id="pensionIds"
-
 																			value="%{pensionIds}" />
 
 
@@ -812,17 +703,20 @@
 
 												<div class="tabbertab">
 
-													<h3 style="margin-left:25px"><s:text name="lbl.bill.details"/> </h3>
+													<h3 style="margin-left: 25px">
+														<s:text name="lbl.bill.details" />
+													</h3>
 
 													<span>
 
 														<table align="center" border="0" cellpadding="0"
-
 															cellspacing="0" class="newtable">
 
 															<tr>
 
-																<td colspan="7"><div class="subheadsmallnew"><s:text name="lbl.bill.details"/></div></td>
+																<td colspan="7"><div class="subheadsmallnew">
+																		<s:text name="lbl.bill.details" />
+																	</div></td>
 
 															</tr>
 
@@ -833,28 +727,36 @@
 																	<div style="float: left; width: 100%;">
 
 																		<table id="billdetailsTable" align="center" border="0"
-
 																			cellpadding="0" cellspacing="0" width="100%">
 
 																			<tr>
 
-																				<th class="bluebgheadtdnew"><s:text name="lbl.bill.number"/></th>
+																				<th class="bluebgheadtdnew"><s:text
+																						name="lbl.bill.number" /></th>
 
-																				<th class="bluebgheadtdnew"><s:text name="lbl.bill.date"/></th>
+																				<th class="bluebgheadtdnew"><s:text
+																						name="lbl.bill.date" /></th>
 
-																				<th class="bluebgheadtdnew"><s:text name="lbl.bill.voucher.number"/></th>
+																				<th class="bluebgheadtdnew"><s:text
+																						name="lbl.bill.voucher.number" /></th>
 
-																				<th class="bluebgheadtdnew"><s:text name="lbl.bill.voucher.date"/></th>
+																				<th class="bluebgheadtdnew"><s:text
+																						name="lbl.bill.voucher.date" /></th>
 
-																				<th class="bluebgheadtdnew"><s:text name="lbl.payee.name"/></th>
+																				<th class="bluebgheadtdnew"><s:text
+																						name="lbl.payee.name" /></th>
 
-																				<th class="bluebgheadtdnew"><s:text name="lbl.net.amount"/></th>
+																				<th class="bluebgheadtdnew"><s:text
+																						name="lbl.net.amount" /></th>
 
-																				<th class="bluebgheadtdnew"><s:text name="lbl.earlier.amount"/></th>
+																				<th class="bluebgheadtdnew"><s:text
+																						name="lbl.earlier.amount" /></th>
 
-																				<th class="bluebgheadtdnew"><s:text name="lbl.payable.amount"/></th>
+																				<th class="bluebgheadtdnew"><s:text
+																						name="lbl.payable.amount" /></th>
 
-																				<th class="bluebgheadtdnew"><s:text name="lbl.payment.amount"/></th>
+																				<th class="bluebgheadtdnew"><s:text
+																						name="lbl.payment.amount" /></th>
 
 																			</tr>
 
@@ -865,45 +767,30 @@
 																					<tr>
 
 																						<td style="text-align: center"
-
 																							class="blueborderfortdnew"><s:hidden
-
 																								name="billList[%{#s.index}].csBillId"
-
 																								id="csBillId%{#s.index}" value="%{csBillId}" />
 
 																							<s:hidden name="billList[%{#s.index}].billNumber"
-
 																								id="billNumber" value="%{billNumber}" /> <s:property
-
 																								value="%{billNumber}" /></td>
 
 																						<td style="text-align: center"
-
 																							class="blueborderfortdnew"><s:hidden
-
 																								name="billList[%{#s.index}].billDate"
-
 																								id="billDate%{#s.index}" value="%{billDate}" />
 
 																							<s:date name="%{billDate}" format="dd/MM/yyyy" /></td>
 
 																						<td style="text-align: center"
-
 																							class="blueborderfortdnew"><s:hidden
-
 																								name="billList[%{#s.index}].billVoucherId"
-
 																								id="billVoucherId%{#s.index}"
-
 																								value="%{billVoucherId}" /> <s:hidden
-
 																								name="billList[%{#s.index}].billVoucherNumber"
-
 																								id="billNumber" value="%{billVoucherNumber}" />
 
 																							<a href="#"
-
 																							onclick="openVoucher('<s:property value='%{billVoucherId}'/>');">
 
 																								<s:property value="%{billVoucherNumber}" />
@@ -911,39 +798,24 @@
 																						</a></td>
 
 																						<td style="text-align: center"
-
 																							class="blueborderfortdnew"><s:hidden
-
 																								name="billList[%{#s.index}].billVoucherDate"
-
 																								id="billVoucherDate%{#s.index}"
-
 																								value="%{billVoucherDate}" /> <s:date
-
 																								name="%{billVoucherDate}" format="dd/MM/yyyy" /></td>
 
 																						<td style="text-align: center"
-
 																							class="blueborderfortdnew"><s:hidden
-
 																								name="billList[%{#s.index}].expType"
-
 																								id="expType%{#s.index}" value="%{expType}" /> <s:hidden
-
 																								name="billList[%{#s.index}].payTo"
-
 																								id="payTo%{#s.index}" value="%{payTo}" /> <s:property
-
 																								value="%{payTo}" /></td>
 
 																						<td style="text-align: right"
-
 																							class="blueborderfortdnew"><s:hidden
-
 																								name="billList[%{#s.index}].netAmt"
-
 																								id="netAmt%{#s.index}" value="%{netAmt}" /> <s:text
-
 																								name="payment.format.number">
 
 																								<s:param value="%{netAmt}" />
@@ -951,15 +823,10 @@
 																							</s:text></td>
 
 																						<td style="text-align: right"
-
 																							class="blueborderfortdnew"><s:hidden
-
 																								name="billList[%{#s.index}].earlierPaymentAmt"
-
 																								id="earlierPaymentAmt%{#s.index}"
-
 																								value="%{earlierPaymentAmt}" /> <s:text
-
 																								name="payment.format.number">
 
 																								<s:param value="%{earlierPaymentAmt}" />
@@ -967,11 +834,8 @@
 																							</s:text></td>
 
 																						<td style="text-align: right"
-
 																							class="blueborderfortdnew"><s:hidden
-
 																								name="billList[%{#s.index}].payableAmt"
-
 																								id="payableAmt%{#s.index}" value="%{payableAmt}" />
 
 																							<s:text name="payment.format.number">
@@ -1009,21 +873,14 @@
 																						<s:else> --%>
 
 																						<td class="blueborderfortdnew"><div
-
 																								align="center">
 
 																								<input type="text"
-
 																									name='billList[<s:property value="%{#s.index}"/>].paymentAmt'
-
 																									value='<s:text name="payment.format.number" ><s:param value="%{paymentAmt}"/></s:text>'
-
 																									id='paymentAmt<s:property value="%{#s.index}"/>'
-
 																									style="text-align: right"
-
 																									onchange="calcGrandTotal(this)"
-
 																									onfocus="updateHidden(this)" />
 
 																								<!-- <s:textfield name="billList[%{#s.index}].paymentAmt" id="paymentAmt%{#s.index}" value="%{paymentAmt}" style="text-align:right" onchange="calcGrandTotal(this)" onfocus="updateHidden(this)"/> -->
@@ -1033,7 +890,6 @@
 																						<%-- </s:else> --%>
 
 																						<c:set var="totalAmt"
-
 																							value="${totalAmt+paymentAmt}" />
 
 																					</tr>
@@ -1047,25 +903,20 @@
 																			<tr>
 
 																				<td style="text-align: right" colspan="8"
-
-																					class="blueborderfortdnew"><strong><s:text name="lbl.grand.total"/> </strong></td>
+																					class="blueborderfortdnew"><strong><s:text
+																							name="lbl.grand.total" /> </strong></td>
 
 																				<td style="text-align: right"
-
 																					class="blueborderfortdnew"><div align="center">
 
 																						<input type="text" name="grandTotal"
-
 																							id="grandTotal"
-
 																							value='<fmt:formatNumber value='${totalAmt}' pattern='#0.00' />'
-
 																							style="text-align: right" readonly />
 
 																					</div></td>
 
 																				<s:hidden name="billListSize" id="billListSize"
-
 																					value="%{billList.size}" />
 
 																			</tr>
@@ -1093,7 +944,6 @@
 														<s:text name="change.party.name" />
 
 														<s:checkbox name="changePartyName" id="changePartyName"
-
 															checked="checked" />
 
 														<s:textfield name="newPartyName" id="newPartyName" />
@@ -1121,10 +971,9 @@
 				<s:hidden name="cutOffDate" id="cutOffDate" />
 
 				<s:hidden name="bankBalanceCheck" id="bankBalanceCheck"
-
 					value="%{bankBalanceCheck}" />
 
-                 <%@ include file='../workflow/commonworkflowhistory.jsp'%>
+				<%@ include file='../workflow/commonworkflowhistory.jsp'%>
 
 
 
@@ -1140,7 +989,7 @@
 
 				<s:hidden name="paymentid" value="%{paymentheader.id}" />
 
-				
+
 
 				<s:hidden name="actionname" id="actionName" value="%{action}" />
 
@@ -1148,13 +997,18 @@
 
 			</div>
 
-			<s:hidden id="selectedContingentRows" name="selectedContingentRows" value="%{selectedContingentRows}" />
+			<s:hidden id="selectedContingentRows" name="selectedContingentRows"
+				value="%{selectedContingentRows}" />
 
-			<s:hidden id="selectedContractorRows" name="selectedContractorRows" value="%{selectedContractorRows}" />
+			<s:hidden id="selectedContractorRows" name="selectedContractorRows"
+				value="%{selectedContractorRows}" />
 
-			<s:hidden id="selectedSupplierRows" name="selectedSupplierRows" value="%{selectedSupplierRows}" />
+			<s:hidden id="selectedSupplierRows" name="selectedSupplierRows"
+				value="%{selectedSupplierRows}" />
 
-			<s:hidden id="billIdsToPaymentAmountsMapId" name="billIdsToPaymentAmountsMap" value="%{billIdsToPaymentAmountsMap}" />
+			<s:hidden id="billIdsToPaymentAmountsMapId"
+				name="billIdsToPaymentAmountsMap"
+				value="%{billIdsToPaymentAmountsMap}" />
 
 
 

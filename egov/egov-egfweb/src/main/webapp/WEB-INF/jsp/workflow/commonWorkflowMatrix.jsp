@@ -126,6 +126,7 @@ function documentdep(){
 		var additionalRule = dom.get('additionalRule').value;
 		var pendingAction = document.getElementById('pendingActions').value;
 		var stateType = '<s:property value="%{stateType}"/>';
+		console.log("statetype "+stateType);
 		document.getElementById("approverDesignation").value="-1";
 		loadDesignationByDeptAndType(stateType, dept, currentState, amountRule,
 				additionalRule, pendingAction);

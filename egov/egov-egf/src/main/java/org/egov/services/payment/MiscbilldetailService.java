@@ -48,14 +48,31 @@
 
 package org.egov.services.payment;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
+import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infstr.services.PersistenceService;
+import org.egov.model.bills.EgBillregister;
 import org.egov.model.bills.Miscbilldetail;
+import org.hibernate.Query;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.hibernate.Session;
+import org.hibernate.Query;
 
 @Service
 public class MiscbilldetailService extends PersistenceService<Miscbilldetail, Long> {
 
 	
+	@PersistenceContext
+    private EntityManager entityManager;
+    
+    
+
+	public Session getSession() {
+		return entityManager.unwrap(Session.class);
+	}
 	public MiscbilldetailService(Class<Miscbilldetail> type) {
 		super(type);
 	}
@@ -64,6 +81,21 @@ public class MiscbilldetailService extends PersistenceService<Miscbilldetail, Lo
 	{
 		this(Miscbilldetail.class);
 	}
+	
+	public Miscbilldetail getBillsById(Long billno) {
+		try {
+			 Query qry = getSession().createQuery("from Miscbilldetail br where br.billVoucherHeader.id =:billno");
+		        qry.setLong("billno", billno);
+		        if(qry.list().size()>0)
+		        	return (Miscbilldetail) qry.list().get(0);
+		        else
+		        	return null;
+		}catch(Exception ex) {
+			ex.printStackTrace();
+			return null;
+		}
+       
+    }
 
 	
 }

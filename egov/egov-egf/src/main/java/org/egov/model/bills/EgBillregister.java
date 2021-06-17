@@ -131,17 +131,20 @@ public class EgBillregister extends StateAware implements java.io.Serializable {
     private String approvalComent;
     private Date sanctiondate;
     private String sanctionnumber;
-
+    //@Transient
+    private String fileno;
+    
     public EgBillregister() {
     }
 
     public EgBillregister(final String billnumber, final Date billdate, final BigDecimal billamount,
-                          final String billstatus, final String expendituretype, final BigDecimal createdby, final Date createddate) {
+                          final String billstatus, final String expendituretype, final BigDecimal createdby, final Date createddate,final String fileno) {
         this.billnumber = billnumber;
         this.billdate = billdate;
         this.billamount = billamount;
         this.billstatus = billstatus;
         this.expendituretype = expendituretype;
+        this.fileno=fileno;
     }
 
     public EgBillregister(final String billnumber, final Date billdate, final BigDecimal billamount,
@@ -151,7 +154,7 @@ public class EgBillregister extends StateAware implements java.io.Serializable {
                           final Date lastmodifieddate, final String zone, final String division, final String workordernumber,
                           final String billapprovalstatus, final Boolean isactive, final Date billpasseddate,
                           final Date workorderdate, final EgBillregistermis egBillregistermis,
-                          final Set<EgBilldetails> egBilldetailes, final EgwStatus status) {
+                          final Set<EgBilldetails> egBilldetailes, final EgwStatus status,final String fileno) {
         this.billnumber = billnumber;
         this.billdate = billdate;
         this.billamount = billamount;
@@ -172,6 +175,7 @@ public class EgBillregister extends StateAware implements java.io.Serializable {
         this.egBillregistermis = egBillregistermis;
         this.egBilldetailes = egBilldetailes;
         this.status = status;
+        this.fileno= fileno;
     }
 
     /**
@@ -498,4 +502,16 @@ public class EgBillregister extends StateAware implements java.io.Serializable {
 	public void setReasoncancel(String reasoncancel) {
 		this.reasoncancel = reasoncancel;
 	}
+
+	public String getFileno() {
+		return fileno;
+	}
+
+	public void setFileno(String fileno) {
+		this.fileno = fileno;
+	}
+
+	
+	
+	
 }
