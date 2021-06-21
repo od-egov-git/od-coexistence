@@ -96,15 +96,17 @@ public class CommonBean {
     private String payto;
     private Long stateId;
     private String budgetReappNo;
-    private String fileNo;
+    private String fileno;
     private String paymentChequeNo;
 
-    public String getFileNo() {
-		return fileNo;
+    
+
+	public String getFileno() {
+		return fileno;
 	}
 
-	public void setFileNo(String fileNo) {
-		this.fileNo = fileNo;
+	public void setFileno(String fileno) {
+		this.fileno = fileno;
 	}
 
 	public Long getRecoveryId() {

@@ -269,39 +269,45 @@
 		jQuery("#historyDetailTable tbody").empty();
 	});
 	function getdata(obj){
-		jQuery('#mymodal').modal('show');
+		//jQuery('#mymodal').modal('show');
 		console.log(obj);
 		var billid= obj.value;
 		jQuery("#historyDetailTable tbody").empty();
 		var url="${pageContext.request.contextPath}/bill/billregisterhistory.action?billregisterid="+billid;
 		if(null!=billid){
 			
-			jQuery.get( url, function( data ) {
-						var mydata  =  data[0];
-						console.log("mydata: "+mydata);
-						console.log("data: "+data);
-						for(var i =0;i<=data.length;i++){
+			jQuery.getJSON( url, function( data ) {
 						
-							data = data[i];
-							console.log("data[i] "+data);
-							if(null!=data || data!=""){
-								jQuery("#historyDetailTable tbody").append('<tr>'+'<td>'+data.date+'</td>'
-										+'<td>'+data.sender+'</td>'
-										+'<td>'+data.task+'</td>'
-										+'<td>'+data.status+'</td>'
-										+'<td>'+data.details+'</td>'
+						
+						console.log("data: "+data);
+						//var tst = 
+						console.log("Length--->>"+data.length);
+						var result = JSON.parse(data);
+						console.log(result);
+						console.log(result.length);
+						//var i =0
+						for(i=0;i<=result.length;i++)
+						{
+							console.log(i);
+							var r = result[i];
+							//console.log(JSON.stringfy(data[i]));
+							console.log("result[i] "+r);
+							//if(null!=data || data!="")
+							//{
+								jQuery("#historyDetailTable tbody").append('<tr>'+'<td>'+r.date+'</td>'
+										+'<td>'+r.sender+'</td>'
+										+'<td>'+r.task+'</td>'
+										+'<td>'+r.status+'</td>'
+										+'<td>'+r.details+'</td>'
 										+'</tr>');
-							}
+							//}
 								
 								//});
 						}
 						
-						
-					
-						
 						jQuery('#mymodal').modal('show');
-						jQuery('#mymodal').show();
-						//document.getElementById("history-inbox").style.display="none";
+						//jQuery('#mymodal').show();
+						
 				});
 			
 			

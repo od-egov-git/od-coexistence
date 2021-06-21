@@ -195,7 +195,13 @@ function checkdate()
 		return false;
 	}
 	}else{
-		return true;
+		if(date.setHours(0,0,0,0) < curdate.setHours(0,0,0,0)){
+			console.log(":::: backdated");
+			return true;
+		}else{
+			console.log(":::: not backdated");
+			return false;
+		}
 	}
 		
 }

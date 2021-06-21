@@ -150,10 +150,12 @@
 							<td style="width: 5%"></td>
 							<td class="greybox"><s:text name="backdated.entry" /><span
 								class="mandatory1">*</span></td>
-							<td class="greybox" colspan="3"><s:select name="backdateentry" 
+							<td class="greybox" colspan="1"><s:select name="backdateentry" 
 																	headerKey="-1" headerValue="Select" value="%{backdateentry}"
 																	list="#{'Y':'Yes' ,'N':'No'}"
 																			id="backlogEntry" /></td>
+							<td class="bluebox">File No</td>
+							<td class="bluebox"><s:textfield name="fileno" id="fileno"/></td>												
 						</tr>
 						</table>
 					</div>
@@ -277,13 +279,13 @@ function onSubmit()
 function onSubmitDraft()
 {
 	//alert(":::modify save as draftonsubmit::");
-	if(checkdate()){
+	//if(checkdate()){
 	document.forms[0].action='${pageContext.request.contextPath}/voucher/journalVoucherModify-update.action';
 	document.forms[0].submit();
-	}else{
+	/* }else{
 		bootbox.alert("Please select back dated entry option correctly");
 		return false;
-	}
+	} */
 	
 }
 
@@ -525,34 +527,30 @@ function validateJV()
 	
 	function checkdate()
 	{
-		//alert(":::::::test modify::");
-		 var backlog=document.getElementById('backlogEntry').value;
+		var backlog=document.getElementById('backlogEntry').value;
 		var date2=document.getElementById('voucherDate').value;
-		//alert(":::::::voucher Date efore split:: "+date2);
 		var parts = date2.split("/");
-		   var date = new Date(parts[1] + "/" + parts[0] + "/" + parts[2]);
-		  // alert(":::::Backlog:: "+backlog);
-	//alert(":::Voucher  Date after split::: "+date);
+		var date = new Date(parts[1] + "/" + parts[0] + "/" + parts[2]);
 		var curdate = new Date();
-		//alert("::::Current date:: "+curdate);
-		
 		if(backlog!='Y'){
 		if(date.setHours(0,0,0,0) == curdate.setHours(0,0,0,0)) {
-		    // Date equals today's date
-		   //alert("date is equal:::");
-		    if(backlog == 'N'){
-		    	//alert(":in N:");
+			if(backlog == 'N'){
 		    	return true;
 		    }
 		    return false;
 		}
 		else{
-			//alert(":::::Else:::: ");
 			return false;
 		}
 		} 
 		else{
-			return true;
+			if(date.setHours(0,0,0,0) < curdate.setHours(0,0,0,0)){
+				console.log(":::: backdated");
+				return true;
+			}else{
+				console.log(":::: not backdated");
+				return false;
+			}
 		}
 		
 	}

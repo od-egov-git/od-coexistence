@@ -188,14 +188,16 @@ public class DirectBankPaymentAction extends BasePaymentAction {
     private String firstsignatory="-1";
     private String secondsignatory="-1";
     private String backlogEntry="";
-    private String fileNo="";
+    private String fileno="";
     
-    public String getFileNo() {
-		return fileNo;
+   
+
+	public String getFileno() {
+		return fileno;
 	}
 
-	public void setFileNo(String fileNo) {
-		this.fileNo = fileNo;
+	public void setFileno(String fileno) {
+		this.fileno = fileno;
 	}
 
 	private String paymentChequeNo=null;
@@ -328,9 +330,17 @@ public class DirectBankPaymentAction extends BasePaymentAction {
                                 voucherHeader.getId());
                 voucherHeader.setId(null);
                 populateWorkflowBean();
-                voucherHeader.setBackdateentry(backlogEntry);
-                voucherHeader.setFileNo(fileNo);
-                paymentheader.setFileNo(fileNo);
+                if(backlogEntry!=null && !backlogEntry.isEmpty()) {
+                    backlogEntry=backlogEntry.split(",")[0];
+                    }
+                    if(firstsignatory!=null && !firstsignatory.isEmpty()) {
+                    	firstsignatory=firstsignatory.split(",")[0];
+                        }
+                    if(secondsignatory!=null && !secondsignatory.isEmpty()) {
+                    	secondsignatory=secondsignatory.split(",")[0];
+                        }
+                voucherHeader.setFileNo(fileno);
+                //paymentheader.setFileNo(fileno);
                 paymentheader = paymentActionHelper.createDirectBankPayment(paymentheader, voucherHeader, billVhId,
                         commonBean, billDetailslist, subLedgerlist, workflowBean,firstsignatory,secondsignatory);
                 showMode = "create";
@@ -636,7 +646,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
         commonBean.setAmount(paymentheader.getPaymentAmount());
         commonBean.setAccountNumberId(paymentheader.getBankaccount().getId().toString());
         commonBean.setAccnumnar(paymentheader.getBankaccount().getNarration());
-        commonBean.setFileNo(voucherHeader.getFileNo());
+        commonBean.setFileno(voucherHeader.getFileNo());
 		commonBean.setPaymentChequeNo(paymentheader.getPaymentChequeNo());
         paymentChequeNo = paymentheader.getPaymentChequeNo();
         LOGGER.info("paymentheader.getPaymentAmount()  ::"+paymentheader.getPaymentAmount());

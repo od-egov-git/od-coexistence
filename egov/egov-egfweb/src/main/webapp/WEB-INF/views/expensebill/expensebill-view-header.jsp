@@ -118,6 +118,12 @@
 				<c:out default="N/A" value="${egBillregister.egBillregistermis.budgetaryAppnumber }" />
 			</div>
 		</div>
+		<div class="row add-border">
+			<div class="col-md-3 col-xs-6 add-margin">File No</div>
+			<div class="col-md-3 col-xs-6 add-margin view-content">
+				<c:out default="N/A" value="${egBillregister.fileno }" />
+			</div>
+		</div>
 	</div>
 	
 </div>

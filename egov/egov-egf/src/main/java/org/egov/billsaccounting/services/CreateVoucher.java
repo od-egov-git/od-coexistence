@@ -202,6 +202,8 @@ public class CreateVoucher {
 	
 	@Autowired
 	private EgwStatusHibernateDAO egwStatusHibernateDAO;
+	
+	
 
 	// add here for other bills
 
@@ -642,8 +644,11 @@ public class CreateVoucher {
 			// Pension,Gratuity are saved as Expense Bill
 			else if (expType.equalsIgnoreCase(FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT)) {
 				//Cahnged Status
-				egBillregister.setStatus(egwStatusHibernateDAO.getEgwStatusByCodeAndModuleType("EXPENSEBILL" ,"Voucher Created"));
-				
+				//egBillregister.setStatus(egwStatusHibernateDAO.getEgwStatusByCodeAndModuleType("EXPENSEBILL" ,"Voucher Created"));
+				/*
+				 * if(egBillregister.getStateid()==null ||
+				 * egBillregister.getStateid().equals("")) egBillregister.setStateid(stateid);
+				 */
 				System.out.println(egBillregister.getStatus().getCode());
 				
 				name = FinancialConstants.JOURNALVOUCHER_NAME_EXPENSEJOURNAL;
@@ -755,6 +760,8 @@ public class CreateVoucher {
 				headerDetails.put(VoucherConstant.BUDGETARYAPPNUMBER, billMis.getBudgetaryAppnumber());
 			if (voucherHeader.getBackdateentry()!=null)
 				headerDetails.put(VoucherConstant.BACKDATE, voucherHeader.getBackdateentry());
+			if (voucherHeader.getFileNo()!=null)
+				headerDetails.put(VoucherConstant.FILENO, voucherHeader.getFileNo());
 			for (final EgBilldetails egBilldetails : billDetailslist) {
 
 				// persistenceService.setSessionFactory(new SessionFactory());
@@ -1877,10 +1884,10 @@ public class CreateVoucher {
 			{
 				cVoucherHeader.setBackdateentry(headerdetails.get("backdateentry").toString());
 			}
-			if(headerdetails.containsKey("fileNo")
-					&& null != headerdetails.get("fileNo"))
+			if(headerdetails.containsKey("fileno")
+					&& null != headerdetails.get("fileno"))
 			{
-				cVoucherHeader.setFileNo(headerdetails.get("fileNo").toString());
+				cVoucherHeader.setFileNo(headerdetails.get("fileno").toString());
 			}
 			// -- Voucher Type checking. --START
 			if (FinancialConstants.STANDARD_VOUCHER_TYPE_JOURNAL.equalsIgnoreCase(voucherType))

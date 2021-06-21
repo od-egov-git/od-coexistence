@@ -142,7 +142,7 @@ public class JournalVoucherAction extends BaseVoucherAction
     private ScriptService scriptService;
     
     private String backlogEntry="N";// modified by abhishek on 09042021
-
+    private String fileno="";
     @SuppressWarnings("unchecked")
     @Override
     public void prepare() {
@@ -264,6 +264,7 @@ public class JournalVoucherAction extends BaseVoucherAction
                 }
                 }
                 voucherHeader.setBackdateentry(getBacklogEntry());
+                voucherHeader.setFileNo(fileno);
                 System.out.println("before save");
               //  voucherHeader = journalVoucherActionHelper.createVcouher(billDetailslist, subLedgerlist, voucherHeader,
                //         voucherTypeBean, workflowBean);
@@ -653,6 +654,14 @@ public class JournalVoucherAction extends BaseVoucherAction
 
 	public void setBacklogEntry(String backlogEntry) {
 		this.backlogEntry = backlogEntry;
+	}
+
+	public String getFileno() {
+		return fileno;
+	}
+
+	public void setFileno(String fileno) {
+		this.fileno = fileno;
 	}
 
 	

@@ -75,8 +75,18 @@ public class PaymentBean {
     private String billVoucherNumber;
     private Date billVoucherDate;
     private String region;
+    private String fileno;
+    
+    
+    public String getFileno() {
+		return fileno;
+	}
 
-    public String getExpType() {
+	public void setFileno(String fileno) {
+		this.fileno = fileno;
+	}
+
+	public String getExpType() {
         return expType;
     }
 

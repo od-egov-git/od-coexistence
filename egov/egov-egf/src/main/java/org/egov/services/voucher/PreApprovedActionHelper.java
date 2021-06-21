@@ -186,19 +186,31 @@ public class PreApprovedActionHelper {
             		voucherHeader.setVoucherDate(currentDate);
             	}
             	
-            	
-            	expenseBill.setStatus(egwStatusHibernateDAO.getEgwStatusByCodeAndModuleType("EXPENSEBILL" ,"Voucher Approved"));
-				
-				System.out.println(expenseBill.getStatus().getCode());
+            	if(expenseBill!=null)
+            	{
+            		expenseBill.setStatus(egwStatusHibernateDAO.getEgwStatusByCodeAndModuleType("EXPENSEBILL" ,"Voucher Approved"));
+            		System.out.println(expenseBill.getStatus().getCode());
+            	}
             }
             voucherService.persist(voucherHeader);
+            if(workflowBean.getWorkFlowAction().equals("Forward") && expenseBill!=null)
+            {
+            	expenseBill.setStatus(egwStatusHibernateDAO.getEgwStatusByCodeAndModuleType("EXPENSEBILL" ,"Voucher Created"));
+            	System.out.println("voucher state "+voucherHeader.getState().getId());
+				/*
+				 * System.out.println("expense state "+expenseBill.getState());
+				 * expenseBill.getState().setId(voucherHeader.getState().getId());
+				 * expenseBillService.create(expenseBill);
+				 */
+       		 	persistenceService.getSession().flush();
+            }
         } catch (final ValidationException e) {
-
+        	System.out.println("Error "+e.getMessage());
             final List<ValidationError> errors = new ArrayList<>();
             errors.add(new ValidationError("exp", e.getErrors().get(0).getMessage()));
             throw new ValidationException(errors);
         } catch (final Exception e) {
-
+        	System.out.println("Error "+e.getMessage());
             final List<ValidationError> errors = new ArrayList<>();
             errors.add(new ValidationError("exp", e.getMessage()));
             throw new ValidationException(errors);

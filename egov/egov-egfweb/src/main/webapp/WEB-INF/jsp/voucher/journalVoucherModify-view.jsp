@@ -351,6 +351,16 @@
 										name="description" style="width:580px"
 										onblur="checkVoucherNarrationLen(this)" /></td>
 							</tr>
+							<tr>
+								<td style="width: 5%"></td>
+							<td class="greybox"><s:text name="backdated.entry" /><span
+								class="mandatory1">*</span></td>
+							<td class="greybox" colspan="1"><s:select name="backdateentry" 
+									headerKey="-1" headerValue="Select" value="%{backdateentry}"
+									list="#{'Y':'Yes' ,'N':'No'}" id="backlogEntry" /></td>
+							<td class="bluebox">File No</td>
+							<td class="bluebox"><s:textfield name="fileno" id="fileno"/></td>
+							</tr>
 						</table>
 					</div>
 					<br />

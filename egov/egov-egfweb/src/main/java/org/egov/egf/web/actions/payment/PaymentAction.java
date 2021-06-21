@@ -242,7 +242,7 @@ public class PaymentAction extends BasePaymentAction {
  	List<HashMap<String, Object>> workflowHistory =new ArrayList<HashMap<String, Object>>(); 
  	private String paymentChequeNo;
  	private String billregisterhistory;
-   
+ 	private String fileno="";
     @Autowired
     private FinancialUtils financialUtils;
     
@@ -489,6 +489,10 @@ public class PaymentAction extends BasePaymentAction {
         // the vocuhermis table
         if (voucherHeader.getVouchermis().getFunction() != null)
             sql.append(" and bill.egBillregistermis.function=" + voucherHeader.getVouchermis().getFunction().getId());
+		/*
+		 * if (voucherHeader.getFileNo() != null)
+		 * sql.append(" and bill.egBillregister.fileno=" + voucherHeader.getFileNo());
+		 */
 
         EgwStatus egwStatus = null;
         /*
@@ -909,6 +913,9 @@ public class PaymentAction extends BasePaymentAction {
               for(int i =0; i< billList.size();i++)
               {
                 voucherHeader = (CVoucherHeader) voucherService.findById( billList.get(i).getBillVoucherId(),false);
+                fileno=voucherHeader.getFileNo();
+                PaymentBean pb=new PaymentBean();
+                pb.setFileno(fileno);
             workflowHistory.addAll(financialUtils.getWorkflowHistory(voucherHeader.getState(), voucherHeader.getStateHistory()));
               }
             }
@@ -1115,10 +1122,27 @@ public class PaymentAction extends BasePaymentAction {
             if (parameters.get("function") != null)
                 billregister.getEgBillregistermis()
                         .setFunction(functionService.findOne(Long.valueOf(parameters.get("function")[0].toString())));
-            String backLogArr[]=new String[1];
-            backLogArr[0]=backlogEntry;
-            parameters.put("backlogEntry", backLogArr);
-            paymentheader = paymentService.createPayment(parameters, billList, billregister, workflowBean,firstsignatory,secondsignatory);
+            try {
+            	if(backlogEntry!=null && !backlogEntry.isEmpty()) {
+                    backlogEntry=backlogEntry.split(",")[0];
+                    }
+                    if(firstsignatory!=null && !firstsignatory.isEmpty()) {
+                    	firstsignatory=firstsignatory.split(",")[0];
+                        }
+                    if(secondsignatory!=null && !secondsignatory.isEmpty()) {
+                    	secondsignatory=secondsignatory.split(",")[0];
+                        }
+				/*
+				 * String fileNo[]=new String[1]; fileNo[0]=fileno;
+				 * parameters.put("fileno",fileNo);
+				 */ System.out.println(" fileNo"+paymentheader.getFileno());
+				 System.out.println(" fileNo"+fileno);
+				
+				/*
+				 * if(fileno!=null) paymentheader.setFileNo(fileno);
+				 */
+            
+            paymentheader = paymentService.createPayment(parameters, billList, billregister, workflowBean,firstsignatory,secondsignatory,fileno);
             miscBillList = paymentActionHelper.getPaymentBills(paymentheader);
             if(miscBillList!=null)
             {
@@ -1128,7 +1152,12 @@ public class PaymentAction extends BasePaymentAction {
             	  workflowHistory.addAll(financialUtils.getWorkflowHistory(miscBillList.get(i).getBillVoucherHeader().getState(),miscBillList.get(i).getBillVoucherHeader().getStateHistory()));
                 
               }
-            }            
+            }
+            }
+            catch(Exception e) {
+            	System.out.println("error "+e.getMessage());
+            	e.printStackTrace();
+            }
             workflowHistory.addAll(financialUtils.getWorkflowHistory(paymentheader.getState(), paymentheader.getStateHistory()));
             // sendForApproval();// this should not be called here as it is
             // public method which is called from jsp submit
@@ -1284,11 +1313,6 @@ public class PaymentAction extends BasePaymentAction {
             {
         	addActionMessage(getMessage("payment.voucher.approved", new String[] {this.getEmployeeName(paymentheader.getState()
             		.getOwnerPosition()) }));
-        	EgBillregister expenseBill = null; 
-			  expenseBill=egBillRegisterService.getBillsById(billregister.getId());
-			 
-			  expenseBill.setStatus(egwStatusHibernateDAO.getStatusByModuleAndCode("EXPENSEBILL" ,"Bill Payment Created"));
-			  egBillRegisterService.update(expenseBill);
         }
         if (FinancialConstants.BUTTONCANCEL.equalsIgnoreCase(workflowBean.getWorkFlowAction()))
             addActionMessage(getText("payment.voucher.cancelled"));
@@ -1296,9 +1320,10 @@ public class PaymentAction extends BasePaymentAction {
             addActionMessage(getMessage("payment.voucher.final.approval"));
 			  EgBillregister expenseBill = null; 
 			  expenseBill=egBillRegisterService.getBillsById(billregister.getId());
-			 
+			  if(expenseBill!=null) {
 			  expenseBill.setStatus(egwStatusHibernateDAO.getStatusByModuleAndCode("EXPENSEBILL" ,"Bill Payment Approved"));
 			  egBillRegisterService.update(expenseBill);
+			  }
         }
         if (Constants.ADVANCE_PAYMENT.equalsIgnoreCase(paymentheader.getVoucherheader().getName())) {
             advanceRequisitionList.addAll(paymentActionHelper.getAdvanceRequisitionDetails(paymentheader));
@@ -1438,6 +1463,10 @@ public class PaymentAction extends BasePaymentAction {
                    
             
         }
+			/*
+			 * if (paymentheader.getVoucherheader().getFileNo()!=null) {
+			 * paymentheader.setFileNo(paymentheader.getVoucherheader().getFileNo()); }
+			 */
          if (paymentheader.getVoucherheader().getFundId().getId()!=null && !paymentheader.getVoucherheader().getFundId().getId().equals("-1"))
         {
         	 final Fund fund = (Fund) persistenceService.find("from Fund where id=?",
@@ -2661,7 +2690,16 @@ public class PaymentAction extends BasePaymentAction {
         this.selectedSupplierRows = selectedSupplierRows;
     }
 
-    public String getBillIdsToPaymentAmountsMap() {
+    
+    public String getFileno() {
+		return fileno;
+	}
+
+	public void setFileno(String fileno) {
+		this.fileno = fileno;
+	}
+
+	public String getBillIdsToPaymentAmountsMap() {
         return billIdsToPaymentAmountsMap;
     }
 

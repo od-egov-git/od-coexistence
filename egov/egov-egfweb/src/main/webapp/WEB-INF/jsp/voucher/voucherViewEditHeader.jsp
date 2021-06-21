@@ -207,7 +207,7 @@
 												value="%{backlogEntry}"
 												list="#{'N':'No','Y':'Yes'}"
 												id="backlogEntry" /></td>
-			<td width="10%" class="<c:out value='${tdclass}' />"><s:text name="File No"/> :
+			<td width="10%" class="<c:out value='${tdclass}' />"><s:text name="fileno"/> :
 				&nbsp;</td>
 			<td colspan="3" class="<c:out value='${tdclass}' />">
 				<s:textfield name="fileno" value="%{getMasterName('fileno')}" readonly="true"/> 

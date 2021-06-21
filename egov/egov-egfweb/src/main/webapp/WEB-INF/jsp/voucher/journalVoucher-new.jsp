@@ -130,10 +130,12 @@
 							<td style="width: 5%"></td>
 							<td class="greybox"><s:text name="backdated.entry" /><span
 								class="mandatory1">*</span></td>
-							<td class="greybox" colspan="3"><s:select name="backlogEntry" 
+							<td class="greybox" colspan="1"><s:select name="backlogEntry" 
 																	headerKey="-1" headerValue="Select" value="%{backlogEntry}"
-																	list="#{'Y':'Yes' ,'N':'No'}"
+																	list="#{'N':'No' ,'Y':'Yes'}"
 																			id="backlogEntry" /></td>
+							<td class="bluebox">File No</td>
+							<td class="bluebox"><s:textfield name="fileno" id="fileno"/></td>
 						</tr>
 						</tr>
 					</table>
@@ -681,7 +683,13 @@ var curdate = new Date();
 	}
 	}
 	else{
-		return true;
+		if(date.setHours(0,0,0,0) < curdate.setHours(0,0,0,0)){
+			console.log(":::: backdated");
+			return true;
+		}else{
+			console.log(":::: not backdated");
+			return false;
+		}
 	}
 	
 	

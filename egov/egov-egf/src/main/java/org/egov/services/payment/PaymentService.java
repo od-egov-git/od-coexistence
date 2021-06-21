@@ -278,12 +278,13 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
 
     @Transactional
     public Paymentheader createPayment(final Map<String, String[]> parameters, final List<PaymentBean> billList,
-            final EgBillregister billregister, WorkflowBean workflowBean, String firstsignatory, String secondsignatory)
+            final EgBillregister billregister, WorkflowBean workflowBean, String firstsignatory, String secondsignatory, String fileno)
             throws ApplicationRuntimeException, ValidationException {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Starting createPayment...");
         Paymentheader paymentheader = null;
         String backlogEntry=null;
+        //String fileno=parameters.get("fileno")[0];
         try {
             accountcodedetails = new ArrayList<HashMap<String, Object>>();
             subledgerdetails = new ArrayList<HashMap<String, Object>>();
@@ -310,7 +311,8 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
                 headerdetails.put("secondsignatory", secondsignatory);
             if (backlogEntry != null)
                 headerdetails.put("backdateentry", backlogEntry);
-            
+			if (fileno != null) 
+				headerdetails.put("fileno", fileno);
             if (parameters.get(VoucherConstant.VOUCHERDATE) != null
                     && !parameters.get(VoucherConstant.VOUCHERDATE)[0].equals(EMPTY_STRING))
                 headerdetails.put(VoucherConstant.VOUCHERDATE,
@@ -3013,7 +3015,7 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
         System.out.println("Executing TYPE ::::"+type);
         System.out.println("Executing paymenCno:::"+paymentChequeNo);
         System.out.println("fileNo voucher "+voucherHeader.getFileNo());
-        paymentheader.setFileNo(voucherHeader.getFileNo());
+        paymentheader.setFileno(voucherHeader.getFileNo());
         if(null!=paymentChequeNo) {
         		System.out.println("Executing paymenCno IF :::"+paymentChequeNo);
         		paymentheader.setPaymentChequeNo(paymentChequeNo);

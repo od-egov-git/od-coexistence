@@ -282,7 +282,10 @@ public class EgBillRegisterService extends PersistenceService<EgBillregister, Lo
         Query qry = this.getCurrentSession()
                 .createQuery("from EgBillregister br where br.billnumber =:billno");
         qry.setString("billno", billno);
-        return (EgBillregister) qry.list().get(0);
+        if(qry.list().size()>0)
+        	return (EgBillregister) qry.list().get(0);
+        else
+        	return null;
     }
     
     

@@ -181,7 +181,7 @@ public class State/* <T extends OwnerGroup> */ extends AbstractAuditable {
 	// @LastModifiedDate
 	// private Date lastModifiedDate;
 
-	protected State() {
+	public State() {
 		// Explicit state initialization not allowed
 	}
 
@@ -191,7 +191,7 @@ public class State/* <T extends OwnerGroup> */ extends AbstractAuditable {
 	}
 
 	// @Override
-	protected void setId(final Long id) {
+	public void setId(final Long id) {
 		this.id = id;
 	}
 

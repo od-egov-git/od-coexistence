@@ -220,4 +220,11 @@
 			<form:errors path="billtype" cssClass="add-margin error-msg" />
 		</div>
 	</div>
+	<div class="form-group">
+		<label class="col-sm-3 control-label text-right">File No
+		</label>
+			<div class="col-sm-3 add-margin">
+			<form:input path="fileno" id="fileno" class="form-control" maxlength="50" ></form:input>
+			</div>
+	</div>
 </div>

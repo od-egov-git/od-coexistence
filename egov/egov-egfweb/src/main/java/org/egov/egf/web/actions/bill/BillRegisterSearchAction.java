@@ -100,7 +100,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 @ParentPackage("egov")
 @Results({
     @Result(name = BillRegisterSearchAction.NEW, location = "billRegisterSearch-" + BillRegisterSearchAction.NEW + ".jsp"),
-    @Result(name = BillRegisterSearchAction.POST, location = "billRegisterSearch-" + BillRegisterSearchAction.POST + ".jsp")
+    @Result(name = BillRegisterSearchAction.POST, location = "billRegisterSearch-" + BillRegisterSearchAction.POST + ".jsp"),
+    @Result(name ="billregisterhistory", location = "billregisterhistoryJsonData.jsp")
 })
 public class BillRegisterSearchAction extends BaseFormAction {
     private static final long serialVersionUID = 1L;
@@ -113,6 +114,8 @@ public class BillRegisterSearchAction extends BaseFormAction {
     private String billDateTo;
     private String expType;
     private List<Map<String, Object>> billList;
+    
+    private List<Inbox> billregisterhistoryList;
     @Autowired
     private AppConfigValueService appConfigValueService;
     private String amount;
@@ -280,7 +283,7 @@ public class BillRegisterSearchAction extends BaseFormAction {
         System.out.println("--------end--------");
         LOGGER.info("size ::: "+list1.size());
         for (final Object[] object : list)
-            stateIds.add(getLongValue(object[11]));
+            stateIds.add(getLongValue(object[10]));
         List<Object[]> oWnerNamesList = new ArrayList<Object[]>();
         if (stateIds != null && stateIds.size() > 0)
             oWnerNamesList = getOwnersForWorkFlowState(stateIds);
@@ -326,14 +329,16 @@ public class BillRegisterSearchAction extends BaseFormAction {
                     billMap.put("sourcepath",
                             "/services/EGF/bill/billView-view.action?billId=" + object[8].toString());
                 // If bill is created from create bill screen6666
-                if (object[11] != null)
+                if (object[10] != null)
                 {
-                    if (!(getStringValue(object[10]).equalsIgnoreCase(FinancialConstants.CONTINGENCYBILL_APPROVED_STATUS) || getStringValue(
-                            object[10]).equalsIgnoreCase(FinancialConstants.CONTINGENCYBILL_CANCELLED_STATUS)))
+                    if (!(getStringValue(object[6]).equalsIgnoreCase(FinancialConstants.CONTINGENCYBILL_APPROVED_STATUS) || getStringValue(
+                            object[6]).equalsIgnoreCase(FinancialConstants.CONTINGENCYBILL_CANCELLED_STATUS) || getStringValue(
+                                    object[6]).equalsIgnoreCase("Voucher Approved") || getStringValue(
+                                            object[6]).equalsIgnoreCase("Bill Payment Approved")))
                         billMap.put(
                                 "ownerName",
-                                stateIdAndOwnerNameMap.get(getLongValue(object[11])) != null ? stateIdAndOwnerNameMap
-                                        .get(getLongValue(object[11])) : "-");
+                                stateIdAndOwnerNameMap.get(getLongValue(object[10])) != null ? stateIdAndOwnerNameMap
+                                        .get(getLongValue(object[10])) : "-");
                     else
                         billMap.put("ownerName", "-");
                 } else
@@ -351,7 +356,7 @@ public class BillRegisterSearchAction extends BaseFormAction {
     
     @SkipValidation
     @Action(value = "/bill/billregisterhistory")
-    public List<Inbox> billRegisterHistory() {
+    public String billRegisterHistory() {
     	System.out.println(billregisterid);
     	String billid=billregisterid;
     	List<HashMap<String, Object>> result;
@@ -364,6 +369,7 @@ public class BillRegisterSearchAction extends BaseFormAction {
     	
     	EgBillregister e=new EgBillregister();
     	e = null;
+    	try {
     	e = egbillregisterservice.getBillsById(Long.parseLong(billid));
     	if(null!=e) {
     		 result=financialUtils.getBillRegisterHistory(e.getState(), e.getStateHistory());
@@ -380,19 +386,27 @@ public class BillRegisterSearchAction extends BaseFormAction {
     			
     			 miscdata =  miscbilldetailService.getBillsById(e.getEgBillregistermis().getVoucherHeader().getId());
     			 if(null!=miscdata && miscdata.getPayVoucherHeader()!=null) {
-    				 paymentresult =  financialUtils.getBillRegisterHistory(miscdata.getPayVoucherHeader().getState(), miscdata.getPayVoucherHeader().getStateHistory());
-    				 if(paymentresult!=null && paymentresult.size()>0) {
-    					 inboxFinalList.addAll(getgetBillRegisterListData(paymentresult));
+    				 if(miscdata.getPayVoucherHeader().getState()!=null) {
+    					 paymentresult =  financialUtils.getBillRegisterHistory(miscdata.getPayVoucherHeader().getState(), miscdata.getPayVoucherHeader().getStateHistory());
+        				 if(paymentresult!=null && paymentresult.size()>0) {
+        					 
+        					 inboxFinalList.addAll(getgetBillRegisterListData(paymentresult));
+        				 }
     				 }
+    				 
     				 
     				
     			 }
     		 }
     		  	
     	}
+    	}catch(Exception ex) {
+    		ex.printStackTrace();
+    	}
     	
+    setBillregisterhistoryList(inboxFinalList);
     	
-       return inboxFinalList;
+       return "billregisterhistory";
     }
     
     
@@ -620,6 +634,14 @@ public class BillRegisterSearchAction extends BaseFormAction {
 
 	public void setBillregisterid(String billregisterid) {
 		this.billregisterid = billregisterid;
+	}
+
+	public List<Inbox> getBillregisterhistoryList() {
+		return billregisterhistoryList;
+	}
+
+	public void setBillregisterhistoryList(List<Inbox> billregisterhistoryList) {
+		this.billregisterhistoryList = billregisterhistoryList;
 	}
 	
 	

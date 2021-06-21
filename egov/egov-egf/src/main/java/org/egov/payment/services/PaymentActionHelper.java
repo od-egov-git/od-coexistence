@@ -342,6 +342,26 @@ public class PaymentActionHelper {
         paymentService.getSession().flush();
         persistenceService.getSession().flush();
         finDashboardService.billPaymentUpdatedAction(paymentheader);
+        if(workflowBean.getWorkFlowAction().equals("Forward"))
+        {
+        	List<Miscbilldetail> miscBillList = miscbilldetailService.findAllBy(
+                    " from Miscbilldetail where payVoucherHeader.id = ? ",
+                    paymentheader.getVoucherheader().getId());
+        	
+        	if(miscBillList !=null && !miscBillList.isEmpty())
+        	{
+        		for(Miscbilldetail row : miscBillList)
+        		{
+        			 expenseBill = expenseBillService.getByBillnumber(row.getBillnumber());
+        			 if(expenseBill != null)
+        			 {
+        				 expenseBill.setStatus(egwStatusDAO.getStatusByModuleAndCode("EXPENSEBILL", "Bill Payment Created"));
+        				 expenseBill.getState().setId(paymentheader.getState().getId());
+                		 expenseBillService.create(expenseBill);
+        			 }
+        		}
+        	}
+        }
         return paymentheader;
     }
 
@@ -645,7 +665,7 @@ public class PaymentActionHelper {
         }
         if(voucherHeader.getFileNo() != null && !voucherHeader.getFileNo().isEmpty() && !voucherHeader.getFileNo().equalsIgnoreCase(""))
         {
-        	headerdetails.put("fileNo", voucherHeader.getFileNo());
+        	headerdetails.put("fileno", voucherHeader.getFileNo());
         }
         if (voucherHeader.getVouchermis().getDepartmentcode() != null)
             headerdetails.put(VoucherConstant.DEPARTMENTCODE,voucherHeader.getVouchermis().getDepartmentcode());

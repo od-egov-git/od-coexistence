@@ -122,6 +122,10 @@
 				<div class="col-md-3 col-xs-6 add-margin view-content" id="ct-email">
 					<c:out default="N/A" value="${egBillregister.egBillregistermis.budgetaryAppnumber }" />
 				</div>
+				<div class="col-md-3 col-xs-6 add-margin">File No</div>
+				<div class="col-md-3 col-xs-6 add-margin view-content">
+					<c:out default="N/A" value="${egBillregister.fileno }" />
+				</div>
 		</div>
 	</div>
 	

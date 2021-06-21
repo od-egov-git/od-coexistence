@@ -272,6 +272,7 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
     Date date;
     private String backlogEntry="";
     private String narration="";
+    private String fileno="";
     @Autowired
     FinanceDashboardService finDashboardService;
     @Autowired
@@ -835,6 +836,8 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
             System.out.println("narration "+narration);
             if(narration!=null)
             voucherHeader.setDescription(narration);
+            if(fileno!=null)
+            	voucherHeader.setFileNo(fileno);
             validateBillVoucherDate(egBillregister, voucherHeader);
             getMasterDataForBill();
             populateWorkflowBean();
@@ -993,7 +996,7 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
                 type = "default";
             //EmployeeInfo employee = microserviceUtils.getEmployeeByPositionId(voucherHeader.getState().getOwnerPosition());
             String empName=this.getEmployeeName(voucherHeader.getState().getOwnerPosition()) ;
-            String rejEmpName=this.getEmployeeName(voucherHeader.getState().getInitiatorPosition()) ;
+            String rejEmpName=this.getEmployeeName(voucherHeader.getState().getOwnerPosition()) ;
             if (FinancialConstants.BUTTONREJECT.equalsIgnoreCase(workflowBean.getWorkFlowAction()))
                 addActionMessage(getText("pjv.voucher.rejected", new String[] {
                 		rejEmpName != null ? rejEmpName : "" }));
@@ -1947,6 +1950,14 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
 
 	public void setINSTRUMENTAMOUNT(String iNSTRUMENTAMOUNT) {
 		INSTRUMENTAMOUNT = iNSTRUMENTAMOUNT;
+	}
+	
+	public String getFileno() {
+		return fileno;
+	}
+
+	public void setFileno(String fileno) {
+		this.fileno = fileno;
 	}
 
 	protected String getMessage(final String key) {

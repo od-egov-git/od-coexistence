@@ -491,7 +491,10 @@
 																<td class="greybox" colspan="2"><s:textfield
 																		id="voucherdate" name="voucherdate"
 																		value="%{voucherdate}" data-date-end-date="0d"
-																		data-inputmask="'mask': 'd/m/y'" readonly="true" /></td>
+																		onkeyup="DateFormat(this,this.value,event,false,'3')"
+																		placeholder="DD/MM/YYYY"
+																		class="form-control datepicker"
+																		data-inputmask="'mask': 'd/m/y'" /></td>
 
 															</tr>
 
@@ -623,9 +626,11 @@
 																		value="%{backlogEntry}" list="#{'Y':'Yes' ,'N':'No'}"
 																		id="backlogEntry" /></td>
 
-																<td class="bluebox" width="15%">&nbsp;</td>
-
-																<td class="bluebox" colspan="4">&nbsp;</td>
+																<td width="10%" class="bluebox">File no :
+																	&nbsp;</td>
+																<td colspan="3" class="bluebox">
+																	<s:textfield id="fileno" name="fileno" value="%{fileno}" /> 
+																</td>
 
 															</tr>
 
@@ -1819,7 +1824,13 @@
 				return false;
 			}
 			}else{
-				return true;
+				if(date.setHours(0,0,0,0) < curdate.setHours(0,0,0,0)){
+					console.log(":::: backdated");
+					return true;
+				}else{
+					console.log(":::: not backdated");
+					return false;
+				}
 			}
 			
 			

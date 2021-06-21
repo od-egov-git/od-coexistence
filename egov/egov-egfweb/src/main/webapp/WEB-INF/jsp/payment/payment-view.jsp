@@ -379,7 +379,21 @@ function openBudgetDtls()
 																<td class="bluebox"><strong>Budget Details</strong></td>
 																<td class="bluebox" colspan="4"><a href="#" onclick="openBudgetDtls('<s:property value='%{billVoucherHeader.id}'/>')">Click</a></td>
 															</tr>
-															
+															<tr>
+																<td class="bluebox">&nbsp;</td>
+																<td class="bluebox"><s:text name="backdated.entry" /><span
+																	class="mandatory1">*</span></td>
+																<td class="bluebox"><s:select name="backlogEntry"
+																		headerKey="-1" headerValue="Select"
+																		value="%{paymentheader.voucherheader.backdateentry}" list="#{'Y':'Yes' ,'N':'No'}"
+																		id="backlogEntry" /></td>
+																<td width="10%" class="bluebox">File no :
+																	&nbsp;</td>
+																<td colspan="3" class="bluebox">
+																	<s:textfield id="fileno" name="fileno" value="%{fileno}" readonly="true"/> 
+																</td>
+
+															</tr>
 														</table> 
 
 													</span>

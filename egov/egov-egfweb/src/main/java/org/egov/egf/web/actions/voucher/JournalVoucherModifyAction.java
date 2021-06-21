@@ -174,7 +174,7 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
 
     @Autowired
     private FileStoreService fileStoreService;
-
+    private String fileno="";
     @SuppressWarnings("unchecked")
     @Override
     public void prepare() {
@@ -206,6 +206,7 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
         voucherHeader.setDocumentDetail(voucherDocList);
         voucherHeader.setDocumentMode(CommonConstants.DOCUMENT_ADD_VIEW_MODE);
         System.out.println("::::BackdateEntry::"+voucherHeader.getBackdateentry());
+        fileno=voucherHeader.getFileNo();
        // voucherHeader.setBackdateentry(voucherHeader.getBackdateentry());
         try {
             if (voucherHeader != null && voucherHeader.getState() != null)
@@ -467,6 +468,7 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
                  }
             	 System.out.println(":::::::: "+voucherHeader.getBackdateentry());
                  voucherHeader.setBackdateentry(voucherHeader.getBackdateentry());
+                 voucherHeader.setFileNo(fileno);
                 voucherHeader = journalVoucherActionHelper.editVoucher(billDetailslist, subLedgerlist, voucherHeader,
                         voucherTypeBean, workflowBean, parameters.get("totaldbamount")[0]);
                 voucherHeader.setDocumentDetail(documentDetail);
@@ -812,5 +814,15 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
 	public void setFileFileName(String[] fileFileName) {
 		this.fileFileName = fileFileName;
 	}
+
+	public String getFileno() {
+		return fileno;
+	}
+
+	public void setFileno(String fileno) {
+		this.fileno = fileno;
+	}
+	
+	
     
 }

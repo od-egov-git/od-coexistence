@@ -174,10 +174,10 @@
 	<td class="greybox"><s:text name="backlog.entry" /><span
 		class="greybox"><span class="mandatory1">*</span></span></td>
 	<td class="greybox"><s:select name="backlogEntry" headerKey="-1"
-			headerValue="Select" value="%{backlogEntry}"
+			headerValue="Select" value="%{backdateentry}"
 			list="#{'Y':'Yes' ,'N':'No'}" id="backlogEntry" /></td>
 	<td class="bluebox">File No</td>
-	<td class="bluebox"><s:textfield name="fileNo" id="fileNo" value="%{fileNo}"/></td>
+	<td class="bluebox"><s:textfield name="fileno" id="fileno" value="%{fileno}"/></td>
 </tr>
 </table>
 <div id="budgetSearchGrid">

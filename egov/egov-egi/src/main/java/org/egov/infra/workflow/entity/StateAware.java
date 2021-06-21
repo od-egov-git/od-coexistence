@@ -107,7 +107,7 @@ public abstract class StateAware extends AbstractAuditable {
         return state;
     }
 
-    private void setState(State state) {
+    public void setState(State state) {
         this.state = state;
     }
 
