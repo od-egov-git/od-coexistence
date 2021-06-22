@@ -760,8 +760,8 @@ public class CreateVoucher {
 				headerDetails.put(VoucherConstant.BUDGETARYAPPNUMBER, billMis.getBudgetaryAppnumber());
 			if (voucherHeader.getBackdateentry()!=null)
 				headerDetails.put(VoucherConstant.BACKDATE, voucherHeader.getBackdateentry());
-			if (voucherHeader.getFileNo()!=null)
-				headerDetails.put(VoucherConstant.FILENO, voucherHeader.getFileNo());
+			if (voucherHeader.getFileno()!=null)
+				headerDetails.put(VoucherConstant.FILENO, voucherHeader.getFileno());
 			for (final EgBilldetails egBilldetails : billDetailslist) {
 
 				// persistenceService.setSessionFactory(new SessionFactory());
@@ -1814,26 +1814,35 @@ public class CreateVoucher {
 	public void validateMandateFields(final HashMap<String, Object> headerdetails) {
 
 		List<String> headerMandateFields = getHeaderMandateFields();
-		if (LOGGER.isDebugEnabled())
-			LOGGER.debug("Inside Validate Method");
+		//if (LOGGER.isDebugEnabled())
+			LOGGER.info("Inside Validate Method");
+			
 		checkMandatoryField("vouchernumber", headerdetails.get(VoucherConstant.VOUCHERNUMBER), headerdetails,
 				headerMandateFields);
+		LOGGER.info("vouchernumber");
 		checkMandatoryField("voucherdate", headerdetails.get(VoucherConstant.VOUCHERDATE), headerdetails,
 				headerMandateFields);
+		LOGGER.info("voucherdate");
 		checkMandatoryField("fund", headerdetails.get(VoucherConstant.FUNDCODE), headerdetails, headerMandateFields);
+		LOGGER.info("fund");
 		checkMandatoryField("department", headerdetails.get(VoucherConstant.DEPARTMENTCODE), headerdetails,
 				headerMandateFields);
+		LOGGER.info("department");
 		checkMandatoryField("scheme", headerdetails.get(VoucherConstant.SCHEMECODE), headerdetails,
 				headerMandateFields);
+		LOGGER.info("scheme");
 		checkMandatoryField("subscheme", headerdetails.get(VoucherConstant.SUBSCHEMECODE), headerdetails,
 				headerMandateFields);
+		LOGGER.info("subscheme");
 		checkMandatoryField("functionary", headerdetails.get(VoucherConstant.FUNCTIONARYCODE), headerdetails,
 				headerMandateFields);
+		LOGGER.info("functionary");
 		// checkMandatoryField("function",headerdetails.get(VoucherConstant.FUNCTIONCODE),headerdetails);
 		checkMandatoryField("fundsource", headerdetails.get(VoucherConstant.FUNDSOURCECODE), headerdetails,
 				headerMandateFields);
+		LOGGER.info("fundsource");
 		checkMandatoryField("field", headerdetails.get(VoucherConstant.DIVISIONID), headerdetails, headerMandateFields);
-
+		LOGGER.info("field");
 	}
 
 	private void validateVoucherType(String vouType) {
@@ -1887,7 +1896,7 @@ public class CreateVoucher {
 			if(headerdetails.containsKey("fileno")
 					&& null != headerdetails.get("fileno"))
 			{
-				cVoucherHeader.setFileNo(headerdetails.get("fileno").toString());
+				cVoucherHeader.setFileno(headerdetails.get("fileno").toString());
 			}
 			// -- Voucher Type checking. --START
 			if (FinancialConstants.STANDARD_VOUCHER_TYPE_JOURNAL.equalsIgnoreCase(voucherType))
@@ -2952,14 +2961,15 @@ public class CreateVoucher {
 
 	protected void checkMandatoryField(final String fieldName, final Object value,
 			final HashMap<String, Object> headerdetails, List<String> mandatoryFields) {
-		if (LOGGER.isDebugEnabled())
-			LOGGER.debug("Filed name :=" + fieldName + " Value = :" + value);
+		//if (LOGGER.isDebugEnabled())
+			LOGGER.info("Filed name :=" + fieldName + " Value = :" + value);
 		String vNumGenMode = null;
 		if (fieldName.equals("vouchernumber")) {
-			if (headerdetails.get(VoucherConstant.VOUCHERTYPE) == null)
+			if (headerdetails.get(VoucherConstant.VOUCHERTYPE) == null) {
+				LOGGER.info("VOUCHERTYPE");
 				throw new ValidationException(Arrays.asList(new ValidationError(
 						VoucherConstant.VOUCHERTYPE + ISREQUIRED, VoucherConstant.VOUCHERTYPE + ISREQUIRED)));
-			else {
+			}else {
 				validateVoucherType(headerdetails.get(VoucherConstant.VOUCHERTYPE).toString());
 				if (FinancialConstants.STANDARD_VOUCHER_TYPE_JOURNAL
 						.equalsIgnoreCase(headerdetails.get(VoucherConstant.VOUCHERTYPE).toString()))
@@ -2973,7 +2983,10 @@ public class CreateVoucher {
 							Arrays.asList(new ValidationError(SELECT + fieldName, SELECT + fieldName)));
 			}
 		} else if (mandatoryFields.contains(fieldName) && (value == null || StringUtils.isEmpty(value.toString())))
+		{
+			LOGGER.info("fieldName error in "+fieldName);
 			throw new ValidationException(Arrays.asList(new ValidationError(SELECT + fieldName, SELECT + fieldName)));
+		}
 	}
 
 	@SuppressWarnings("unchecked")

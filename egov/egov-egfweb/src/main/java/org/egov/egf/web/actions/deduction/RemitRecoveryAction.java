@@ -162,6 +162,8 @@ public class RemitRecoveryAction extends BasePaymentAction {
     private String message = "";
     private String selectedRows;
     private Long functionId;
+    private String backdateentry;
+    private String fileno;
     @Autowired
     @Qualifier("remittanceRecoveryService")
     private RecoveryService recoveryService;
@@ -345,6 +347,8 @@ public class RemitRecoveryAction extends BasePaymentAction {
                 } catch (final ParseException e) {
 
                 }
+            
+            
             voucherHeader.setType(FinancialConstants.STANDARD_VOUCHER_TYPE_PAYMENT);
             if (voucherHeader.getVouchermis().getDepartmentcode() == null) {
                 voucherHeader.getVouchermis().setDepartmentcode(departmentId.toString());
@@ -406,7 +410,9 @@ public class RemitRecoveryAction extends BasePaymentAction {
         	
         	String fSignatory =firstsignatory;
         	String sSignatory = secondsignatory;
-        	
+        	String bentry=backdateentry;
+        	String filen=fileno;
+        	System.out.println("::::backdate:: "+bentry+"::::fileno:: "+filen);
         	System.out.println("In create Function....>>"+fSignatory+"..."+sSignatory);
         	
             final String vdate = parameters.get("voucherDate")[0];
@@ -430,6 +436,8 @@ public class RemitRecoveryAction extends BasePaymentAction {
             System.out.println("Part 2");
             voucherHeader.setType(FinancialConstants.STANDARD_VOUCHER_TYPE_PAYMENT);
             voucherHeader.setName(FinancialConstants.PAYMENTVOUCHER_NAME_REMITTANCE);
+            voucherHeader.setBackdateentry(bentry);
+            voucherHeader.setFileno(filen);
             //added by prasanta for save signotory
             voucherHeader.setFirstsignatory(fSignatory);
             voucherHeader.setSecondsignatory(sSignatory);
@@ -1486,6 +1494,23 @@ public class RemitRecoveryAction extends BasePaymentAction {
 
 	public void setSecondsignatory(String secondsignatory) {
 		this.secondsignatory = secondsignatory;
+	}
+
+	
+	public String getFileno() {
+		return fileno;
+	}
+
+	public void setFileno(String fileno) {
+		this.fileno = fileno;
+	}
+
+	public String getBackdateentry() {
+		return backdateentry;
+	}
+
+	public void setBackdateentry(String backdateentry) {
+		this.backdateentry = backdateentry;
 	}
 
 	

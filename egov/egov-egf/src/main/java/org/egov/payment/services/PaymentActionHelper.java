@@ -356,8 +356,10 @@ public class PaymentActionHelper {
         			 if(expenseBill != null)
         			 {
         				 expenseBill.setStatus(egwStatusDAO.getStatusByModuleAndCode("EXPENSEBILL", "Bill Payment Created"));
-        				 expenseBill.getState().setId(paymentheader.getState().getId());
-                		 expenseBillService.create(expenseBill);
+						/*
+						 * expenseBill.getState().setId(paymentheader.getState().getId());
+						 * expenseBillService.create(expenseBill);
+						 */
         			 }
         		}
         	}
@@ -663,9 +665,9 @@ public class PaymentActionHelper {
         {
         	headerdetails.put("backdateentry", voucherHeader.getBackdateentry());
         }
-        if(voucherHeader.getFileNo() != null && !voucherHeader.getFileNo().isEmpty() && !voucherHeader.getFileNo().equalsIgnoreCase(""))
+        if(voucherHeader.getFileno() != null && !voucherHeader.getFileno().isEmpty() && !voucherHeader.getFileno().equalsIgnoreCase(""))
         {
-        	headerdetails.put("fileno", voucherHeader.getFileNo());
+        	headerdetails.put("fileno", voucherHeader.getFileno());
         }
         if (voucherHeader.getVouchermis().getDepartmentcode() != null)
             headerdetails.put(VoucherConstant.DEPARTMENTCODE,voucherHeader.getVouchermis().getDepartmentcode());

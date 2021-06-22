@@ -543,8 +543,8 @@ public class ContraBTBActionHelper {
 					voucherHeader.getVouchermis().getFunctionary().getCode());
 		if (voucherHeader.getVouchermis().getFunction() != null)
 			headerdetails.put(VoucherConstant.FUNCTIONCODE, voucherHeader.getVouchermis().getFunction().getCode());
-		if (voucherHeader.getFileNo() != null)
-			headerdetails.put(VoucherConstant.FILENO, voucherHeader.getFileNo());
+		if (voucherHeader.getFileno() != null)
+			headerdetails.put(VoucherConstant.FILENO, voucherHeader.getFileno());
 		return headerdetails;
 	}
 

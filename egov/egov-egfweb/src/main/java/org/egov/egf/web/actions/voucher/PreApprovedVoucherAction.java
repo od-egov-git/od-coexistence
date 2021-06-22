@@ -837,7 +837,7 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
             if(narration!=null)
             voucherHeader.setDescription(narration);
             if(fileno!=null)
-            	voucherHeader.setFileNo(fileno);
+            	voucherHeader.setFileno(fileno);
             validateBillVoucherDate(egBillregister, voucherHeader);
             getMasterDataForBill();
             populateWorkflowBean();
@@ -1201,7 +1201,7 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
             	}
             }
             else if ("fileno".equals(name))
-                val = voucherHeader.getFileNo();
+                val = voucherHeader.getFileno();
         } else if (name.equals("fund") && egBillregister.getEgBillregistermis().getFund() != null)
             val = egBillregister.getEgBillregistermis().getFund().getName();
         else if (name.equals("fundsource") && egBillregister.getEgBillregistermis().getFundsource() != null)

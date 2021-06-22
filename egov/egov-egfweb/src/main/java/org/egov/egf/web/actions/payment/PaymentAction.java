@@ -913,7 +913,7 @@ public class PaymentAction extends BasePaymentAction {
               for(int i =0; i< billList.size();i++)
               {
                 voucherHeader = (CVoucherHeader) voucherService.findById( billList.get(i).getBillVoucherId(),false);
-                fileno=voucherHeader.getFileNo();
+                fileno=voucherHeader.getFileno();
                 PaymentBean pb=new PaymentBean();
                 pb.setFileno(fileno);
             workflowHistory.addAll(financialUtils.getWorkflowHistory(voucherHeader.getState(), voucherHeader.getStateHistory()));
@@ -1154,6 +1154,7 @@ public class PaymentAction extends BasePaymentAction {
 				/*
 				 * if(fileno!=null) paymentheader.setFileNo(fileno);
 				 */
+                    
             
             paymentheader = paymentService.createPayment(parameters, billList, billregister, workflowBean,firstsignatory,secondsignatory,fileno);
             miscBillList = paymentActionHelper.getPaymentBills(paymentheader);

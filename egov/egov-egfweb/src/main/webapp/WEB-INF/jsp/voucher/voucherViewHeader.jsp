@@ -92,12 +92,12 @@
 				<td width="25%" class="<c:out value='${tdclass}' />"><s:property
 						value="%{getMasterName('subscheme')}" /></td>
 			</s:if>
-			<s:if test="%{shouldShowHeaderField('fundsource')}">
+			<%-- <s:if test="%{shouldShowHeaderField('fundsource')}">
 				<td width="10%" class="<c:out value='${tdclass}' />"><s:text name="voucher.financingSource"/> : &nbsp;</td>
 				<td width="25%" class="<c:out value='${tdclass}' />"><s:property
 						value="%{getMasterName('fundsource')}" /></td>
 
-			</s:if>
+			</s:if> --%>
 			<s:if
 				test="%{shouldShowHeaderField('fundsource') && shouldShowHeaderField('subscheme')}" />
 			<s:elseif

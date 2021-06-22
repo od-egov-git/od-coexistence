@@ -163,15 +163,15 @@ public class CVoucherHeader extends StateAware implements java.io.Serializable{
     private String secondsignatory;
     private String postauditprocessing;
     private String backdateentry;
-    private String fileNo;
+    private String fileno;
     
     
-    public String getFileNo() {
-		return fileNo;
+   	public String getFileno() {
+		return fileno;
 	}
 
-	public void setFileNo(String fileNo) {
-		this.fileNo = fileNo;
+	public void setFileno(String fileno) {
+		this.fileno = fileno;
 	}
 
 	public String getPostauditprocessing() {

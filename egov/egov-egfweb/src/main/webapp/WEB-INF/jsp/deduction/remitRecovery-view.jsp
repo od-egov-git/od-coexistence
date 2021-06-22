@@ -176,7 +176,7 @@ function printVoucher(){
 	}
 </script>
 </head>
-<body>
+<body onload="documentdep();">
 	<s:form action="remitRecovery" theme="simple" name="remittanceForm"
 		id="remittanceForm">
 		<s:push value="model">
@@ -314,6 +314,19 @@ function printVoucher(){
 																			value="%{voucherHeader.description}" type="text"
 																			style="width:580px;"></s:textarea>
 																	<td></td>
+																</tr>
+																<tr>
+																	<td class="bluebox">&nbsp;</td>
+																	<td class="bluebox">Back Date Entry:</td>
+																	<td class="bluebox" colspan="1"><s:textfield
+																			name="backdateentry" id="backdateentry"
+																			value="%{voucherHeader.backdateentry}" type="text"
+																			></s:textfield></td>
+																	<td class="bluebox">File No:</td>
+																	<td class="bluebox" colspan="4"><s:textfield
+																			name="fileno" id="fileno"
+																			value="%{voucherHeader.fileno}" type="text"
+																			></s:textfield></td>
 																</tr>
 															</table>
 														</span>

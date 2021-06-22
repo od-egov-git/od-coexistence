@@ -206,7 +206,7 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
         voucherHeader.setDocumentDetail(voucherDocList);
         voucherHeader.setDocumentMode(CommonConstants.DOCUMENT_ADD_VIEW_MODE);
         System.out.println("::::BackdateEntry::"+voucherHeader.getBackdateentry());
-        fileno=voucherHeader.getFileNo();
+        fileno=voucherHeader.getFileno();
        // voucherHeader.setBackdateentry(voucherHeader.getBackdateentry());
         try {
             if (voucherHeader != null && voucherHeader.getState() != null)
@@ -468,7 +468,7 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
                  }
             	 System.out.println(":::::::: "+voucherHeader.getBackdateentry());
                  voucherHeader.setBackdateentry(voucherHeader.getBackdateentry());
-                 voucherHeader.setFileNo(fileno);
+                 voucherHeader.setFileno(fileno);
                 voucherHeader = journalVoucherActionHelper.editVoucher(billDetailslist, subLedgerlist, voucherHeader,
                         voucherTypeBean, workflowBean, parameters.get("totaldbamount")[0]);
                 voucherHeader.setDocumentDetail(documentDetail);

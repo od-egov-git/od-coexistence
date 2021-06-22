@@ -320,7 +320,7 @@ System.out.println(":::list size::::: "+list1.size());
 						System.out.println("fileNo "+fileNo);
 						if(fileNo!=null)
 						{
-							voucherHeader.setFileNo(fileNo);
+							voucherHeader.setFileno(fileNo);
 						}
 						voucherHeader = contraBTBActionHelper.create(contraBean, contraVoucher, voucherHeader);
 						addActionMessage("Bank to Bank Transfer " + getText("transaction.success") + " with Voucher number: "
@@ -427,7 +427,7 @@ System.out.println(":::list size::::: "+list1.size());
 			voucherHeader4.setType(voucherHeader2.getType());
 			voucherHeader4.setVouchermis(voucherHeader2.getVouchermis());
 			voucherHeader4.setVoucherDate(voucherDate);
-			voucherHeader4.setFileNo(voucherHeader2.getFileNo());
+			voucherHeader4.setFileno(voucherHeader2.getFileno());
 			voucherTypeBean.setVoucherName(FinancialConstants.CONTRAVOUCHER_NAME_INTERFUND);
 			oldVoucher2 = voucherService.updateVoucherHeader(voucherHeader4, voucherTypeBean);
 

@@ -383,11 +383,12 @@ public class JournalVoucherActionHelper {
                 }
                
                 System.out.println("::::::::"+workflowBean.getApproverPositionId());
+                
                 voucherHeader.transition().start().withSenderName(user.getName())
                         .withComments(workflowBean.getApproverComments())
                        // .withStateValue(wfmatrix.getNextState()).withDateInfo(currentDate.toDate())
                         .withStateValue(ststeValue).withDateInfo(currentDate.toDate())
-                        .withOwner(workflowBean.getApproverPositionId())//.withOwnerName((workflowBean.getApproverPositionId() != null && workflowBean.getApproverPositionId() > 0L) ? getEmployeeName(workflowBean.getApproverPositionId()):"")
+                        .withOwner(workflowBean.getApproverPositionId()).withOwnerName((workflowBean.getApproverPositionId() != null && workflowBean.getApproverPositionId() > 0L) ? getEmployeeName(workflowBean.getApproverPositionId()):"")
                         .withNextAction(wfmatrix.getNextAction())
                         .withInitiator(user.getId());
                         //.withInitiator((info != null && info.getAssignments() != null && !info.getAssignments().isEmpty())
@@ -411,6 +412,27 @@ public class JournalVoucherActionHelper {
                 		voucherHeader.setStatus(6);
                 		
                 }
+          ///////added abhishek//////////////////////////////
+                if(voucherHeader.getState().getValue().equalsIgnoreCase("Rejected")) 
+                {
+	                HashMap<Long, String> positionmap = new HashMap<>();
+	                HashMap<Long, String> positionmap1 = new HashMap<>();
+	                int size=voucherHeader.getStateHistory().size();
+	    			for(int i=0;i<size;i++)
+	    			{
+	    				positionmap.put(voucherHeader.getStateHistory().get(i).getLastModifiedBy(),
+	    						voucherHeader.getStateHistory().get(i).getValue());
+	    				positionmap1.put(voucherHeader.getStateHistory().get(i).getLastModifiedBy(),
+	    						voucherHeader.getStateHistory().get(i).getNextAction());
+	    			}
+	    			if(positionmap.containsKey(user.getId()))
+	    			{
+	    				ststeValue=positionmap.get(user.getId());
+	    				wfmatrix.setNextAction(positionmap1.get(user.getId()));
+	    			}
+	    			
+                
+                }
                 
                 voucherHeader.transition().progressWithStateCopy().withSenderName(user.getName())
                         .withComments(workflowBean.getApproverComments())
@@ -432,7 +454,7 @@ public class JournalVoucherActionHelper {
         headerdetails.put(VoucherConstant.VOUCHERDATE, voucherHeader.getVoucherDate());
         headerdetails.put(VoucherConstant.DESCRIPTION, voucherHeader.getDescription());
         headerdetails.put("backdateentry", voucherHeader.getBackdateentry());
-        headerdetails.put("fileno", voucherHeader.getFileNo());
+        headerdetails.put("fileno", voucherHeader.getFileno());
         if (voucherHeader.getVouchermis().getDepartmentcode() != null)
             headerdetails.put(VoucherConstant.DEPARTMENTCODE, voucherHeader.getVouchermis().getDepartmentcode());
         if (voucherHeader.getFundId() != null)

@@ -207,7 +207,11 @@ function populateUser(){
 		   return false;
 		   }
 		   //Added for validation Signatory by Prasanta
-		  
+		  if(document.getElementById('backlogEntry').value=='-1')
+		   {
+		   bootbox.alert("Please select Backlog Entry.")
+		   return false;
+		   }
 		   var firstsignatory='';
 			if(dom.get('firstsignatory') == null || dom.get('firstsignatory').value == '-1')
 		   {
@@ -241,7 +245,8 @@ function populateUser(){
 		  
 			return true;
 		}
-function onLoad(){
+function onLoad1(){
+	
 	var fund = document.getElementById('fundId');
 	var scheme = document.getElementById('schemeid');
 	var subscheme = document.getElementById('subschemeid');
@@ -252,8 +257,8 @@ function onLoad(){
 	jQuery(scheme).attr('disabled', 'disabled');
 	jQuery(subscheme).attr('disabled', 'disabled');
 	jQuery(fundsource).attr('disabled', 'disabled');
-	if(document.getElementById('approverDepartment'))
-		document.getElementById('approverDepartment').value = "-1";
+	/* if(document.getElementById('approverDepartment'))
+		document.getElementById('approverDepartment').value = "-1"; */
 	if (jQuery("#bankBalanceCheck") == null || jQuery("#bankBalanceCheck").val() == "") {
 		disableForm();
 	}
@@ -263,6 +268,7 @@ function onSubmit()
 	var balanceCheckMandatory='<s:text name="payment.mandatory"/>';
 	var balanceCheckWarning='<s:text name="payment.warning"/>';
 	var noBalanceCheck='<s:text name="payment.none"/>';
+	if(checkdate()){
 	if(validate()){
 		 //Added for validation Signatory by Prasanta
 		var firstsignatory='';
@@ -290,13 +296,15 @@ function onSubmit()
 	   //end validation of Signatory and get selected value 
 		
 		 var myform = jQuery('#remittanceForm');
+	   var fileno = jQuery('#fileno').val();
+	   var backdateentry = jQuery('#backlogEntry').val();
 		// re-disabled the set of inputs that you previously
 		var disabled = myform.find(':input:disabled').removeAttr('disabled'); 
 		
 		 if(jQuery("#bankBalanceCheck").val()==noBalanceCheck)
 		{
 			disableAll();
-			document.remittanceForm.action='${pageContext.request.contextPath}/deduction/remitRecovery-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory;
+			document.remittanceForm.action='${pageContext.request.contextPath}/deduction/remitRecovery-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory+'&fileno='+fileno+'&backdateentry='+backdateentry;
 		  return true;
 		}
 	else if(!balanceCheck() && jQuery("#bankBalanceCheck").val()==balanceCheckMandatory){
@@ -307,7 +315,7 @@ function onSubmit()
 		 var msg = confirm("<s:text name='msg.insuff.bank.bal.do.you.want.to.process'/>");
 		 if (msg == true) {
 			 disableAll();
-			 document.remittanceForm.action='${pageContext.request.contextPath}/deduction/remitRecovery-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory;
+			 document.remittanceForm.action='${pageContext.request.contextPath}/deduction/remitRecovery-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory+'&fileno='+fileno+'&backdateentry='+backdateentry;
 			 document.remittanceForm.submit();
 			return true;
 		 } else {
@@ -317,12 +325,16 @@ function onSubmit()
 		}
 	else{
 		disableAll();
-		document.remittanceForm.action='${pageContext.request.contextPath}/deduction/remitRecovery-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory;
+		document.remittanceForm.action='${pageContext.request.contextPath}/deduction/remitRecovery-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory+'&fileno='+fileno+'&backdateentry='+backdateentry;
 	 	document.remittanceForm.submit();
 	}
 			
 	}
 		return false;
+	}else{
+		bootbox.alert("Please select Backdate Entry correctly.")
+		return false;
+	}
 		
 	
 }
@@ -345,9 +357,37 @@ else{
 		return false;
 	}
 }
+function checkdate()
+{
+	
+	var backlog=document.getElementById('backlogEntry').value;
+	var date2=document.getElementById('voucherDate').value;
+	//alert(":::backlog::"+backlog+":::::vouc:: "+date2);
+	var parts = date2.split("/");
+	   var date = new Date(parts[1] + "/" + parts[0] + "/" + parts[2]);
+var curdate = new Date();
+	if(backlog!='Y'){
+	if(date.setHours(0,0,0,0) == curdate.setHours(0,0,0,0)) {
+	   return true;
+	}
+	else{
+		return false;
+	}
+	}
+	else{
+		if(date.setHours(0,0,0,0) < curdate.setHours(0,0,0,0)){
+			console.log(":::: backdated");
+		return true;
+		}else{
+			console.log(":::: not backdated");
+			return false;
+		}
+	}
+	
+}
 </script>
 </head>
-<body onload="return onLoad();">
+<body onload="onLoad1();documentdep();">
 	<s:form action="remitRecovery" theme="simple" name="remittanceForm"
 		id="remittanceForm">
 		<s:push value="model">
@@ -512,6 +552,18 @@ else{
 																			name="description" id="narration" type="text"
 																			style="width: 580px;"></textarea></td>
 																	<td></td>
+																</tr>
+																<tr>
+																	<td style="width: 5%"></td>
+																	<td class="greybox"><s:text name="backdated.entry" /><span
+																		class="mandatory1">*</span></td>
+																	<td class="greybox" colspan="1"><s:select
+																			name="backdateentry" headerKey="-1"
+																			headerValue="Select" value="%{backdateentry}"
+																			list="#{'Y':'Yes' ,'N':'No'}" id="backlogEntry" /></td>
+																	<td class="bluebox">File No</td>
+																	<td class="bluebox"><s:textfield name="fileno"
+																			id="fileno" value="%{fileno}" /></td>
 																</tr>
 															</table>
 														</span>

@@ -309,6 +309,10 @@ public class BaseVoucherAction extends GenericWorkFlowAction {
             headerdetails.put("firstsignatory", voucherHeader.getFirstsignatory());
         if (voucherHeader.getSecondsignatory() != null)
             headerdetails.put("secondsignatory", voucherHeader.getSecondsignatory());
+        if (voucherHeader.getFileno() != null)
+            headerdetails.put("fileno", voucherHeader.getFileno());
+        if (voucherHeader.getBackdateentry() != null)
+            headerdetails.put("backdateentry", voucherHeader.getBackdateentry());
         
 		return headerdetails;
 	}
