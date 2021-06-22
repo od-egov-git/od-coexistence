@@ -1386,6 +1386,8 @@
 				secondsignatory=dom.get('secondsignatory').value;
 
 			//}
+			/* Bikash */
+			var fileno = dom.get('fileno').value;
 
 			var backlogEntry='';
 
@@ -1502,6 +1504,7 @@
 				
 
 				paymentChequeNo= document.getElementById("paymentChequeNo").value;
+				
 
 				if(null==paymentChequeNo||paymentChequeNo=="")
 
@@ -1557,7 +1560,7 @@
 
 			
 
-			 var submitUrl = '${pageContext.request.contextPath}/payment/payment-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory+'&backlogEntry='+backlogEntry;
+			 var submitUrl = '${pageContext.request.contextPath}/payment/payment-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory+'&backlogEntry='+backlogEntry+'&fileno='+fileno;
 
 			if(rtgs!=null){
 

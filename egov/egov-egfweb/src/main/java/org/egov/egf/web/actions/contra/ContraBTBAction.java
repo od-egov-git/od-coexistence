@@ -277,22 +277,37 @@ public class ContraBTBAction extends BaseVoucherAction {
 			List<Object[]> list1= null;
 	    	SQLQuery queryMain =  null;
 	    	query1
-	        .append("select ac.fromchequenumber,ac.tochequenumber from egf_account_cheques ac,cheque_dept_mapping cd " + 
-	        		"where ac.id = cd.id and ac.id="+contraVoucher.getFromBankAccountId().getId()+ " "+
+	        .append("select ac.fromchequenumber,ac.tochequenumber from cheque_dept_mapping cd left join egf_account_cheques ac on cd.accountchequeid = ac.id  " + 
+	        		"where ac.bankaccountid="+contraVoucher.getFromBankAccountId().getId()+ " "+
 	        		" and cd.allotedTo ='"+voucherHeader.getVouchermis().getDepartmentcode()+"'");
+	    	
 	    	LOGGER.info("Query 1 :: "+query1.toString());
+	    	System.out.println("1----> "+contraVoucher.getFromBankAccountId().getId());
+	    	System.out.println("2-----> "+voucherHeader.getVouchermis().getDepartmentcode());
 	    	queryMain=this.persistenceService.getSession().createSQLQuery(query1.toString());
 	    	list1 = queryMain.list();
+System.out.println(":::list size::::: "+list1.size());	    	
 	    	if(list1!=null)
 	    	{
+	    		boolean range=false;
 	    		int start=0,end=0,chqNo;
+	    		chqNo=Integer.parseInt(contraBean.getChequeNumber());
 	    		for (final Object[] object : list1)
 	    		{
 	    			start=Integer.parseInt(object[0].toString());
 	    			end=Integer.parseInt(object[1].toString());
+	    			System.out.println("::::start:::: "+start+"::::end::::: "+end);
+	    			if(chqNo >= start && chqNo <= end){
+		    			System.out.println("correct cheque no");
+		    			range=true;
+		    		}
+	    			if(range) {
+	    				break;
+	    			}
 	    		}
-	    		chqNo=Integer.parseInt(contraBean.getChequeNumber());
-	    		if(end>=chqNo && chqNo>=start){
+	    		
+	    		//if(end>=chqNo && chqNo>=start){
+	    			if(range){
 	    			System.out.println("correct cheque no");
 	    		boolean valid=true;
 				if (egovCommon.isShowChequeNumber())

@@ -242,7 +242,7 @@ public class PaymentAction extends BasePaymentAction {
  	List<HashMap<String, Object>> workflowHistory =new ArrayList<HashMap<String, Object>>(); 
  	private String paymentChequeNo;
  	private String billregisterhistory;
- 	private String fileno="";
+ 	private String fileno;
     @Autowired
     private FinancialUtils financialUtils;
     
@@ -1079,6 +1079,20 @@ public class PaymentAction extends BasePaymentAction {
             	pcheque[0]=paymentChequeNo;
                 parameters.put("paymentChequeNo", pcheque);
         	}
+        	
+        	if(null!=fileno) {
+        		String pcheque[]=new String[1];
+            	pcheque[0]=fileno;
+                parameters.put("fileno", pcheque);
+        	}
+        	
+        	
+        	System.out.println("The File ------------>"+fileno);
+        	System.out.println("The File ------------>"+fileno);
+        	
+        	
+        
+			 System.out.println(" fileNo"+fileno);
             contingentList = prepareBillTypeList(contingentList,selectedContingentRows);
             contractorList = prepareBillTypeList(contractorList,selectedContractorRows);
             supplierList = prepareBillTypeList(supplierList,selectedSupplierRows);
@@ -1135,8 +1149,7 @@ public class PaymentAction extends BasePaymentAction {
 				/*
 				 * String fileNo[]=new String[1]; fileNo[0]=fileno;
 				 * parameters.put("fileno",fileNo);
-				 */ System.out.println(" fileNo"+paymentheader.getFileno());
-				 System.out.println(" fileNo"+fileno);
+				 */ 
 				
 				/*
 				 * if(fileno!=null) paymentheader.setFileNo(fileno);

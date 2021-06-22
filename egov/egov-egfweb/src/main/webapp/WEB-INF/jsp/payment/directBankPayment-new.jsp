@@ -518,12 +518,12 @@ function onSubmit()
 		secondsignatory=document.getElementById('secondsignatory').value;
 	//}
  
-		if(document.getElementById("modeOfPaymentcheque").checked == true || document.getElementById("modeOfPaymentonline").checked == true){
+		if(document.getElementById("modeOfPaymentcheque").checked == true){
 			paymentChequeNo = jQuery("#paymentChequeNo").val();
 			
 			if(null==paymentChequeNo||paymentChequeNo=="")
 			{
-				bootbox.alert('Payment Cheque Number is mandatory for RTGS payment');
+				bootbox.alert('Payment Cheque Number is mandatory ');
 				jQuery("#paymentChequeNo").val("");
 				undoLoadingMask();
 				return false;

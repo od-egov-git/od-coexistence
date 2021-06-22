@@ -340,7 +340,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
                     	secondsignatory=secondsignatory.split(",")[0];
                         }
                 voucherHeader.setFileNo(fileno);
-                //paymentheader.setFileNo(fileno);
+                paymentheader.setFileno(fileno);
                 paymentheader = paymentActionHelper.createDirectBankPayment(paymentheader, voucherHeader, billVhId,
                         commonBean, billDetailslist, subLedgerlist, workflowBean,firstsignatory,secondsignatory);
                 showMode = "create";

@@ -215,6 +215,9 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
     @Autowired
     @Qualifier("workflowService")
     private SimpleWorkflowService<Paymentheader> paymentHeaderWorkflowService;
+    
+    
+    String voucherFileNo;
 
     public PaymentService(Class<Paymentheader> type) {
         super(type);

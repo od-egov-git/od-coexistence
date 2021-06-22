@@ -390,7 +390,7 @@ function openBudgetDtls()
 																<td width="10%" class="bluebox">File no :
 																	&nbsp;</td>
 																<td colspan="3" class="bluebox">
-																	<s:textfield id="fileno" name="fileno" value="%{fileno}" readonly="true"/> 
+																	<s:textfield id="fileno" name="fileno" value="%{paymentheader.voucherheader.fileno}" /> 
 																</td>
 
 															</tr>
