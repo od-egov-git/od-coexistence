@@ -250,6 +250,7 @@ List<String> billtype=new ArrayList<>();
         }
 
         for (final EgBilldetails details : egBillregister.getEgBilldetailes()) {
+        	System.out.println(":::"+egBillregister.getEgBillregistermis().getFunction().getId());
             if (details.getGlcodeid() != null) {
                 if (egBillregister.getEgBillregistermis().getFunction() != null){
                     details.setFunctionid(BigDecimal.valueOf(egBillregister.getEgBillregistermis().getFunction().getId()));

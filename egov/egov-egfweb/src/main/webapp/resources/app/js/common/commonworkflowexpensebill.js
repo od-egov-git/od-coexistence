@@ -46,7 +46,13 @@
  *
  */
 $(document).ready(function()
-{	
+{	des=  $('#approvalDesignation').val(),
+	dep =$('#approvalDepartment').val();
+state=$('#stateType').val();
+curr=$('#currentState').val();
+pend=$('#pendingActions').val();
+add=$('#additionalRule').val();
+console.log(":des: "+des+"dep : "+dep+"state :"+state+"curr : "+curr+"pend : "+pend+" add :"+add);
 	console.log("workflow file got updated................");
 	$('#approvalDepartment').change(function(){
 		$.ajax({
@@ -63,6 +69,7 @@ $(document).ready(function()
 			},
 			dataType: "json",
 			success: function (response) {
+				console.log("::::onload");
 				console.log("success"+response);
 				$('#approvalDesignation').empty();
 				$('#approvalDesignation').append($("<option value=''>Select from below</option>"));
@@ -119,6 +126,7 @@ $(document).ready(function()
 			contentType:'application/json',
 //			data: JSON.stringify(jsonData),
 			success: function (response) {
+				console.log(":::Approver:onload");
 				console.log("success"+response);
 				$('#approvalPosition').empty();
 				$('#approvalPosition').append($("<option value=''>Select from below</option>"));

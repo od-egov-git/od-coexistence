@@ -276,7 +276,13 @@ public class BillPaymentVoucherPrintAction extends BaseFormAction {
             final Long id = Long.valueOf(parameters.get("id")[0]);
             paymentHeader = persistenceService.getSession().get(Paymentheader.class, id);
             
-            if(paymentHeader != null && (paymentHeader.getType().equalsIgnoreCase(FinancialConstants.MODEOFPAYMENT_RTGS))) {
+			/*
+			 * if(paymentHeader != null &&
+			 * (paymentHeader.getType().equalsIgnoreCase(FinancialConstants.
+			 * MODEOFPAYMENT_RTGS ))) {
+			 */
+            //Changed for all Previews
+            if(paymentHeader != null ) {
             	if(paymentHeader.getPaymentChequeNo()!=null && !paymentHeader.getPaymentChequeNo().isEmpty()) {
             		paymentChequeNo = paymentHeader.getPaymentChequeNo();
             	}

@@ -210,7 +210,7 @@
 			<td width="10%" class="<c:out value='${tdclass}' />"><s:text name="fileno"/> :
 				&nbsp;</td>
 			<td colspan="3" class="<c:out value='${tdclass}' />">
-				<s:textfield name="fileno" value="%{getMasterName('fileno')}" readonly="true"/> 
+				<s:textfield name="fileno" value="%{getMasterName('fileno')}" /> 
 			</td>
 		</tr>
 	</table>

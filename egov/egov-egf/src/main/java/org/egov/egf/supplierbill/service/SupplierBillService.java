@@ -484,7 +484,7 @@ public class SupplierBillService {
                 egBillregister.transition().start().withSenderName(user.getUsername() + "::" + user.getName())
                         .withComments(approvalComent)
                       //.withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
-                        .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos) //added abhishek on 05042021
+                        .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"") //added abhishek on 05042021
                         .withNextAction("")
                         .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_SBILL_DISPLAYNAME)
                         .withCreatedBy(user.getId())
@@ -584,6 +584,26 @@ public class SupplierBillService {
 		        }
 				else
 				{
+				//////added abhishek for forward when current state is rejected
+									if(egBillregister.getState().getValue().equalsIgnoreCase("Rejected")) 
+					                {
+						                HashMap<Long, String> positionmap = new HashMap<>();
+						                HashMap<Long, String> positionmap1 = new HashMap<>();
+						                int size=egBillregister.getStateHistory().size();
+						    			for(int i=0;i<size;i++)
+						    			{
+						    				positionmap.put(egBillregister.getStateHistory().get(i).getLastModifiedBy(),
+						    						egBillregister.getStateHistory().get(i).getValue());
+						    				positionmap1.put(egBillregister.getStateHistory().get(i).getLastModifiedBy(),
+						    						egBillregister.getStateHistory().get(i).getNextAction());
+						    			}
+						    			if(positionmap.containsKey(user.getId()))
+						    			{
+						    				stateValue=positionmap.get(user.getId());
+						    				wfmatrix.setNextAction(positionmap1.get(user.getId()));
+						    			}
+					                }
+									////////end
                 egBillregister.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
                         .withComments(approvalComent)
                         .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")

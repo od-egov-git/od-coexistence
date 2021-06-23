@@ -413,6 +413,12 @@ public class UpdateContractorBillController extends BaseBillController {
                 && request.getParameter(APPROVAL_POSITION) != null
                 && !request.getParameter(APPROVAL_POSITION).isEmpty())
             approvalPosition = Long.valueOf(request.getParameter(APPROVAL_POSITION));
+        
+        if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
+    	{
+    		approvalPosition =populatePosition();    		
+    	}
+        
         if (request.getParameter(APPROVAL_DESIGNATION) != null && !request.getParameter(APPROVAL_DESIGNATION).isEmpty())
             apporverDesignation = String.valueOf(request.getParameter(APPROVAL_DESIGNATION));
 
@@ -423,7 +429,24 @@ public class UpdateContractorBillController extends BaseBillController {
             populateSubLedgerDetails(egBillregister, resultBinder);
             validateBillNumber(egBillregister, resultBinder);
             validateLedgerAndSubledger(egBillregister, resultBinder);
-        }
+        }else if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT)){
+            
+         	for(EgBilldetails b:egBillregister.getDebitDetails())
+         	{
+         		System.out.println("::::::::"+b.getCreditamount()+":::::: "+b.getDebitamount());
+         	}
+             populateBillDetails(egBillregister);
+             populateSubLedgerDetails(egBillregister, resultBinder);
+            // validateBillNumber(egBillregister, resultBinder);
+            // validateLedgerAndSubledger(egBillregister, resultBinder);
+         	
+             }else {
+             	populateBillDetails(egBillregister);
+                 populateSubLedgerDetails(egBillregister, resultBinder);
+                 validateBillNumber(egBillregister, resultBinder);
+                 validateLedgerAndSubledger(egBillregister, resultBinder);
+             }
+        
         model.addAttribute(CONTRACTOR_ID,
                 workOrderService.getByOrderNumber(egBillregister.getWorkordernumber()).getContractor().getId());
 
@@ -567,6 +590,19 @@ public class UpdateContractorBillController extends BaseBillController {
     		
     	}
 		return empName;
+	}
+    
+    private Long populatePosition() {
+    	Long empId = ApplicationThreadLocals.getUserId();
+    	Long pos=null;
+    	List<EmployeeInfo> employs = microServiceUtil.getEmployee(empId, null,null, null);
+    	if(null !=employs && employs.size()>0 )
+    	{
+    		pos=employs.get(0).getAssignments().get(0).getPosition();
+    		
+    	}
+    	//System.out.println("pos-----populatePosition---()----------------------"+pos);
+		return pos;
 	}
     
     public String getEmployeeName(Long empId){
