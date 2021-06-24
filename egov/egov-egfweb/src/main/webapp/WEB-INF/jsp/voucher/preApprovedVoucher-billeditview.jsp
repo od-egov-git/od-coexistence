@@ -59,6 +59,7 @@
 </head>
 <script>
  function vdate(){
+	 console.log("inside vdate");
 	 var cDate = new Date();
 		var date=cDate.getDate();
 		if(date<10)

@@ -380,7 +380,7 @@ public class MicroserviceUtils {
     }
 
     private Object getFinanceDesginCodes() {
-
+    	LOGGER.info("getFinanceDesginCodes-----> ");
         HashMap mdmsObj = this.getFinanceMdmsObj();
         if (mdmsObj != null)
             return mdmsObj.get("designation");
@@ -388,6 +388,7 @@ public class MicroserviceUtils {
     }
 
     private HashMap getFinanceMdmsObj() {
+    	LOGGER.info("getFinanceMdmsObj-----> ");
         HashMap mdmObj = null;
         List<ModuleDetail> moduleDetailsList = new ArrayList<>();
         this.prepareModuleDetails(moduleDetailsList , "common-masters", "mapping", null, null, String.class);
@@ -436,6 +437,9 @@ public class MicroserviceUtils {
     public List<Department> getDepartments(String codes, String module) {
         List<Department> deptList = new ArrayList<>();
         FilterRequest filterReq = new FilterRequest();
+        LOGGER.info("inside get departments-----> ");
+        LOGGER.info("Code-----> "+codes);
+        LOGGER.info("Module-----> "+module);
         try {
             if(!StringUtils.isEmpty(codes) && codes != null && StringUtils.contains(codes, ",")){
                 filterReq.setCodes(Arrays.asList(codes.split(",")));
@@ -448,6 +452,7 @@ public class MicroserviceUtils {
                 }else if(ApplicationConstant.MODULE_FINANCE.equalsIgnoreCase(module)) {
                 	deptCodes = (String) getFinanceDeptCodes();
                 }
+                LOGGER.info("deptCodes-----> "+deptCodes);
                 if(!StringUtils.isBlank(deptCodes))
                 	filterReq.setCodes(Arrays.asList(deptCodes.split(",")));
             }
@@ -460,6 +465,7 @@ public class MicroserviceUtils {
                 dept.setActive((Boolean)lhm.get("active"));
                 deptList.add(dept);
             });
+            LOGGER.info("deptList-----> "+deptList.toString());
             return deptList;
         } catch (Exception e) {
             e.printStackTrace();
@@ -1552,7 +1558,8 @@ public class MicroserviceUtils {
     
     public Object getMdmsData(List<ModuleDetail> moduleDetails,boolean isStateLevel, String tenantId, String token){
         String mdmsUrl = appConfigManager.getEgovMdmsSerHost()+ this.mdmsSearchUrl;
-        
+        LOGGER.info("getMdmsData-----> ");
+        LOGGER.info("moduleDetails-----> "+moduleDetails);
         RequestInfo requestInfo = new RequestInfo();
         requestInfo.setAuthToken(token != null && !token.isEmpty() ? token : getUserToken());
         

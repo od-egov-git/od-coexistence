@@ -105,7 +105,14 @@ import net.sf.jasperreports.engine.JRException;
 				Constants.INPUT_STREAM, Constants.CONTENT_TYPE, "application/xls", Constants.CONTENT_DISPOSITION,
 				"no-cache;filename=ChequeIssueRegister.xls" }),
 		@Result(name = "online_search", location = "onlineIssueRegisterReport-form.jsp"),
-		@Result(name = "online_results", location = "onlineIssueRegisterReport-result.jsp")
+		@Result(name = "online_results", location = "onlineIssueRegisterReport-result.jsp"),
+		
+		@Result(name = "Online_PDF", type = "stream", location = Constants.INPUT_STREAM, params = { Constants.INPUT_NAME,
+				Constants.INPUT_STREAM, Constants.CONTENT_TYPE, "application/pdf", Constants.CONTENT_DISPOSITION,
+				"no-cache;filename=OnlineIssueRegister.pdf" }),
+		@Result(name = "Online_XLS", type = "stream", location = Constants.INPUT_STREAM, params = { Constants.INPUT_NAME,
+				Constants.INPUT_STREAM, Constants.CONTENT_TYPE, "application/xls", Constants.CONTENT_DISPOSITION,
+				"no-cache;filename=OnlineIssueRegister.xls" })
 })
 @ParentPackage("egov")
 public class ChequeIssueRegisterReportAction extends BaseFormAction {
@@ -115,6 +122,8 @@ public class ChequeIssueRegisterReportAction extends BaseFormAction {
 	private static final long serialVersionUID = -5452940328051657821L;
 	private static final String MULTIPLE = "Multiple";
 	String jasperpath = "/reports/templates/chequeIssueRegisterReport.jasper";
+	
+	String jasperpathOnline = "/reports/templates/chequeIssueRegisterReportOnline.jasper";
 	String bankAdviceJasperPath = "/reports/templates/bankAdviceExcelReport.jasper";
 	private List<ChequeIssueRegisterDisplay> chequeIssueRegisterList = new ArrayList<ChequeIssueRegisterDisplay>();
 	private Date fromDate;
@@ -400,7 +409,50 @@ public class ChequeIssueRegisterReportAction extends BaseFormAction {
 		inputStream = reportHelper.exportXls(getInputStream(), jasperpath, getParamMap(), data);
 		return "XLS";
 	}
+	
+	
+	
+	@Action(value = "/report/onlineIssueRegisterReport-generatePdf")
+	public String OnlinegeneratePdf() throws JRException, IOException {
+		System.out.println("Executing PDF===>>>>");
+		generateReportOnline();
+		
 
+		for(ChequeIssueRegisterDisplay e:getChequeIssueRegisterList()) {
+			System.out.println("The Cheque Nu--->>"+e.getChequeNumber());
+			
+		}
+		
+		final List<Object> data = new ArrayList<Object>();
+		data.addAll(getChequeIssueRegisterList());
+		try {
+			inputStream = reportHelper.exportPdf(getInputStream(), jasperpathOnline, getParamMap(), data);
+		}catch(Exception ex) {
+			ex.printStackTrace();
+		}
+		
+		return "Online_PDF";
+	}
+
+	@Action(value = "/report/onlineIssueRegisterReport-generateXls")
+	public String OnlinegenerateXls() throws JRException, IOException {
+		
+		System.out.println("Executing XLS===>>>>");
+		generateReportOnline();
+		final List<Object> data = new ArrayList<Object>();
+		
+		for(ChequeIssueRegisterDisplay e:getChequeIssueRegisterList()) {
+			System.out.println("The Cheque Nu--->>"+e.getChequeNumber());
+			
+		}
+		
+		data.addAll(getChequeIssueRegisterList());
+		inputStream = reportHelper.exportXls(getInputStream(), jasperpathOnline, getParamMap(), data);
+		return "Online_XLS";
+	}
+	
+	
+	
 	@Action(value = "/report/chequeIssueRegisterReport-bankAdviceExcel")
 	public String bankAdviceExcel() throws JRException, IOException {
 		BankAdviceReportInfo bankAdvice = new BankAdviceReportInfo();

@@ -72,7 +72,7 @@
 </head>
 
 <body
-	onload="loadDropDownCodes();loadDropDownCodesFunction();onLoadTask();documentdep()">
+	onload="loadDropDownCodes();loadDropDownCodesFunction();documentdep();onLoadTask();">
 
 	<s:form theme="simple" name="jvmodifyform" enctype ="multipart/form-data">
 		<s:push value="model">
@@ -479,6 +479,8 @@ function validateJV()
 		//loadSlFunction();
 		//getSlAccountCodes();
 		// code- JV subtype - starts
+		
+		console.log("Onload task call journal vouchermodify");
 		document.getElementById('vType').value='<s:property value="voucherTypeBean.voucherSubType"/>';
 		if('<s:property value="voucherTypeBean.voucherSubType"/>' == 'JVGeneral' ){
 			document.getElementById('voucherTypeBean.partyBillNum').readOnly=true;

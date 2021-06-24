@@ -58,7 +58,7 @@
 					<textElement>
 						<font size="16" isBold="true"/>
 					</textElement>
-					<text><![CDATA[Cheque Issue Register]]></text>
+					<text><![CDATA[Online Issue Register]]></text>
 				</staticText>
 			</frame>
 			<frame>
@@ -148,7 +148,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
-				<text><![CDATA[Cheque Number]]></text>
+				<text><![CDATA[Transaction Number]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="125" y="0" width="63" height="47" uuid="29aa255b-4b14-4cb7-8607-7a5ae804a5c7"/>
@@ -162,7 +162,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
-				<text><![CDATA[Cheque Date]]></text>
+				<text><![CDATA[Transaction Date]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="188" y="0" width="100" height="47" uuid="966b2fad-ddb1-42a0-8199-98040a9fb57e"/>

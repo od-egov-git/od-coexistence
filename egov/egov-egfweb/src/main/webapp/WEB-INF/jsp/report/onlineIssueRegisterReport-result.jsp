@@ -85,7 +85,7 @@
 										<th class="bluebgheadtd" width="10%">Name of the Payee</th>
 										<th class="bluebgheadtd" width="10%"> Amount(Rs)</th>
 										<th class="bluebgheadtd" width="10%">Nature of Payment</th>
-										<th class="bluebgheadtd" width="10%">Cheque Status</th>
+										<th class="bluebgheadtd" width="10%">Transaction Status</th>
 										<th class="bluebgheadtd" width="15%">Payment Order No.
 											&amp; Date</th>
 										<th class="bluebgheadtd" width="15%">Bank Payment Voucher
@@ -166,9 +166,9 @@
 						<td>
 							<div class="excelpdf">
 								<a
-									href='/services/EGF/report/chequeIssueRegisterReport-generateXls.action?fromDate=<s:property value="fromDate"/>&toDate=<s:property value="toDate"/>&accountNumber.id=<s:property value="accountNumber.id"/>&deptImpl.code=<s:property value="deptImpl.code"/>&function.id=<s:property value="function.id"/>&functionary.id=<s:property value="functionary.id"/>&fund.id=<s:property value="fund.id"/>&field.id=<s:property value="field.id"/>&bank=<s:property value="bank"/>'>Excel</a>
+									href='/services/EGF/report/onlineIssueRegisterReport-generateXls.action?fromDate=<s:property value="fromDate"/>&toDate=<s:property value="toDate"/>&accountNumber.id=<s:property value="accountNumber.id"/>&deptImpl.code=<s:property value="deptImpl.code"/>&function.id=<s:property value="function.id"/>&functionary.id=<s:property value="functionary.id"/>&fund.id=<s:property value="fund.id"/>&field.id=<s:property value="field.id"/>&bank=<s:property value="bank"/>'>Excel</a>
 								&nbsp; | <a
-									href='/services/EGF/report/chequeIssueRegisterReport-generatePdf.action?fromDate=<s:property value="fromDate"/>&toDate=<s:property value="toDate"/>&accountNumber.id=<s:property value="accountNumber.id"/>&deptImpl.code=<s:property value="deptImpl.code"/>&function.id=<s:property value="function.id"/>&functionary.id=<s:property value="functionary.id"/>&fund.id=<s:property value="fund.id"/>&field.id=<s:property value="field.id"/>&bank=<s:property value="bank"/>'>PDF</a>
+									href='/services/EGF/report/onlineIssueRegisterReport-generatePdf.action?fromDate=<s:property value="fromDate"/>&toDate=<s:property value="toDate"/>&accountNumber.id=<s:property value="accountNumber.id"/>&deptImpl.code=<s:property value="deptImpl.code"/>&function.id=<s:property value="function.id"/>&functionary.id=<s:property value="functionary.id"/>&fund.id=<s:property value="fund.id"/>&field.id=<s:property value="field.id"/>&bank=<s:property value="bank"/>'>PDF</a>
 								
 							</div>
 						</td>

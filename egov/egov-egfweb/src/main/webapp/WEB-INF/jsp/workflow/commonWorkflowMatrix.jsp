@@ -54,6 +54,7 @@
 
 <script>
 function documentdep(){
+	console.log("documentdep calling");
 	document.getElementById("approverDepartment").value="DEPT_25";
 	loadDesignationFromMatrix1();
 	var con=document.getElementById("approverDepartment");
