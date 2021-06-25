@@ -1468,7 +1468,7 @@ public class ReceiptAction extends BaseFormAction {
         else {
         String type="view";
         System.out.println("view");
-         receiptlist = this.microserviceUtils.searchRecieptsFin(null, null, null, null,
+         receiptlist = this.microserviceUtils.searchRecieptsFinNew(null, null, null, null,
                 Arrays.asList(selectedReceipts),type);
         } 
        

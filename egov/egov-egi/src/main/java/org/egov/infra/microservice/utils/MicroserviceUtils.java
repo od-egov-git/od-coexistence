@@ -266,6 +266,9 @@ public class MicroserviceUtils {
 
     @Value("${egov.services.collection.service.receipts.search}")
     private String receiptSearchUrl;
+    
+    @Value("${egov.services.collection.service.payment.searchnew}")
+    private String receiptSearchUrlNew;
 
     @Value("${egov.services.collection.service.basm.create}")
     private String bankAccountServiceMappingCreateUrl;
@@ -1165,6 +1168,46 @@ public class MicroserviceUtils {
         return this.getReceipt(criteria);
     }
     
+	public List<Receipt> getReceiptNew(ReceiptSearchCriteria rSearchcriteria) {
+        // Checking for the collection version either older version or new version are getting used
+        List<Receipt> receipts = new ArrayList<>();
+        LOGGER.info("inside getReceiptNew Calling");
+        switch (ApplicationThreadLocals.getCollectionVersion().toUpperCase()) {
+        case "V2":
+        case "VERSION2":
+        	System.out.println("DDDDD");
+            PaymentSearchCriteria paySearchCriteria=new PaymentSearchCriteria();
+            System.out.println("EEEE");
+            rSearchcriteria.toPayemntSerachCriteriaContract(paySearchCriteria);
+            System.out.println("FFFF");
+            List<Payment> payments = this.getPaymentsNew(paySearchCriteria);
+            System.out.println("GGGG");
+            paymentUtils.getReceiptsFromPayments(payments, receipts);
+            System.out.println("HHHH");
+            break;
+
+        default:
+            RequestInfo requestInfo = new RequestInfo();
+            RequestInfoSearchWrapper reqWrapper = new RequestInfoSearchWrapper();
+            requestInfo.setAuthToken(getUserToken());
+            requestInfo.setUserInfo(getUserInfo());
+            reqWrapper.setIds(rSearchcriteria.getIds());
+            reqWrapper.setRequestInfo(requestInfo);
+            StringBuilder url = new StringBuilder();
+            url.append(appConfigManager.getEgovCollSerHost()).append(receiptSearchUrlNew).append("?tenantId=").append(getTenentId());
+            try {
+            prepareReceiptSearchUrl(rSearchcriteria, url);
+            LOGGER.info("call:" + url.toString());
+            ReceiptResponse response = restTemplate.postForObject(url.toString(), reqWrapper, ReceiptResponse.class);
+            receipts = response.getReceipts();
+            }
+            catch(Exception e) {
+            	e.printStackTrace();
+            }
+        }
+        return receipts;
+    }
+	
     public List<Receipt> getReceipt(ReceiptSearchCriteria rSearchcriteria) {
         // Checking for the collection version either older version or new version are getting used
         List<Receipt> receipts = new ArrayList<>();
@@ -1328,6 +1371,21 @@ public class MicroserviceUtils {
                 .classification(classification)
                 .build();
         return this.getReceipt(criteria);
+    }
+    
+    public List<Receipt> searchRecieptsFinNew(String classification, Date fromDate, Date toDate, String businessCode,
+            List<String> receiptNos,String type) {
+    	LOGGER.info("searchRecieptsFinNew calling");
+    	System.out.println("searchRecieptsFinNew calling");
+        ReceiptSearchCriteria criteria = new ReceiptSearchCriteria().builder()
+                .fromDate(fromDate)
+                .toDate(toDate)
+                .type(type)
+                .businessCodes(businessCode != null ? Arrays.stream(businessCode.split(",")).collect(Collectors.toSet()) : Collections.EMPTY_SET)
+                .receiptNumbers(receiptNos != null ? receiptNos.stream().collect(Collectors.toSet()) : Collections.EMPTY_SET)
+                .classification(classification)
+                .build();
+        return this.getReceiptNew(criteria);
     }
 
     public InstrumentResponse reconcileInstruments(List<Instrument> instruments, String depositedBankAccountNum) {
@@ -1800,6 +1858,57 @@ public class MicroserviceUtils {
          RequestInfoCancelWrapper reqReceiptWrapper=new RequestInfoCancelWrapper();
          RequestInfoSearchWrapper reqSearchWrapper = new RequestInfoSearchWrapper();
         StringBuilder url = new StringBuilder(appConfigManager.getEgovCollSerHost()).append(appConfigManager.getCollSerPaymentSearch()).append("?");
+        if(searchCriteria.getIds() != null && !searchCriteria.getIds().isEmpty())
+        {
+        	reqSearchWrapper.setIds(searchCriteria.getIds());
+        	reqSearchWrapper.setRequestInfo(requestInfo);
+        }
+        else if(searchCriteria.getReceiptNumbers() != null && !searchCriteria.getReceiptNumbers().isEmpty())
+        {
+        	LOGGER.info("searchCriteria.getReceiptNumbers()     :::"+searchCriteria.getReceiptNumbers().size());
+        	reqReceiptWrapper.setIds(searchCriteria.getReceiptNumbers());
+        	reqReceiptWrapper.setRequestInfo(requestInfo);
+        }
+        else
+        {
+            reqWrapper = new RequestInfoWrapper();
+        reqWrapper.setRequestInfo(requestInfo);
+        }
+        try {
+            preparePaymentSearchQueryString(searchCriteria, url);
+            if(searchCriteria.getIds() != null && !searchCriteria.getIds().isEmpty())
+            {
+            	LOGGER.info("ids ; "+url.toString());
+            	response = restTemplate.postForObject(url.toString(), reqSearchWrapper, PaymentResponse.class);
+            }
+            else if(searchCriteria.getReceiptNumbers() != null && !searchCriteria.getReceiptNumbers().isEmpty()) {
+            	LOGGER.info("reqReceiptWrapper.getIds().size()    :::"+reqReceiptWrapper.getIds().size());
+            	response = restTemplate.postForObject(url.toString(), reqReceiptWrapper, PaymentResponse.class);
+            }
+            else
+            {
+            	LOGGER.info("non ids : "+url.toString());
+            response = restTemplate.postForObject(url.toString(), reqWrapper, PaymentResponse.class);
+            }
+            
+            return response.getPayments();
+        } catch (Exception e) {
+            LOGGER.error("ERROR occurred while fetching the Payment list : ",e);
+        }
+        return null;
+    }
+    
+    public List<Payment> getPaymentsNew(PaymentSearchCriteria searchCriteria){
+    	System.out.println("IIII");
+    	System.out.println("getPaymentsNew");
+    	System.out.println("searchCriteria.getIds() ::: "+searchCriteria.getIds());
+    	System.out.println("searchCriteria.getReceiptNumbers()   ::: "+searchCriteria.getReceiptNumbers());
+        PaymentResponse response = null;
+         RequestInfo requestInfo = getRequestInfo();
+         RequestInfoWrapper reqWrapper = null;
+         RequestInfoCancelWrapper reqReceiptWrapper=new RequestInfoCancelWrapper();
+         RequestInfoSearchWrapper reqSearchWrapper = new RequestInfoSearchWrapper();
+        StringBuilder url = new StringBuilder(appConfigManager.getEgovCollSerHost()).append(appConfigManager.getCollSerPaymentSearchNew()).append("?");
         if(searchCriteria.getIds() != null && !searchCriteria.getIds().isEmpty())
         {
         	reqSearchWrapper.setIds(searchCriteria.getIds());
