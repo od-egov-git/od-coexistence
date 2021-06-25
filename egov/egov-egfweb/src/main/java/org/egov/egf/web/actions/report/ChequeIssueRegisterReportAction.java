@@ -414,15 +414,8 @@ public class ChequeIssueRegisterReportAction extends BaseFormAction {
 	
 	@Action(value = "/report/onlineIssueRegisterReport-generatePdf")
 	public String OnlinegeneratePdf() throws JRException, IOException {
-		System.out.println("Executing PDF===>>>>");
+		
 		generateReportOnline();
-		
-
-		for(ChequeIssueRegisterDisplay e:getChequeIssueRegisterList()) {
-			System.out.println("The Cheque Nu--->>"+e.getChequeNumber());
-			
-		}
-		
 		final List<Object> data = new ArrayList<Object>();
 		data.addAll(getChequeIssueRegisterList());
 		try {
@@ -436,16 +429,8 @@ public class ChequeIssueRegisterReportAction extends BaseFormAction {
 
 	@Action(value = "/report/onlineIssueRegisterReport-generateXls")
 	public String OnlinegenerateXls() throws JRException, IOException {
-		
-		System.out.println("Executing XLS===>>>>");
 		generateReportOnline();
-		final List<Object> data = new ArrayList<Object>();
-		
-		for(ChequeIssueRegisterDisplay e:getChequeIssueRegisterList()) {
-			System.out.println("The Cheque Nu--->>"+e.getChequeNumber());
-			
-		}
-		
+		final List<Object> data = new ArrayList<Object>();	
 		data.addAll(getChequeIssueRegisterList());
 		inputStream = reportHelper.exportXls(getInputStream(), jasperpathOnline, getParamMap(), data);
 		return "Online_XLS";

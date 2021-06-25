@@ -2,9 +2,9 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="journalVoucherReport" pageWidth="595" pageHeight="900" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="f2914511-217a-45fb-9be9-a524aca30fcf">
 	<property name="ireport.scriptlethandling" value="0"/>
 	<property name="ireport.encoding" value="UTF-8"/>
-	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.zoom" value="1.3310000000000004"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="59"/>
+	<property name="ireport.y" value="218"/>
 	<import value="net.sf.jasperreports.engine.*"/>
 	<import value="java.util.*"/>
 	<import value="net.sf.jasperreports.engine.data.*"/>
@@ -176,11 +176,13 @@
 					<textFieldExpression><![CDATA[$P{bankAccountNumber}]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true">
-					<reportElement x="99" y="131" width="429" height="20" uuid="2c711f79-58cb-4178-8a3c-cd0f75378b63"/>
+					<reportElement x="99" y="131" width="429" height="20" uuid="2c711f79-58cb-4178-8a3c-cd0f75378b63">
+						<printWhenExpression><![CDATA[$P{paymentMode}=="rtgs"]]></printWhenExpression>
+					</reportElement>
 					<textElement>
 						<font size="8"/>
 					</textElement>
-					<textFieldExpression><![CDATA[$P{paymentMode}=="rtgs"?$P{rtgsRefNo}:$P{chequeNumber}]]></textFieldExpression>
+					<textFieldExpression><![CDATA[$P{paymentMode}=="rtgs"?$P{rtgsRefNo}:""]]></textFieldExpression>
 				</textField>
 				<textField>
 					<reportElement x="350" y="51" width="177" height="20" uuid="513d46ea-9de0-4d8f-8e5c-eb0cf8bccfe6"/>
@@ -225,7 +227,9 @@
 					<textFieldExpression><![CDATA[$P{paymentMode}=="rtgs"?"RTGS Date:":"Cheque Date:"]]></textFieldExpression>
 				</textField>
 				<textField>
-					<reportElement x="3" y="131" width="92" height="20" uuid="77fe4805-c48f-478b-a45b-c173c2941ffe"/>
+					<reportElement x="3" y="131" width="92" height="20" uuid="77fe4805-c48f-478b-a45b-c173c2941ffe">
+						<printWhenExpression><![CDATA[$P{paymentMode}=="rtgs"]]></printWhenExpression>
+					</reportElement>
 					<textElement>
 						<font size="8" isBold="true"/>
 					</textElement>
@@ -259,7 +263,7 @@
 					<textElement>
 						<font size="8" isBold="true"/>
 					</textElement>
-					<text><![CDATA[Cheque Number:]]></text>
+					<text><![CDATA[Payment Cheque No]]></text>
 				</staticText>
 			</frame>
 		</band>

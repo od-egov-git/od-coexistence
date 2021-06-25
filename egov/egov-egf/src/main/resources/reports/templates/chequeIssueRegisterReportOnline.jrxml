@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.17.0.final using JasperReports Library version 6.17.0-6d93193241dd8cc42629e188b94f9e0bc5722efd  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="journalVoucherReport" pageWidth="792" pageHeight="842" orientation="Landscape" whenNoDataType="NoPages" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="330ed9fc-f017-4cb3-856b-565fd7e58e2e">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="journalVoucherReport" pageWidth="792" pageHeight="842" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="330ed9fc-f017-4cb3-856b-565fd7e58e2e">
 	<property name="ireport.scriptlethandling" value="0"/>
 	<property name="ireport.encoding" value="UTF-8"/>
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="171"/>
+	<property name="ireport.y" value="0"/>
+	<import value="net.sf.jasperreports.engine.*"/>
 	<import value="java.util.*"/>
 	<import value="net.sf.jasperreports.engine.data.*"/>
-	<import value="net.sf.jasperreports.engine.*"/>
 	<parameter name="ulbName" class="java.lang.String"/>
 	<parameter name="bank" class="java.lang.String"/>
 	<parameter name="accountNumber" class="java.lang.String"/>
@@ -218,7 +220,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
-				<text><![CDATA[Cheque Amount (Rs)]]></text>
+				<text><![CDATA[Amount (Rs)]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="433" y="0" width="91" height="47" uuid="bcba830e-ffe8-44cc-b355-381351b20a53"/>
@@ -232,7 +234,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
-				<text><![CDATA[Cheque Status]]></text>
+				<text><![CDATA[Online Status]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="524" y="0" width="108" height="47" uuid="f8875443-2e9a-4082-9950-575ee795df1d"/>
