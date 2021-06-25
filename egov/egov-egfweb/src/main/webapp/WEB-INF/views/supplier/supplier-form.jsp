@@ -102,7 +102,7 @@
 	<label class="col-sm-2 control-label text-right" for="mobileNumber"> <spring:message code="lbl.mobile" text="Mobile Number"/> 
 	</label>
 	<div class="col-sm-3 add-margin">
-		<form:input path="mobileNumber" id="mobileNumber" maxlength="10" cssClass="form-control patternvalidation" data-pattern="number" required="required" />
+		<form:input path="mobileNumber" id="mobileNumber" maxlength="10" cssClass="form-control patternvalidation" data-pattern="number" />
 		<form:errors path="mobileNumber" cssClass="add-margin error-msg" />
 	</div>
 </div>

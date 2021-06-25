@@ -256,7 +256,9 @@ public class BankRemittanceAction extends BaseFormAction {
             throw new ValidationException(Arrays.asList(new ValidationError("Please select Account number",
                     "bankremittance.error.noaccountNumberselected")));
         // voucherHeaderValues =
+        LOGGER.info("finalList  :"+finalList.toString());
         LOGGER.info("accountNumberId  :"+accountNumberId);
+        LOGGER.info("remittanceDate  :"+remittanceDate);
         List<Receipt> receipts = remittanceService.createCashBankRemittance(finalList, accountNumberId, remittanceDate);
         final long elapsedTimeMillis = System.currentTimeMillis() - startTimeMillis;
         LOGGER.info("$$$$$$ Time taken to persist the remittance list (ms) = " + elapsedTimeMillis);

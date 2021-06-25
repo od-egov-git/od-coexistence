@@ -624,6 +624,7 @@ public class RemittanceServiceImpl extends RemittanceService {
         LOGGER.info("after group by receipt");
         for (String key : receiptDateWiseMap.keySet()) {
             List<Receipt> tempList = receiptDateWiseMap.get(key);
+            LOGGER.info("receipt key "+key);
             groupByService(key, serviceWiseMap, tempList);
         }
         LOGGER.info("after group by service");
@@ -704,11 +705,15 @@ public class RemittanceServiceImpl extends RemittanceService {
                     BusinessServiceMapping serviceMapping = bsServiceMapping.get(serviceCode);
                     LOGGER.info("serviceMapping.getFund() :: "+serviceMapping.getFund());
                     if(StringUtils.isNumeric(serviceMapping.getFund())){
+                    	rb.setFund(serviceMapping.getFund());
                         rb.setFundName(fundCodeNameMap.get(serviceMapping.getFund()));
+                        LOGGER.info("fund --"+rb.getFund()+" fundname---  "+rb.getFundName());
                     }
                     LOGGER.info("serviceMapping.getDepartment() :: "+serviceMapping.getDepartment());
                     if(StringUtils.isNoneBlank(serviceMapping.getDepartment())){
+                    	rb.setDepartment(serviceMapping.getDepartment());
                         rb.setDepartmentName(deptCodeNameMap.get(serviceMapping.getDepartment()));
+                        LOGGER.info("dept --"+rb.getDepartment()+" deptname---  "+rb.getDepartmentName());
                     }
                 }
             }
