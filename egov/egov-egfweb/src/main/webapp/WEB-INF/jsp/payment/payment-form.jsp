@@ -576,7 +576,7 @@
 																	<td class="bluebox"><s:text name="bank.onlinelink" /></td>
 
 																	<td class="bluebox"><a id="onlineLink" href="#"
-																		target="_blank" style="font-size: 15px;">Click</a></td>
+																		target="_blank" style="font-size: 15px;" hidden>Click</a></td>
 
 																	<td class="bluebox" width="15%"><strong><s:text
 																				name="payment.balance" />(Rs)</strong></td>
@@ -1086,7 +1086,8 @@
 				if(branchIdFromList == selectedBranchId)
 
 					{
-
+						document.getElementById("onlineLink").removeAttribute("hidden");
+						
 						var link = '<s:property value="bank.onlinelink"/>';
 
 						document.getElementById("onlineLink").href=link;
@@ -1276,6 +1277,7 @@
 				disableForm();
 
 			}
+			
 
 		}
 

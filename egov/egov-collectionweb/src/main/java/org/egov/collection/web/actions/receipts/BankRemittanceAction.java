@@ -256,7 +256,12 @@ public class BankRemittanceAction extends BaseFormAction {
             throw new ValidationException(Arrays.asList(new ValidationError("Please select Account number",
                     "bankremittance.error.noaccountNumberselected")));
         // voucherHeaderValues =
-        LOGGER.info("finalList  :"+finalList.toString());
+        LOGGER.info("finalList size---- "+finalList.size());
+        for(ReceiptBean r : finalList) {
+        	LOGGER.info("dept in list---- "+r.getDepartment());
+        	LOGGER.info("fund in list---- "+r.getFund());
+        }
+        
         LOGGER.info("accountNumberId  :"+accountNumberId);
         LOGGER.info("remittanceDate  :"+remittanceDate);
         List<Receipt> receipts = remittanceService.createCashBankRemittance(finalList, accountNumberId, remittanceDate);

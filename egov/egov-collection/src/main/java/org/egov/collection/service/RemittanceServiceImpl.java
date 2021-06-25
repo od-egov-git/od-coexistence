@@ -218,6 +218,10 @@ public class RemittanceServiceImpl extends RemittanceService {
         List<Instrument> instrumentsList;
         LOGGER.info("Start receipt list");
         for (ReceiptBean receipt : receiptList) {
+        	LOGGER.info("receipt service ===== "+receipt.getService());
+        	LOGGER.info("receipt fund ===== "+receipt.getFund());
+        	LOGGER.info("receipt department ===== "+receipt.getDepartment());
+        	LOGGER.info("receipt receipt date ===== "+receipt.getReceiptDate());
             if (receipt.getSelected() != null && receipt.getSelected()) {
                 if (receipt.getFund() != null && !receipt.getFund().isEmpty())
                     fundCode = receipt.getFund();
@@ -553,6 +557,8 @@ public class RemittanceServiceImpl extends RemittanceService {
 
         final String deptCode = collectionsUtil.getAppConfigValue(CollectionConstants.MODULE_NAME_COLLECTIONS_CONFIG,
                 CollectionConstants.APPCONFIG_VALUE_COLLECTION_BANKREMITTANCE_DEPTCODE);
+        
+        LOGGER.info("-------->>>prepareHeaderDetails>>>>"+deptCode);
 
         if (collectionsUtil.getVoucherType()) {
             headerdetails.put(VoucherConstant.VOUCHERNAME, CollectionConstants.FINANCIAL_RECEIPTS_VOUCHERNAME);

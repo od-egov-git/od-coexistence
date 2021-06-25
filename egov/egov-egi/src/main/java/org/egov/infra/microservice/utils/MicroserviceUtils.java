@@ -1195,15 +1195,29 @@ public class MicroserviceUtils {
             reqWrapper.setRequestInfo(requestInfo);
             StringBuilder url = new StringBuilder();
             url.append(appConfigManager.getEgovCollSerHost()).append(receiptSearchUrl).append("?tenantId=").append(getTenentId());
+            try {
             prepareReceiptSearchUrl(rSearchcriteria, url);
             LOGGER.info("call:" + url.toString());
             ReceiptResponse response = restTemplate.postForObject(url.toString(), reqWrapper, ReceiptResponse.class);
             receipts = response.getReceipts();
+            }
+            catch(Exception e) {
+            	e.printStackTrace();
+            }
         }
         return receipts;
     }
 
     private void prepareReceiptSearchUrl(ReceiptSearchCriteria criteria, StringBuilder url) {
+    	LOGGER.info("=================inside prepareReceiptSearchUrl=====================");
+    	LOGGER.info("receipt-> "+criteria.getReceiptNumbers());
+    	LOGGER.info("depatment-> "+criteria.getDepartment());
+    	LOGGER.info("fund-> "+criteria.getFund());
+    	LOGGER.info("businessCode-> "+criteria.getBusinessCodes());
+    	LOGGER.info("fromDate-> "+criteria.getFromDate());
+    	LOGGER.info("todate-> "+criteria.getToDate());
+    	LOGGER.info("classification-> "+criteria.getClassification());
+    	
         if(CollectionUtils.isNotEmpty(criteria.getReceiptNumbers())){
             url.append("&receiptNumbers=").append(StringUtils.join(criteria.getReceiptNumbers(), ","));
         }

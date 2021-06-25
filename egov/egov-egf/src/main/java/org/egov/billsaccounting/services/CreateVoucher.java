@@ -2985,7 +2985,7 @@ public class CreateVoucher {
 		} else if (mandatoryFields.contains(fieldName) && (value == null || StringUtils.isEmpty(value.toString())))
 		{
 			LOGGER.info("fieldName error in "+fieldName);
-			throw new ValidationException(Arrays.asList(new ValidationError(SELECT + fieldName, SELECT + fieldName)));
+			//throw new ValidationException(Arrays.asList(new ValidationError(SELECT + fieldName, SELECT + fieldName)));
 		}
 	}
 
