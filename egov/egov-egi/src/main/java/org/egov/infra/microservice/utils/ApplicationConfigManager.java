@@ -85,7 +85,13 @@ public class ApplicationConfigManager {
     private String egovIndexerSerHost;
     @Value("${egov.default.services.endpoint}")
     private String egovSerHost;
-    
+	@Value("${egov.filestore.service.endpoint:}")
+    private String egovFileStoreSerHost;
+    @Value("${egov.services.filestore.service.upload.file:}")
+    private String egovFileStoreUploadFile;
+    @Value("${egov.services.filestore.service.download.file:}")
+    private String egovFileStoreDownloadFile;											 
+	
     @Value("${egov.services.collection.service.payment.search:}")
     private String collSerPaymentSearch;
     
@@ -101,6 +107,9 @@ public class ApplicationConfigManager {
     @Value("${egov.services.collection.service.payment.workflow:}")
     private String collSerPaymentWorkflow;
     
+																	
+										   
+	
     public String getEgovHrmsSerHost(){
         return StringUtils.isNotBlank(egovHrmsSerHost) ? egovHrmsSerHost : egovSerHost; 
     }
@@ -135,6 +144,16 @@ public class ApplicationConfigManager {
     public String getEgovIndexerSerHost(){
         return StringUtils.isNotBlank(egovIndexerSerHost) ? egovIndexerSerHost : egovSerHost; 
     }
+	public String getEgovFileStoreSerHost(){
+        return StringUtils.isNotBlank(egovFileStoreSerHost) ? egovFileStoreSerHost : egovSerHost; 
+    }
+    public String getEgovFileStoreUploadFile(){
+        return StringUtils.isNotBlank(egovFileStoreUploadFile) ? egovFileStoreUploadFile : egovSerHost; 
+    }
+    public String getEgovFileStoreDownloadFile(){
+        return StringUtils.isNotBlank(egovFileStoreDownloadFile) ? egovFileStoreDownloadFile : egovSerHost; 
+    }
     
     
+	
 }

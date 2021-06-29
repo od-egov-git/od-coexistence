@@ -52,6 +52,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.egov.infra.utils.ApplicationConstant.CITIZEN_ROLE_NAME;
 import static org.egov.infra.utils.DateUtils.toDefaultDateTimeFormat;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -146,6 +147,7 @@ import org.egov.infra.microservice.models.RemittanceResponse;
 import org.egov.infra.microservice.models.RemittanceResponseDepositWorkDetails;
 import org.egov.infra.microservice.models.RequestInfo;
 import org.egov.infra.microservice.models.ResponseInfo;
+import org.egov.infra.microservice.models.StorageResponse;
 import org.egov.infra.microservice.models.TaxHeadMaster;
 import org.egov.infra.microservice.models.TaxHeadMasterResponse;
 import org.egov.infra.microservice.models.TaxPeriod;
@@ -163,16 +165,21 @@ import org.json.simple.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+
+import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -305,6 +312,9 @@ public class MicroserviceUtils {
     
     @Autowired
     ApplicationConfigManager appConfigManager;
+    
+    
+    
     
     public MicroserviceUtils() {
         mapper = new ObjectMapper();
@@ -2033,7 +2043,63 @@ public class MicroserviceUtils {
         return response;
     }
     
+////////added by abhishek compare with new microutils via mail
+public StorageResponse getFileStorageService(final List<MultipartFile> files, String modulename)
+        throws IOException {
+    HttpHeaders headers = new HttpHeaders();
+    headers.set(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_UTF8_VALUE);
+    headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+    MultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
+    map.add("module", modulename);
+    map.add("tenantId", getTenentId());
+
+    ByteArrayResource contentsAsResource = null;
+    for (MultipartFile file : files) {
+        contentsAsResource = new ByteArrayResource(file.getBytes()) {
+            @Override
+            public String getFilename() {
+                return file.getOriginalFilename();
+            }
+        };
+    };
+    map.add("file", contentsAsResource);
+    //map.add("file", contentsAsResource);
+   
+    StringBuilder uri = new StringBuilder(appConfigManager.getEgovFileStoreSerHost())
+            .append(appConfigManager.getEgovFileStoreUploadFile());
+
+    HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(map, headers);
+
+    return restTemplate.postForObject(uri.toString(), request, StorageResponse.class);
 }
+    
+
+public ResponseEntity<byte[]> fetchFilesFromDigitService(String fileStoreId) throws RuntimeException {
+    Map<String, String> request = new HashMap<String, String>();
+    String tenantId=getTenentId();
+    request.put("tenantId", tenantId);
+    request.put("fileStoreId", fileStoreId);
+    
+    StringBuilder uri = new StringBuilder(appConfigManager.getEgovFileStoreSerHost())
+            .append(appConfigManager.getEgovFileStoreDownloadFile()).append("?");
+
+    if (StringUtils.isNotBlank(tenantId)) {
+        uri.append("tenantId=").append(tenantId);
+    }
+    if (StringUtils.isNotBlank(fileStoreId)) {
+        uri.append("&fileStoreId=").append(fileStoreId);
+    }
+  
+    HttpHeaders headers = new HttpHeaders();
+    headers.setAccept(Arrays.asList(MediaType.APPLICATION_OCTET_STREAM));
+    HttpEntity<String> entity = new HttpEntity<>(headers);
+    ResponseEntity<byte[]> response = restTemplate.exchange(uri.toString(), HttpMethod.GET, entity, byte[].class);
+    return response;
+}
+}
+
+
 
 class FilterRequest {
     private List<Long> id;
@@ -2157,6 +2223,7 @@ class FilterRequest {
     
     
     
+	
     
     
 }

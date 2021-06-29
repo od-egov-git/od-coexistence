@@ -616,6 +616,7 @@ public class BankAdviceReportAction extends BaseFormAction {
         reportParams.put("letterContext", letterContext.toString());
         reportParams.put("accountNumber", getBankAccountNumber(bankaccount.getId()));
         reportParams.put("chequeNumber", "RTGS Ref. No: " + getInstrumentNumber(instrumentnumber.getId()));
+        reportParams.put("rtgsRefNo", getInstrumentNumber(instrumentnumber.getId()));
         reportParams.put("chequeDate", getInstrumentDate(instrumentnumber.getId()));
         reportParams.put("instrumentType", "RTGS");
         final List<BankAdviceReportInfo> subLedgerList = getBankAdviceReportList();

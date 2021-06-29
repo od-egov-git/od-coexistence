@@ -292,7 +292,7 @@ public class UpdateContractorBillController extends BaseBillController {
             check = false;
             woExist = false;
             contractorExist = false;
-            if (details.getChartOfAccounts().getChartOfAccountDetails() != null
+            if (details.getChartOfAccounts()!=null && details.getChartOfAccounts().getChartOfAccountDetails() != null
                     && !details.getChartOfAccounts().getChartOfAccountDetails().isEmpty()) {
                 for (CChartOfAccountDetail cad : details.getChartOfAccounts().getChartOfAccountDetails()) {
                     if (cad.getDetailTypeId() != null) {
@@ -430,14 +430,15 @@ public class UpdateContractorBillController extends BaseBillController {
             validateBillNumber(egBillregister, resultBinder);
             validateLedgerAndSubledger(egBillregister, resultBinder);
         }else if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT)){
-            
-         	for(EgBilldetails b:egBillregister.getDebitDetails())
-         	{
-         		System.out.println("::::::::"+b.getCreditamount()+":::::: "+b.getDebitamount());
-         	}
-             populateBillDetails(egBillregister);
-             populateSubLedgerDetails(egBillregister, resultBinder);
-            // validateBillNumber(egBillregister, resultBinder);
+        	for(EgBilldetails b:egBillregister.getDebitDetails())
+        	{
+        		System.out.println("::::::::"+b.getCreditamount()+":::::: "+b.getDebitamount());
+        	}
+        	if(egBillregister.getBillDetails()!=null)
+        	{  
+        		populateBillDetails(egBillregister);
+            	populateSubLedgerDetails(egBillregister, resultBinder);
+        	}            // validateBillNumber(egBillregister, resultBinder);
             // validateLedgerAndSubledger(egBillregister, resultBinder);
          	
              }else {
