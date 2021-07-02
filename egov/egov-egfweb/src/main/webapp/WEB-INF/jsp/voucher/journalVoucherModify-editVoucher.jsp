@@ -72,7 +72,7 @@
 </head>
 
 <body
-	onload="loadDropDownCodes();loadDropDownCodesFunction();documentdep();onLoadTask();">
+	onload="loadDropDownCodes();loadDropDownCodesFunction();onLoadTask();documentdep();">
 
 	<s:form theme="simple" name="jvmodifyform" enctype ="multipart/form-data">
 		<s:push value="model">

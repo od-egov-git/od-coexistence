@@ -54,6 +54,7 @@ import org.egov.infra.workflow.entity.StateAware;
 import org.egov.infra.workflow.matrix.entity.WorkFlowMatrix;
 import org.egov.infra.workflow.matrix.service.CustomizedWorkFlowService;
 import org.egov.infstr.utils.EgovMasterDataCaching;
+import org.elasticsearch.action.get.GetRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
@@ -142,11 +143,22 @@ public abstract class GenericWorkFlowAction extends BaseFormAction {
 
             validActions = Arrays.asList(FORWARD);
         } else {
-            if (getModel().getCurrentState() != null) {
+        	System.out.println("currentstate "+getModel().getCurrentState().getValue());
+        	System.out.println("createdby "+getModel().getCurrentState().getCreatedBy());
+        	System.out.println("currentowner "+getModel().getCurrentState().getOwnerPosition());
+        	if (getModel().getCurrentState() != null) {
                 validActions = this.customizedWorkFlowService.getNextValidActions(getModel()
                         .getStateType(), getWorkFlowDepartment(), getAmountRule(),
                         getAdditionalRule(), getModel().getCurrentState().getValue(),
                         getPendingActions(), getModel().getCreatedDate());
+                if ((getModel().getCurrentState().getValue()).equals("Rejected")){
+                long ownerid=getModel().getCurrentState().getOwnerPosition();
+            	long createdid=getModel().getCurrentState().getCreatedBy();
+            	if(ownerid==createdid) {
+            		validActions = Arrays.asList(FORWARD);
+            		System.out.println("ValidActions "+validActions.toString());
+            	}
+                }
             }
         }
         return validActions;

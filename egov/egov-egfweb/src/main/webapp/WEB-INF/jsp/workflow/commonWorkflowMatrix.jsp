@@ -52,17 +52,32 @@
 <%@ include file="/includes/taglibs.jsp"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
-<script>
+<script type="text/javascript">
 function documentdep(){
-	console.log("documentdep calling");
+	//alert("hi");
 	document.getElementById("approverDepartment").value="DEPT_25";
 	loadDesignationFromMatrix1();
 	var con=document.getElementById("approverDepartment");
 	con.disabled = true;
+	//document.getElementById("approverDepartment").disabled=true;
 	//setDesignation1();
 	//document.getElementById('approverPositionId').value="-1";
 	
-}  
+}
+function loadDesignationFromMatrix1() {
+	var e = dom.get('approverDepartment');
+	var dept = e.options[e.selectedIndex].text;
+	var currentState = dom.get('currentState').value;
+	var amountRule = dom.get('amountRule').value;
+	var additionalRule = dom.get('additionalRule').value;
+	var pendingAction = document.getElementById('pendingActions').value;
+	var stateType = '<s:property value="%{stateType}"/>';
+	//var stateType = 'CVoucherHeader';
+	document.getElementById("approverDesignation").value="-1";
+	//alert(stateType+" "+dept+" "+currentState+" "+amountRule+" "+additionalRule+" "+pendingAction);
+	loadDesignationByDeptAndType(stateType, dept, currentState, amountRule,
+			additionalRule, pendingAction);
+}
 	function getUsersByDesignationAndDept() {
 		populateapproverPositionId({
 			approverDepartmentId : document
@@ -74,7 +89,7 @@ function documentdep(){
 	function callAlertForDepartment() {
 		var value = document.getElementById("approverDepartment").value;
 		if (value == "-1") {
-			bootbox.alert("<s:text name='msg.please.select.approver.department'/>");
+			bootbox.alert("<s:text name='msg.please.select.approver.dept'/>");
 			document.getElementById("approverDepartment").focus();
 			return false;
 		}
@@ -91,7 +106,8 @@ function documentdep(){
 
 	function loadDesignationByDeptAndType(typeValue, departmentValue,
 			currentStateValue, amountRuleValue, additionalRuleValue,
-			pendingActionsValue) {
+			pendingActionsValue) { 
+		//alert("3");
 		var designationObj = document.getElementById('approverDesignation');
 		designationObj.options.length = 0;
 		designationObj.options[0] = new Option("----Choose----", "-1");
@@ -116,23 +132,11 @@ function documentdep(){
 		var additionalRule = dom.get('additionalRule').value;
 		var pendingAction = document.getElementById('pendingActions').value;
 		var stateType = '<s:property value="%{stateType}"/>';
+		//var stateType = 'CVoucherHeader';
 		loadDesignationByDeptAndType(stateType, dept, currentState, amountRule,
 				additionalRule, pendingAction);
 	}
-	function loadDesignationFromMatrix1() {
-		var e = dom.get('approverDepartment');
-		var dept = e.options[e.selectedIndex].text;
-		var currentState = dom.get('currentState').value;
-		var amountRule = dom.get('amountRule').value;
-		var additionalRule = dom.get('additionalRule').value;
-		var pendingAction = document.getElementById('pendingActions').value;
-		var stateType = '<s:property value="%{stateType}"/>';
-		console.log("statetype "+stateType);
-		document.getElementById("approverDesignation").value="-1";
-		loadDesignationByDeptAndType(stateType, dept, currentState, amountRule,
-				additionalRule, pendingAction);
-	}
-	
+
 	function populateApprover() {
 		getUsersByDesignationAndDept();
 	}
@@ -141,28 +145,28 @@ function documentdep(){
 		document.getElementById("approverDesignation").value = '<s:property value="%{approverDesignation}"/>';
 		populateApprover();
 	}
-	function setDesignation1() {
-		document.getElementById("approverDesignation").value = '<s:property value="%{approverDesignation}"/>';
-		document.getElementById('approverPositionId').value="-1";
-		//populateApprover();
-	}
 
 	function setApprover() {
 		document.getElementById("approverPositionId").value = '<s:property value="%{approverPositionId}"/>';
 	}
 </script>
 <s:if test="%{getNextAction()!='END'}">
-	<s:if test="%{!'Closed'.equalsIgnoreCase(model.state.value)}">
-		<s:hidden id="currentState" name="currentState" value="%{model.state.value}" />
+	<s:if test="%{getCurrentState()!='Closed'}">
+		<s:hidden id="currentState" name="currentState"
+			value="%{getCurrentState()}" />
 	</s:if>
 	<s:else>
 		<s:hidden id="currentState" name="currentState" value="" />
 	</s:else>
-	<s:hidden id="currentDesignation" name="currentDesignation" value="%{currentDesignation}" />
-	<s:hidden id="additionalRule" name="additionalRule" value="%{additionalRule}" />
+	<s:hidden id="currentDesignation" name="currentDesignation"
+		value="%{currentDesignation}" />
+	<s:hidden id="additionalRule" name="additionalRule"
+		value="%{additionalRule}" />
 	<s:hidden id="amountRule" name="amountRule" value="%{amountRule}" />
-	<s:hidden id="workFlowDepartment" name="workFlowDepartment" value="%{workFlowDepartment}" />
-	<s:hidden id="pendingActions" name="pendingActions" value="%{pendingActions}" />
+	<s:hidden id="workFlowDepartment" name="workFlowDepartment"
+		value="%{workFlowDepartment}" />
+	<s:hidden id="pendingActions" name="pendingActions"
+		value="%{pendingActions}" />
 	<s:hidden id="approverName" name="approverName" />
 
 	<s:if test="%{#request.approverOddTextCss==null}">
@@ -176,25 +180,50 @@ function documentdep(){
 	</s:if>
 
 	<table width="100%" border="0" cellspacing="0" cellpadding="0">
-	</br>
 		<tr>
 			<div class="headingsmallbg">
 				<span class="bold"><s:text name="title.approval.information" /></span>
 			</div>
 
 		</tr>
-		</br>
-		<>
+		<br></br>
 		<tr>
 			<td class="${approverOddCSS}" width="5%">&nbsp;</td>
-			<td class="${approverOddCSS}" id="deptLabel" width="14%"><s:text name="wf.approver.department" />:</td>
-			<td class="${approverOddTextCss}" width="14%"><s:select name="approverDepartment" id="approverDepartment" list="dropdownData.approverDepartmentList" listKey="code" listValue="name" headerKey="-1" headerValue="----Choose----" value="%{approverDepartment}" onchange="loadDesignationFromMatrix();"  cssClass="dropDownCss" />
-			<egov:ajaxdropdown fields="['Text','Value']" url="workflow/ajaxWorkFlow-getDesignationsByObjectType.action"  id="approverDesignation" dropdownId="approverDesignation" contextToBeUsed="/services/eis" afterSuccess="setDesignation();"  /></td>
-			<td class="${approverOddCSS}" width="14%"><s:text name="wf.approver.designation" />:</td>
-			<td class="${approverOddTextCss}" width="14%"><s:select id="approverDesignation" name="approverDesignation" list="dropdownData.designationList" listKey="code" headerKey="-1" listValue="value" headerValue="----Choose----" onchange="populateApprover();" onfocus="callAlertForDepartment();" cssClass="dropDownCss" /> 
-			<egov:ajaxdropdown id="approverPositionId" fields="['Text','Value']" dropdownId="approverPositionId" url="workflow/ajaxWorkFlow-getPositionByPassingDesigId.action" contextToBeUsed="/services/eis" afterSuccess="setApprover();" /></td>
-			<td class="${approverOddCSS}" width="14%"><s:text name="wf.approver" />:</td>
-			<td class="${approverOddTextCss}" width="14%"><s:select id="approverPositionId" name="approverPositionId" list="dropdownData.approverList" headerKey="-1" headerValue="----Choose----" listKey="id" listValue="firstName" onfocus="callAlertForDesignation();" value="%{approverPositionId}" cssClass="dropDownCss" /></td>
+			<td class="${approverOddCSS}" id="deptLabel" width="14%"><s:text
+					name="wf.approver.department" />:</td>
+			<td class="${approverOddTextCss}" width="14%">
+				<s:select name="approverDepartment" id="approverDepartment"
+					list="dropdownData.approverDepartmentList" listKey="code"
+					listValue="name" headerKey="-1" headerValue="%{getText('lbl.choose.options')}"
+					value="%{approverDepartment}"
+					onchange="loadDesignationFromMatrix();" cssClass="dropDownCss" />
+				<egov:ajaxdropdown fields="['Text','Value']"
+					url="workflow/ajaxWorkFlow-getDesignationsByObjectType.action"
+					id="approverDesignation" dropdownId="approverDesignation"
+					contextToBeUsed="/services/eis" afterSuccess="setDesignation();" />
+			</td>
+			<td class="${approverOddCSS}" width="14%">
+				<s:text	name="wf.approver.designation" />:</td>
+			<td class="${approverOddTextCss}" width="14%">
+				<s:select	id="approverDesignation" name="approverDesignation"
+					list="dropdownData.designationList" listKey="designationId"
+					headerKey="-1" listValue="designationName"
+					headerValue="%{getText('lbl.choose.options')}" onchange="populateApprover();"
+					onfocus="callAlertForDepartment();" cssClass="dropDownCss" /> 
+					<egov:ajaxdropdown id="approverPositionId" fields="['Text','Value']"
+					dropdownId="approverPositionId"
+					url="workflow/ajaxWorkFlow-getPositionByPassingDesigId.action"
+					contextToBeUsed="/services/eis" afterSuccess="setApprover();" />
+			</td>
+			<td class="${approverOddCSS}" width="14%">
+				<s:text	name="wf.approver" />:</td>
+			<td class="${approverOddTextCss}" width="14%">
+				<s:select	id="approverPositionId" name="approverPositionId"
+					list="dropdownData.approverList" headerKey="-1"
+					headerValue="%{getText('lbl.choose.options')}" listKey="id" listValue="firstName"
+					onfocus="callAlertForDesignation();" value="%{approverPositionId}"
+					cssClass="dropDownCss" />
+			</td>
 			<td class="${approverOddCSS}" width="5%">&nbsp;</td>
 		</tr>
 	</table>
@@ -206,8 +235,10 @@ function documentdep(){
 		<tr>
 			<td width="10%" class="${approverEvenCSS}">&nbsp;</td>
 			<td width="20%" class="${approverEvenCSS}">&nbsp;</td>
-			<td class="${approverEvenCSS}" width="13%"><s:text name="wf.approver.remarks" />:</td>
-			<td class="${approverEvenTextCSS}"><textarea id="approverComments" name="approverComments" rows="2" cols="35"></textarea> </td>
+			<td class="${approverEvenCSS}" width="13%"><s:text
+					name="wf.approver.remarks" />:</td>
+			<td class="${approverEvenTextCSS}"><textarea
+					id="approverComments" name="approverComments" rows="2" cols="35"></textarea></td>
 			<td class="${approverEvenCSS}">&nbsp;</td>
 			<td width="10%" class="${approverEvenCSS}">&nbsp;</td>
 			<td class="${approverEvenCSS}">&nbsp;</td>

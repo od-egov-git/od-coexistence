@@ -11,11 +11,6 @@
 	href="/services/EGF/resources/css/jquery-ui/css/smoothness/jquery-ui-1.8.4.custom.css" />
 <link rel="stylesheet" type="text/css" media="screen"
 	href="../resources/css/jquery/ui.jqgrid.css" />--%>
-<script src="<cdn:url value='/resources/app/js/common/commondocumentupload.js?rnd=${app_release_no}' context='/services/EGF'/>"></script>
-<script type="text/javascript">
-
-</script>
-
 
 <style>
     .file-ellipsis {

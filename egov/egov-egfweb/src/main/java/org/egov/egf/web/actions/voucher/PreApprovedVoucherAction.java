@@ -460,6 +460,14 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
                     validActions = this.customizedWorkFlowService.getNextValidActions(getModel().getStateType(),
                             getWorkFlowDepartment(), getAmountRule(), getAdditionalRule(),
                             getModel().getCurrentState().getValue(), getPendingActions(), getModel().getCreatedDate());
+                    if ((getModel().getCurrentState().getValue()).equals("Rejected")){
+                        long ownerid=getModel().getCurrentState().getOwnerPosition();
+                    	long createdid=getModel().getCurrentState().getCreatedBy();
+                    	if(ownerid==createdid) {
+                    		validActions = Arrays.asList(FORWARD);
+                    		System.out.println("ValidActions "+validActions.toString());
+                    	}
+                        }
                 }
             }
         else {

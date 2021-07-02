@@ -596,15 +596,16 @@ public class PaymentAction extends BasePaymentAction {
                     + "')) and bill.expendituretype=? and bill.egBillregistermis.voucherHeader.status=0 "
                     + " and bill.egBillregistermis.voucherHeader NOT IN (select misc.billVoucherHeader from Miscbilldetail misc where misc.billVoucherHeader is not null and misc.payVoucherHeader.status <> 4)";
 
-            egwStatus = egwStatusHibernateDAO.getStatusByModuleAndCode("EXPENSEBILL", "Approved"); // for
-                                                                                                   // financial
-                                                                                                   // expense
-                                                                                                   // bills
-            final EgwStatus egwStatus2 = egwStatusHibernateDAO.getStatusByModuleAndCode("EXPENSEBILL", "Bill Payment Approved"); // for 481
+			/*
+			 * egwStatus = egwStatusHibernateDAO.getStatusByModuleAndCode("EXPENSEBILL",
+			 * "Approved"); // for // financial // expense // bills final EgwStatus
+			 * egwStatus2 = egwStatusHibernateDAO.getStatusByModuleAndCode("EXPENSEBILL",
+			 * "Bill Payment Approved");
+			 */ // for 481
             final EgwStatus egwStatus3 = egwStatusHibernateDAO.getStatusByModuleAndCode("EXPENSEBILL", "Voucher Approved"); // for 481
-            final String cBillSql = cBillmainquery + " and bill.status in ("+egwStatus.getId()+","+egwStatus2.getId()+","+egwStatus3.getId()+") " + sql.toString()
+            final String cBillSql = cBillmainquery + " and bill.status in ("+egwStatus.getId()+","+egwStatus3.getId()+") " + sql.toString()
                     + " order by bill.billdate desc";
-            final String cBillSql1 = cBillmainquery1 + " and bill.status in ("+egwStatus.getId()+","+egwStatus2.getId()+","+egwStatus3.getId()+") " + sql.toString()
+            final String cBillSql1 = cBillmainquery1 + " and bill.status in ("+egwStatus.getId()+","+egwStatus3.getId()+") " + sql.toString()
                     + " order by bill.billdate desc";
             try
             {
