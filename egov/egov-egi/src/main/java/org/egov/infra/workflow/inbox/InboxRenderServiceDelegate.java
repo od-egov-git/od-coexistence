@@ -309,10 +309,12 @@ public class InboxRenderServiceDelegate<T extends StateAware> {
     	List<EmployeeInfo> employs = microserviceUtils.getEmployee(empId, null,null, null);
     	
     	if(null !=employs && employs.size()>0 ) {
-    		LOG.debug ("pos no : "+employs.get(0).getAssignments().get(0).getPosition());
-	    	employs.get(0).getAssignments().forEach(assignment->{
-	    		positions.add(assignment.getPosition());
-	    	});
+			/*
+			 * LOG.debug ("pos no : "+employs.get(0).getAssignments().get(0).getPosition());
+			 * employs.get(0).getAssignments().forEach(assignment->{
+			 * positions.add(assignment.getPosition()); });
+			 */
+    		positions.add(empId);
     	}
     	
     	return positions;
