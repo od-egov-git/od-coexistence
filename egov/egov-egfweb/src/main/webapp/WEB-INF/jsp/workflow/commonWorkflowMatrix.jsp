@@ -54,7 +54,7 @@
 
 <script type="text/javascript">
 function documentdep(){
-	//alert("hi");
+	//alert("1");
 	document.getElementById("approverDepartment").value="DEPT_25";
 	loadDesignationFromMatrix1();
 	var con=document.getElementById("approverDepartment");
@@ -65,6 +65,7 @@ function documentdep(){
 	
 }
 function loadDesignationFromMatrix1() {
+	//alert("2");
 	var e = dom.get('approverDepartment');
 	var dept = e.options[e.selectedIndex].text;
 	var currentState = dom.get('currentState').value;
@@ -73,7 +74,7 @@ function loadDesignationFromMatrix1() {
 	var pendingAction = document.getElementById('pendingActions').value;
 	var stateType = '<s:property value="%{stateType}"/>';
 	//var stateType = 'CVoucherHeader';
-	document.getElementById("approverDesignation").value="-1";
+	//document.getElementById("approverDesignation").value="-1";
 	//alert(stateType+" "+dept+" "+currentState+" "+amountRule+" "+additionalRule+" "+pendingAction);
 	loadDesignationByDeptAndType(stateType, dept, currentState, amountRule,
 			additionalRule, pendingAction);
@@ -109,6 +110,7 @@ function loadDesignationFromMatrix1() {
 			pendingActionsValue) { 
 		//alert("3");
 		var designationObj = document.getElementById('approverDesignation');
+		//alert("designationObj "+document.getElementById('approverDesignation').value);
 		designationObj.options.length = 0;
 		designationObj.options[0] = new Option("----Choose----", "-1");
 		var approverObj = document.getElementById('approverPositionId');
@@ -151,9 +153,8 @@ function loadDesignationFromMatrix1() {
 	}
 </script>
 <s:if test="%{getNextAction()!='END'}">
-	<s:if test="%{getCurrentState()!='Closed'}">
-		<s:hidden id="currentState" name="currentState"
-			value="%{getCurrentState()}" />
+	<s:if test="%{!'Closed'.equalsIgnoreCase(model.state.value)}">
+		<s:hidden id="currentState" name="currentState" value="%{model.state.value}" />
 	</s:if>
 	<s:else>
 		<s:hidden id="currentState" name="currentState" value="" />
