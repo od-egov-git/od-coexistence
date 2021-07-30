@@ -445,6 +445,10 @@ truncate table egf_contractor cascade;
 truncate table egf_supplier cascade;
 truncate table accountdetailkey cascade;
 truncate table chartofaccountdetail cascade;
+truncate table tds cascade;
+truncate table eg_city cascade; 
+truncate table eg_citypreferences cascade;
+truncate table eg_wf_matrix cascade;
 
 
 ALTER sequence seq_chartofaccounts START WITH 1;
@@ -464,6 +468,11 @@ ALTER sequence seq_egf_contractor START WITH 1;
 ALTER sequence seq_egf_supplier START WITH 1;
 ALTER sequence seq_accountdetailkey START WITH 1;
 ALTER sequence seq_chartofaccountdetail START WITH 1;
+ALTER sequence seq_tds START WITH 1;
+ALTER sequence seq_eg_city START WITH 1;
+ALTER sequence seq_eg_citypreferences START WITH 1;
+ALTER sequence seq_eg_wf_matrix START WITH 1;
+
 
 ALTER sequence seq_chartofaccounts RESTART WITH 1;
 ALTER sequence seq_scheme RESTART WITH 1;
@@ -482,6 +491,10 @@ ALTER sequence seq_egf_contractor RESTART WITH 1;
 ALTER sequence seq_egf_supplier RESTART WITH 1;
 ALTER sequence seq_accountdetailkey RESTART WITH 1;
 ALTER sequence seq_chartofaccountdetail RESTART WITH 1;
+ALTER sequence seq_tds RESTART WITH 1;
+ALTER sequence seq_eg_city RESTART WITH 1;
+ALTER sequence seq_eg_citypreferences RESTART WITH 1;
+ALTER sequence seq_eg_wf_matrix RESTART WITH 1;
 
 --Insert begin in Scedulemapping
 
