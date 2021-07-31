@@ -283,10 +283,6 @@ ALTER TABLE egf_contractor ADD blcklistfromdate timestamp NULL;
 
 ALTER TABLE egf_contractor ADD blcklisttodate timestamp NULL;
 
-ALTER TABLE egf_contractor ADD contractortype varchar(50) NULL;
-
-ALTER TABLE egf_supplier ADD suppliertype varchar(50) NULL;
-
 ALTER TABLE voucherheader ADD firstsignatory varchar(100) NULL;
 
 ALTER TABLE voucherheader ADD secondsignatory varchar(100) NULL;
