@@ -5520,14 +5520,14 @@ INSERT INTO deogarh.chartofaccounts (id,glcode,name,description,isactiveforposti
 	 (nextval('deogarh.seq_chartofaccounts'),'4502017','IDBI-DEOGARH-13691014000040000',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
 	 (nextval('deogarh.seq_chartofaccounts'),'4502007','SBI-DEOGARH-30316026519',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11);
 INSERT INTO deogarh.chartofaccounts (id,glcode,name,description,isactiveforposting,parentid,purposeid,operation,"type","class",classification,functionreqd,budgetcheckreq,scheduleid,receiptscheduleid,receiptoperation,paymentscheduleid,paymentoperation,majorcode,fiescheduleid,fieoperation,createddate,createdby,lastmodifieddate,lastmodifiedby,"version") VALUES
-	 (nextval('deogarh.seq_chartofaccounts')'4502010','HDFC-DEOGARH-50100091863767',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
-	 (nextval('deogarh.seq_chartofaccounts')'4502004','SBI-DEOGARH-31949179909',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
-	 (nextval('deogarh.seq_chartofaccounts')'4502008','ICICI-DEOGARH-368301000083',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
-	 (nextval('deogarh.seq_chartofaccounts')'4502015','BOB-DEOGARH-40700100000471',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
-	 (nextval('deogarh.seq_chartofaccounts')'4502001','SBI-DEOGARH-30440597975',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
-	 (nextval('deogarh.seq_chartofaccounts')'4502012','AXIS-DEOGARH-915010039555089',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
-	 (nextval('deogarh.seq_chartofaccounts')'4502014','UBI-DEOGARH-70670205000006',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
-	 (nextval('deogarh.seq_chartofaccounts')'4502011','ICICI-DEOGARH-368301000033',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11);
+	 (nextval('deogarh.seq_chartofaccounts'),'4502010','HDFC-DEOGARH-50100091863767',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
+	 (nextval('deogarh.seq_chartofaccounts'),'4502004','SBI-DEOGARH-31949179909',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
+	 (nextval('deogarh.seq_chartofaccounts'),'4502008','ICICI-DEOGARH-368301000083',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
+	 (nextval('deogarh.seq_chartofaccounts'),'4502015','BOB-DEOGARH-40700100000471',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
+	 (nextval('deogarh.seq_chartofaccounts'),'4502001','SBI-DEOGARH-30440597975',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
+	 (nextval('deogarh.seq_chartofaccounts'),'4502012','AXIS-DEOGARH-915010039555089',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
+	 (nextval('deogarh.seq_chartofaccounts'),'4502014','UBI-DEOGARH-70670205000006',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
+	 (nextval('deogarh.seq_chartofaccounts'),'4502011','ICICI-DEOGARH-368301000033',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11);
 	 
 INSERT INTO deogarh.bankaccount (id,branchid,accountnumber,accounttype,narration,isactive,glcodeid,fundid,payto,"type",createdby,lastmodifiedby,createddate,lastmodifieddate,"version",chequeformatid) VALUES
 	 (nextval('deogarh.seq_bankaccount'),4,'4911101000896','45020 - Consolidated Bank Balances - Municipal Fund (all places)','Construction of BUS stand',true,1247,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
@@ -7962,7 +7962,7 @@ INSERT INTO kabisuryanagar.bankbranch (id,branchcode,branchname,branchaddress1,b
 INSERT INTO kabisuryanagar.bankbranch (id,branchcode,branchname,branchaddress1,branchaddress2,branchcity,branchstate,branchpin,branchphone,branchfax,bankid,contactperson,isactive,narration,micr,createddate,lastmodifieddate,lastmodifiedby,"version",createdby) VALUES
 	 (nextval('kabisuryanagar.seq_bankbranch'),'2981','BALISIRA','Balisira',NULL,NULL,NULL,NULL,NULL,NULL,3,NULL,true,NULL,NULL,now(),now(),0,0,0);
 	 
-INSERT INTO "Kavisuryanagar".chartofaccounts (id,glcode,name,description,isactiveforposting,parentid,purposeid,operation,"type","class",classification,functionreqd,budgetcheckreq,scheduleid,receiptscheduleid,receiptoperation,paymentscheduleid,paymentoperation,majorcode,fiescheduleid,fieoperation,createddate,createdby,lastmodifieddate,lastmodifiedby,"version") VALUES
+INSERT INTO kabisuryanagar.chartofaccounts (id,glcode,name,description,isactiveforposting,parentid,purposeid,operation,"type","class",classification,functionreqd,budgetcheckreq,scheduleid,receiptscheduleid,receiptoperation,paymentscheduleid,paymentoperation,majorcode,fiescheduleid,fieoperation,createddate,createdby,lastmodifieddate,lastmodifiedby,"version") VALUES
 	 (nextval('kabisuryanagar.seq_chartofaccounts'),'4502002','IOB-Kabisuryanagar-260901000004779',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
 	 (nextval('kabisuryanagar.seq_chartofaccounts'),'4502033','AXIS-Aska-916010081700201',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
 	 (nextval('kabisuryanagar.seq_chartofaccounts'),'4502032','AXIS-Aska -919010038831203',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
@@ -7973,7 +7973,7 @@ INSERT INTO "Kavisuryanagar".chartofaccounts (id,glcode,name,description,isactiv
 	 (nextval('kabisuryanagar.seq_chartofaccounts'),'4502047','SBI-Kabisuryanagar-10978896022',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
 	 (nextval('kabisuryanagar.seq_chartofaccounts'),'4502014','BOI-Kabisuryanagar-516610210000001',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
 	 (nextval('kabisuryanagar.seq_chartofaccounts'),'4502013','IOB-Kabisuryanagar-260901000004207',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11);
-INSERT INTO "Kavisuryanagar".chartofaccounts (id,glcode,name,description,isactiveforposting,parentid,purposeid,operation,"type","class",classification,functionreqd,budgetcheckreq,scheduleid,receiptscheduleid,receiptoperation,paymentscheduleid,paymentoperation,majorcode,fiescheduleid,fieoperation,createddate,createdby,lastmodifieddate,lastmodifiedby,"version") VALUES
+INSERT INTO kabisuryanagar.chartofaccounts (id,glcode,name,description,isactiveforposting,parentid,purposeid,operation,"type","class",classification,functionreqd,budgetcheckreq,scheduleid,receiptscheduleid,receiptoperation,paymentscheduleid,paymentoperation,majorcode,fiescheduleid,fieoperation,createddate,createdby,lastmodifieddate,lastmodifiedby,"version") VALUES
 	 (nextval('kabisuryanagar.seq_chartofaccounts'),'4502004','IOB-Kabisuryanagar-260901000007609',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
 	 (nextval('kabisuryanagar.seq_chartofaccounts'),'4502048','SBI-Aska-10656670135',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
 	 (nextval('kabisuryanagar.seq_chartofaccounts'),'4502008','IOB-Kabisuryanagar-260901000000487',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
@@ -7984,7 +7984,7 @@ INSERT INTO "Kavisuryanagar".chartofaccounts (id,glcode,name,description,isactiv
 	 (nextval('kabisuryanagar.seq_chartofaccounts'),'4502041','ICICI-Aska-149801000338',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
 	 (nextval('kabisuryanagar.seq_chartofaccounts'),'4502011','IOB-Kabisuryanagar-260901000004061',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
 	 (nextval('kabisuryanagar.seq_chartofaccounts'),'4502003','IOB-Kabisuryanagar-260901000003609',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11);
-INSERT INTO "Kavisuryanagar".chartofaccounts (id,glcode,name,description,isactiveforposting,parentid,purposeid,operation,"type","class",classification,functionreqd,budgetcheckreq,scheduleid,receiptscheduleid,receiptoperation,paymentscheduleid,paymentoperation,majorcode,fiescheduleid,fieoperation,createddate,createdby,lastmodifieddate,lastmodifiedby,"version") VALUES
+INSERT INTO kabisuryanagar.chartofaccounts (id,glcode,name,description,isactiveforposting,parentid,purposeid,operation,"type","class",classification,functionreqd,budgetcheckreq,scheduleid,receiptscheduleid,receiptoperation,paymentscheduleid,paymentoperation,majorcode,fiescheduleid,fieoperation,createddate,createdby,lastmodifieddate,lastmodifiedby,"version") VALUES
 	 (nextval('kabisuryanagar.seq_chartofaccounts'),'4502038','ICICI-Aska-149801000367',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
 	 (nextval('kabisuryanagar.seq_chartofaccounts'),'4502028','UBI-Chatrapur-622902010003110',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
 	 (nextval('kabisuryanagar.seq_chartofaccounts'),'4502021','SBI-Kabisuryanagar-30292544839',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
@@ -7995,7 +7995,7 @@ INSERT INTO "Kavisuryanagar".chartofaccounts (id,glcode,name,description,isactiv
 	 (nextval('kabisuryanagar.seq_chartofaccounts'),'4502044','HDFC-BALISIRA-50100225695484',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
 	 (nextval('kabisuryanagar.seq_chartofaccounts'),'4502029','SYN-Kabisuryanagar-80372200000902',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
 	 (nextval('kabisuryanagar.seq_chartofaccounts'),'4502024','SBI-Kabisuryanagar-30468286518',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11);
-INSERT INTO "Kavisuryanagar".chartofaccounts (id,glcode,name,description,isactiveforposting,parentid,purposeid,operation,"type","class",classification,functionreqd,budgetcheckreq,scheduleid,receiptscheduleid,receiptoperation,paymentscheduleid,paymentoperation,majorcode,fiescheduleid,fieoperation,createddate,createdby,lastmodifieddate,lastmodifiedby,"version") VALUES
+INSERT INTO kabisuryanagar.chartofaccounts (id,glcode,name,description,isactiveforposting,parentid,purposeid,operation,"type","class",classification,functionreqd,budgetcheckreq,scheduleid,receiptscheduleid,receiptoperation,paymentscheduleid,paymentoperation,majorcode,fiescheduleid,fieoperation,createddate,createdby,lastmodifieddate,lastmodifiedby,"version") VALUES
 	 (nextval('kabisuryanagar.seq_chartofaccounts'),'4502026','SBI-Kabisuryanagar-30314262389',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
 	 (nextval('kabisuryanagar.seq_chartofaccounts'),'4502042','ICICI-Aska-149801000368',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
 	 (nextval('kabisuryanagar.seq_chartofaccounts'),'4502017','BOI-Kabisuryanagar-516610110004449',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
@@ -8006,7 +8006,7 @@ INSERT INTO "Kavisuryanagar".chartofaccounts (id,glcode,name,description,isactiv
 	 (nextval('kabisuryanagar.seq_chartofaccounts'),'4502039','ICICI-Aska-149801000360',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
 	 (nextval('kabisuryanagar.seq_chartofaccounts'),'4502030','SYN-Kabisuryanagar-80372200004147',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
 	 (nextval('kabisuryanagar.seq_chartofaccounts'),'4502012','IOB-Kabisuryanagar-2609010000000660',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11);
-INSERT INTO "Kavisuryanagar".chartofaccounts (id,glcode,name,description,isactiveforposting,parentid,purposeid,operation,"type","class",classification,functionreqd,budgetcheckreq,scheduleid,receiptscheduleid,receiptoperation,paymentscheduleid,paymentoperation,majorcode,fiescheduleid,fieoperation,createddate,createdby,lastmodifieddate,lastmodifiedby,"version") VALUES
+INSERT INTO kabisuryanagar.chartofaccounts (id,glcode,name,description,isactiveforposting,parentid,purposeid,operation,"type","class",classification,functionreqd,budgetcheckreq,scheduleid,receiptscheduleid,receiptoperation,paymentscheduleid,paymentoperation,majorcode,fiescheduleid,fieoperation,createddate,createdby,lastmodifieddate,lastmodifiedby,"version") VALUES
 	 (nextval('kabisuryanagar.seq_chartofaccounts'),'4502022','SBI-Kabisuryanagar-10978942242',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
 	 (nextval('kabisuryanagar.seq_chartofaccounts'),'4502018','BOI-Kabisuryanagar-516610110004419',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
 	 (nextval('kabisuryanagar.seq_chartofaccounts'),'4502009','IOB-Kabisuryanagar-260901000002609',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
@@ -9032,16 +9032,16 @@ INSERT INTO keonjhargarh.bankaccount (id,branchid,accountnumber,accounttype,narr
 	 (nextval('keonjhargarh.seq_bankaccount'),6,'22840110000748','45020 - Consolidated Bank Balances - Municipal Fund (all places)','OWN FUND',true,1286,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
 	 (nextval('keonjhargarh.seq_bankaccount'),19,'8448','45020 - Consolidated Bank Balances - Municipal Fund (all places)','HUD',true,1292,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL);
 INSERT INTO keonjhargarh.bankaccount (id,branchid,accountnumber,accounttype,narration,isactive,glcodeid,fundid,payto,"type",createdby,lastmodifiedby,createddate,lastmodifieddate,"version",chequeformatid) VALUES
-	 (21,17,'3139101000003','45020 - Consolidated Bank Balances - Municipal Fund (all places)','HUD',true,1255,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
-	 (22,2,'11382682576','45020 - Consolidated Bank Balances - Municipal Fund (all places)','OWN FUND',true,1290,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
-	 (23,4,'200110100009795','45020 - Consolidated Bank Balances - Municipal Fund (all places)','OWN FUND',true,1299,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
-	 (24,6,'22840110103234','45020 - Consolidated Bank Balances - Municipal Fund (all places)','DUDA',true,1282,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
-	 (25,22,'700010100009027','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',true,1314,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
-	 (26,18,'541710110000431','45020 - Consolidated Bank Balances - Municipal Fund (all places)','HUD',true,1263,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
-	 (27,16,'46901000838','45020 - Consolidated Bank Balances - Municipal Fund (all places)','HUD',true,1284,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
-	 (28,20,'100044073663','45020 - Consolidated Bank Balances - Municipal Fund (all places)','DUDA',true,1285,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
-	 (29,2,'11382665753','45020 - Consolidated Bank Balances - Municipal Fund (all places)','HUD',true,1313,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
-	 (30,7,'501900030506762','45020 - Consolidated Bank Balances - Municipal Fund (all places)','HUD',true,1251,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL);
+	 (nextval('keonjhargarh.seq_bankaccount'),17,'3139101000003','45020 - Consolidated Bank Balances - Municipal Fund (all places)','HUD',true,1255,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
+	 (nextval('keonjhargarh.seq_bankaccount'),2,'11382682576','45020 - Consolidated Bank Balances - Municipal Fund (all places)','OWN FUND',true,1290,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
+	 (nextval('keonjhargarh.seq_bankaccount'),4,'200110100009795','45020 - Consolidated Bank Balances - Municipal Fund (all places)','OWN FUND',true,1299,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
+	 (nextval('keonjhargarh.seq_bankaccount'),6,'22840110103234','45020 - Consolidated Bank Balances - Municipal Fund (all places)','DUDA',true,1282,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
+	 (nextval('keonjhargarh.seq_bankaccount'),22,'700010100009027','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',true,1314,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
+	 (nextval('keonjhargarh.seq_bankaccount'),18,'541710110000431','45020 - Consolidated Bank Balances - Municipal Fund (all places)','HUD',true,1263,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
+	 (nextval('keonjhargarh.seq_bankaccount'),16,'46901000838','45020 - Consolidated Bank Balances - Municipal Fund (all places)','HUD',true,1284,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
+	 (nextval('keonjhargarh.seq_bankaccount'),20,'100044073663','45020 - Consolidated Bank Balances - Municipal Fund (all places)','DUDA',true,1285,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
+	 (nextval('keonjhargarh.seq_bankaccount'),2,'11382665753','45020 - Consolidated Bank Balances - Municipal Fund (all places)','HUD',true,1313,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
+	 (nextval('keonjhargarh.seq_bankaccount'),7,'501900030506762','45020 - Consolidated Bank Balances - Municipal Fund (all places)','HUD',true,1251,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL);
 INSERT INTO keonjhargarh.bankaccount (id,branchid,accountnumber,accounttype,narration,isactive,glcodeid,fundid,payto,"type",createdby,lastmodifiedby,createddate,lastmodifieddate,"version",chequeformatid) VALUES
 	 (nextval('keonjhargarh.seq_bankaccount'),2,'30313859942','45020 - Consolidated Bank Balances - Municipal Fund (all places)','HUD',true,1269,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
 	 (nextval('keonjhargarh.seq_bankaccount'),1,'1016104000131920','45020 - Consolidated Bank Balances - Municipal Fund (all places)','OWN FUND',true,1266,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
@@ -12850,16 +12850,16 @@ INSERT INTO puri.bankaccount (id,branchid,accountnumber,accounttype,narration,is
 	 (nextval('puri.seq_bankaccount'),25,'16728','45020 - Consolidated Bank Balances - Municipal Fund (all places)','Tourism (Light)',true,1274,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
 	 (nextval('puri.seq_bankaccount'),3,'20273153401','45020 - Consolidated Bank Balances - Municipal Fund (all places)','subsidy',true,1273,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL);
 INSERT INTO puri.bankaccount (id,branchid,accountnumber,accounttype,narration,isactive,glcodeid,fundid,payto,"type",createdby,lastmodifiedby,createddate,lastmodifieddate,"version",chequeformatid) VALUES
-	 (41,26,'919010003212271','45020 - Consolidated Bank Balances - Municipal Fund (all places)','Radhagobinda Lane Bhagabat Tungi',true,1312,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
-	 (42,24,'1663143142','45020 - Consolidated Bank Balances - Municipal Fund (all places)','SJSRY Subsidy',false,1353,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
-	 (43,30,'555210110008067','45020 - Consolidated Bank Balances - Municipal Fund (all places)','NRB ',true,1358,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
-	 (44,15,'87501000878','45020 - Consolidated Bank Balances - Municipal Fund (all places)','Nabakalebar Special LED Light',false,1264,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
-	 (45,3,'20273189686','45020 - Consolidated Bank Balances - Municipal Fund (all places)','12th Finance',true,1302,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
-	 (46,19,'2900110072158','45020 - Consolidated Bank Balances - Municipal Fund (all places)','Biju Yava Bahini',true,1367,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
-	 (47,26,'916010082815142','45020 - Consolidated Bank Balances - Municipal Fund (all places)','Dreging of narendra Tank',false,1319,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
-	 (48,17,'2891000100001360','45020 - Consolidated Bank Balances - Municipal Fund (all places)','Subsidy ',false,1338,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
-	 (49,31,'403104000156059','45020 - Consolidated Bank Balances - Municipal Fund (all places)','Public Toilet',true,1248,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
-	 (50,21,'11171450000312','45020 - Consolidated Bank Balances - Municipal Fund (all places)','PIU & Other Grant',true,1350,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL);
+	 (nextval('puri.seq_bankaccount'),26,'919010003212271','45020 - Consolidated Bank Balances - Municipal Fund (all places)','Radhagobinda Lane Bhagabat Tungi',true,1312,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
+	 (nextval('puri.seq_bankaccount'),24,'1663143142','45020 - Consolidated Bank Balances - Municipal Fund (all places)','SJSRY Subsidy',false,1353,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
+	 (nextval('puri.seq_bankaccount'),30,'555210110008067','45020 - Consolidated Bank Balances - Municipal Fund (all places)','NRB ',true,1358,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
+	 (nextval('puri.seq_bankaccount'),15,'87501000878','45020 - Consolidated Bank Balances - Municipal Fund (all places)','Nabakalebar Special LED Light',false,1264,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
+	 (nextval('puri.seq_bankaccount'),3,'20273189686','45020 - Consolidated Bank Balances - Municipal Fund (all places)','12th Finance',true,1302,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
+	 (nextval('puri.seq_bankaccount'),19,'2900110072158','45020 - Consolidated Bank Balances - Municipal Fund (all places)','Biju Yava Bahini',true,1367,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
+	 (nextval('puri.seq_bankaccount'),26,'916010082815142','45020 - Consolidated Bank Balances - Municipal Fund (all places)','Dreging of narendra Tank',false,1319,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
+	 (nextval('puri.seq_bankaccount'),17,'2891000100001360','45020 - Consolidated Bank Balances - Municipal Fund (all places)','Subsidy ',false,1338,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
+	 (nextval('puri.seq_bankaccount'),31,'403104000156059','45020 - Consolidated Bank Balances - Municipal Fund (all places)','Public Toilet',true,1248,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
+	 (nextval('puri.seq_bankaccount'),21,'11171450000312','45020 - Consolidated Bank Balances - Municipal Fund (all places)','PIU & Other Grant',true,1350,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL);
 INSERT INTO puri.bankaccount (id,branchid,accountnumber,accounttype,narration,isactive,glcodeid,fundid,payto,"type",createdby,lastmodifiedby,createddate,lastmodifieddate,"version",chequeformatid) VALUES
 	 (nextval('puri.seq_bankaccount'),25,'1439101006031','45020 - Consolidated Bank Balances - Municipal Fund (all places)','SJSRY ',false,1348,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
 	 (nextval('puri.seq_bankaccount'),26,'918020058351596','45020 - Consolidated Bank Balances - Municipal Fund (all places)','Deduction A/c.',true,1349,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
@@ -13101,55 +13101,55 @@ INSERT INTO rairangpur.bankbranch (id,branchcode,branchname,branchaddress1,branc
 INSERT INTO rairangpur.bankbranch (id,branchcode,branchname,branchaddress1,branchaddress2,branchcity,branchstate,branchpin,branchphone,branchfax,bankid,contactperson,isactive,narration,micr,createddate,lastmodifieddate,lastmodifiedby,"version",createdby) VALUES
 	 (nextval('rairangpur.seq_bankbranch'),'0','RAIRANGPUR SUB TREASURY','RAIRANGPUR, MAYURBHANJ-757043',NULL,NULL,NULL,NULL,NULL,NULL,1,NULL,true,NULL,NULL,now(),now(),0,0,0);
 	 
-INSERT INTO rairangpur.chartofaccounts (id,glcode,"name",description,isactiveforposting,parentid,purposeid,operation,"type","class",classification,functionreqd,budgetcheckreq,scheduleid,receiptscheduleid,receiptoperation,paymentscheduleid,paymentoperation,majorcode,fiescheduleid,fieoperation,createddate,createdby,lastmodifieddate,lastmodifiedby,"version",column6) VALUES
-	 (nextval('rairangpur.seq_chartofaccounts'),'4502018','Axis-RAIRANGPUR-911010050661406',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11,NULL),
-	 (nextval('rairangpur.seq_chartofaccounts'),'4502015','BOI-RAIRANGPUR-550310200012800',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11,NULL),
-	 (nextval('rairangpur.seq_chartofaccounts'),'4502009','CANARA-RAIRANGPUR-1868101015800',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11,NULL),
-	 (nextval('rairangpur.seq_chartofaccounts'),'4502025','ICICI-RAIRANGPUR-096301001015',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11,NULL),
-	 (nextval('rairangpur.seq_chartofaccounts'),'4502003','SBI-RAIRANGPUR-11085744008',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11,NULL),
-	 (nextval('rairangpur.seq_chartofaccounts'),'4502040','IDBI-RAIRANGPUR-1743104000014863',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11,NULL),
-	 (nextval('rairangpur.seq_chartofaccounts'),'4502030','ICICI-RAIRANGPUR-096301001096',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11,NULL),
-	 (nextval('rairangpur.seq_chartofaccounts'),'4502016','BOI-RAIRANGPUR-550310110016724',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11,NULL),
-	 (nextval('rairangpur.seq_chartofaccounts'),'4502022','ICICI-RAIRANGPUR-096301000528',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11,NULL),
-	 (nextval('rairangpur.seq_chartofaccounts'),'4502033','HDFC-RAIRANGPUR-50300414405695',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11,NULL);
-INSERT INTO rairangpur.chartofaccounts (id,glcode,"name",description,isactiveforposting,parentid,purposeid,operation,"type","class",classification,functionreqd,budgetcheckreq,scheduleid,receiptscheduleid,receiptoperation,paymentscheduleid,paymentoperation,majorcode,fiescheduleid,fieoperation,createddate,createdby,lastmodifieddate,lastmodifiedby,"version",column6) VALUES
-	 (nextval('rairangpur.seq_chartofaccounts'),'4502026','ICICI-RAIRANGPUR-096301001013',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11,NULL),
-	 (nextval('rairangpur.seq_chartofaccounts'),'4502021','ICICI-RAIRANGPUR-096301000891',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11,NULL),
-	 (nextval('rairangpur.seq_chartofaccounts'),'4502017','OGB-RAIRANGPUR-105810100001842',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11,NULL),
-	 (nextval('rairangpur.seq_chartofaccounts'),'4502014','BOI-RAIRANGPUR-550310200012185',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11,NULL),
-	 (nextval('rairangpur.seq_chartofaccounts'),'4502002','SBI-RAIRANGPUR-11085744235',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11,NULL),
-	 (nextval('rairangpur.seq_chartofaccounts'),'4502011','BOI-RAIRANGPUR-550310200007795',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11,NULL),
-	 (nextval('rairangpur.seq_chartofaccounts'),'4502008','CANARA-RAIRANGPUR-1868101004694',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11,NULL),
-	 (nextval('rairangpur.seq_chartofaccounts'),'4502007','SBI-RAIRANGPUR-37807386518',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11,NULL),
-	 (nextval('rairangpur.seq_chartofaccounts'),'4502043','Bandhan-RAIRANGPUR-50190004608744',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11,NULL),
-	 (nextval('rairangpur.seq_chartofaccounts'),'4502019','Axis-RAIRANGPUR-915010019193546 ',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11,NULL);
-INSERT INTO rairangpur.chartofaccounts (id,glcode,"name",description,isactiveforposting,parentid,purposeid,operation,"type","class",classification,functionreqd,budgetcheckreq,scheduleid,receiptscheduleid,receiptoperation,paymentscheduleid,paymentoperation,majorcode,fiescheduleid,fieoperation,createddate,createdby,lastmodifieddate,lastmodifiedby,"version",column6) VALUES
-	 (nextval('rairangpur.seq_chartofaccounts'),'4502013','BOI-RAIRANGPUR-550310200008526',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11,NULL),
-	 (nextval('rairangpur.seq_chartofaccounts'),'4502041','IDBI-RAIRANGPUR-1743104000002950 ',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11,NULL),
-	 (nextval('rairangpur.seq_chartofaccounts'),'4502006','SBI-RAIRANGPUR-35915678503',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11,NULL),
-	 (nextval('rairangpur.seq_chartofaccounts'),'4502031','HDFC-RAIRANGPUR-50100114888898',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11,NULL),
-	 (nextval('rairangpur.seq_chartofaccounts'),'4502028','ICICI-RAIRANGPUR-096301001014',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11,NULL),
-	 (nextval('rairangpur.seq_chartofaccounts'),'4502027','ICICI-RAIRANGPUR-096301001012',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11,NULL),
-	 (nextval('rairangpur.seq_chartofaccounts'),'4502001','SBI-RAIRANGPUR-11085739133',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11,NULL),
-	 (nextval('rairangpur.seq_chartofaccounts'),'4502034','HDFC-RAIRANGPUR-50100165200031',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11,NULL),
-	 (nextval('rairangpur.seq_chartofaccounts'),'4502020','Axis-RAIRANGPUR-918010114417968',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11,NULL),
-	 (nextval('rairangpur.seq_chartofaccounts'),'4502004','SBI-RAIRANGPUR-11085744224',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11,NULL);
-INSERT INTO rairangpur.chartofaccounts (id,glcode,"name",description,isactiveforposting,parentid,purposeid,operation,"type","class",classification,functionreqd,budgetcheckreq,scheduleid,receiptscheduleid,receiptoperation,paymentscheduleid,paymentoperation,majorcode,fiescheduleid,fieoperation,createddate,createdby,lastmodifieddate,lastmodifiedby,"version",column6) VALUES
-	 (nextval('rairangpur.seq_chartofaccounts'),'4502012','BOI-RAIRANGPUR-550310200008431',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11,NULL),
-	 (nextval('rairangpur.seq_chartofaccounts'),'4502038','HDFC-RAIRANGPUR-50100345738890',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11,NULL),
-	 (nextval('rairangpur.seq_chartofaccounts'),'4502036','HDFC-RAIRANGPUR-50100233784340',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11,NULL),
-	 (nextval('rairangpur.seq_chartofaccounts'),'4502032','HDFC-RAIRANGPUR-50100099098830 ',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11,NULL),
-	 (nextval('rairangpur.seq_chartofaccounts'),'4502023','ICICI-RAIRANGPUR-096301000571',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11,NULL),
-	 (nextval('rairangpur.seq_chartofaccounts'),'4502035','HDFC-RAIRANGPUR-50100235779739',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11,NULL),
-	 (nextval('rairangpur.seq_chartofaccounts'),'4502044','DCB-RAIRANGPUR-33713600000046',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11,NULL),
-	 (nextval('rairangpur.seq_chartofaccounts'),'4502010','BOI-RAIRANGPUR-550310110014694',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11,NULL),
-	 (nextval('rairangpur.seq_chartofaccounts'),'4502042','IDBI-RAIRANGPUR-1743104000037873',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11,NULL),
-	 (nextval('rairangpur.seq_chartofaccounts'),'4502039','IDBI-RAIRANGPUR-1743104000004244',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11,NULL);
-INSERT INTO rairangpur.chartofaccounts (id,glcode,"name",description,isactiveforposting,parentid,purposeid,operation,"type","class",classification,functionreqd,budgetcheckreq,scheduleid,receiptscheduleid,receiptoperation,paymentscheduleid,paymentoperation,majorcode,fiescheduleid,fieoperation,createddate,createdby,lastmodifieddate,lastmodifiedby,"version",column6) VALUES
-	 (nextval('rairangpur.seq_chartofaccounts'),'4502024','ICICI-RAIRANGPUR-096301000816',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11,NULL),
-	 (nextval('rairangpur.seq_chartofaccounts'),'4502005','SBI-RAIRANGPUR-11085744213',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11,NULL),
-	 (nextval('rairangpur.seq_chartofaccounts'),'4502037','HDFC-RAIRANGPUR-50100311614341',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11,NULL),
-	 (nextval('rairangpur.seq_chartofaccounts'),'4502029','TREASURY-RAIRANGPUR-8448',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11,NULL);
+INSERT INTO rairangpur.chartofaccounts (id,glcode,"name",description,isactiveforposting,parentid,purposeid,operation,"type","class",classification,functionreqd,budgetcheckreq,scheduleid,receiptscheduleid,receiptoperation,paymentscheduleid,paymentoperation,majorcode,fiescheduleid,fieoperation,createddate,createdby,lastmodifieddate,lastmodifiedby,"version") VALUES
+	 (nextval('rairangpur.seq_chartofaccounts'),'4502018','Axis-RAIRANGPUR-911010050661406',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
+	 (nextval('rairangpur.seq_chartofaccounts'),'4502015','BOI-RAIRANGPUR-550310200012800',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
+	 (nextval('rairangpur.seq_chartofaccounts'),'4502009','CANARA-RAIRANGPUR-1868101015800',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
+	 (nextval('rairangpur.seq_chartofaccounts'),'4502025','ICICI-RAIRANGPUR-096301001015',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
+	 (nextval('rairangpur.seq_chartofaccounts'),'4502003','SBI-RAIRANGPUR-11085744008',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
+	 (nextval('rairangpur.seq_chartofaccounts'),'4502040','IDBI-RAIRANGPUR-1743104000014863',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
+	 (nextval('rairangpur.seq_chartofaccounts'),'4502030','ICICI-RAIRANGPUR-096301001096',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
+	 (nextval('rairangpur.seq_chartofaccounts'),'4502016','BOI-RAIRANGPUR-550310110016724',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
+	 (nextval('rairangpur.seq_chartofaccounts'),'4502022','ICICI-RAIRANGPUR-096301000528',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
+	 (nextval('rairangpur.seq_chartofaccounts'),'4502033','HDFC-RAIRANGPUR-50300414405695',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11);
+INSERT INTO rairangpur.chartofaccounts (id,glcode,"name",description,isactiveforposting,parentid,purposeid,operation,"type","class",classification,functionreqd,budgetcheckreq,scheduleid,receiptscheduleid,receiptoperation,paymentscheduleid,paymentoperation,majorcode,fiescheduleid,fieoperation,createddate,createdby,lastmodifieddate,lastmodifiedby,"version") VALUES
+	 (nextval('rairangpur.seq_chartofaccounts'),'4502026','ICICI-RAIRANGPUR-096301001013',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
+	 (nextval('rairangpur.seq_chartofaccounts'),'4502021','ICICI-RAIRANGPUR-096301000891',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
+	 (nextval('rairangpur.seq_chartofaccounts'),'4502017','OGB-RAIRANGPUR-105810100001842',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
+	 (nextval('rairangpur.seq_chartofaccounts'),'4502014','BOI-RAIRANGPUR-550310200012185',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
+	 (nextval('rairangpur.seq_chartofaccounts'),'4502002','SBI-RAIRANGPUR-11085744235',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
+	 (nextval('rairangpur.seq_chartofaccounts'),'4502011','BOI-RAIRANGPUR-550310200007795',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
+	 (nextval('rairangpur.seq_chartofaccounts'),'4502008','CANARA-RAIRANGPUR-1868101004694',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
+	 (nextval('rairangpur.seq_chartofaccounts'),'4502007','SBI-RAIRANGPUR-37807386518',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
+	 (nextval('rairangpur.seq_chartofaccounts'),'4502043','Bandhan-RAIRANGPUR-50190004608744',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
+	 (nextval('rairangpur.seq_chartofaccounts'),'4502019','Axis-RAIRANGPUR-915010019193546 ',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11);
+INSERT INTO rairangpur.chartofaccounts (id,glcode,"name",description,isactiveforposting,parentid,purposeid,operation,"type","class",classification,functionreqd,budgetcheckreq,scheduleid,receiptscheduleid,receiptoperation,paymentscheduleid,paymentoperation,majorcode,fiescheduleid,fieoperation,createddate,createdby,lastmodifieddate,lastmodifiedby,"version") VALUES
+	 (nextval('rairangpur.seq_chartofaccounts'),'4502013','BOI-RAIRANGPUR-550310200008526',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
+	 (nextval('rairangpur.seq_chartofaccounts'),'4502041','IDBI-RAIRANGPUR-1743104000002950 ',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
+	 (nextval('rairangpur.seq_chartofaccounts'),'4502006','SBI-RAIRANGPUR-35915678503',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
+	 (nextval('rairangpur.seq_chartofaccounts'),'4502031','HDFC-RAIRANGPUR-50100114888898',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
+	 (nextval('rairangpur.seq_chartofaccounts'),'4502028','ICICI-RAIRANGPUR-096301001014',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
+	 (nextval('rairangpur.seq_chartofaccounts'),'4502027','ICICI-RAIRANGPUR-096301001012',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
+	 (nextval('rairangpur.seq_chartofaccounts'),'4502001','SBI-RAIRANGPUR-11085739133',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
+	 (nextval('rairangpur.seq_chartofaccounts'),'4502034','HDFC-RAIRANGPUR-50100165200031',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
+	 (nextval('rairangpur.seq_chartofaccounts'),'4502020','Axis-RAIRANGPUR-918010114417968',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
+	 (nextval('rairangpur.seq_chartofaccounts'),'4502004','SBI-RAIRANGPUR-11085744224',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11);
+INSERT INTO rairangpur.chartofaccounts (id,glcode,"name",description,isactiveforposting,parentid,purposeid,operation,"type","class",classification,functionreqd,budgetcheckreq,scheduleid,receiptscheduleid,receiptoperation,paymentscheduleid,paymentoperation,majorcode,fiescheduleid,fieoperation,createddate,createdby,lastmodifieddate,lastmodifiedby,"version") VALUES
+	 (nextval('rairangpur.seq_chartofaccounts'),'4502012','BOI-RAIRANGPUR-550310200008431',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
+	 (nextval('rairangpur.seq_chartofaccounts'),'4502038','HDFC-RAIRANGPUR-50100345738890',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
+	 (nextval('rairangpur.seq_chartofaccounts'),'4502036','HDFC-RAIRANGPUR-50100233784340',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
+	 (nextval('rairangpur.seq_chartofaccounts'),'4502032','HDFC-RAIRANGPUR-50100099098830 ',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
+	 (nextval('rairangpur.seq_chartofaccounts'),'4502023','ICICI-RAIRANGPUR-096301000571',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
+	 (nextval('rairangpur.seq_chartofaccounts'),'4502035','HDFC-RAIRANGPUR-50100235779739',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
+	 (nextval('rairangpur.seq_chartofaccounts'),'4502044','DCB-RAIRANGPUR-33713600000046',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
+	 (nextval('rairangpur.seq_chartofaccounts'),'4502010','BOI-RAIRANGPUR-550310110014694',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
+	 (nextval('rairangpur.seq_chartofaccounts'),'4502042','IDBI-RAIRANGPUR-1743104000037873',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
+	 (nextval('rairangpur.seq_chartofaccounts'),'4502039','IDBI-RAIRANGPUR-1743104000004244',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11);
+INSERT INTO rairangpur.chartofaccounts (id,glcode,"name",description,isactiveforposting,parentid,purposeid,operation,"type","class",classification,functionreqd,budgetcheckreq,scheduleid,receiptscheduleid,receiptoperation,paymentscheduleid,paymentoperation,majorcode,fiescheduleid,fieoperation,createddate,createdby,lastmodifieddate,lastmodifiedby,"version") VALUES
+	 (nextval('rairangpur.seq_chartofaccounts'),'4502024','ICICI-RAIRANGPUR-096301000816',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
+	 (nextval('rairangpur.seq_chartofaccounts'),'4502005','SBI-RAIRANGPUR-11085744213',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
+	 (nextval('rairangpur.seq_chartofaccounts'),'4502037','HDFC-RAIRANGPUR-50100311614341',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11),
+	 (nextval('rairangpur.seq_chartofaccounts'),'4502029','TREASURY-RAIRANGPUR-8448',NULL,true,321,NULL,'A','A',NULL,4,true,false,NULL,NULL,NULL,NULL,NULL,'450',NULL,NULL,now(),0,now(),0,11);
 	 
 INSERT INTO rairangpur.bankaccount (id,branchid,accountnumber,accounttype,narration,isactive,glcodeid,fundid,payto,"type",createdby,lastmodifiedby,createddate,lastmodifieddate,"version",chequeformatid) VALUES
 	 (nextval('rairangpur.seq_bankaccount'),9,'1868101004694','45020 - Consolidated Bank Balances - Municipal Fund (all places)','SJSRY',true,1262,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
@@ -14071,16 +14071,16 @@ INSERT INTO rourkela.bankaccount (id,branchid,accountnumber,accounttype,narratio
 	 (nextval('rourkela.seq_bankaccount'),23,'50100169431561','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1345,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
 	 (nextval('rourkela.seq_bankaccount'),24,'755002010001394','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1355,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL);
 INSERT INTO rourkela.bankaccount (id,branchid,accountnumber,accounttype,narration,isactive,glcodeid,fundid,payto,"type",createdby,lastmodifiedby,createddate,lastmodifieddate,"version",chequeformatid) VALUES
-	 (41,10,'240104000080778','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1358,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
-	 (42,15,'19501007178','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1251,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
-	 (43,4,'740501011001715','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1250,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
-	 (44,17,'917010049165036','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1363,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
-	 (45,15,'19501004446','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1311,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
-	 (46,3,'60091534187','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1300,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
-	 (47,23,'50100314671570','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1328,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
-	 (48,22,'32334469828','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1277,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
-	 (49,7,'49210100059605','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1314,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
-	 (50,10,'240104000079976','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1341,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL);
+	 (nextval('rourkela.seq_bankaccount'),10,'240104000080778','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1358,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
+	 (nextval('rourkela.seq_bankaccount'),15,'19501007178','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1251,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
+	 (nextval('rourkela.seq_bankaccount'),4,'740501011001715','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1250,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
+	 (nextval('rourkela.seq_bankaccount'),17,'917010049165036','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1363,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
+	 (nextval('rourkela.seq_bankaccount'),15,'19501004446','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1311,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
+	 (nextval('rourkela.seq_bankaccount'),3,'60091534187','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1300,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
+	 (nextval('rourkela.seq_bankaccount'),23,'50100314671570','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1328,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
+	 (nextval('rourkela.seq_bankaccount'),22,'32334469828','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1277,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
+	 (nextval('rourkela.seq_bankaccount'),7,'49210100059605','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1314,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
+	 (nextval('rourkela.seq_bankaccount'),10,'240104000079976','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1341,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL);
 INSERT INTO rourkela.bankaccount (id,branchid,accountnumber,accounttype,narration,isactive,glcodeid,fundid,payto,"type",createdby,lastmodifiedby,createddate,lastmodifieddate,"version",chequeformatid) VALUES
 	 (nextval('rourkela.seq_bankaccount'),5,'5782191014084','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1290,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
 	 (nextval('rourkela.seq_bankaccount'),2,'490100012888','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1279,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
@@ -14104,16 +14104,16 @@ INSERT INTO rourkela.bankaccount (id,branchid,accountnumber,accounttype,narratio
 	 (nextval('rourkela.seq_bankaccount'),34,'54400101008790','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1275,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
 	 (nextval('rourkela.seq_bankaccount'),18,'520310100007133','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1262,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL);
 INSERT INTO rourkela.bankaccount (id,branchid,accountnumber,accounttype,narration,isactive,glcodeid,fundid,payto,"type",createdby,lastmodifiedby,createddate,lastmodifieddate,"version",chequeformatid) VALUES
-	 (71,14,'7661001200000020','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1327,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
-	 (72,11,'6150101000560','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1261,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
-	 (73,10,'240104000108010','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1385,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
-	 (74,22,'31087953087','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1286,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
-	 (75,31,'8448','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1383,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
-	 (76,15,'19510001592','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1274,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
-	 (77,15,'19501004624','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1359,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
-	 (78,17,'917010027050280','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1350,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
-	 (79,22,'32415280933','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1294,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
-	 (80,9,'8194600000300','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1309,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL);
+	 (nextval('rourkela.seq_bankaccount'),14,'7661001200000020','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1327,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
+	 (nextval('rourkela.seq_bankaccount'),11,'6150101000560','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1261,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
+	 (nextval('rourkela.seq_bankaccount'),10,'240104000108010','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1385,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
+	 (nextval('rourkela.seq_bankaccount'),22,'31087953087','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1286,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
+	 (nextval('rourkela.seq_bankaccount'),31,'8448','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1383,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
+	 (nextval('rourkela.seq_bankaccount'),15,'19510001592','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1274,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
+	 (nextval('rourkela.seq_bankaccount'),15,'19501004624','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1359,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
+	 (nextval('rourkela.seq_bankaccount'),17,'917010027050280','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1350,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
+	 (nextval('rourkela.seq_bankaccount'),22,'32415280933','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1294,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
+	 (nextval('rourkela.seq_bankaccount'),9,'8194600000300','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1309,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL);
 INSERT INTO rourkela.bankaccount (id,branchid,accountnumber,accounttype,narration,isactive,glcodeid,fundid,payto,"type",createdby,lastmodifiedby,createddate,lastmodifieddate,"version",chequeformatid) VALUES
 	 (nextval('rourkela.seq_bankaccount'),16,'7120100007764','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1264,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
 	 (nextval('rourkela.seq_bankaccount'),21,'50200026995455','45020 - Consolidated Bank Balances - Municipal Fund (all places)','',false,1284,1,NULL,'RECEIPTS_PAYMENTS',0,0,now(),now(),0,NULL),
