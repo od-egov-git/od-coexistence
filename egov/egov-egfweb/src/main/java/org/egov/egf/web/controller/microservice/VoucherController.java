@@ -370,7 +370,7 @@ public class VoucherController {
     	boolean result=false;
     	try
     	{
-    		 query = this.persistenceService.getSession().createSQLQuery("select public.f_mig_tran_test('"+code+"')");
+    		 query = this.persistenceService.getSession().createSQLQuery("select public.f_mig_tran('"+code+"')");
     	    rows = query.list();
     	    
     	    if(rows != null && !rows.isEmpty())
