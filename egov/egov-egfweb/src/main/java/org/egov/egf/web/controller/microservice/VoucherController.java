@@ -235,16 +235,17 @@ public class VoucherController {
 		{
 		//save
 			Migration m = new Migration();
+			m.setTrn_id(Long.parseLong(k.getTrn_id()));
 			m.setVoucher_name(k.getVOUCHER_NAME()!=null?k.getVOUCHER_NAME():"");
 			m.setVoucher_type(k.getVOUCHER_TYPE()!=null?k.getVOUCHER_TYPE():"");
 			m.setVoucher_description(k.getVOUCHER_DESCRIPTION()!=null?k.getVOUCHER_DESCRIPTION():"");
 			m.setVoucher_no(k.getVOUCHER_NO()!=null?k.getVOUCHER_NO():"");
 			m.setTransaction_no(k.getTRANSACTION_NO()!=null?Long.getLong(k.getTRANSACTION_NO()):null);
-			m.setTransaction_no_for_data_migration(k.getTRANSACTION_NO_FOR_DATA_MIGRATION()!=null?k.getTRANSACTION_NO_FOR_DATA_MIGRATION():"");
 			m.setVoucher_date(k.getVOUCHER_DATE()!=null?k.getVOUCHER_DATE():"");
 			m.setTransaction_date(k.getTRANSACTION_DATE()!=null?k.getTRANSACTION_DATE():"");
 			m.setFund_name(k.getFUND_NAME()!=null?k.getFUND_NAME():"");
 			m.setFinancial_year(k.getFINANCIAL_YEAR()!=null?k.getFINANCIAL_YEAR():"");
+			m.setTransaction_no_for_data_migration(m.getTransaction_no()+m.getFinancial_year());
 			m.setVoucher_status(k.getVOUCHER_STATUS()!=null? k.getVOUCHER_STATUS():"");
 			m.setCreated_by(k.getCREATED_BY()!=null ? k.getCREATED_BY():"");
 			m.setVoucher_first_signatory(k.getVOUCHER_FIRST_SIGNATORY()!=null ? k.getVOUCHER_FIRST_SIGNATORY():"");
@@ -270,7 +271,7 @@ public class VoucherController {
 			m.setParty_details(k.getPARTY_DETAILS()!=null ? k.getPARTY_DETAILS() : "");
 			m.setOther_party(k.getOTHER_PARTY()!=null ? k.getOTHER_PARTY() : "");
 			m.setPayment_amount_to_party(k.getPAYMENT_AMOUNT_TO_PARTY()!=null ? new BigDecimal(k.getPAYMENT_AMOUNT_TO_PARTY()) : new BigDecimal(0));
-			m.setMigration(k.getMIGRATION()!=null ? k.getMIGRATION() : "");
+			m.setMigration("");
 			m.setReason("");
 			
 			mRepo.save(m);
