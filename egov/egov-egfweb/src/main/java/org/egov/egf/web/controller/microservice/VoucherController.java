@@ -19,6 +19,7 @@ import org.egov.commons.EgModules;
 import org.egov.egf.contract.model.AccountDetailContract;
 import org.egov.egf.contract.model.Kendrapara;
 import org.egov.egf.contract.model.Migration;
+import org.egov.egf.contract.model.MigrationRepo;
 import org.egov.egf.contract.model.MigrationRequest;
 import org.egov.egf.contract.model.MigrationResponse;
 import org.egov.egf.contract.model.SubledgerDetailContract;
@@ -30,9 +31,15 @@ import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.exception.ApplicationRuntimeException;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.validation.exception.ValidationException;
+import org.egov.infstr.services.PersistenceService;
+import org.egov.model.common.ResponseInfo;
+import org.egov.model.common.ResponseInfoWrapper;
 import org.egov.services.voucher.VoucherService;
+import org.hibernate.SQLQuery;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.repository.query.Param;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -47,6 +54,13 @@ public class VoucherController {
 	private CreateVoucher createVoucher;
 	@Autowired
 	private VoucherService voucherService;
+	
+	@Autowired
+	MigrationRepo mRepo;
+	
+	@Autowired
+	 @Qualifier("persistenceService")
+	 private PersistenceService persistenceService;
 
 	@PostMapping(value = "/rest/voucher/_search")
 	@ResponseBody
@@ -214,13 +228,12 @@ public class VoucherController {
 	@PostMapping(value = "/rest/voucher/migration_data_save")
 	@ResponseBody
 	public MigrationResponse migration_data_save(@RequestBody MigrationRequest voucherRequest) {
-
+		System.out.println("XX");
 		MigrationResponse response = new MigrationResponse();
-		List<Kendrapara> kendra = voucherRequest.getVouchers();
+		Kendrapara k = voucherRequest.getVouchers();
 		try
 		{
 		//save
-			for(Kendrapara k: kendra) {
 			Migration m = new Migration();
 			m.setVoucher_name(k.getVOUCHER_NAME()!=null?k.getVOUCHER_NAME():"");
 			m.setVoucher_type(k.getVOUCHER_TYPE()!=null?k.getVOUCHER_TYPE():"");
@@ -260,11 +273,9 @@ public class VoucherController {
 			m.setMigration(k.getMIGRATION()!=null ? k.getMIGRATION() : "");
 			m.setReason("");
 			
-			
-			
-				response.setResponseInfo(MicroserviceUtils.getResponseInfo(voucherRequest.getRequestInfo(),
+			mRepo.save(m);
+			response.setResponseInfo(MicroserviceUtils.getResponseInfo(voucherRequest.getRequestInfo(),
 						HttpStatus.SC_CREATED, null));
-			}
 			} catch (ValidationException e) {
 				throw e;
 
@@ -278,182 +289,134 @@ public class VoucherController {
 	}
 	
 	@GetMapping(value = "/rest/voucher/migration_data_truncate")
-	public VoucherResponse migration_data_truncate(@RequestParam(required = false) final String code) {
-
-		VoucherResponse response = new VoucherResponse();
-		final HashMap<String, Object> headerDetails = new HashMap<String, Object>();
-		HashMap<String, Object> detailMap = null;
-		HashMap<String, Object> subledgertDetailMap = null;
-		final List<HashMap<String, Object>> accountdetails = new ArrayList<>();
-		final List<HashMap<String, Object>> subledgerDetails = new ArrayList<>();
-
-		for (Voucher voucher : voucherRequest.getVouchers()) {
-			try {
-				SimpleDateFormat fm = new SimpleDateFormat("dd/MM/yyyy");
-				Date vDate = fm.parse(voucher.getVoucherDate());
-				headerDetails.put(VoucherConstant.DEPARTMENTCODE, voucher.getDepartment());
-				headerDetails.put(VoucherConstant.VOUCHERNAME, voucher.getName());
-				headerDetails.put(VoucherConstant.VOUCHERTYPE, voucher.getType());
-				headerDetails.put(VoucherConstant.VOUCHERNUMBER, voucher.getVoucherNumber());
-				headerDetails.put(VoucherConstant.VOUCHERDATE, vDate);
-				headerDetails.put(VoucherConstant.DESCRIPTION, voucher.getDescription());
-				headerDetails.put(VoucherConstant.MODULEID, voucher.getModuleId());
-				String source = voucher.getSource();
-				headerDetails.put(VoucherConstant.SOURCEPATH, source);
-				headerDetails.put(VoucherConstant.RECEIPTNUMBER, voucher.getReceiptNumber());
-//				String receiptNumber = !source.isEmpty() & source != null ? source.indexOf("?selectedReceipts=") != -1 ? source.substring(source.indexOf("?selectedReceipts=")).split("=")[1]: "" : "";
-				if(voucher.getReferenceDocument() != null && !voucher.getReferenceDocument().isEmpty()){
-				    headerDetails.put(VoucherConstant.REFERENCEDOC, voucher.getReferenceDocument());
-				}
-				if(voucher.getServiceName() != null && !voucher.getServiceName().isEmpty()){
-				    headerDetails.put(VoucherConstant.SERVICE_NAME, voucher.getServiceName());
-				}
-				// headerDetails.put(VoucherConstant.BUDGETCHECKREQ, voucher());
-				if (voucher.getFund() != null)
-					headerDetails.put(VoucherConstant.FUNDCODE, voucher.getFund().getCode());
-
-				if (voucher.getFunction() != null)
-					headerDetails.put(VoucherConstant.FUNCTIONCODE, voucher.getFunction().getCode());
-
-				if (voucher.getFunctionary() != null)
-					headerDetails.put(VoucherConstant.FUNCTIONARYCODE, voucher.getFunctionary().getCode());
-				if (voucher.getScheme() != null)
-					headerDetails.put(VoucherConstant.SCHEMECODE, voucher.getScheme().getCode());
-				if (voucher.getSubScheme() != null)
-					headerDetails.put(VoucherConstant.SUBSCHEMECODE, voucher.getSubScheme().getCode());
-
-				for (AccountDetailContract ac : voucher.getLedgers()) {
-
-					detailMap = new HashMap<>();
-					detailMap.put(VoucherConstant.GLCODE, ac.getGlcode());
-					detailMap.put(VoucherConstant.DEBITAMOUNT, ac.getDebitAmount());
-					detailMap.put(VoucherConstant.CREDITAMOUNT, ac.getCreditAmount());
-					if (ac.getFunction() != null)
-						detailMap.put(VoucherConstant.FUNCTIONCODE, ac.getFunction().getCode());
-
-					accountdetails.add(detailMap);
-
-					for (SubledgerDetailContract sl : ac.getSubledgerDetails()) {
-
-						subledgertDetailMap = new HashMap<>();
-						subledgertDetailMap.put(VoucherConstant.GLCODE, ac.getGlcode());
-						subledgertDetailMap.put(VoucherConstant.DETAILAMOUNT, sl.getAmount());
-						subledgertDetailMap.put(VoucherConstant.DETAIL_TYPE_ID, sl.getAccountDetailType().getId());
-						subledgertDetailMap.put(VoucherConstant.DETAIL_KEY_ID, sl.getAccountDetailKey().getId());
-						subledgerDetails.add(subledgertDetailMap);
-					}
-				}
-				CVoucherHeader voucherHeader = createVoucher.createVoucher(headerDetails, accountdetails,
-						subledgerDetails);
-				voucher.setId(voucherHeader.getId());
-				voucher.setVoucherNumber(voucherHeader.getVoucherNumber());
-				response.getVouchers().add(voucher);
-				response.setResponseInfo(MicroserviceUtils.getResponseInfo(voucherRequest.getRequestInfo(),
-						HttpStatus.SC_CREATED, null));
-			} catch (ValidationException e) {
-				throw e;
-
-			} catch (ApplicationRuntimeException e) {
-
-				throw e;
-			} catch (ParseException e) {
-
-				throw new ApplicationRuntimeException(e.getMessage());
-			}
-
+	public ResponseEntity<ResponseInfoWrapper> migration_data_truncate(@RequestParam(required = false) final String code) {
+		boolean result1=false;
+		List<Boolean> resultList=new ArrayList<Boolean>();
+		System.out.println("code ::::"+code);
+		try
+		{
+			result1=truncate(code);
+			System.out.println("result1 ::::"+result1);
+			resultList.add(result1);
+		}catch (Exception e) {
+			e.printStackTrace();
 		}
-		return response;
+		
+		
+		return new ResponseEntity<>(ResponseInfoWrapper.builder()
+				.responseInfo(ResponseInfo.builder().status("Success").build())
+				.responseBody(resultList).build(), org.springframework.http.HttpStatus.OK);
 	}
 	
+	private boolean truncate(String code) {
+		SQLQuery query =  null;
+    	List<Object[]> rows = null;
+    	String response="";
+    	boolean result=false;
+    	try
+    	{
+    		 query = this.persistenceService.getSession().createSQLQuery("select public.f_schema_truncate('"+code+"')");
+    	    rows = query.list();
+    	    
+    	    if(rows != null && !rows.isEmpty())
+    	    {
+    	    	for(Object[] element : rows)
+    	    	{
+    	    		response=element[0].toString();
+    	    	}
+    	    }
+    	}catch (Exception e) {
+			e.printStackTrace();
+		}
+    	if(response != null && !response.isEmpty() && response.equalsIgnoreCase("true"))
+    	{
+    		result=true;
+    	}
+    	return result;
+	}
+
 	@GetMapping(value = "/rest/voucher/migration_data_trigger")
-	public VoucherResponse migration_data_trigger(@RequestParam(required = false) final String code) {
-
-		VoucherResponse response = new VoucherResponse();
-		final HashMap<String, Object> headerDetails = new HashMap<String, Object>();
-		HashMap<String, Object> detailMap = null;
-		HashMap<String, Object> subledgertDetailMap = null;
-		final List<HashMap<String, Object>> accountdetails = new ArrayList<>();
-		final List<HashMap<String, Object>> subledgerDetails = new ArrayList<>();
-
-		for (Voucher voucher : voucherRequest.getVouchers()) {
-			try {
-				SimpleDateFormat fm = new SimpleDateFormat("dd/MM/yyyy");
-				Date vDate = fm.parse(voucher.getVoucherDate());
-				headerDetails.put(VoucherConstant.DEPARTMENTCODE, voucher.getDepartment());
-				headerDetails.put(VoucherConstant.VOUCHERNAME, voucher.getName());
-				headerDetails.put(VoucherConstant.VOUCHERTYPE, voucher.getType());
-				headerDetails.put(VoucherConstant.VOUCHERNUMBER, voucher.getVoucherNumber());
-				headerDetails.put(VoucherConstant.VOUCHERDATE, vDate);
-				headerDetails.put(VoucherConstant.DESCRIPTION, voucher.getDescription());
-				headerDetails.put(VoucherConstant.MODULEID, voucher.getModuleId());
-				String source = voucher.getSource();
-				headerDetails.put(VoucherConstant.SOURCEPATH, source);
-				headerDetails.put(VoucherConstant.RECEIPTNUMBER, voucher.getReceiptNumber());
-//				String receiptNumber = !source.isEmpty() & source != null ? source.indexOf("?selectedReceipts=") != -1 ? source.substring(source.indexOf("?selectedReceipts=")).split("=")[1]: "" : "";
-				if(voucher.getReferenceDocument() != null && !voucher.getReferenceDocument().isEmpty()){
-				    headerDetails.put(VoucherConstant.REFERENCEDOC, voucher.getReferenceDocument());
-				}
-				if(voucher.getServiceName() != null && !voucher.getServiceName().isEmpty()){
-				    headerDetails.put(VoucherConstant.SERVICE_NAME, voucher.getServiceName());
-				}
-				// headerDetails.put(VoucherConstant.BUDGETCHECKREQ, voucher());
-				if (voucher.getFund() != null)
-					headerDetails.put(VoucherConstant.FUNDCODE, voucher.getFund().getCode());
-
-				if (voucher.getFunction() != null)
-					headerDetails.put(VoucherConstant.FUNCTIONCODE, voucher.getFunction().getCode());
-
-				if (voucher.getFunctionary() != null)
-					headerDetails.put(VoucherConstant.FUNCTIONARYCODE, voucher.getFunctionary().getCode());
-				if (voucher.getScheme() != null)
-					headerDetails.put(VoucherConstant.SCHEMECODE, voucher.getScheme().getCode());
-				if (voucher.getSubScheme() != null)
-					headerDetails.put(VoucherConstant.SUBSCHEMECODE, voucher.getSubScheme().getCode());
-
-				for (AccountDetailContract ac : voucher.getLedgers()) {
-
-					detailMap = new HashMap<>();
-					detailMap.put(VoucherConstant.GLCODE, ac.getGlcode());
-					detailMap.put(VoucherConstant.DEBITAMOUNT, ac.getDebitAmount());
-					detailMap.put(VoucherConstant.CREDITAMOUNT, ac.getCreditAmount());
-					if (ac.getFunction() != null)
-						detailMap.put(VoucherConstant.FUNCTIONCODE, ac.getFunction().getCode());
-
-					accountdetails.add(detailMap);
-
-					for (SubledgerDetailContract sl : ac.getSubledgerDetails()) {
-
-						subledgertDetailMap = new HashMap<>();
-						subledgertDetailMap.put(VoucherConstant.GLCODE, ac.getGlcode());
-						subledgertDetailMap.put(VoucherConstant.DETAILAMOUNT, sl.getAmount());
-						subledgertDetailMap.put(VoucherConstant.DETAIL_TYPE_ID, sl.getAccountDetailType().getId());
-						subledgertDetailMap.put(VoucherConstant.DETAIL_KEY_ID, sl.getAccountDetailKey().getId());
-						subledgerDetails.add(subledgertDetailMap);
-					}
-				}
-				CVoucherHeader voucherHeader = createVoucher.createVoucher(headerDetails, accountdetails,
-						subledgerDetails);
-				voucher.setId(voucherHeader.getId());
-				voucher.setVoucherNumber(voucherHeader.getVoucherNumber());
-				response.getVouchers().add(voucher);
-				response.setResponseInfo(MicroserviceUtils.getResponseInfo(voucherRequest.getRequestInfo(),
-						HttpStatus.SC_CREATED, null));
-			} catch (ValidationException e) {
-				throw e;
-
-			} catch (ApplicationRuntimeException e) {
-
-				throw e;
-			} catch (ParseException e) {
-
-				throw new ApplicationRuntimeException(e.getMessage());
+	public ResponseEntity<ResponseInfoWrapper> migration_data_trigger(@RequestParam(required = false) final String code) {
+		boolean result1=false;
+		boolean result2=false;
+		List<Boolean> resultList=new ArrayList<Boolean>();
+		System.out.println("code ::::"+code);
+		try
+		{
+			result1=trigger1(code);
+			System.out.println("result1 ::::"+result1);
+			if(result1)
+			{
+				result2=trigger2(code);
+				System.out.println("result2 ::::"+result2);
 			}
-
+			
+			resultList.add(result1);
+		}catch (Exception e) {
+			e.printStackTrace();
 		}
-		return response;
+		
+		
+		return new ResponseEntity<>(ResponseInfoWrapper.builder()
+				.responseInfo(ResponseInfo.builder().status("Success").build())
+				.responseBody(resultList).build(), org.springframework.http.HttpStatus.OK);
 	}
 	
-	@GetMapping(value = "/rest/voucher/migration_data_extract")
+	private boolean trigger2(String code) {
+		SQLQuery query =  null;
+    	List<Object[]> rows = null;
+    	String response="";
+    	boolean result=false;
+    	try
+    	{
+    		 query = this.persistenceService.getSession().createSQLQuery("select public.f_mig_tran_test('"+code+"')");
+    	    rows = query.list();
+    	    
+    	    if(rows != null && !rows.isEmpty())
+    	    {
+    	    	for(Object[] element : rows)
+    	    	{
+    	    		response=element[0].toString();
+    	    	}
+    	    }
+    	}catch (Exception e) {
+			e.printStackTrace();
+		}
+    	if(response != null && !response.isEmpty() && response.equalsIgnoreCase("true"))
+    	{
+    		result=true;
+    	}
+    	return result;
+	}
+
+	private boolean trigger1(String code) {
+		SQLQuery query =  null;
+    	List<Object[]> rows = null;
+    	String response="";
+    	boolean result=false;
+    	try
+    	{
+    		 query = this.persistenceService.getSession().createSQLQuery("select public.f_mig_tran_chk('"+code+"')");
+    	    rows = query.list();
+    	    
+    	    if(rows != null && !rows.isEmpty())
+    	    {
+    	    	for(Object[] element : rows)
+    	    	{
+    	    		response=element[0].toString();
+    	    	}
+    	    }
+    	}catch (Exception e) {
+			e.printStackTrace();
+		}
+    	if(response != null && !response.isEmpty() && response.equalsIgnoreCase("true"))
+    	{
+    		result=true;
+    	}
+    	return result;
+	}
+
+	/*@GetMapping(value = "/rest/voucher/migration_data_extract")
 	public VoucherResponse migration_data_extract(@RequestParam(required = false) final String code) {
 
 		VoucherResponse response = new VoucherResponse();
@@ -539,6 +502,6 @@ public class VoucherController {
 
 		}
 		return response;
-	}
+	}*/
 
 }

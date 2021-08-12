@@ -47,9 +47,6 @@
  */
 package org.egov.egf.contract.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.validation.constraints.NotNull;
 
 import org.egov.infra.microservice.models.RequestInfo;
@@ -84,11 +81,11 @@ public class MigrationRequest {
         this.requestInfo = requestInfo;
     }
 
-	public List<Kendrapara> getVouchers() {
+	public Kendrapara getVouchers() {
 		return vouchers;
 	}
 
-	public void setVouchers(List<Kendrapara> vouchers) {
+	public void setVouchers(Kendrapara vouchers) {
 		this.vouchers = vouchers;
 	}
 
