@@ -64,7 +64,7 @@ public class ESSchedularService {
         RollOutAdoptionDataWrapper wrapper = new RollOutAdoptionDataWrapper();
         wrapper.setRollOutAdoptionData(rollOutAdoptionData);
         RequestInfo requestInfo = new RequestInfo();
-        requestInfo.setAuthToken(microServiceUtil.generateAdminToken("pb."+ApplicationThreadLocals.getTenantID()));
+        requestInfo.setAuthToken(microServiceUtil.generateAdminToken("od."+ApplicationThreadLocals.getTenantID()));
         wrapper.setRequestInfo(requestInfo);
         microServiceUtil.pushDataToIndexer(wrapper,finIndexerTopic);
     }
