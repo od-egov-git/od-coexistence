@@ -245,7 +245,7 @@ public class VoucherController {
 			m.setTransaction_date(k.getTRANSACTION_DATE()!=null?k.getTRANSACTION_DATE():"");
 			m.setFund_name(k.getFUND_NAME()!=null?k.getFUND_NAME():"");
 			m.setFinancial_year(k.getFINANCIAL_YEAR()!=null?k.getFINANCIAL_YEAR():"");
-			m.setTransaction_no_for_data_migration(m.getTransaction_no()+m.getFinancial_year());
+			m.setTransaction_no_for_data_migration(m.getTransaction_no()+"/"+m.getFinancial_year());
 			m.setVoucher_status(k.getVOUCHER_STATUS()!=null? k.getVOUCHER_STATUS():"");
 			m.setCreated_by(k.getCREATED_BY()!=null ? k.getCREATED_BY():"");
 			m.setVoucher_first_signatory(k.getVOUCHER_FIRST_SIGNATORY()!=null ? k.getVOUCHER_FIRST_SIGNATORY():"");
@@ -264,13 +264,13 @@ public class VoucherController {
 			m.setGlcode(k.getGLCODE()!=null?k.getGLCODE():"");
 			m.setBank_account_name(k.getBANK_ACCOUNT_NAME()!=null ? k.getBANK_ACCOUNT_NAME():"");
 			m.setBank_account_code(k.getBANK_ACCOUNT_CODE()!=null ? k.getBANK_ACCOUNT_CODE():"");
-			m.setDebit_amount(k.getDEBIT_AMOUNT()!=null ? new BigDecimal(k.getDEBIT_AMOUNT()) : new BigDecimal(0));
-			m.setCredit_amount(k.getCREDIT_AMOUNT()!=null ? new BigDecimal(k.getCREDIT_AMOUNT()): new BigDecimal(0));;
+			m.setDebit_amount(k.getDEBIT_AMOUNT()!=null ? new BigDecimal(k.getDEBIT_AMOUNT()) : null);
+			m.setCredit_amount(k.getCREDIT_AMOUNT()!=null ? new BigDecimal(k.getCREDIT_AMOUNT()): null);
 			m.setContractor_name(k.getCONTRACTOR_NAME()!=null ? k.getCONTRACTOR_NAME() : "");
 			m.setSupplier_name(k.getSUPPLIER_NAME()!=null ? k.getSUPPLIER_NAME() : "");
 			m.setParty_details(k.getPARTY_DETAILS()!=null ? k.getPARTY_DETAILS() : "");
 			m.setOther_party(k.getOTHER_PARTY()!=null ? k.getOTHER_PARTY() : "");
-			m.setPayment_amount_to_party(k.getPAYMENT_AMOUNT_TO_PARTY()!=null ? new BigDecimal(k.getPAYMENT_AMOUNT_TO_PARTY()) : new BigDecimal(0));
+			m.setPayment_amount_to_party(k.getPAYMENT_AMOUNT_TO_PARTY()!=null ? new BigDecimal(k.getPAYMENT_AMOUNT_TO_PARTY()) : null);
 			m.setMigration("");
 			m.setReason("");
 			
@@ -316,7 +316,7 @@ public class VoucherController {
     	boolean result=false;
     	try
     	{
-    		 query = this.persistenceService.getSession().createSQLQuery("select public.f_schema_truncate('"+code+"')");
+    		 query = this.persistenceService.getSession().createSQLQuery("select generic.f_schema_truncate('"+code+"')");
     	    rows = query.list();
     	    
     	    if(rows != null && !rows.isEmpty())
@@ -370,7 +370,7 @@ public class VoucherController {
     	boolean result=false;
     	try
     	{
-    		 query = this.persistenceService.getSession().createSQLQuery("select public.f_mig_tran('"+code+"')");
+    		 query = this.persistenceService.getSession().createSQLQuery("select generic.f_mig_tran('"+code+"')");
     	    rows = query.list();
     	    
     	    if(rows != null && !rows.isEmpty())
@@ -397,7 +397,7 @@ public class VoucherController {
     	boolean result=false;
     	try
     	{
-    		 query = this.persistenceService.getSession().createSQLQuery("select public.f_mig_tran_chk('"+code+"')");
+    		 query = this.persistenceService.getSession().createSQLQuery("select generic.f_mig_tran_chk('"+code+"')");
     	    rows = query.list();
     	    
     	    if(rows != null && !rows.isEmpty())
