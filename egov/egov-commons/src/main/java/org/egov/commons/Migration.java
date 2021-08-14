@@ -36,7 +36,7 @@ public class Migration {
 	private String service_name;
 	private String receipt_no;
 	private String remittance_date;
-	private String trans_id_receipt_no;
+	private Long trans_id_receipt_no;
 	private String glcode;
 	private String bank_account_name;
 	private String bank_account_code;
@@ -199,12 +199,6 @@ public class Migration {
 	public void setRemittance_date(String remittance_date) {
 		this.remittance_date = remittance_date;
 	}
-	public String getTrans_id_receipt_no() {
-		return trans_id_receipt_no;
-	}
-	public void setTrans_id_receipt_no(String trans_id_receipt_no) {
-		this.trans_id_receipt_no = trans_id_receipt_no;
-	}
 	public String getGlcode() {
 		return glcode;
 	}
@@ -276,6 +270,12 @@ public class Migration {
 	}
 	public void setReason(String reason) {
 		this.reason = reason;
+	}
+	public Long getTrans_id_receipt_no() {
+		return trans_id_receipt_no;
+	}
+	public void setTrans_id_receipt_no(Long trans_id_receipt_no) {
+		this.trans_id_receipt_no = trans_id_receipt_no;
 	}
 	
 	

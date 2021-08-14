@@ -240,7 +240,7 @@ public class VoucherController {
 			m.setVoucher_type(k.getVOUCHER_TYPE()!=null?k.getVOUCHER_TYPE():"");
 			m.setVoucher_description(k.getVOUCHER_DESCRIPTION()!=null?k.getVOUCHER_DESCRIPTION():"");
 			m.setVoucher_no(k.getVOUCHER_NO()!=null?k.getVOUCHER_NO():"");
-			m.setTransaction_no(k.getTRANSACTION_NO()!=null?Long.getLong(k.getTRANSACTION_NO()):null);
+			m.setTransaction_no((k.getTRANSACTION_NO()!=null && !k.getTRANSACTION_NO().isEmpty())?Long.getLong(k.getTRANSACTION_NO()):null);
 			m.setVoucher_date(k.getVOUCHER_DATE()!=null?k.getVOUCHER_DATE():"");
 			m.setTransaction_date(k.getTRANSACTION_DATE()!=null?k.getTRANSACTION_DATE():"");
 			m.setFund_name(k.getFUND_NAME()!=null?k.getFUND_NAME():"");
@@ -260,17 +260,17 @@ public class VoucherController {
 			m.setService_name(k.getSERVICE_NAME()!=null ? k.getSERVICE_NAME():"");
 			m.setReceipt_no(k.getRECEIPT_NO()!=null ? k.getRECEIPT_NO():"");
 			m.setRemittance_date(k.getREMITTANCE_DATE()!=null ? k.getREMITTANCE_DATE():"");
-			m.setTrans_id_receipt_no(k.getTRANS_ID_RECEIPT_NO()!=null?k.getTRANS_ID_RECEIPT_NO():"");
+			m.setTrans_id_receipt_no((k.getTRANS_ID_RECEIPT_NO()!=null && !k.getTRANS_ID_RECEIPT_NO().isEmpty())?Long.parseLong(k.getTRANS_ID_RECEIPT_NO()):null);
 			m.setGlcode(k.getGLCODE()!=null?k.getGLCODE():"");
 			m.setBank_account_name(k.getBANK_ACCOUNT_NAME()!=null ? k.getBANK_ACCOUNT_NAME():"");
 			m.setBank_account_code(k.getBANK_ACCOUNT_CODE()!=null ? k.getBANK_ACCOUNT_CODE():"");
-			m.setDebit_amount(k.getDEBIT_AMOUNT()!=null ? new BigDecimal(k.getDEBIT_AMOUNT()) : null);
-			m.setCredit_amount(k.getCREDIT_AMOUNT()!=null ? new BigDecimal(k.getCREDIT_AMOUNT()): null);
+			m.setDebit_amount((k.getDEBIT_AMOUNT()!=null && !k.getDEBIT_AMOUNT().isEmpty())? new BigDecimal(k.getDEBIT_AMOUNT()) : null);
+			m.setCredit_amount((k.getCREDIT_AMOUNT()!=null && !k.getCREDIT_AMOUNT().isEmpty())? new BigDecimal(k.getCREDIT_AMOUNT()): null);
 			m.setContractor_name(k.getCONTRACTOR_NAME()!=null ? k.getCONTRACTOR_NAME() : "");
 			m.setSupplier_name(k.getSUPPLIER_NAME()!=null ? k.getSUPPLIER_NAME() : "");
 			m.setParty_details(k.getPARTY_DETAILS()!=null ? k.getPARTY_DETAILS() : "");
 			m.setOther_party(k.getOTHER_PARTY()!=null ? k.getOTHER_PARTY() : "");
-			m.setPayment_amount_to_party(k.getPAYMENT_AMOUNT_TO_PARTY()!=null ? new BigDecimal(k.getPAYMENT_AMOUNT_TO_PARTY()) : null);
+			m.setPayment_amount_to_party((k.getPAYMENT_AMOUNT_TO_PARTY()!=null && !k.getPAYMENT_AMOUNT_TO_PARTY().isEmpty())? new BigDecimal(k.getPAYMENT_AMOUNT_TO_PARTY()) : null);
 			m.setMigration("");
 			m.setReason("");
 			
@@ -302,6 +302,7 @@ public class VoucherController {
 			System.out.println("result1 ::::"+result1);
 			resultList.add(result1);
 		}catch (Exception e) {
+			resultList.add(result1);
 			e.printStackTrace();
 		}
 		
@@ -345,14 +346,18 @@ public class VoucherController {
 		{
 			result1=trigger1(code);
 			System.out.println("result1 ::::"+result1);
+			resultList.add(result1);
 			if(result1)
 			{
 				result2=trigger2(code);
 				System.out.println("result2 ::::"+result2);
+				resultList.add(result2);
 			}
 			
-			resultList.add(result1);
+			
 		}catch (Exception e) {
+			resultList.add(result1);
+			resultList.add(result2);
 			e.printStackTrace();
 		}
 		
