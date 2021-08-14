@@ -1,4 +1,4 @@
-package org.egov.egf.contract.model;
+package org.egov.commons;
 
 import java.math.BigDecimal;
 

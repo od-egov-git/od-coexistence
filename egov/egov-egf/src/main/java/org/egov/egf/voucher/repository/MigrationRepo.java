@@ -1,9 +1,7 @@
-package org.egov.egf.contract.model;
+package org.egov.egf.voucher.repository;
 
-import org.egov.egf.contract.model.Migration;
+import org.egov.commons.Migration;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository

@@ -1,7 +1,7 @@
 package org.egov.egf.contract.model;
 
-import org.egov.egf.contract.model.Migration;
-import org.egov.egf.contract.model.MigrationRepo;
+import org.egov.commons.Migration;
+import org.egov.egf.voucher.repository.MigrationRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
