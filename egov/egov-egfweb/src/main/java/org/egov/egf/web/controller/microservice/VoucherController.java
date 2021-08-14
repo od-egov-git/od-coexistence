@@ -278,12 +278,14 @@ public class VoucherController {
 			response.setResponseInfo(MicroserviceUtils.getResponseInfo(voucherRequest.getRequestInfo(),
 						HttpStatus.SC_CREATED, null));
 			} catch (ValidationException e) {
-				throw e;
+				e.printStackTrace();
 
 			} catch (ApplicationRuntimeException e) {
-
-				throw e;
+				e.printStackTrace();
+			} catch (Exception e){
+				e.printStackTrace();
 			}
+		
 
 		
 		return response;
@@ -321,15 +323,12 @@ public class VoucherController {
     	    
     	    if(rows != null && !rows.isEmpty())
     	    {
-    	    	for(Object[] element : rows)
-    	    	{
-    	    		response=element[0].toString();
-    	    	}
+    	    	response=rows.toString();
     	    }
     	}catch (Exception e) {
 			e.printStackTrace();
 		}
-    	if(response != null && !response.isEmpty() && response.equalsIgnoreCase("true"))
+    	if(response != null && !response.isEmpty() && response.contains("true"))
     	{
     		result=true;
     	}
@@ -375,15 +374,12 @@ public class VoucherController {
     	    
     	    if(rows != null && !rows.isEmpty())
     	    {
-    	    	for(Object[] element : rows)
-    	    	{
-    	    		response=element[0].toString();
-    	    	}
+    	    		response=rows.toString();
     	    }
     	}catch (Exception e) {
 			e.printStackTrace();
 		}
-    	if(response != null && !response.isEmpty() && response.equalsIgnoreCase("true"))
+    	if(response != null && !response.isEmpty() && response.contains("true"))
     	{
     		result=true;
     	}
@@ -402,107 +398,93 @@ public class VoucherController {
     	    
     	    if(rows != null && !rows.isEmpty())
     	    {
-    	    	for(Object[] element : rows)
-    	    	{
-    	    		response=element[0].toString();
-    	    	}
+    	    		response=rows.toString();
     	    }
     	}catch (Exception e) {
 			e.printStackTrace();
 		}
-    	if(response != null && !response.isEmpty() && response.equalsIgnoreCase("true"))
+    	if(response != null && !response.isEmpty() && response.contains("true"))
     	{
     		result=true;
     	}
     	return result;
 	}
 
-	/*@GetMapping(value = "/rest/voucher/migration_data_extract")
-	public VoucherResponse migration_data_extract(@RequestParam(required = false) final String code) {
-
-		VoucherResponse response = new VoucherResponse();
-		final HashMap<String, Object> headerDetails = new HashMap<String, Object>();
-		HashMap<String, Object> detailMap = null;
-		HashMap<String, Object> subledgertDetailMap = null;
-		final List<HashMap<String, Object>> accountdetails = new ArrayList<>();
-		final List<HashMap<String, Object>> subledgerDetails = new ArrayList<>();
-
-		for (Voucher voucher : voucherRequest.getVouchers()) {
-			try {
-				SimpleDateFormat fm = new SimpleDateFormat("dd/MM/yyyy");
-				Date vDate = fm.parse(voucher.getVoucherDate());
-				headerDetails.put(VoucherConstant.DEPARTMENTCODE, voucher.getDepartment());
-				headerDetails.put(VoucherConstant.VOUCHERNAME, voucher.getName());
-				headerDetails.put(VoucherConstant.VOUCHERTYPE, voucher.getType());
-				headerDetails.put(VoucherConstant.VOUCHERNUMBER, voucher.getVoucherNumber());
-				headerDetails.put(VoucherConstant.VOUCHERDATE, vDate);
-				headerDetails.put(VoucherConstant.DESCRIPTION, voucher.getDescription());
-				headerDetails.put(VoucherConstant.MODULEID, voucher.getModuleId());
-				String source = voucher.getSource();
-				headerDetails.put(VoucherConstant.SOURCEPATH, source);
-				headerDetails.put(VoucherConstant.RECEIPTNUMBER, voucher.getReceiptNumber());
-//				String receiptNumber = !source.isEmpty() & source != null ? source.indexOf("?selectedReceipts=") != -1 ? source.substring(source.indexOf("?selectedReceipts=")).split("=")[1]: "" : "";
-				if(voucher.getReferenceDocument() != null && !voucher.getReferenceDocument().isEmpty()){
-				    headerDetails.put(VoucherConstant.REFERENCEDOC, voucher.getReferenceDocument());
-				}
-				if(voucher.getServiceName() != null && !voucher.getServiceName().isEmpty()){
-				    headerDetails.put(VoucherConstant.SERVICE_NAME, voucher.getServiceName());
-				}
-				// headerDetails.put(VoucherConstant.BUDGETCHECKREQ, voucher());
-				if (voucher.getFund() != null)
-					headerDetails.put(VoucherConstant.FUNDCODE, voucher.getFund().getCode());
-
-				if (voucher.getFunction() != null)
-					headerDetails.put(VoucherConstant.FUNCTIONCODE, voucher.getFunction().getCode());
-
-				if (voucher.getFunctionary() != null)
-					headerDetails.put(VoucherConstant.FUNCTIONARYCODE, voucher.getFunctionary().getCode());
-				if (voucher.getScheme() != null)
-					headerDetails.put(VoucherConstant.SCHEMECODE, voucher.getScheme().getCode());
-				if (voucher.getSubScheme() != null)
-					headerDetails.put(VoucherConstant.SUBSCHEMECODE, voucher.getSubScheme().getCode());
-
-				for (AccountDetailContract ac : voucher.getLedgers()) {
-
-					detailMap = new HashMap<>();
-					detailMap.put(VoucherConstant.GLCODE, ac.getGlcode());
-					detailMap.put(VoucherConstant.DEBITAMOUNT, ac.getDebitAmount());
-					detailMap.put(VoucherConstant.CREDITAMOUNT, ac.getCreditAmount());
-					if (ac.getFunction() != null)
-						detailMap.put(VoucherConstant.FUNCTIONCODE, ac.getFunction().getCode());
-
-					accountdetails.add(detailMap);
-
-					for (SubledgerDetailContract sl : ac.getSubledgerDetails()) {
-
-						subledgertDetailMap = new HashMap<>();
-						subledgertDetailMap.put(VoucherConstant.GLCODE, ac.getGlcode());
-						subledgertDetailMap.put(VoucherConstant.DETAILAMOUNT, sl.getAmount());
-						subledgertDetailMap.put(VoucherConstant.DETAIL_TYPE_ID, sl.getAccountDetailType().getId());
-						subledgertDetailMap.put(VoucherConstant.DETAIL_KEY_ID, sl.getAccountDetailKey().getId());
-						subledgerDetails.add(subledgertDetailMap);
-					}
-				}
-				CVoucherHeader voucherHeader = createVoucher.createVoucher(headerDetails, accountdetails,
-						subledgerDetails);
-				voucher.setId(voucherHeader.getId());
-				voucher.setVoucherNumber(voucherHeader.getVoucherNumber());
-				response.getVouchers().add(voucher);
-				response.setResponseInfo(MicroserviceUtils.getResponseInfo(voucherRequest.getRequestInfo(),
-						HttpStatus.SC_CREATED, null));
-			} catch (ValidationException e) {
-				throw e;
-
-			} catch (ApplicationRuntimeException e) {
-
-				throw e;
-			} catch (ParseException e) {
-
-				throw new ApplicationRuntimeException(e.getMessage());
-			}
-
+	@GetMapping(value = "/rest/voucher/migration_data_extract")
+	public ResponseEntity<ResponseInfoWrapper> migration_data_extract(@RequestParam(required = false) final String code) {
+		boolean result1=true;
+		List<Kendrapara> migrationDetailList=new ArrayList<Kendrapara>();
+		System.out.println("code ::::"+code);
+		try
+		{
+			migrationDetailList=extract(code);
+			System.out.println("result1 ::::"+result1);
+		}catch (Exception e) {
+			e.printStackTrace();
 		}
-		return response;
-	}*/
+		return new ResponseEntity<>(ResponseInfoWrapper.builder()
+				.responseInfo(ResponseInfo.builder().status("Success").build())
+				.responseBody(migrationDetailList).build(), org.springframework.http.HttpStatus.OK);
+	}
 
+	private List<Kendrapara> extract(String code) {
+		SQLQuery query =  null;
+    	List<Object[]> rows = null;
+    	List<Kendrapara> resultList=new ArrayList<Kendrapara>();
+    	try
+    	{
+    		 query = this.persistenceService.getSession().createSQLQuery("select * from "+code+".transaction_csv ");
+    	    rows = query.list();
+    	    Kendrapara k =null;
+    	    if(rows != null && !rows.isEmpty())
+    	    {
+    	    	for(Object[] data : rows)
+    	    	{
+    	    		k = new Kendrapara();
+					k.setTrn_id(data[0] !=null ?data[0].toString():"");
+					k.setVOUCHER_NAME(data[1] !=null ?data[1].toString():"");
+					k.setVOUCHER_TYPE(data[2] !=null ?data[2].toString():"");
+					k.setVOUCHER_DESCRIPTION(data[3] !=null ?data[3].toString():"");
+					k.setVOUCHER_NO(data[4] !=null ?data[4].toString():"");
+					k.setTRANSACTION_NO(data[5] !=null ?data[5].toString():"");
+					k.setTRANSACTION_NO_FOR_DATA_MIGRATION(data[6] !=null ?data[6].toString():"");
+					k.setVOUCHER_DATE(data[7] !=null ?data[7].toString():"");
+					k.setTRANSACTION_DATE(data[8] !=null ?data[8].toString():"");
+					k.setFUND_NAME(data[9] !=null ?data[9].toString():"");
+					k.setFINANCIAL_YEAR(data[10] !=null ?data[10].toString():"");
+					k.setVOUCHER_STATUS(data[11] !=null ?data[11].toString():"");
+					k.setCREATED_BY(data[12] !=null ?data[12].toString():"");
+					k.setVOUCHER_FIRST_SIGNATORY(data[13] !=null ?data[13].toString():"");
+					k.setVOUCHER_SECOND_SIGNATORY(data[14] !=null ?data[14].toString():"");
+					k.setDEPARTMENT_NAME(data[15] !=null ?data[15].toString():"");
+					k.setSCHEME_NAME(data[16] !=null ?data[16].toString():"");
+					k.setSUB_SCHEME_NAME(data[17] !=null ?data[17].toString():"");
+					k.setBUDGETARY_APPLICATION_NO(data[18] !=null ?data[18].toString():"");
+					k.setBUDGET_CHEQUE_REQUEST(data[19] !=null ?data[19].toString():"");
+					k.setFUNCTION_NAME(data[20] !=null ?data[20].toString():"");
+					k.setFILE_NO(data[21] !=null ?data[21].toString():"");
+					k.setSERVICE_NAME(data[22] !=null ?data[22].toString():"");
+					k.setRECEIPT_NO(data[23] !=null ?data[23].toString():"");
+					k.setREMITTANCE_DATE(data[24] !=null ?data[24].toString():"");
+					k.setTRANS_ID_RECEIPT_NO(data[25] !=null ?data[25].toString():"");
+					k.setGLCODE(data[26] !=null ?data[26].toString():"");
+					k.setBANK_ACCOUNT_NAME(data[27] !=null ?data[27].toString():"");
+					k.setBANK_ACCOUNT_CODE(data[28] !=null ?data[28].toString():"");
+					k.setDEBIT_AMOUNT(data[29] !=null ?data[29].toString():"");
+					k.setCREDIT_AMOUNT(data[30] !=null ?data[30].toString():"");
+					k.setCONTRACTOR_NAME(data[31] !=null ?data[31].toString():"");
+					k.setSUPPLIER_NAME(data[32] !=null ?data[32].toString():"");
+					k.setPARTY_DETAILS(data[33] !=null ?data[33].toString():"");
+					k.setOTHER_PARTY(data[34] !=null ?data[34].toString():"");
+					k.setPAYMENT_AMOUNT_TO_PARTY(data[35] !=null ?data[35].toString():"");
+					k.setMIGRATION(data[36] !=null ?data[36].toString():"");
+					k.setREASON(data[37] !=null ?data[37].toString():"");
+					resultList.add(k);
+    	    	}
+    	    }
+    	}catch (Exception e) {
+			e.printStackTrace();
+		}
+    	return resultList;
+	}
 }

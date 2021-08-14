@@ -93,6 +93,7 @@ public class Kendrapara {
 	private String OTHER_PARTY;
 	private String PAYMENT_AMOUNT_TO_PARTY;										
 	private String MIGRATION;
+	private String REASON;
 	
 	
 	
@@ -388,5 +389,11 @@ public class Kendrapara {
 	}
 	public void setTrn_id(String trn_id) {
 		this.trn_id = trn_id;
+	}
+	public String getREASON() {
+		return REASON;
+	}
+	public void setREASON(String rEASON) {
+		REASON = rEASON;
 	}
 }
