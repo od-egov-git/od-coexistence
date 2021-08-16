@@ -18,7 +18,7 @@ import org.egov.commons.CVoucherHeader;
 import org.egov.commons.EgModules;
 import org.egov.commons.Migration;
 import org.egov.egf.contract.model.AccountDetailContract;
-import org.egov.egf.contract.model.Kendrapara;
+import org.egov.egf.contract.model.TransactionDetail;
 import org.egov.egf.contract.model.MigrationRequest;
 import org.egov.egf.contract.model.MigrationResponse;
 import org.egov.egf.contract.model.SubledgerDetailContract;
@@ -58,7 +58,7 @@ public class VoucherController {
 	@Autowired
 	MigrationRepo mRepo;
 	
-	@Autowired
+	 @Autowired
 	 @Qualifier("persistenceService")
 	 private PersistenceService persistenceService;
 
@@ -230,15 +230,20 @@ public class VoucherController {
 	public MigrationResponse migration_data_save(@RequestBody MigrationRequest voucherRequest) {
 		System.out.println("XX");
 		MigrationResponse response = new MigrationResponse();
-		List<Kendrapara> mirationList=voucherRequest.getVouchers();
+		List<TransactionDetail> mirationList=voucherRequest.getVouchers();
 		Migration m = null;
 		int counter=1;
 		try
 		{
 		//save
-			for(Kendrapara k:mirationList)
+			for(TransactionDetail k:mirationList)
 			{
 				System.out.println("counter :::"+counter++);
+				if (counter > 0 && counter % 50 == 0) {
+					mRepo.flush();
+					persistenceService.getSession().flush();
+					persistenceService.getSession().clear();
+		        }
 				m = new Migration();
 				m.setTrn_id(Long.parseLong(k.getTrn_id()));
 				m.setVoucher_name(k.getVOUCHER_NAME()!=null?k.getVOUCHER_NAME():"");
@@ -280,6 +285,7 @@ public class VoucherController {
 				m.setReason("");
 				
 				mRepo.save(m);
+				
 			}
 			
 			response.setResponseInfo(MicroserviceUtils.getResponseInfo(voucherRequest.getRequestInfo(),
@@ -425,7 +431,7 @@ public class VoucherController {
 	@GetMapping(value = "/rest/voucher/migration_data_extract")
 	public ResponseEntity<ResponseInfoWrapper> migration_data_extract(@RequestParam(required = false) final String code) {
 		boolean result1=true;
-		List<Kendrapara> migrationDetailList=new ArrayList<Kendrapara>();
+		List<TransactionDetail> migrationDetailList=new ArrayList<TransactionDetail>();
 		System.out.println("code ::::"+code);
 		try
 		{
@@ -439,20 +445,20 @@ public class VoucherController {
 				.responseBody(migrationDetailList).build(), org.springframework.http.HttpStatus.OK);
 	}
 
-	private List<Kendrapara> extract(String code) {
+	private List<TransactionDetail> extract(String code) {
 		SQLQuery query =  null;
     	List<Object[]> rows = null;
-    	List<Kendrapara> resultList=new ArrayList<Kendrapara>();
+    	List<TransactionDetail> resultList=new ArrayList<TransactionDetail>();
     	try
     	{
     		 query = this.persistenceService.getSession().createSQLQuery("select * from "+code+".transaction_csv ");
     	    rows = query.list();
-    	    Kendrapara k =null;
+    	    TransactionDetail k =null;
     	    if(rows != null && !rows.isEmpty())
     	    {
     	    	for(Object[] data : rows)
     	    	{
-    	    		k = new Kendrapara();
+    	    		k = new TransactionDetail();
 					k.setTrn_id(data[0] !=null ?data[0].toString():"");
 					k.setVOUCHER_NAME(data[1] !=null ?data[1].toString():"");
 					k.setVOUCHER_TYPE(data[2] !=null ?data[2].toString():"");

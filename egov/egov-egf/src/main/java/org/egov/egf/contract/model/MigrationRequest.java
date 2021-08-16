@@ -66,7 +66,7 @@ public class MigrationRequest {
     private RequestInfo requestInfo;
 
     @JsonProperty("vouchers")
-    private List<Kendrapara> vouchers  = new ArrayList<>(0);
+    private List<TransactionDetail> vouchers  = new ArrayList<>(0);
 
     public String getTenantId() {
         return tenantId;
@@ -84,11 +84,11 @@ public class MigrationRequest {
         this.requestInfo = requestInfo;
     }
 
-	public List<Kendrapara> getVouchers() {
+	public List<TransactionDetail> getVouchers() {
 		return vouchers;
 	}
 
-	public void setVouchers(List<Kendrapara> vouchers) {
+	public void setVouchers(List<TransactionDetail> vouchers) {
 		this.vouchers = vouchers;
 	}
 

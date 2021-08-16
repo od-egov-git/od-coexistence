@@ -47,14 +47,7 @@
  */
 package org.egov.egf.contract.model;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.egov.commons.CGeneralLedger;
-import org.egov.commons.CVoucherHeader;
-
-public class Kendrapara {
+public class TransactionDetail {
 	private String trn_id;
 	private String VOUCHER_NAME;
 	private String VOUCHER_TYPE;
@@ -116,10 +109,10 @@ public class Kendrapara {
 				+ ", OTHER_PARTY=" + OTHER_PARTY + ", PAYMENT_AMOUNT_TO_PARTY=" + PAYMENT_AMOUNT_TO_PARTY
 				+ ", MIGRATION=" + MIGRATION + "]";
 	}
-	public Kendrapara() {
+	public TransactionDetail() {
 		
 	}
-	public Kendrapara(String vOUCHER_NAME, String vOUCHER_TYPE, String vOUCHER_DESCRIPTION, String vOUCHER_NO,
+	public TransactionDetail(String vOUCHER_NAME, String vOUCHER_TYPE, String vOUCHER_DESCRIPTION, String vOUCHER_NO,
 			String tRANSACTION_NO, String tRANSACTION_NO_FOR_DATA_MIGRATION, String vOUCHER_DATE,
 			String tRANSACTION_DATE, String fUND_NAME, String fINANCIAL_YEAR, String vOUCHER_STATUS, String cREATED_BY,
 			String vOUCHER_FIRST_SIGNATORY, String vOUCHER_SECOND_SIGNATORY, String dEPARTMENT_NAME, String sCHEME_NAME,
