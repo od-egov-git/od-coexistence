@@ -230,51 +230,58 @@ public class VoucherController {
 	public MigrationResponse migration_data_save(@RequestBody MigrationRequest voucherRequest) {
 		System.out.println("XX");
 		MigrationResponse response = new MigrationResponse();
-		Kendrapara k = voucherRequest.getVouchers();
+		List<Kendrapara> mirationList=voucherRequest.getVouchers();
+		Migration m = null;
+		int counter=1;
 		try
 		{
 		//save
-			Migration m = new Migration();
-			m.setTrn_id(Long.parseLong(k.getTrn_id()));
-			m.setVoucher_name(k.getVOUCHER_NAME()!=null?k.getVOUCHER_NAME():"");
-			m.setVoucher_type(k.getVOUCHER_TYPE()!=null?k.getVOUCHER_TYPE():"");
-			m.setVoucher_description(k.getVOUCHER_DESCRIPTION()!=null?k.getVOUCHER_DESCRIPTION():"");
-			m.setVoucher_no(k.getVOUCHER_NO()!=null?k.getVOUCHER_NO():"");
-			m.setTransaction_no((k.getTRANSACTION_NO()!=null && !k.getTRANSACTION_NO().isEmpty())?Long.getLong(k.getTRANSACTION_NO()):null);
-			m.setVoucher_date(k.getVOUCHER_DATE()!=null?k.getVOUCHER_DATE():"");
-			m.setTransaction_date(k.getTRANSACTION_DATE()!=null?k.getTRANSACTION_DATE():"");
-			m.setFund_name(k.getFUND_NAME()!=null?k.getFUND_NAME():"");
-			m.setFinancial_year(k.getFINANCIAL_YEAR()!=null?k.getFINANCIAL_YEAR():"");
-			m.setTransaction_no_for_data_migration(m.getTransaction_no()+"/"+m.getFinancial_year());
-			m.setVoucher_status(k.getVOUCHER_STATUS()!=null? k.getVOUCHER_STATUS():"");
-			m.setCreated_by(k.getCREATED_BY()!=null ? k.getCREATED_BY():"");
-			m.setVoucher_first_signatory(k.getVOUCHER_FIRST_SIGNATORY()!=null ? k.getVOUCHER_FIRST_SIGNATORY():"");
-			m.setVoucher_second_signatory(k.getVOUCHER_SECOND_SIGNATORY()!=null ? k.getVOUCHER_SECOND_SIGNATORY():"");
-			m.setDepartment_name(k.getDEPARTMENT_NAME()!=null ? k.getDEPARTMENT_NAME():"");
-			m.setScheme_name(k.getSCHEME_NAME()!=null ? k.getSCHEME_NAME():"");
-			m.setSub_scheme_name(k.getSUB_SCHEME_NAME()!=null ? k.getSUB_SCHEME_NAME():"");
-			m.setBudgetary_application_no(k.getBUDGETARY_APPLICATION_NO()!=null ? k.getBUDGETARY_APPLICATION_NO():"");
-			m.setBudget_cheque_request(k.getBUDGET_CHEQUE_REQUEST()!=null ? k.getBUDGET_CHEQUE_REQUEST():"");
-			m.setFunction_name(k.getFUNCTION_NAME()!=null ? k.getFUNCTION_NAME():"");
-			m.setFile_no(k.getFILE_NO()!=null ? k.getFILE_NO():"");
-			m.setService_name(k.getSERVICE_NAME()!=null ? k.getSERVICE_NAME():"");
-			m.setReceipt_no(k.getRECEIPT_NO()!=null ? k.getRECEIPT_NO():"");
-			m.setRemittance_date(k.getREMITTANCE_DATE()!=null ? k.getREMITTANCE_DATE():"");
-			m.setTrans_id_receipt_no((k.getTRANS_ID_RECEIPT_NO()!=null && !k.getTRANS_ID_RECEIPT_NO().isEmpty())?Long.parseLong(k.getTRANS_ID_RECEIPT_NO()):null);
-			m.setGlcode(k.getGLCODE()!=null?k.getGLCODE():"");
-			m.setBank_account_name(k.getBANK_ACCOUNT_NAME()!=null ? k.getBANK_ACCOUNT_NAME():"");
-			m.setBank_account_code(k.getBANK_ACCOUNT_CODE()!=null ? k.getBANK_ACCOUNT_CODE():"");
-			m.setDebit_amount((k.getDEBIT_AMOUNT()!=null && !k.getDEBIT_AMOUNT().isEmpty())? new BigDecimal(k.getDEBIT_AMOUNT()) : null);
-			m.setCredit_amount((k.getCREDIT_AMOUNT()!=null && !k.getCREDIT_AMOUNT().isEmpty())? new BigDecimal(k.getCREDIT_AMOUNT()): null);
-			m.setContractor_name(k.getCONTRACTOR_NAME()!=null ? k.getCONTRACTOR_NAME() : "");
-			m.setSupplier_name(k.getSUPPLIER_NAME()!=null ? k.getSUPPLIER_NAME() : "");
-			m.setParty_details(k.getPARTY_DETAILS()!=null ? k.getPARTY_DETAILS() : "");
-			m.setOther_party(k.getOTHER_PARTY()!=null ? k.getOTHER_PARTY() : "");
-			m.setPayment_amount_to_party((k.getPAYMENT_AMOUNT_TO_PARTY()!=null && !k.getPAYMENT_AMOUNT_TO_PARTY().isEmpty())? new BigDecimal(k.getPAYMENT_AMOUNT_TO_PARTY()) : null);
-			m.setMigration("");
-			m.setReason("");
+			for(Kendrapara k:mirationList)
+			{
+				System.out.println("counter :::"+counter++);
+				m = new Migration();
+				m.setTrn_id(Long.parseLong(k.getTrn_id()));
+				m.setVoucher_name(k.getVOUCHER_NAME()!=null?k.getVOUCHER_NAME():"");
+				m.setVoucher_type(k.getVOUCHER_TYPE()!=null?k.getVOUCHER_TYPE():"");
+				m.setVoucher_description(k.getVOUCHER_DESCRIPTION()!=null?k.getVOUCHER_DESCRIPTION():"");
+				m.setVoucher_no(k.getVOUCHER_NO()!=null?k.getVOUCHER_NO():"");
+				m.setTransaction_no((k.getTRANSACTION_NO()!=null && !k.getTRANSACTION_NO().isEmpty())?Long.getLong(k.getTRANSACTION_NO()):null);
+				m.setVoucher_date(k.getVOUCHER_DATE()!=null?k.getVOUCHER_DATE():"");
+				m.setTransaction_date(k.getTRANSACTION_DATE()!=null?k.getTRANSACTION_DATE():"");
+				m.setFund_name(k.getFUND_NAME()!=null?k.getFUND_NAME():"");
+				m.setFinancial_year(k.getFINANCIAL_YEAR()!=null?k.getFINANCIAL_YEAR():"");
+				m.setTransaction_no_for_data_migration(m.getTransaction_no()+"/"+m.getFinancial_year());
+				m.setVoucher_status(k.getVOUCHER_STATUS()!=null? k.getVOUCHER_STATUS():"");
+				m.setCreated_by(k.getCREATED_BY()!=null ? k.getCREATED_BY():"");
+				m.setVoucher_first_signatory(k.getVOUCHER_FIRST_SIGNATORY()!=null ? k.getVOUCHER_FIRST_SIGNATORY():"");
+				m.setVoucher_second_signatory(k.getVOUCHER_SECOND_SIGNATORY()!=null ? k.getVOUCHER_SECOND_SIGNATORY():"");
+				m.setDepartment_name(k.getDEPARTMENT_NAME()!=null ? k.getDEPARTMENT_NAME():"");
+				m.setScheme_name(k.getSCHEME_NAME()!=null ? k.getSCHEME_NAME():"");
+				m.setSub_scheme_name(k.getSUB_SCHEME_NAME()!=null ? k.getSUB_SCHEME_NAME():"");
+				m.setBudgetary_application_no(k.getBUDGETARY_APPLICATION_NO()!=null ? k.getBUDGETARY_APPLICATION_NO():"");
+				m.setBudget_cheque_request(k.getBUDGET_CHEQUE_REQUEST()!=null ? k.getBUDGET_CHEQUE_REQUEST():"");
+				m.setFunction_name(k.getFUNCTION_NAME()!=null ? k.getFUNCTION_NAME():"");
+				m.setFile_no(k.getFILE_NO()!=null ? k.getFILE_NO():"");
+				m.setService_name(k.getSERVICE_NAME()!=null ? k.getSERVICE_NAME():"");
+				m.setReceipt_no(k.getRECEIPT_NO()!=null ? k.getRECEIPT_NO():"");
+				m.setRemittance_date(k.getREMITTANCE_DATE()!=null ? k.getREMITTANCE_DATE():"");
+				m.setTrans_id_receipt_no((k.getTRANS_ID_RECEIPT_NO()!=null && !k.getTRANS_ID_RECEIPT_NO().isEmpty())?Long.parseLong(k.getTRANS_ID_RECEIPT_NO()):null);
+				m.setGlcode(k.getGLCODE()!=null?k.getGLCODE():"");
+				m.setBank_account_name(k.getBANK_ACCOUNT_NAME()!=null ? k.getBANK_ACCOUNT_NAME():"");
+				m.setBank_account_code(k.getBANK_ACCOUNT_CODE()!=null ? k.getBANK_ACCOUNT_CODE():"");
+				m.setDebit_amount((k.getDEBIT_AMOUNT()!=null && !k.getDEBIT_AMOUNT().isEmpty())? new BigDecimal(k.getDEBIT_AMOUNT()) : null);
+				m.setCredit_amount((k.getCREDIT_AMOUNT()!=null && !k.getCREDIT_AMOUNT().isEmpty())? new BigDecimal(k.getCREDIT_AMOUNT()): null);
+				m.setContractor_name(k.getCONTRACTOR_NAME()!=null ? k.getCONTRACTOR_NAME() : "");
+				m.setSupplier_name(k.getSUPPLIER_NAME()!=null ? k.getSUPPLIER_NAME() : "");
+				m.setParty_details(k.getPARTY_DETAILS()!=null ? k.getPARTY_DETAILS() : "");
+				m.setOther_party(k.getOTHER_PARTY()!=null ? k.getOTHER_PARTY() : "");
+				m.setPayment_amount_to_party((k.getPAYMENT_AMOUNT_TO_PARTY()!=null && !k.getPAYMENT_AMOUNT_TO_PARTY().isEmpty())? new BigDecimal(k.getPAYMENT_AMOUNT_TO_PARTY()) : null);
+				m.setMigration("");
+				m.setReason("");
+				
+				mRepo.save(m);
+			}
 			
-			mRepo.save(m);
 			response.setResponseInfo(MicroserviceUtils.getResponseInfo(voucherRequest.getRequestInfo(),
 						HttpStatus.SC_CREATED, null));
 			} catch (ValidationException e) {
