@@ -250,9 +250,7 @@ public class VoucherController {
 				m.setVoucher_type(k.getVOUCHER_TYPE()!=null?k.getVOUCHER_TYPE():"");
 				m.setVoucher_description(k.getVOUCHER_DESCRIPTION()!=null?k.getVOUCHER_DESCRIPTION():"");
 				m.setVoucher_no(k.getVOUCHER_NO()!=null?k.getVOUCHER_NO():"");
-				System.out.println(" k.getTRANSACTION_NO() :::"+k.getTRANSACTION_NO());
-				System.out.println("boolean :::"+((k.getTRANSACTION_NO()!=null && !k.getTRANSACTION_NO().isEmpty())));
-				m.setTransaction_no((k.getTRANSACTION_NO()!=null && !k.getTRANSACTION_NO().isEmpty())?Long.getLong(k.getTRANSACTION_NO()):null);
+				m.setTransaction_no((k.getTRANSACTION_NO()!=null && !k.getTRANSACTION_NO().isEmpty())?Long.parseLong(k.getTRANSACTION_NO()):null);
 				m.setVoucher_date(k.getVOUCHER_DATE()!=null?k.getVOUCHER_DATE():"");
 				m.setTransaction_date(k.getTRANSACTION_DATE()!=null?k.getTRANSACTION_DATE():"");
 				m.setFund_name(k.getFUND_NAME()!=null?k.getFUND_NAME():"");
