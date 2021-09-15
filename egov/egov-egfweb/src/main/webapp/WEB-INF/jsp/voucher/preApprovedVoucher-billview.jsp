@@ -59,11 +59,11 @@
 </head>
 <script>
 	function checkBillIdBillview(){
-		if(document.getElementById('id').value!=''){
- 			document.getElementById('aa_approve').disabled=true;
-		}else{
- 			document.getElementById('aa_approve').disabled=false;
- 		}
+		//if(document.getElementById('id').value!=''){
+ 			//document.getElementById('aa_approve').disabled=true;
+		//}else{
+ 			//document.getElementById('aa_approve').disabled=false;
+ 		//}
 		if('<s:property value="voucherHeader.id"/>' ==''){
 			document.getElementById('print').disabled=true;
 		}else{
@@ -122,6 +122,11 @@ function onSubmit()
 	var voucherdate =document.getElementById('voucherDate').value ;
 	if(voucherdate!=null && voucherdate!=""){
 		document.preApprovedVoucher.action='${pageContext.request.contextPath}/voucher/preApprovedVoucher-save.action';
+		jQuery(preApprovedVoucher).append(jQuery('<input>', {
+            type : 'hidden',
+            name : '${_csrf.parameterName}',
+            value : '${_csrf.token}'
+        }));
 		return true;
 	}else{
 		bootbox.alert("<s:text name='msg.please.select.voucher.date'/> ");

@@ -3,7 +3,6 @@ package org.egov.infra.filestore.service.impl;
 import static java.io.File.separator;
 import static java.util.UUID.randomUUID;
 import static org.apache.commons.io.FileUtils.getUserDirectoryPath;
-import static org.apache.commons.lang3.StringUtils.defaultString;
 import static org.egov.infra.config.core.ApplicationThreadLocals.getCityCode;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -15,6 +14,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -112,7 +112,7 @@ public class MicroDiskFileStoreService implements FileStoreService {
             int length = (int) file.length();
             File parentFile = file.getParentFile();
     
-            DiskFileItem fileItem = new DiskFileItem("budgetInXls",probeContentType, false, name, length, parentFile);
+            DiskFileItem fileItem = new DiskFileItem("files",probeContentType, false, name, length, parentFile);
             InputStream inputs =  new FileInputStream(file);
             OutputStream os = fileItem.getOutputStream();
             int ret = inputs.read();
@@ -138,13 +138,14 @@ public class MicroDiskFileStoreService implements FileStoreService {
         try {
             StorageResponse storageRes = microserviceUtils.getFileStorageService(files, moduleName);
             FileStoreMapper fileMapper = null;
-
-            List<FileReq> filesList = storageRes.getFiles();
-            for (FileReq filesId : filesList) {
-                fileMapper = new FileStoreMapper(filesId.getFileStoreId(), fileName);
-                fileMapper.setContentType(mimeType);
-            }
-            
+            List<FileReq> filesList = new ArrayList<FileReq>();
+            if (storageRes.getFiles() != null && !storageRes.getFiles().isEmpty())
+                filesList = storageRes.getFiles();
+            if (!filesList.isEmpty() && filesList != null)
+                for (FileReq filesId : filesList) {
+                    fileMapper = new FileStoreMapper(filesId.getFileStoreId(), fileName);
+                    fileMapper.setContentType(mimeType);
+                }
             return fileMapper;
         } catch (IOException e) {
             throw new ApplicationRuntimeException(String.format(FILE_STORE_ERROR, getCityCode(), moduleName), e);
@@ -196,6 +197,11 @@ public class MicroDiskFileStoreService implements FileStoreService {
     public File fetchFromDigitFileStoreApi(String fileStoreId) throws IOException {
         return fetchDigitFilestore(fileStoreId);
     }
+    
+    @Override
+    public File fetchNFS(String fileStoreId, String moduleName) {
+        return fetchAsPathNFS(fileStoreId, moduleName).toFile();
+    }
 
     @Override
     public Path fetchAsPath(String fileStoreId, String moduleName) {
@@ -213,7 +219,7 @@ public class MicroDiskFileStoreService implements FileStoreService {
         try {
             path = Files.write(fileDirPath, responseEntity.getBody());
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error("error occured while fetching path" + e.getMessage());
         }
         return path;
 
@@ -225,6 +231,15 @@ public class MicroDiskFileStoreService implements FileStoreService {
         Path path = Files.write(Paths.get(fileDirPath + separator + fileStoreId), responseEntity.getBody());
 
         return path.toFile();
+    }
+
+    @Override
+    public Path fetchAsPathNFS(String fileStoreId, String moduleName) {
+       Path fileDirPath = this.getFileDirectoryPath(moduleName);
+        if (!fileDirPath.toFile().exists())
+            throw new ApplicationRuntimeException(String.format("File Store does not exist at Path : %s/%s/%s",
+                   this.fileStoreBaseDir, getCityCode(), moduleName));
+        return this.getFilePath(fileDirPath, fileStoreId);
     }
 
     @Override

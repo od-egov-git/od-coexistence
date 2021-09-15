@@ -48,10 +48,15 @@
 package org.egov.eis.web.actions;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.struts2.ServletActionContext;
 import org.apache.struts2.convention.annotation.Action;
@@ -59,12 +64,11 @@ import org.apache.struts2.convention.annotation.ParentPackage;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.convention.annotation.ResultPath;
 import org.apache.struts2.convention.annotation.Results;
+import org.egov.infra.microservice.models.Assignment;
 import org.egov.infra.microservice.models.Designation;
-import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.web.struts.actions.BaseFormAction;
 import org.egov.infra.workflow.matrix.entity.WorkFlowMatrix;
 import org.egov.infra.workflow.matrix.service.CustomizedWorkFlowService;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *
@@ -73,146 +77,160 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @ParentPackage("egov")
 @ResultPath("/WEB-INF/jsp/")
-@Results({
-        @Result(name = "designations", location = "/WEB-INF/jsp/workflow/ajaxWorkFlow-designations.jsp"),
-        @Result(name = "approvers", location = "/WEB-INF/jsp/workflow/ajaxWorkFlow-approvers.jsp") })
+@Results({ @Result(name = "designations", location = "/WEB-INF/jsp/workflow/ajaxWorkFlow-designations.jsp"),
+		@Result(name = "approvers", location = "/WEB-INF/jsp/workflow/ajaxWorkFlow-approvers.jsp") })
 public class AjaxWorkFlowAction extends BaseFormAction {
 
-    private static final long serialVersionUID = -4816498948951535977L;
-    private static final String WF_DESIGNATIONS = "designations";
-    private static final String WF_APPROVERS = "approvers";
-    private transient List<Designation> designationList;
-    private transient List approverList;
-    private String designationId;
-    private String approverDepartmentId;
+	private static final String SELECT = "----Choose----";
+	private static final long serialVersionUID = -4816498948951535977L;
+	private static final String WF_DESIGNATIONS = "designations";
+	private static final String WF_APPROVERS = "approvers";
+	private transient List<Designation> designationList;
+	private transient List<Assignment> approverList;
+	private String designationId;
+	private String approverDepartmentId;
 
-    private transient CustomizedWorkFlowService customizedWorkFlowService;
-    private String type;
-    private BigDecimal amountRule;
-    private String additionalRule;
-    private String currentState;
-    private String pendingAction;
-    private String departmentRule;
-    private String designation;
-    private transient List<String> roleList;
+	private transient CustomizedWorkFlowService customizedWorkFlowService;
+	private String type;
+	private BigDecimal amountRule;
+	private String additionalRule;
+	private String currentState;
+	private String pendingAction;
+	private String departmentRule;
+	private String designation;
+	private transient List<String> roleList;
 
-    @Autowired
-    private MicroserviceUtils microserviceUtils;
+	@Action(value = "/workflow/ajaxWorkFlow-getPositionByPassingDesigId")
+	public String getPositionByPassingDesigId() {
+		if (isNotEmpty(designationId) && !designationId.equalsIgnoreCase("-1") && isNotEmpty(approverDepartmentId)
+				&& !approverDepartmentId.equalsIgnoreCase("-1")) {
+			approverList = microserviceUtils.getAssignments(approverDepartmentId, designationId);
+		}
+		return WF_APPROVERS;
+	}
 
-    @Action(value = "/workflow/ajaxWorkFlow-getPositionByPassingDesigId")
-    public String getPositionByPassingDesigId() {
-        if (designationId != null && !designationId.equalsIgnoreCase("-1") && approverDepartmentId != null
-                && !approverDepartmentId.equalsIgnoreCase("-1")) {
+	@Action(value = "/workflow/ajaxWorkFlow-getDesignationsByObjectType")
+	public String getDesignationsByObjectType() {
+		final List<String> workflowDesignations = new ArrayList<>();
+		if (!SELECT.equals(departmentRule)) {
+			final WorkFlowMatrix wfmatrix = getWfMatrix();
+			if (wfmatrix.getCurrentDesignation() != null) {
+				workflowDesignations.addAll(Arrays.asList(wfmatrix.getCurrentDesignation().split(",")));
+			}
+			designationList = microserviceUtils.getDesignations().stream()
+					.filter(desig -> workflowDesignations.contains(desig.getName())).collect(Collectors.toList());
+		}
+		return WF_DESIGNATIONS;
+	}
 
-            approverList = microserviceUtils.getAssignments(approverDepartmentId, designationId);
-        }
-        return WF_APPROVERS;
-    }
+	@Action(value = "/workflow/ajaxWorkFlow-findDesignationsByObjectType")
+	public String findDesignationsByObjectType() {
+		final List<String> workflowDesignations = new ArrayList<>();
+		if ("END".equals(currentState))
+			currentState = "";
+		if (isNotEmpty(designation))
+			workflowDesignations.addAll(customizedWorkFlowService.getNextDesignations(type, departmentRule, amountRule,
+					additionalRule, currentState, pendingAction, new Date(), designation));
+		else
+			workflowDesignations.addAll(customizedWorkFlowService.getNextDesignations(type, departmentRule, amountRule,
+					additionalRule, currentState, pendingAction, new Date()));
 
-    @Action(value = "/workflow/ajaxWorkFlow-getDesignationsByObjectType")
-    public String getDesignationsByObjectType() {
-        /*
-         * if ("END".equals(currentState)) currentState = ""; if (StringUtils.isNotBlank(designation)) designationList =
-         * designationService.getDesignationsByNames(customizedWorkFlowService.getNextDesignations(type, departmentRule,
-         * amountRule, additionalRule, currentState, pendingAction, new Date(), designation)); else designationList =
-         * designationService.getDesignationsByNames(customizedWorkFlowService.getNextDesignations(type, departmentRule,
-         * amountRule, additionalRule, currentState, pendingAction, new Date()));
-         */
-            designationList = microserviceUtils.getDesignations();
-        return WF_DESIGNATIONS;
-    }
+		designationList = microserviceUtils.getDesignations().stream()
+				.filter(desig -> workflowDesignations.contains(desig.getName())).collect(Collectors.toList());
 
-    public void getAjaxValidButtonsAndNextAction() throws IOException {
-        final StringBuilder actionString = new StringBuilder();
-        final WorkFlowMatrix matrix = getWfMatrix();
-        if (isBlank(currentState)) {
+		return WF_DESIGNATIONS;
+	}
 
-            if (matrix != null && "END".equals(matrix.getNextAction()))
-                actionString.append("Save,Approve");
-            else
-                actionString.append("Save,Forward");
-            actionString.append('@');
-            if (matrix != null)
-                actionString.append(matrix.getNextAction());
-            else
-                actionString.append(' ');
-        } else if (matrix != null) {
-            actionString.append(matrix.getValidActions());
-            actionString.append('@');
-            actionString.append(matrix.getNextAction());
-        }
-        ServletActionContext.getResponse().getWriter().write(actionString.toString());
-    }
+	public void getAjaxValidButtonsAndNextAction() throws IOException {
+		final StringBuilder actionString = new StringBuilder();
+		final WorkFlowMatrix matrix = getWfMatrix();
+		if (isBlank(currentState)) {
 
-    private WorkFlowMatrix getWfMatrix() {
-        return customizedWorkFlowService.getWfMatrix(type, departmentRule,
-                amountRule, additionalRule, currentState, pendingAction);
-    }
+			if (matrix != null && "END".equals(matrix.getNextAction()))
+				actionString.append("Save,Approve");
+			else
+				actionString.append("Save,Forward");
+			actionString.append('@');
+			if (matrix != null)
+				actionString.append(matrix.getNextAction());
+			else
+				actionString.append(' ');
+		} else if (matrix != null) {
+			actionString.append(matrix.getValidActions());
+			actionString.append('@');
+			actionString.append(matrix.getNextAction());
+		}
+		ServletActionContext.getResponse().getWriter().write(actionString.toString());
+	}
 
-    public List<Designation> getDesignationList() {
-        return designationList;
-    }
+	private WorkFlowMatrix getWfMatrix() {
+		return customizedWorkFlowService.getWfMatrix(type, departmentRule, amountRule, additionalRule, currentState,
+				pendingAction);
+	}
 
-    public List getApproverList() {
-        return approverList;
-    }
+	public List<Designation> getDesignationList() {
+		return designationList;
+	}
 
-    public void setDesignationId(final String designationId) {
-        this.designationId = designationId;
-    }
+	public List<Assignment> getApproverList() {
+		return approverList;
+	}
 
-    public void setType(final String type) {
-        this.type = type;
-    }
+	public void setDesignationId(final String designationId) {
+		this.designationId = designationId;
+	}
 
-    public void setAmountRule(final BigDecimal amountRule) {
-        this.amountRule = amountRule;
-    }
+	public void setType(final String type) {
+		this.type = type;
+	}
 
-    public void setAdditionalRule(final String additionalRule) {
-        this.additionalRule = additionalRule;
-    }
+	public void setAmountRule(final BigDecimal amountRule) {
+		this.amountRule = amountRule;
+	}
 
-    public void setCurrentState(final String currentState) {
-        this.currentState = currentState;
-    }
+	public void setAdditionalRule(final String additionalRule) {
+		this.additionalRule = additionalRule;
+	}
 
-    public void setApproverDepartmentId(final String approverDepartmentId) {
-        this.approverDepartmentId = approverDepartmentId;
-    }
+	public void setCurrentState(final String currentState) {
+		this.currentState = currentState;
+	}
 
-    public void setDepartmentRule(final String departmentRule) {
-        this.departmentRule = departmentRule;
-    }
+	public void setApproverDepartmentId(final String approverDepartmentId) {
+		this.approverDepartmentId = approverDepartmentId;
+	}
 
-    @Override
-    public Object getModel() {
-        return null;
-    }
+	public void setDepartmentRule(final String departmentRule) {
+		this.departmentRule = departmentRule;
+	}
 
-    public void setCustomizedWorkFlowService(
-            final CustomizedWorkFlowService customizedWorkFlowService) {
-        this.customizedWorkFlowService = customizedWorkFlowService;
-    }
+	@Override
+	public Object getModel() {
+		return null;
+	}
 
-    public void setPendingAction(final String pendingAction) {
-        this.pendingAction = pendingAction;
-    }
+	public void setCustomizedWorkFlowService(final CustomizedWorkFlowService customizedWorkFlowService) {
+		this.customizedWorkFlowService = customizedWorkFlowService;
+	}
 
-    public List<String> getRoleList() {
-        return roleList;
-    }
+	public void setPendingAction(final String pendingAction) {
+		this.pendingAction = pendingAction;
+	}
 
-    public void setRoleList(final List<String> roleList) {
-        this.roleList = roleList;
-    }
+	public List<String> getRoleList() {
+		return roleList;
+	}
 
-    public String getDesignation() {
-        return designation;
-    }
+	public void setRoleList(final List<String> roleList) {
+		this.roleList = roleList;
+	}
 
-    public void setDesignation(final String designation) {
-        this.designation = designation;
-    }
+	public String getDesignation() {
+		return designation;
+	}
+
+	public void setDesignation(final String designation) {
+		this.designation = designation;
+	}
 
 }

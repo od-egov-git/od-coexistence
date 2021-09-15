@@ -115,7 +115,7 @@ public class ContraBTBActionHelper {
 
 	@Transactional
 	public CVoucherHeader create(ContraBean contraBean, ContraJournalVoucher contraVoucher,
-			CVoucherHeader voucherHeader) throws Exception {
+			CVoucherHeader voucherHeader) {
 		try {
 			voucherHeader2 = null;
 			final List<InstrumentHeader> instrumentList = instrumentService
@@ -149,9 +149,11 @@ public class ContraBTBActionHelper {
 		} catch (final ValidationException e) {
 			throw new ValidationException(Arrays
 					.asList(new ValidationError(e.getErrors().get(0).getMessage(), e.getErrors().get(0).getMessage())));
-		} catch (final Exception e) {
-			throw new ValidationException(Arrays.asList(new ValidationError(e.getMessage(), e.getMessage())));
-		}
+        } /*
+           * catch (final Exception e) { throw new
+           * ValidationException(Arrays.asList(new
+           * ValidationError(e.getMessage(), e.getMessage()))); }
+           */
 		return voucherHeader;
 	}
 
@@ -223,9 +225,11 @@ public class ContraBTBActionHelper {
 		} catch (final ValidationException e) {
 			throw new ValidationException(Arrays
 					.asList(new ValidationError(e.getErrors().get(0).getMessage(), e.getErrors().get(0).getMessage())));
-		} catch (final Exception e) {
-			throw new ValidationException(Arrays.asList(new ValidationError(e.getMessage(), e.getMessage())));
-		}
+        } /*
+           * catch (final Exception e) { throw new
+           * ValidationException(Arrays.asList(new
+           * ValidationError(e.getMessage(), e.getMessage()))); }
+           */
 		return iList;
 	}
 
@@ -304,12 +308,7 @@ public class ContraBTBActionHelper {
 			final HashMap<String, Object> headerDetails = createHeaderAndMisDetails(voucher);
 
 			headerDetails.put(VoucherConstant.VOUCHERNAME, FinancialConstants.CONTRAVOUCHER_NAME_INTERFUND);
-			if (voucher.getFundId().getCode().equalsIgnoreCase("03")) {
-				final Department department = (Department) persistenceService.find("from Department where code=?", "Z");
-				headerDetails.remove(VoucherConstant.DEPARTMENTCODE);
-				headerDetails.put(VoucherConstant.DEPARTMENTCODE, department.getCode());
-			}
-			// update ContraBTB source path
+           	// update ContraBTB source path
 			headerDetails.put(VoucherConstant.SOURCEPATH, "/services/EGF/contra/contraBTB-beforeView.action?voucherHeader.id=");
 
 			HashMap<String, Object> detailMap = null;
@@ -343,14 +342,9 @@ public class ContraBTBActionHelper {
 			headerDetails.put(VoucherConstant.VOUCHERNAME, FinancialConstants.CONTRAVOUCHER_NAME_INTERFUND);
 			headerDetails.put(VoucherConstant.VOUCHERNAME, voucher.getName());
 			headerDetails.put(VoucherConstant.FUNDCODE, toFund.getCode());
-			if (toFund.getCode().equalsIgnoreCase("03")) {
-				final Department department = (Department) persistenceService.find("from Department where code=?", "Z");
-				headerDetails.remove(VoucherConstant.DEPARTMENTCODE);
-				headerDetails.put(VoucherConstant.DEPARTMENTCODE, department.getCode());
-			} else {
-				headerDetails.remove(VoucherConstant.DEPARTMENTCODE);
-				headerDetails.put(VoucherConstant.DEPARTMENTCODE, toDepartment == null ? "" : toDepartment.getCode());
-			}
+			headerDetails.remove(VoucherConstant.DEPARTMENTCODE);
+			headerDetails.put(VoucherConstant.DEPARTMENTCODE, toDepartment == null ? "" : toDepartment.getCode());
+           
 			headerDetails.remove(VoucherConstant.SCHEMECODE);
 			headerDetails.remove(VoucherConstant.SUBSCHEMECODE);
 			headerDetails.remove(VoucherConstant.FUNDSOURCECODE);
@@ -380,9 +374,11 @@ public class ContraBTBActionHelper {
 		} catch (final ValidationException e) {
 			throw new ValidationException(Arrays
 					.asList(new ValidationError(e.getErrors().get(0).getMessage(), e.getErrors().get(0).getMessage())));
-		} catch (final Exception e) {
-			throw new ValidationException(Arrays.asList(new ValidationError(e.getMessage(), e.getMessage())));
-		}
+        } /*
+           * catch (final Exception e) { throw new
+           * ValidationException(Arrays.asList(new
+           * ValidationError(e.getMessage(), e.getMessage()))); }
+           */
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("Posted to Ledger " + voucher.getId());
 		return voucher;
@@ -458,9 +454,11 @@ public class ContraBTBActionHelper {
 		} catch (final ValidationException e) {
 			throw new ValidationException(Arrays
 					.asList(new ValidationError(e.getErrors().get(0).getMessage(), e.getErrors().get(0).getMessage())));
-		} catch (final Exception e) {
-			throw new ValidationException(Arrays.asList(new ValidationError(e.getMessage(), e.getMessage())));
-		}
+        } /*
+           * catch (final Exception e) { throw new
+           * ValidationException(Arrays.asList(new
+           * ValidationError(e.getMessage(), e.getMessage()))); }
+           */
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("Posted to Ledger " + voucher.getId());
 		return voucher;
@@ -479,9 +477,11 @@ public class ContraBTBActionHelper {
 		} catch (final ValidationException e) {
 			throw new ValidationException(Arrays
 					.asList(new ValidationError(e.getErrors().get(0).getMessage(), e.getErrors().get(0).getMessage())));
-		} catch (final Exception e) {
-			throw new ValidationException(Arrays.asList(new ValidationError(e.getMessage(), e.getMessage())));
-		}
+        } /*
+           * catch (final Exception e) { throw new
+           * ValidationException(Arrays.asList(new
+           * ValidationError(e.getMessage(), e.getMessage()))); }
+           */
 	}
 
 	@Transactional
@@ -505,9 +505,11 @@ public class ContraBTBActionHelper {
 		} catch (final ValidationException e) {
 			throw new ValidationException(Arrays
 					.asList(new ValidationError(e.getErrors().get(0).getMessage(), e.getErrors().get(0).getMessage())));
-		} catch (final Exception e) {
-			throw new ValidationException(Arrays.asList(new ValidationError(e.getMessage(), e.getMessage())));
-		}
+        } /*
+           * catch (final Exception e) { throw new
+           * ValidationException(Arrays.asList(new
+           * ValidationError(e.getMessage(), e.getMessage()))); }
+           */
 		return cjv;
 	}
 

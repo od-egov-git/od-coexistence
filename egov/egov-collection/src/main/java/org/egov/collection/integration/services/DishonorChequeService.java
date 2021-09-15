@@ -71,7 +71,6 @@ import org.egov.collection.entity.CollectionDishonorChequeSubLedgerDetails;
 import org.egov.collection.entity.DishonoredChequeBean;
 import org.egov.collection.entity.ReceiptDetail;
 import org.egov.collection.entity.ReceiptHeader;
-import org.egov.collection.entity.DishonoredChequeBean.AccountCode;
 import org.egov.collection.service.ReceiptHeaderService;
 import org.egov.collection.utils.CollectionsUtil;
 import org.egov.collection.utils.FinancialsUtil;
@@ -84,12 +83,15 @@ import org.egov.commons.EgwStatus;
 import org.egov.commons.dao.EgwStatusHibernateDAO;
 import org.egov.commons.service.ChartOfAccountsService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
+import org.egov.infra.microservice.models.BankAccountServiceMapping;
 import org.egov.infra.microservice.models.DishonorReasonContract;
 import org.egov.infra.microservice.models.FinancialStatus;
 import org.egov.infra.microservice.models.Instrument;
 import org.egov.infra.microservice.models.InstrumentSearchContract;
 import org.egov.infra.microservice.models.InstrumentVoucher;
+import org.egov.infra.microservice.models.PaymentWorkflow;
 import org.egov.infra.microservice.models.Receipt;
+import org.egov.infra.microservice.models.ReceiptResponse;
 import org.egov.infra.microservice.models.ReceiptSearchCriteria;
 import org.egov.infra.microservice.models.TransactionType;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
@@ -106,12 +108,15 @@ import org.egov.services.voucher.GeneralLedgerDetailService;
 import org.egov.services.voucher.GeneralLedgerService;
 import org.egov.services.voucher.VoucherHeaderService;
 import org.egov.utils.FinancialConstants;
+import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Query;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindingResult;
 
 @Service
 @Transactional(readOnly = true)
@@ -119,7 +124,7 @@ public class DishonorChequeService implements FinancialIntegrationService {
 
     private static final Logger LOGGER = Logger.getLogger(DishonorChequeService.class);
 
-    private static final String VOUCHER_SEARCH_QUERY = " from CVoucherHeader where voucherNumber=?";;
+    private static final String VOUCHER_SEARCH_QUERY = " from CVoucherHeader where voucherNumber=?";
 
     @Autowired
     private FinancialsUtil financialsUtil;
@@ -165,9 +170,12 @@ public class DishonorChequeService implements FinancialIntegrationService {
     
     @Autowired
     private MicroserviceUtils microserviceUtils;
+    
+    @Value("${collection.payment.searchurl.enabled}")
+    private Boolean paymentSearchEndPointEnabled;
 
     @Transactional
-    public DishonorCheque createDishonorCheque(final DishonoredChequeBean chequeForm) throws Exception {
+    public DishonorCheque createDishonorCheque(final DishonoredChequeBean chequeForm) {
         final DishonorCheque dishonorChq = new DishonorCheque();
 
         try {
@@ -186,18 +194,19 @@ public class DishonorChequeService implements FinancialIntegrationService {
             final List<ValidationError> errors = new ArrayList<>();
             errors.add(new ValidationError("exp", e.getErrors().get(0).getMessage()));
             throw new ValidationException(errors);
-        } catch (final Exception e) {
-            LOGGER.error("Error in DishonorCheque >>>>" + e);
-            final List<ValidationError> errors = new ArrayList<>();
-            errors.add(new ValidationError("exp", e.getMessage()));
-            throw new ValidationException(errors);
-        }
+        } /*
+           * catch (final Exception e) {
+           * LOGGER.error("Error in DishonorCheque >>>>" + e); final
+           * List<ValidationError> errors = new ArrayList<>(); errors.add(new
+           * ValidationError("exp", e.getMessage())); throw new
+           * ValidationException(errors); }
+           */
         return dishonorChq;
     }
 
     @Transactional
     public void createDishonorChequeForVoucher(final DishonoredChequeBean chequeForm, final DishonorCheque dishonorChq,
-            final CVoucherHeader originalVoucher, final InstrumentHeader instrumentHeader) throws Exception {
+            final CVoucherHeader originalVoucher, final InstrumentHeader instrumentHeader) {
         DishonorChequeSubLedgerDetails dishonourChqSLDetails = new DishonorChequeSubLedgerDetails();
         dishonorChq.setStatus(egwStatusDAO.getStatusByModuleAndCode(FinancialConstants.STATUS_MODULE_DISHONORCHEQUE,
                 FinancialConstants.DISHONORCHEQUE_APPROVED_STATUS));
@@ -243,8 +252,9 @@ public class DishonorChequeService implements FinancialIntegrationService {
 
         for (final String gl : remittanceGeneralLedger) {
             final CVoucherHeader remittanceVoucher = voucherHeaderService
-                    .find("select gl.voucherHeaderId from CGeneralLedger gl ,InstrumentOtherDetails iod where gl.voucherHeaderId.id = iod.payinslipId.id and iod.instrumentHeaderId.id   in ("
-                            + chequeForm.getInstHeaderIds() + ") ");
+                    .find("select gl.voucherHeaderId from CGeneralLedger gl ,InstrumentOtherDetails iod"
+                    		+ " where gl.voucherHeaderId.id = iod.payinslipId.id "
+                    		+ "and iod.instrumentHeaderId.id   in (?) ", chequeForm.getInstHeaderIds());
             ledger = generalLedgerService.find("from CGeneralLedger where voucherHeaderId.id = ? and glcode = ?",
                     remittanceVoucher.getId(), gl.split("-")[0].trim());
             final List<CGeneralLedgerDetail> ledgerDetailSet = generalLedgerDetailService.findAllBy(
@@ -280,7 +290,7 @@ public class DishonorChequeService implements FinancialIntegrationService {
 
     @Transactional
     public CollectionDishonorCheque populateAndPersistDishonorCheque(final DishonoredChequeBean chequeForm)
-            throws Exception {
+             {
         final CollectionDishonorCheque dishonorChq = new CollectionDishonorCheque();
 
         try {
@@ -310,12 +320,13 @@ public class DishonorChequeService implements FinancialIntegrationService {
             final List<ValidationError> errors = new ArrayList<>();
             errors.add(new ValidationError("exp", e.getErrors().get(0).getMessage()));
             throw new ValidationException(errors);
-        } catch (final Exception e) {
-            LOGGER.error("Error in DishonorCheque >>>>" + e.getMessage());
-            final List<ValidationError> errors = new ArrayList<>();
-            errors.add(new ValidationError("exp", e.getMessage()));
-            throw new ValidationException(errors);
-        }
+        } /*
+           * catch (final Exception e) {
+           * LOGGER.error("Error in DishonorCheque >>>>" + e.getMessage());
+           * final List<ValidationError> errors = new ArrayList<>();
+           * errors.add(new ValidationError("exp", e.getMessage())); throw new
+           * ValidationException(errors); }
+           */
         return dishonorChq;
     }
 
@@ -353,7 +364,7 @@ public class DishonorChequeService implements FinancialIntegrationService {
 
     @Transactional
     public void createDishonorChequeWithoutVoucher(final DishonoredChequeBean chequeForm,
-            final InstrumentHeader instrumentHeader) throws Exception {
+            final InstrumentHeader instrumentHeader) {
         instrumentHeader.setSurrendarReason(chequeForm.getDishonorReason());
         persistenceService.update(instrumentHeader);
         populateAndPersistDishonorCheque(chequeForm);
@@ -381,12 +392,13 @@ public class DishonorChequeService implements FinancialIntegrationService {
             final List<ValidationError> errors = new ArrayList<ValidationError>();
             errors.add(new ValidationError("exp", e.getErrors().get(0).getMessage()));
             throw new ValidationException(errors);
-        } catch (final Exception e) {
-            LOGGER.error("Error in DishonorCheque >>>>" + e);
-            final List<ValidationError> errors = new ArrayList<ValidationError>();
-            errors.add(new ValidationError("exp", e.getMessage()));
-            throw new ValidationException(errors);
-        }
+        } /*
+           * catch (final Exception e) {
+           * LOGGER.error("Error in DishonorCheque >>>>" + e); final
+           * List<ValidationError> errors = new ArrayList<ValidationError>();
+           * errors.add(new ValidationError("exp", e.getMessage())); throw new
+           * ValidationException(errors); }
+           */
     }
 
     @Transactional
@@ -430,12 +442,13 @@ public class DishonorChequeService implements FinancialIntegrationService {
             final List<ValidationError> errors = new ArrayList<ValidationError>();
             errors.add(new ValidationError("exp", e.getErrors().get(0).getMessage()));
             throw new ValidationException(errors);
-        } catch (final Exception e) {
-            LOGGER.error("Error in DishonorCheque >>>>" + e);
-            final List<ValidationError> errors = new ArrayList<ValidationError>();
-            errors.add(new ValidationError("exp", e.getMessage()));
-            throw new ValidationException(errors);
-        }
+        } /*
+           * catch (final Exception e) {
+           * LOGGER.error("Error in DishonorCheque >>>>" + e); final
+           * List<ValidationError> errors = new ArrayList<ValidationError>();
+           * errors.add(new ValidationError("exp", e.getMessage())); throw new
+           * ValidationException(errors); }
+           */
         return reversalVoucher;
     }
 
@@ -485,7 +498,8 @@ public class DishonorChequeService implements FinancialIntegrationService {
                 .getReceiptStatusForCode(CollectionConstants.RECEIPT_STATUS_CODE_CANCELLED);
         final ReceiptHeader receiptHeader = (ReceiptHeader) persistenceService
                 .find("select DISTINCT (receipt) from ReceiptHeader receipt "
-                        + "join receipt.receiptInstrument as instruments where instruments.id=? and instruments.statusId.code not in (?,?)",
+                        + "join receipt.receiptInstrument as instruments where instruments.id=?"
+                        + " and instruments.statusId.code not in (?,?)",
                         Long.valueOf(instrumentHeaderId), receiptInstrumentBounceStatus.getCode(),
                         receiptCancellationStatus.getCode());
         final InstrumentHeader instrumentHeader = (InstrumentHeader) persistenceService.findByNamedQuery(
@@ -540,8 +554,24 @@ public class DishonorChequeService implements FinancialIntegrationService {
             List<Instrument> instList = microserviceUtils.getInstrumentsBySearchCriteria(insSearchContra );
             Map<String, String> receiptInstMap = instList.stream().map(Instrument::getInstrumentVouchers).flatMap(x -> x.stream()).collect(Collectors.toMap(InstrumentVoucher::getReceiptHeaderId, InstrumentVoucher::getInstrument));
             Set<String> receiptIds = receiptInstMap.keySet();
-            ReceiptSearchCriteria rSearchcriteria = ReceiptSearchCriteria.builder().receiptNumbers(receiptIds).build();
-            List<Receipt> receipt = microserviceUtils.getReceipt(rSearchcriteria  );
+            ReceiptSearchCriteria rSearchcriteria=null;
+            if (paymentSearchEndPointEnabled) {
+                final Set<String> serviceCodeLists = new HashSet();
+                final Set<String> accNumberList = new HashSet();
+                instList.stream().forEach(ins -> {
+                    accNumberList.add(ins.getBankAccount().getAccountNumber());
+                });
+                List<BankAccountServiceMapping> mappings = microserviceUtils
+                        .getBankAcntServiceMappingsByBankAcc(StringUtils.join(accNumberList, ","), null);
+                for (BankAccountServiceMapping basm : mappings) {
+                    serviceCodeLists.add(basm.getBusinessDetails());
+                }
+                rSearchcriteria = ReceiptSearchCriteria.builder().receiptNumbers(receiptIds)
+                        .businessCodes(serviceCodeLists).build();
+            } else {
+                rSearchcriteria = ReceiptSearchCriteria.builder().receiptNumbers(receiptIds).build();
+            }
+            List<Receipt> receipt = microserviceUtils.getReceipt(rSearchcriteria);
             Map<String, Receipt> receiptIdToReceiptMap= null;
             switch (ApplicationThreadLocals.getCollectionVersion().toUpperCase()) {
             case "V2":
@@ -572,12 +602,13 @@ public class DishonorChequeService implements FinancialIntegrationService {
                 chequeBean.setBankName(getBankName(ins));
                 chequeBean.setAccountNumber(ins.getBankAccount().getAccountNumber());
                 chequeBean.setPayTo(ins.getPayee());
+                chequeBean.setService(receiptIdToReceiptMapTemp.get(ins.getInstrumentVouchers().get(0).getReceiptHeaderId()).getService());
                 populateReceiptVoucherAccountDetails(receiptVoucherHeader, chequeBean);
                 populateReversalVoucherAccountDetails(receiptVoucherHeader, payInSlipVoucher, chequeBean);
                 dishonoredChequeList.add(chequeBean);
             });
             return dishonoredChequeList;
-        } catch (Exception e) {
+        } catch (ObjectNotFoundException e) {
             LOGGER.error("Error in Cheques Dishonoring Listing :: ",e);
             throw e;
         }
@@ -616,7 +647,7 @@ public class DishonorChequeService implements FinancialIntegrationService {
                 }
             });
             
-        } catch (Exception e) {
+        } catch (ObjectNotFoundException e) {
             LOGGER.error("Error occurred in populateReversalVoucherAccountDetails : ",e);
             throw e;
         }
@@ -647,7 +678,7 @@ public class DishonorChequeService implements FinancialIntegrationService {
                 DishonoredChequeBean.AccountCode accountCode = new DishonoredChequeBean.AccountCode (ac.getGlcode(), coaMap.get(ac.getGlcode()).getName(), ac.getDebitAmount() == null ? 0 : ac.getDebitAmount() , ac.getCreditAmount() == null ? 0 : ac.getCreditAmount());
                 chequeBean.getReceiptVoucherGLDetails().add(accountCode);
             });
-        } catch (Exception e) {
+        } catch (ObjectNotFoundException e) {
             LOGGER.error("Error occurred in populateReceiptVoucherAccountDetails : ",e);
             throw e;
         }
@@ -675,6 +706,11 @@ public class DishonorChequeService implements FinancialIntegrationService {
     }
 
     public void processDishonor(DishonoredChequeBean model) {
+        List<Receipt> receiptList = new ArrayList<>();
+        Set<String> paymentIdSet = new HashSet();
+        Set<String> receiptNumbers = new HashSet();
+        final Set<String> accNumberList = new HashSet();
+        final List<String> serviceCodeList = new ArrayList<>();
         List<Instrument> instruments = microserviceUtils.getInstruments(model.getInstHeaderIds());
         FinancialStatus finStatus = new FinancialStatus();
         finStatus.setCode("Dishonored");
@@ -688,8 +724,53 @@ public class DishonorChequeService implements FinancialIntegrationService {
                     .instrument(ins.getId())
                     .build();
             ins.setDishonor(dishonorReasonContract);
+            ins.getInstrumentVouchers().stream().forEach(insVou -> {
+                receiptNumbers.add(insVou.getReceiptHeaderId());
+               });
+            accNumberList.add(ins.getBankAccount().getAccountNumber());
         });
         microserviceUtils.updateInstruments(instruments, null, finStatus );
+        // calling cancel receipt api
+        if (!receiptNumbers.isEmpty()) {
+            if (paymentSearchEndPointEnabled) {
+                List<BankAccountServiceMapping> mappings = microserviceUtils
+                        .getBankAcntServiceMappingsByBankAcc(StringUtils.join(accNumberList, ","), null);
+                for (BankAccountServiceMapping basm : mappings) {
+                    serviceCodeList.add(basm.getBusinessDetails());
+                }
+                receiptList = microserviceUtils.getReceiptsList(StringUtils.join(receiptNumbers, ","),
+                        StringUtils.join(serviceCodeList, ","));
+            } else {
+                receiptList = microserviceUtils.getReceipts(StringUtils.join(receiptNumbers, ","));
+            }
+            for (Receipt receipts : receiptList) {
+                paymentIdSet.add(receipts.getPaymentId());
+                break;
+            }
+            switch (ApplicationThreadLocals.getCollectionVersion().toUpperCase()) {
+            case "V2":
+            case "VERSION2":
+                if (!paymentIdSet.isEmpty()) {
+                    if (paymentSearchEndPointEnabled) {
+                        microserviceUtils.performWorkflowWithModuleName(paymentIdSet,
+                                PaymentWorkflow.PaymentAction.DISHONOUR, model.getDishonorReason(), StringUtils.join(serviceCodeList, ","));
+                    } else {
+                        microserviceUtils.performWorkflow(paymentIdSet, PaymentWorkflow.PaymentAction.DISHONOUR,
+                                model.getDishonorReason());
+                    }
+                }
+                break;
+
+            default:
+                for (final Receipt receiptHeader : receiptList) {
+                    receiptHeader.getBill().get(0).getBillDetails().get(0).setStatus("Cancelled");
+                    receiptHeader.getInstrument().setTenantId(receiptHeader.getTenantId());
+                    receiptHeader.getBill().get(0).setPayerName(receiptHeader.getBill().get(0).getPaidBy());
+                }
+                ReceiptResponse response = microserviceUtils.updateReceipts(new ArrayList<>(receiptList));
+                break;
+            }
+        }
     }
     
     private void prepareDishonouredSearchCriteria(DishonoredChequeBean model, InstrumentSearchContract criteria) {
@@ -704,7 +785,6 @@ public class DishonorChequeService implements FinancialIntegrationService {
         if(StringUtils.isNotBlank(model.getInstrumentNumber())){
             criteria.setTransactionNumber(model.getInstrumentNumber());
         }
-       
         criteria.setTransactionFromDate(model.getFromDate());
         criteria.setTransactionToDate(model.getToDate());
         
@@ -716,8 +796,26 @@ public class DishonorChequeService implements FinancialIntegrationService {
             List<Instrument> instList = microserviceUtils.getInstrumentsBySearchCriteria(insSearchContra );
             Map<String, String> receiptInstMap = instList.stream().map(Instrument::getInstrumentVouchers).flatMap(x -> x.stream()).collect(Collectors.toMap(InstrumentVoucher::getReceiptHeaderId, InstrumentVoucher::getInstrument));
             Set<String> receiptIds = receiptInstMap.keySet();
-            ReceiptSearchCriteria rSearchcriteria = ReceiptSearchCriteria.builder().receiptNumbers(receiptIds).build();
-            List<Receipt> receipt = microserviceUtils.getReceipt(rSearchcriteria  );
+            ReceiptSearchCriteria rSearchcriteria=null;
+            if (paymentSearchEndPointEnabled) {
+                final Set<String> serviceCodeLists = new HashSet();
+                final Set<String> accNumberList = new HashSet();
+                instList.stream().forEach(ins -> {
+                    accNumberList.add(ins.getBankAccount().getAccountNumber());
+                    LOGGER.info("AccountNumer ---+ins.getBankAccount().getAccountNumber()");
+                });
+                LOGGER.info("AccountNumer ---+accNumberList");
+                List<BankAccountServiceMapping> mappings = microserviceUtils
+                        .getBankAcntServiceMappingsByBankAcc(StringUtils.join(accNumberList, ","), null);
+                for (BankAccountServiceMapping basm : mappings) {
+                    serviceCodeLists.add(basm.getBusinessDetails());
+                }
+                rSearchcriteria = ReceiptSearchCriteria.builder().receiptNumbers(receiptIds)
+                        .businessCodes(serviceCodeLists).build();
+            } else {
+                rSearchcriteria = ReceiptSearchCriteria.builder().receiptNumbers(receiptIds).build();
+            }
+            List<Receipt> receipt = microserviceUtils.getReceipt(rSearchcriteria);
             Map<String, Receipt> receiptIdToReceiptMap= null;
             switch (ApplicationThreadLocals.getCollectionVersion().toUpperCase()) {
             case "V2":
@@ -749,14 +847,32 @@ public class DishonorChequeService implements FinancialIntegrationService {
                 Long dateVal=ins.getDishonor().getDishonorDate();
                 Date date=new Date(dateVal); 
                 chequeBean.setDishonorDate(date);
+                chequeBean.setDishonorReason(ins.getDishonor().getReason());
+                chequeBean.setService(receiptIdToReceiptMapTemp.get(ins.getInstrumentVouchers().get(0).getReceiptHeaderId()).getService());
                 dishonoredChequeList.add(chequeBean);
             });
             return dishonoredChequeList;
-        } catch (Exception e) {
+        } catch (ObjectNotFoundException e) {
             LOGGER.error("Error in report Cheques Dishonoring Listing :: ",e);
             throw e;
         }
     }
 
-  
+    public void validateManadatoryFields(final DishonoredChequeBean chequeBean, final BindingResult resultBinder) {
+        if (StringUtils.isEmpty(chequeBean.getRemarks()) || chequeBean.getRemarks() == null)
+            resultBinder.reject("Remarks is Required");
+        if (StringUtils.isEmpty(chequeBean.getDishonorReason()) || chequeBean.getDishonorReason() == null)
+            resultBinder.reject("DishonourReason is Required");
+        if (chequeBean.getDishonorDate() == null)
+            resultBinder.reject("TransactionDate is Required");
+    }
+
+    public void validateBeforeSearch(final DishonoredChequeBean chequeBean, final BindingResult resultBinder) {
+        if (StringUtils.isEmpty(chequeBean.getInstrumentMode()) || chequeBean.getInstrumentMode() == null)
+            resultBinder.reject("msg.please.select.instrument.mode");
+        if (StringUtils.isEmpty(chequeBean.getInstrumentNumber()) || chequeBean.getInstrumentNumber() == null)
+            resultBinder.reject("msg.please.enter.cheque.dd.number");
+        if (chequeBean.getTransactionDate() == null)
+            resultBinder.reject("msg.please.select.cheque.dd.date");
+    }
 }

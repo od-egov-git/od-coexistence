@@ -46,8 +46,6 @@ $(document).ready(function(){
 		callAjaxSearch();
 	});
 
-
-
 	function callAjaxSearch() {
 		var bankAccountId = $("#bankAccountId").val();
 		var fromDate = $("#fromDateId").val();
@@ -59,10 +57,14 @@ $(document).ready(function(){
 			bootbox.alert(toDateAlertMsg);
 			return false;
 		}
-		if(fromDate != "" && toDate != "" && fromDate> toDate){
+		if(fromDate != "" && toDate != ""){
+			fromDates = Date.parse(fromDate);
+		    toDates = Date.parse(toDate);
+			if(fromDates>toDates){
 			bootbox.alert(fromDateToDateAlertMsg);
 			return false;
 		}
+	}
 
 		var fileName = 'Dishonoured Cheque Report';
 		var drillDowntableContainer = $("#resultTable");
@@ -73,7 +75,7 @@ $(document).ready(function(){
 			{"data" : "id","sClass" : "text-center"},
 			{"data" : "receiptNumber","sClass" : "text-left",
 				fnCreatedCell : function(nTd,sData, oData, iRow,iCol) {				
-					$(nTd).html('<a href="javascript:void(0);" onclick="viewReceipt(\''+ oData.receiptSourceUrl +'\')">' + oData.receiptNumber + '</a>');
+					$(nTd).html('<a href="javascript:void(0);" onclick="viewReceipt(\''+ oData.receiptSourceUrl +'\',\''+ oData.service + '\')">' + oData.receiptNumber + '</a>');
 				}
 			},
 			{"data" : "transactionDate","sClass" : "text-left",
@@ -93,7 +95,8 @@ $(document).ready(function(){
 					return moment(value).format('DD/MM/YYYY');
 				}
 			},
-			{"data" : "instrumentAmount","sClass" : "text-left"}
+			{"data" : "instrumentAmount","sClass" : "text-left"},
+			{"data" : "dishonorReason","sClass" : "text-left"}
 			];
 		$.fn.dataTable.ext.errMode = 'none';
 		var heading = prepareHeading();
@@ -183,7 +186,6 @@ function loadMappedService(){
 
 
 function viewReceipt(receiptSourceUrl){
-	console.log("hiii");
 	event.preventDefault();
 	window.open(receiptSourceUrl,'',' width=900, height=700');
 }
