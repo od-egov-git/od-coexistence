@@ -147,8 +147,8 @@ public abstract class ScheduleService extends PersistenceService {
                         " v.id=g.voucherheaderid and c.id=g.glcodeid and v.id=mis.voucherheaderid and v.status not in("
                         + voucherStatusToExclude + ")  AND v.voucherdate <= '" +
                         getFormattedDate(toDate) + "' and v.voucherdate >='" + getFormattedDate(fromDate) +
-                        "' and substr(c.glcode,1," + minorCodeLength
-                        + ") in (select distinct coa2.glcode from chartofaccounts coa2, " +
+                        "' and c.parentid "
+                        + " in (select coa2.id from chartofaccounts coa2, " +
                         "schedulemapping s where s.id=coa2.scheduleid and coa2.classification=2 and s.reporttype = '"
                         + reportType + "') " + filterQuery +
                         " group by v.fundid,substr(c.glcode,1," + minorCodeLength + "),c.name order by substr(c.glcode,1,"
@@ -236,8 +236,8 @@ public abstract class ScheduleService extends PersistenceService {
                         " schedulemapping s " +
                         " where    s.id=coa.scheduleid  AND coa.classification=2 AND s.reporttype='" + reportType
                         + "' and coad.majorcode='" +
-                        majorCode + "' and coa.type='" + type + "' and  coa.glcode=SUBSTR(coad.glcode,1," + minorCodeLength
-                        + ") and coad.classification=4 order by coad.glcode");
+                        majorCode + "' and coa.type='" + type + "' and  coa.id=coad.parentid"
+                        + " and coad.classification=4 order by coad.glcode");
         return query.list();
     }
 
@@ -361,8 +361,8 @@ public abstract class ScheduleService extends PersistenceService {
                         "and c.glcode in (select distinct coad.glcode from chartofaccounts coa2, schedulemapping s " +
                         ",chartofaccounts coad where s.id=coa2.scheduleid and coa2.classification=2 and s.reporttype = '"
                         + reportType + "'" +
-                        " and coa2.glcode=SUBSTR(coad.glcode,1," + minorCodeLength
-                        + ") and coad.classification=4 and coad.majorcode='" + majorCode + "')  and c.majorcode='" + majorCode
+                        " and coa2.id=coad.parentid "
+                        + " and coad.classification=4 and coad.majorcode='" + majorCode + "')  and c.majorcode='" + majorCode
                         + "' and c.classification=4 " + filterQuery +
                 " group by v.fundid,c.glcode order by c.glcode");
         return query.list();

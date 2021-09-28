@@ -305,10 +305,10 @@ public abstract class ReportService {
                                 + getFormattedDate(toDate)
                                 + "' and v.voucherdate >='"
                                 + getFormattedDate(fromDate)
-                                + "' and substr(c.glcode,1,"
-                                + minorCodeLength
-                                + ") in "
-                                + "(select distinct coa2.glcode from chartofaccounts coa2, schedulemapping s where s.id=coa2.scheduleid and "
+                                + "' and c.parentid "
+                                //+ minorCodeLength
+                                + " in "
+                                + "(select coa2.id from chartofaccounts coa2, schedulemapping s where s.id=coa2.scheduleid and "
                                 + "coa2.classification=2 and s.reporttype = '"
                                 + subReportType
                                 + "') "

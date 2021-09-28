@@ -244,7 +244,8 @@ public class BalanceSheetScheduleService extends ScheduleService {
                 +balanceSheetService.getFormattedDate(balanceSheetService.getPreviousYearFor(fromDate)) +
                 "' and c.glcode in (select distinct coad.glcode from chartofaccounts coa2, schedulemapping s " +
                 ",chartofaccounts coad where s.id=coa2.scheduleid and coa2.classification=2 and s.reporttype = 'BS'" +
-                " and coa2.glcode=SUBSTR(coad.glcode,1," + minorCodeLength + ") and coad.classification=4 and coad.majorcode='"
+                //" and coa2.glcode=SUBSTR(coad.glcode,1," + minorCodeLength + ") and coad.classification=4 and coad.majorcode='"
+                " and coa2.id=coad.parentid and coad.classification=4 and coad.majorcode='"
                 + majorCode + "')  and c.majorcode='" + majorCode + "' and c.classification=4 " + filterQuery
                 + " group by c.glcode");
         final Query query = persistenceService.getSession().createSQLQuery(qry.toString());
