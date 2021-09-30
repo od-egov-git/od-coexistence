@@ -55,6 +55,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -308,15 +309,31 @@ public class VoucherSearchAction extends BaseFormAction {
 			{
 				System.out.println("before executing");
 			list = qry.list();
+			if(list !=null)
+			{
+				System.out.println("size --->"+list.size());
+			}
 			System.out.println("after executing");
 			}catch (Exception e) {
 				e.printStackTrace();
 			}
 			System.out.println("quey executed");
 		} else if (showMode.equalsIgnoreCase("nonbillPayment"))
+		{
 			list = voucherSearchUtil.searchNonBillVouchers(voucherHeader, fromDate, toDate, showMode);
+			if(list !=null)
+			{
+				System.out.println("size1 --->"+list.size());
+			}
+		}
 		else
+		{
 			list = voucherSearchUtil.search(voucherHeader, fromDate, toDate, showMode);
+			if(list !=null)
+			{
+				System.out.println("size2 --->"+list.size());
+			}
+		}
 		if (null == showMode || showMode.equals("")) {
 			paymentVoucherMap.clear();
 			
@@ -338,6 +355,10 @@ public class VoucherSearchAction extends BaseFormAction {
 			}
 			
 			System.out.println("before filter");
+			if(list !=null)
+			{
+				System.out.println("size3 --->"+list.size());
+			}
 			for (CVoucherHeader cVoucherHeader : list) {
 				
 				 if(amount != null && amount.compareTo(BigDecimal.ZERO) != 0){
@@ -394,13 +415,20 @@ public class VoucherSearchAction extends BaseFormAction {
 				
 			}
 			
-			
+			if(filterlist !=null)
+			{
+				System.out.println("size F--->"+filterlist.size());
+			}
 			System.out.println("fileter execution done");
 			
 			
 			
 			populateVoucherMap(filterlist);
 			System.out.println("populateVoucherMap execution done");
+			if(filterlist !=null)
+			{
+				System.out.println("size F2--->"+filterlist.size());
+			}
 			for (final CVoucherHeader voucherheader : filterlist) {
 				voucherMap = new HashMap<String, Object>();
 				final BigDecimal amt = voucherheader.getTotalAmount();
@@ -445,6 +473,20 @@ public class VoucherSearchAction extends BaseFormAction {
 					voucherMap.put("pendingWith", "-");
 				}
 				voucherList.add(voucherMap);
+			}
+			if(voucherList != null)
+			{
+				System.out.println("voucher size ::"+voucherList.size());
+			}
+			Set<String> keys=new HashSet<String>();
+			if(voucherMap !=null)
+			{
+				keys=voucherMap.keySet();
+				if(keys !=null)
+				{
+					System.out.println("size map Set--->"+keys.size());
+				}
+				
 			}
 			System.out.println("populateVoucherMap execution ended");
 			Page page = new Page<Map<String, Object>>(1, voucherList.size(), voucherList);
@@ -612,6 +654,11 @@ public class VoucherSearchAction extends BaseFormAction {
 			}
 			 
 		}
+		if(paymentList !=null)
+		{
+			System.out.println("size P--->"+paymentList.size());
+		}
+		
 		if(paymentList!=null && !paymentList.isEmpty())
 		{
 			for(Paymentheader ph : paymentList)
@@ -631,6 +678,16 @@ public class VoucherSearchAction extends BaseFormAction {
 					
 				}
 			}
+		}
+		Set<Long> keys=new HashSet<Long>();
+		if(paymentVoucherMap !=null)
+		{
+			keys=paymentVoucherMap.keySet();
+			if(keys !=null)
+			{
+				System.out.println("size Set--->"+keys.size());
+			}
+			
 		}
 	}
 

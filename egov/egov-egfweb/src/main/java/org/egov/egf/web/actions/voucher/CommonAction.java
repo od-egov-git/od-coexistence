@@ -3329,6 +3329,11 @@ public class CommonAction extends BaseFormAction {
         StringBuffer chartOfAccounts_parentId = new StringBuffer();
         StringBuffer chartOfAccounts_glCode = new StringBuffer();
         int i = 0;
+        if(coaList != null)
+        {
+        	System.out.println("coa size list :::"+coaList.size());
+        }
+        
         for (CChartOfAccounts cc : coaList) {
             if (i > 0) {
                 type.append("+");
@@ -3344,7 +3349,9 @@ public class CommonAction extends BaseFormAction {
             chartOfAccounts_name.append(cc.getName());
             chartOfAccounts_parentId.append(cc.getParentId());
             chartOfAccounts_glCode.append(cc.getGlcode());
-
+            System.out.println(i);
+            System.out.println(type.toString() + "^" + chartOfAccounts_ID.toString() + "^" + chartOfAccounts_name + "^" +
+                        chartOfAccounts_parentId.toString() + "^" + chartOfAccounts_glCode.toString() + "^");
         }
         result.append(type.toString() + "^" + chartOfAccounts_ID.toString() + "^" + chartOfAccounts_name + "^" +
                 chartOfAccounts_parentId.toString() + "^" + chartOfAccounts_glCode.toString() + "^");

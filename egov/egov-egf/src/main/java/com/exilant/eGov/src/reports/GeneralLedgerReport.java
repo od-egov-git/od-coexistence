@@ -124,7 +124,7 @@ public class GeneralLedgerReport {
         final LinkedList dataList = new LinkedList();
         if (LOGGER.isInfoEnabled())
             LOGGER.info("Indise the loop..........");
-        new CashBook(null);
+        //new CashBook(null);
 
         String isconfirmed = "";
         String glCode1 = "";
@@ -911,16 +911,16 @@ public class GeneralLedgerReport {
                     "SELECT  gl.glcode as \"code\",(select ca.type from chartofaccounts ca where glcode=gl.glcode) as \"glType\",vh.id AS \"vhid\", vh.voucherDate AS \"vDate\", ")
             .append(" TO_CHAR(vh.voucherDate, 'dd-Mon-yyyy') AS voucherdate, ")
             .append(" vh.voucherNumber AS \"vouchernumber\", gl.glCode AS \"glcode\", ")
-            .append(" coa.name AS \"name\",CASE WHEN gl.debitAmount = 0 THEN (case (gl.creditamount) when 0 then gl.creditAmount||'.00cr' when floor(gl.creditamount) then gl.creditAmount||'.00cr' else  gl.creditAmount||'cr'  end ) ELSE (case (gl.debitamount) when 0 then gl.debitamount||'.00dr' when floor(gl.debitamount) then gl.debitamount||'.00dr' else  gl.debitamount||'dr' end ) END"
+            .append(" coa.name AS \"name\",CASE WHEN sum(gl.debitAmount) = 0 THEN (case sum((gl.creditamount)) when 0 then sum(gl.creditAmount)||'.00cr' when floor(sum(gl.creditamount)) then sum(gl.creditAmount)||'.00cr' else  sum(gl.creditAmount)||'cr'  end ) ELSE (case sum((gl.debitamount)) when 0 then sum(gl.debitamount)||'.00dr' when floor(sum(gl.debitamount)) then sum(gl.debitamount)||'.00dr' else  sum(gl.debitamount)||'dr' end ) END"
                     + " AS \"amount\", ")
                     .append(" gl.description AS \"narration\", vh.type || '-' || vh.name||CASE WHEN status = 1 THEN '(Reversed)' ELSE (CASE WHEN status = 2 THEN '(Reversal)' ELSE '' END) END AS \"type\", ")
-                    .append(" gl.debitamount  AS \"debitamount\", gl.creditamount  AS \"creditamount\",f.name as \"fundName\",  vh.isconfirmed as \"isconfirmed\",gl.functionid as \"functionid\",vh.type||'-'||vh.name as \"vouchertypename\" ")
+                    .append(" sum(gl.debitamount)  AS \"debitamount\", sum(gl.creditamount)  AS \"creditamount\",f.name as \"fundName\",  vh.isconfirmed as \"isconfirmed\",gl.functionid as \"functionid\",vh.type||'-'||vh.name as \"vouchertypename\" ")
                     .append(" FROM generalLedger gl, voucherHeader vh, vouchermis vmis1, chartOfAccounts coa,  fund f " + addTableToQuery
                             + "").append(" WHERE coa.glCode = gl.glCode AND gl.voucherHeaderId = vh.id  AND vmis1.voucherheaderid =vh.id ")
                             .append(" AND	f.id=vh.fundid ").append(" AND gl.glcode ='" + glCode1 + "'")
                             .append(" AND (gl.debitamount>0 OR gl.creditamount>0) ").append(functionCondition).append(schemeCondition)
                             .append(" and vh.id in (" + engineQry + " )")
-                            .append(" group by vh.id,gl.glcode,vh.voucherDate ,vh.voucherNumber,coa.name,gl.description,  vh.type || '-' || vh.name||CASE WHEN status = 1 THEN '(Reversed)' ELSE (CASE WHEN status = 2 THEN '(Reversal)' ELSE '' END) END, gl.debitamount , gl.creditamount  ,f.name, vh.isconfirmed, vh.type  ||'-'  ||vh.name, gl.functionid   ")
+                            .append(" group by vh.id,gl.glcode,vh.voucherDate ,vh.voucherNumber,coa.name,gl.description,  vh.type || '-' || vh.name||CASE WHEN status = 1 THEN '(Reversed)' ELSE (CASE WHEN status = 2 THEN '(Reversal)' ELSE '' END) END, f.name, vh.isconfirmed, vh.type  ||'-'  ||vh.name, gl.functionid   ")
                             .append(" order by \"code\",\"vDate\" ");
             if (LOGGER.isDebugEnabled())
                 LOGGER.debug("____________________________________________________________" + sql.toString());
