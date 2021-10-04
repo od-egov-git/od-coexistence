@@ -54,6 +54,7 @@ import java.util.List;
 
 import org.egov.commons.Accountdetailtype;
 import org.egov.commons.CChartOfAccountDetail;
+import org.egov.commons.CFunction;
 import org.egov.commons.dao.FunctionDAO;
 import org.egov.commons.service.AccountdetailtypeService;
 import org.egov.commons.service.ChartOfAccountsService;
@@ -61,6 +62,7 @@ import org.egov.commons.utils.EntityType;
 import org.egov.egf.billsubtype.service.EgBillSubTypeService;
 import org.egov.egf.expensebill.service.ExpenseBillService;
 import org.egov.egf.web.controller.voucher.BaseVoucherController;
+import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.exception.ApplicationRuntimeException;
 import org.egov.infstr.services.PersistenceService;
@@ -124,7 +126,19 @@ List<String> billtype=new ArrayList<>();
         model.addAttribute("billNumberGenerationAuto", expenseBillService.isBillNumberGenerationAuto());
         model.addAttribute("billSubTypes", getBillSubTypes());
         model.addAttribute("subLedgerTypes", accountdetailtypeService.findAll());
-        model.addAttribute("cFunctions", functionDAO.getAllActiveFunctions());
+        //model.addAttribute("cFunctions", functionDAO.getAllActiveFunctions());
+        List<CFunction> func1=new ArrayList<CFunction>();
+        Long funId=0l;
+        final List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"function");
+        
+        for(AppConfigValues value:appConfigValuesList)
+        {
+        	funId=Long.parseLong(value.getValue());
+        }
+        CFunction fun=functionDAO.getFunctionById(funId);
+        func1.add(fun);
+        model.addAttribute("cFunctions", func1);
         isBillDateDefaultValue = expenseBillService.isDefaultAutoPopulateCurrDateEnable();
        // model.addAttribute("billTypes", getBillTypes());
     }

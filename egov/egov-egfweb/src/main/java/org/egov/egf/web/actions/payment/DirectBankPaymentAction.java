@@ -258,6 +258,26 @@ public class DirectBankPaymentAction extends BasePaymentAction {
             }
         voucherHeader.reset();
         commonBean.reset();
+        List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"fund");
+       for(AppConfigValues value:appConfigValuesList)
+       {
+    	   commonBean.setFundnew(value.getValue());
+       }
+       appConfigValuesList=null;
+       appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"department");
+       for(AppConfigValues value:appConfigValuesList)
+       {
+    	   commonBean.setDepartmentnew(value.getValue());
+       }
+       appConfigValuesList=null;
+       appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"function");
+       for(AppConfigValues value:appConfigValuesList)
+       {
+    	   commonBean.setFunctionnew(value.getValue());
+       }
         //commonBean.setModeOfPayment(MDP_PEX);
         voucherHeader.setVouchermis(new Vouchermis());
         // voucherHeader.getVouchermis().setDepartmentid((Department)paymentService.getAssignment().getDeptId());
@@ -996,7 +1016,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
 
         if (FinancialConstants.BUTTONREJECT.equalsIgnoreCase(workflowBean.getWorkFlowAction()))
             addActionMessage(getText("payment.voucher.rejected", new String[] { this.getEmployeeName(paymentheader.getState()
-                    .getInitiatorPosition()) }));
+                    .getOwnerPosition()) }));
         if (FinancialConstants.BUTTONFORWARD.equalsIgnoreCase(workflowBean.getWorkFlowAction()))
             addActionMessage(getText("payment.voucher.approved", new String[] { this.getEmployeeName(paymentheader.getState()
                     .getOwnerPosition()) }));

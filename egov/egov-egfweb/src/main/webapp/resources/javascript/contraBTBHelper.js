@@ -45,18 +45,32 @@
  *   In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
  *
  */
+function onloadtriple(){
+		document.getElementById("fundId").value=document.getElementById("contraBean.fundnew").value;
+		document.getElementById("toFundId").value=document.getElementById("contraBean.fundnew").value;
+		document.getElementById("vouchermis.departmentid").value=document.getElementById("contraBean.departmentnew").value;
+		document.getElementById("vouchermis.function").value=document.getElementById("contraBean.functionnew").value;
+		loadBank(document.getElementById("contraBean.fundnew").value);
+		loadToBank(document.getElementById("contraBean.fundnew").value);
+}						
+
 function loadBank(fund) {
 	// bootbox.alert(fund.options[fund.selectedIndex].value);
 	//loadFromDepartment();
+	if(fund==null ||fund =='')
+	fund="1";	  
+								  
 	populatefromBankId({
-		fundId : fund.options[fund.selectedIndex].value,
+		//fundId : fund.options[fund.selectedIndex].value,
+		fundId : fund,		
 		typeOfAccount : "RECEIPTS_PAYMENTS,RECEIPTS"
 	})
 	checkInterFund();
 }
 
 function loadFromDepartment() {
-	var selectedFund = jQuery("#fundId option:selected").text();
+	//var selectedFund = jQuery("#fundId option:selected").text();
+	var selectedFund = '01-Municipal Fund';									
 	if (selectedFund == '01-Municipal Fund'
 			|| selectedFund == '02-Capital Fund') {
 		document.getElementById("vouchermis.departmentid").disabled = "";
@@ -70,7 +84,8 @@ function loadFromDepartment() {
 	}
 }
 function loadToDepartment() {
-	var selectedFund = jQuery("#toFundId option:selected").text();
+	//var selectedFund = jQuery("#toFundId option:selected").text();
+	var selectedFund = '01-Municipal Fund';									
 	if (selectedFund == '01-Municipal Fund'
 			|| selectedFund == '02-Capital Fund') {
 		document.getElementById("contraBean.toDepartment").disabled = "";
@@ -85,35 +100,38 @@ function loadToDepartment() {
 }
 function loadToBank(fund) {
 	//loadToDepartment();
+	if(fund==null ||fund =='')
+		fund="1";  
 	populatetoBankId({
-		fundId : fund.options[fund.selectedIndex].value,
+		//fundId : fund.options[fund.selectedIndex].value,
+		fundId : fund,
 		typeOfAccount : "RECEIPTS_PAYMENTS,PAYMENTS"
 	})
 }
 
 function loadFromAccNum(branch) {
 
-	var fundObj = document.getElementById('fundId');
+	var fundObj = "1";//document.getElementById('fundId');
 	var bankbranchId = branch.options[branch.selectedIndex].value;
 	var index = bankbranchId.indexOf("-");
 	var bankId = bankbranchId.substring(0, index);
 	var brId = bankbranchId.substring(index + 1, bankbranchId.length);
 	document.getElementById('fromBankBalance').value="";// added abhishek on 21052021
 	populatefromAccountNumber({
-		fundId : fundObj.options[fundObj.selectedIndex].value,
+		fundId : fundObj,//.options[fundObj.selectedIndex].value,
 		branchId : brId,
 		typeOfAccount : "RECEIPTS_PAYMENTS,RECEIPTS"
 	})
 }
 function loadToAccNum(branch) {
-	var fundObj = document.getElementById('toFundId');
+	var fundObj = "1";//document.getElementById('toFundId');
 	var bankbranchId = branch.options[branch.selectedIndex].value;
 	var index = bankbranchId.indexOf("-");
 	var bankId = bankbranchId.substring(0, index);
 	var brId = bankbranchId.substring(index + 1, bankbranchId.length);
 	document.getElementById('toBankBalance').value="";// added abhishek on 21052021
 	populatetoAccountNumber({
-		fundId : fundObj.options[fundObj.selectedIndex].value,
+		fundId : fundObj,//.options[fundObj.selectedIndex].value,
 		branchId : brId,
 		typeOfAccount : "RECEIPTS_PAYMENTS,PAYMENTS"
 	})
@@ -188,8 +206,8 @@ function nextChqNo() {
 		document.getElementById("chequeNum").value = sRtn;
 }
 function checkInterFund() {
-	var fromFund = document.getElementById('fundId').value;
-	var toFund = document.getElementById('toFundId').value;
+	var fromFund = '1';//document.getElementById('fundId').value;
+	var toFund ='1';//document.getElementById('toFundId').value;
 	var splitStr = new Array();
 	var temp;
 	// bootbox.alert("hi"+toFund);

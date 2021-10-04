@@ -45,6 +45,13 @@
  *   In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
  *
  */
+function onloadtriple() {
+	document.getElementById("fundId").value = document.getElementById("commonBean.fundnew").value;
+	document.getElementById("vouchermis.departmentid").value = document.getElementById("commonBean.departmentnew").value;
+	document.getElementById("vouchermis.function").value = document.getElementById("commonBean.functionnew").value;
+	loadBank("1");
+}
+
 function validate() {
 	if (!validateForm_directBankPayment()) {
 		undoLoadingMask();
@@ -56,7 +63,8 @@ function validate() {
 		return false;
 	}
 	if(!balanceCheck()){
-		bootbox.alert("Insuffiecient Bank Balance. Do you want to process", function() { 
+		bootbox.alert("Insuffiecient Bank Balance. Do you want to process",
+				function() {
 			return true;
 		});
 	}
@@ -136,7 +144,6 @@ var callback = {
 	}
 }
 
-
 var documentNoAndDateTypeFrom = {
 	success : function(o) {
 		if (o.responseText != "") {
@@ -153,7 +160,7 @@ var documentNoAndDateTypeFrom = {
 function loadBank(fund) {
 	var vTypeOfAccount = document.getElementById('typeOfAccount').value;
 	populatebankId({
-		fundId : fund.options[fund.selectedIndex].value,
+		fundId : "1",// fund.options[fund.selectedIndex].value,
 		typeOfAccount : vTypeOfAccount
 	})
 }

@@ -150,7 +150,26 @@ public class JournalVoucherAction extends BaseVoucherAction
         addDropdownData("approvaldepartmentList", Collections.EMPTY_LIST);
         addDropdownData("designationList", Collections.EMPTY_LIST);
         addDropdownData("userList", Collections.EMPTY_LIST);
-
+        List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"fund");
+        for(AppConfigValues value:appConfigValuesList)
+        {
+        	voucherTypeBean.setFundnew(value.getValue());
+        }
+        appConfigValuesList=null;
+        appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"department");
+        for(AppConfigValues value:appConfigValuesList)
+        {
+        	voucherTypeBean.setDepartmentnew(value.getValue());
+        }
+        appConfigValuesList=null;
+        appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"function");
+        for(AppConfigValues value:appConfigValuesList)
+        {
+        	voucherTypeBean.setFunctionnew(value.getValue());
+        }
     }
 
     @SkipValidation

@@ -78,13 +78,16 @@ import org.egov.commons.Fundsource;
 import org.egov.commons.Scheme;
 import org.egov.commons.SubScheme;
 import org.egov.commons.Vouchermis;
+										
 import org.egov.eis.service.AssignmentService;
 import org.egov.eis.web.actions.workflow.GenericWorkFlowAction;
 import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.entity.Boundary;
 import org.egov.infra.admin.master.service.AppConfigValueService;
+															 
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.exception.ApplicationRuntimeException;
+													 
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.validation.exception.ValidationError;
 import org.egov.infra.validation.exception.ValidationException;
@@ -141,6 +144,8 @@ public class BaseVoucherAction extends GenericWorkFlowAction {
 	@Autowired
 	protected MicroserviceUtils microserviceUtils;
 
+ 
+ 
 	public BaseVoucherAction() {
 		voucherHeader.setVouchermis(new Vouchermis());
 		addRelatedEntity("fundId", Fund.class);
@@ -177,15 +182,26 @@ public class BaseVoucherAction extends GenericWorkFlowAction {
 			LOGGER.debug("Inside Prepare method");
 		getHeaderMandateFields();
 		if (headerFields.contains("department")){
-			List<org.egov.infra.microservice.models.Department> departments = masterDataCache.get("egi-department");
-			addDropdownData("departmentList", departments);
+//			List<org.egov.infra.microservice.models.Department> departments =this.getDepartmentsFromMs();
+			List dept = masterDataCache.get("egi-department");
+			List dept1=new ArrayList();
+			dept1.add(dept.get(1));
+			addDropdownData("departmentList", dept1);
 		}
 		if (headerFields.contains("functionary"))
 			addDropdownData("functionaryList", masterDataCache.get("egi-functionary"));
-		if (headerFields.contains("function"))
-			addDropdownData("functionList", masterDataCache.get("egi-function"));
-		if (headerFields.contains("fund"))
-			addDropdownData("fundList", masterDataCache.get("egi-fund"));
+		if (headerFields.contains("function")) {
+			List func = masterDataCache.get("egi-function");
+			List func1 = new ArrayList();
+			func1.add(func.get(0));
+			addDropdownData("functionList", func1);
+		}
+		if (headerFields.contains("fund")) {
+			List fund = masterDataCache.get("egi-fund");
+			List fund1 = new ArrayList();
+			fund1.add(fund.get(0));
+			addDropdownData("fundList", fund1);
+		}
 		if (headerFields.contains("fundsource"))
 			addDropdownData("fundsourceList", masterDataCache.get("egi-fundSource"));
 		if (headerFields.contains("field"))
@@ -270,6 +286,7 @@ public class BaseVoucherAction extends GenericWorkFlowAction {
 							voucherHeader.getVouchermis().getSchemeid().getId()));
 	}
 
+ 
 	protected void loadFundSource() {
 		if (headerFields.contains("fundsource") && null != voucherHeader.getVouchermis().getSubschemeid()) {
 			final List<Fundsource> fundSourceList = financingSourceService

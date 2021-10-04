@@ -65,6 +65,13 @@
 <s:else>
 	<title><s:text name="lbl.bill.payment.search"/> </title>
 </s:else>
+<script type="text/javascript">
+window.onload=function(){
+	document.getElementById("fundId").value=document.getElementById("fundnew").value;
+	document.getElementById("departmentid").value=document.getElementById("departmentnew").value;
+	document.getElementById("vouchermis.function").value=document.getElementById("functionnew").value;
+}
+</script>	 
 </head>
 <body>
 	<s:form action="payment" theme="simple">
@@ -78,9 +85,15 @@
 			<div class="subheadnew">
 				<s:if
 					test="%{disableExpenditureType == true && enablePensionType == false}"><s:text name="lbl.salary.bill.payment.search"/></s:if>
+													 
+		   
 				<s:elseif
 					test="%{disableExpenditureType == true && enablePensionType == true}"><s:text name="lbl.pension.bill.payment.search"/></s:elseif>
+													  
+			   
+			
 				<s:else><s:text name="lbl.bill.payment.search"/></s:else>
+			 
 			</div>
 			<table align="center" width="100%" cellpadding="0" cellspacing="0">
 				<tr>
@@ -145,10 +158,15 @@
 			value="%{disableExpenditureType}" />
 		<s:hidden name="enablePensionType" id="enablePensionType"
 			value="%{enablePensionType}" />
+			<input type="hidden" path="" id="fundnew" value="${fundnew}"/>
+			<input type="hidden" path="" id="departmentnew" value="${departmentnew}"/>
+			<input type="hidden" path="" id="functionnew" value="${functionnew}"/>
 	</s:form>
 	<div align="center" class="buttonbottom">
 		<input type="submit" class="buttonsubmit" value="<s:text name='lbl.search'/>"
+																	  
 			id="searchBtn" name="searchBtn" onclick="return search();" /> <input
+									 
 			type="button" value="<s:text name='lbl.close'/>" onclick="window.parent.postMessage('close','*');window.close();"
 			class="button" />
 	</div>
@@ -182,5 +200,7 @@
 				element.disabled = true;
 			</s:if>
 		</script>
+
+ 
 </body>
 </html>

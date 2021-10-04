@@ -208,6 +208,9 @@ public class PaymentAction extends BasePaymentAction {
     private String fundSourceNameStr = "";
     private String schemeStr = "";
     private String subSchemeStr = "";
+    private String fundnew="";
+    private String departmentnew="";
+    private String functionnew="";
     private Map<String, String> payeeMap = new HashMap<String, String>();
     private Map<Long, BigDecimal> deductionAmtMap = new HashMap<Long, BigDecimal>();
     private Map<Long, BigDecimal> paidAmtMap = new HashMap<Long, BigDecimal>();
@@ -280,6 +283,26 @@ public class PaymentAction extends BasePaymentAction {
         if (parameters.containsKey("pensionType")) {
             setEnablePensionType(true);
             setDisableExpenditureType(true);
+        }
+        List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","fund");
+        for(AppConfigValues value:appConfigValuesList)
+        {
+        	setFundnew(value.getValue());
+        	//model.addAttribute("fundnew", getFundnew());
+        }
+        appConfigValuesList=null;
+        appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","department");
+        for(AppConfigValues value:appConfigValuesList)
+        {
+        	setDepartmentnew(value.getValue());
+        	//model.addAttribute("departmentnew", getDepartmentnew());
+        }
+        appConfigValuesList=null;
+        appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","function");
+        for(AppConfigValues value:appConfigValuesList)
+        {
+        	setFunctionnew(value.getValue());
+        	//model.addAttribute("functionnew", getFunctionnew());
         }
         if (parameters.get("fundId") != null && !parameters.get("fundId")[0].equals("-1")) {
             final Fund fund = (Fund) persistenceService.find("from Fund where id=?",
@@ -1323,7 +1346,7 @@ public class PaymentAction extends BasePaymentAction {
         EmployeeInfo employee = microserviceUtils.getEmployeeByPositionId(paymentheader.getState().getOwnerPosition());
         if (FinancialConstants.BUTTONREJECT.equalsIgnoreCase(workflowBean.getWorkFlowAction()))
             addActionMessage(getText("payment.voucher.rejected", new String[] {this.getEmployeeName(paymentheader.getState()
-                    .getInitiatorPosition())}));
+                    .getOwnerPosition())}));
         if (FinancialConstants.BUTTONFORWARD.equalsIgnoreCase(workflowBean.getWorkFlowAction()))
             {
         	addActionMessage(getMessage("payment.voucher.approved", new String[] {this.getEmployeeName(paymentheader.getState()
@@ -2504,6 +2527,30 @@ public class PaymentAction extends BasePaymentAction {
     public boolean isDisableExpenditureType() {
         return disableExpenditureType;
     }
+
+    public String getFundnew() {
+		return fundnew;
+	}
+
+	public void setFundnew(String fundnew) {
+		this.fundnew = fundnew;
+	}
+
+	public String getDepartmentnew() {
+		return departmentnew;
+	}
+
+	public void setDepartmentnew(String departmentnew) {
+		this.departmentnew = departmentnew;
+	}
+
+	public String getFunctionnew() {
+		return functionnew;
+	}
+
+	public void setFunctionnew(String functionnew) {
+		this.functionnew = functionnew;
+	}
 
     public void setVoucherHelper(final VoucherHelper voucherHelper) {
     }

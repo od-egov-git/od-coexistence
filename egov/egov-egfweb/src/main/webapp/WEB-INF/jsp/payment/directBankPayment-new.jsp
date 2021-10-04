@@ -305,7 +305,7 @@
 
 </head>
 <body
-	onload="onLoadTask_new();loadDropDownCodesExcludingCashAndBank();loadDropDownCodesFunction();documentdep();">
+	onload="onLoadTask_new();loadDropDownCodesExcludingCashAndBank();loadDropDownCodesFunction();documentdep();onloadtriple();">
 	<s:form action="directBankPayment" theme="css_xhtml" name="dbpform"
 		validate="true">
 		<s:push value="model">
@@ -361,6 +361,9 @@
 
 					</br>
 				</table>
+				<input type="hidden" id="commonBean.fundnew" name="commonBean.fundnew" value="${commonBean.fundnew}" />
+			<input type="hidden" id="commonBean.departmentnew" name="commonBean.departmentnew" value="${commonBean.departmentnew}" />
+			<input type="hidden" id="commonBean.functionnew" name="commonBean.functionnew" value="${commonBean.functionnew}" />
 				<s:hidden name="cutOffDate" id="cutOffDate" />
 				<s:hidden name="bankBalanceCheck" id="bankBalanceCheck" value="%{bankBalanceCheck}" />
             	<jsp:include page="../payment/commonWorkflowMatrix.jsp"/>
@@ -475,7 +478,8 @@ function onLoadTask_new()
 }
 
 function populateAccNum(branch){
-	var fundObj = document.getElementById('fundId');
+	alert("populate Acc Num");
+	var fundObj = "1";//document.getElementById('fundId');
 	var bankbranchId = branch.options[branch.selectedIndex].value;
 	var index=bankbranchId.indexOf("-");
 	var bankId = bankbranchId.substring(0,index);
@@ -483,7 +487,7 @@ function populateAccNum(branch){
 	
 	var vTypeOfAccount = '<s:property value="%{typeOfAccount}"/>';
 	
-	populateaccountNumber({fundId: fundObj.options[fundObj.selectedIndex].value,bankId:bankId,branchId:brId,typeOfAccount:vTypeOfAccount})
+	populateaccountNumber({fundId:fundObj,bankId:bankId,branchId:brId,typeOfAccount:vTypeOfAccount})
 }
 function onSubmit()
 {

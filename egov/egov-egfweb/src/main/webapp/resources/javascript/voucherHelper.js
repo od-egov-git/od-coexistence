@@ -62,6 +62,19 @@ var codesForAccountDetailType={}
 var funcIdfuncAccCodeArray;
 var accCodeFuncFuncIdArray
 var slAccountCodes = new Array();
+
+function onloadtriple(){
+		document.getElementById("fundId").value=document.getElementById("voucherTypeBean.fundnew").value;
+		document.getElementById("vouchermis.departmentid").value=document.getElementById("voucherTypeBean.departmentnew").value;
+		document.getElementById("vouchermis.function").value=document.getElementById("voucherTypeBean.functionnew").value;
+}
+
+//function onloadPayment(){
+//	document.getElementById("fundId").value="1";
+//	document.getElementById("departmentid").value="DEPT_25";
+//	document.getElementById("vouchermis.function").value="169";
+//}
+
 function updateGridPJV(field,index,value){
 	
 	document.getElementById(VOUCHERDETAILLIST+'['+index+'].'+field).value=value;

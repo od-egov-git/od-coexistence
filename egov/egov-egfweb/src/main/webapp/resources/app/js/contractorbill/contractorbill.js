@@ -556,10 +556,14 @@ function loadMisAttributes(orderNumber){
 		}).done(
 				function(response) {
 					$.each(response, function(index, value) {
-						$('#fundId').val(value.fund.id);
-						$('#fundName').val(value.fund.name);
-						$('#departmentCode').val(value.department);
-						$('#departmentName').val(value.description);
+						//$('#fundId').val(value.fund.id);
+						$('#fundId').val(document.getElementById("fundnew").value);
+						//$('#fundName').val(value.fund.name);
+						$('#fundName').val(document.getElementById("fundnamenew").value);
+						//$('#departmentCode').val(value.department);
+						$('#departmentCode').val(document.getElementById("departmentnew").value);
+						//$('#departmentName').val(value.description);
+						$('#departmentName').val(document.getElementById("departmentnamenew").value);
 						$('#schemeId').val(value.scheme.id);
 						$('#schemeName').val(value.scheme.name);
 						$('#subSchemeId').val(value.subScheme.id);

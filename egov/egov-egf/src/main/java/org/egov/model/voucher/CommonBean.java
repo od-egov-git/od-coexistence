@@ -98,8 +98,34 @@ public class CommonBean {
     private String budgetReappNo;
     private String fileno;
     private String paymentChequeNo;
+    private String fundnew;
+    private String departmentnew;
+    private String functionnew;
 
     
+	public String getFundnew() {
+		return fundnew;
+	}
+
+	public void setFundnew(String fundnew) {
+		this.fundnew = fundnew;
+	}
+
+	public String getDepartmentnew() {
+		return departmentnew;
+	}
+
+	public void setDepartmentnew(String departmentnew) {
+		this.departmentnew = departmentnew;
+	}
+
+	public String getFunctionnew() {
+		return functionnew;
+	}
+
+	public void setFunctionnew(String functionnew) {
+		this.functionnew = functionnew;
+	}
 
 	public String getFileno() {
 		return fileno;

@@ -69,6 +69,7 @@ import org.egov.commons.Fund;
 import org.egov.commons.Vouchermis;
 import org.egov.egf.commons.EgovCommon;
 import org.egov.egf.web.actions.voucher.BaseVoucherAction;
+import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.entity.Department;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.exception.ApplicationRuntimeException;
@@ -200,6 +201,7 @@ public class ContraBTBAction extends BaseVoucherAction {
 
 	private String firstsignatory="-1";
     private String secondsignatory="-1";
+
 	@Override
 	public void prepare() {
 		super.prepare();
@@ -662,7 +664,6 @@ System.out.println(":::list size::::: "+list1.size());
 	@Action(value = "/contra/contraBTB-newform")
 	public String newform() {
 		try {
-
 			reset();
 			LoadAjaxedDropDowns();
 			loadDefalutDates();
@@ -672,6 +673,26 @@ System.out.println(":::list size::::: "+list1.size());
 			//contraBean.setModeOfCollection(MDC_OTHER);// comment by abhishek
 			contraBean.setModeOfCollection(MDC_PEX);//added by abhishek on 08042021
 			voucherDate = sdf.parse(sdf.format(currDate));
+			List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+					"fund");
+	       for(AppConfigValues value:appConfigValuesList)
+	       {
+	    	   contraBean.setFundnew(value.getValue());
+	       }
+	       appConfigValuesList=null;
+	       appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+					"department");
+	       for(AppConfigValues value:appConfigValuesList)
+	       {
+	    	   contraBean.setDepartmentnew(value.getValue());
+	       }
+	       appConfigValuesList=null;
+	       appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+					"function");
+	       for(AppConfigValues value:appConfigValuesList)
+	       {
+	    	   contraBean.setFunctionnew(value.getValue());
+	       }
 		} catch (ParseException e) {
 
 		}

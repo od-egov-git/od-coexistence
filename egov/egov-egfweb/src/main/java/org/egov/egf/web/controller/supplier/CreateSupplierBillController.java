@@ -86,6 +86,7 @@ import org.egov.egf.utils.FinancialUtils;
 import org.egov.egf.web.controller.contractor.CreateContractorBillController;
 import org.egov.egf.web.controller.expensebill.BaseBillController;
 import org.egov.eis.web.contract.WorkflowContainer;
+import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.filestore.service.FileStoreService;
@@ -194,16 +195,56 @@ public class CreateSupplierBillController extends BaseBillController {
     public CreateSupplierBillController(final AppConfigValueService appConfigValuesService) {
         super(appConfigValuesService);
     }
+    private String fundnew;
+    private String fundnamenew;
+    private String departmentnew;
+    private String departmentnamenew;
+    private String functionnew;
 
-    @Override
+										
+    public String getFundnamenew() {
+		return fundnamenew;
+	}
+
+	public void setFundnamenew(String fundnamenew) {
+		this.fundnamenew = fundnamenew;
+	}
+
+	public String getDepartmentnamenew() {
+		return departmentnamenew;
+	}
+
+	public void setDepartmentnamenew(String departmentnamenew) {
+		this.departmentnamenew = departmentnamenew;
+	}
+
+	public String getFundnew() {
+		return fundnew;
+	}
+
+	public void setFundnew(String fundnew) {
+		this.fundnew = fundnew;
+	}
+	 
+	public String getDepartmentnew() {
+		return departmentnew;
+	}
+										   
+	public void setDepartmentnew(String departmentnew) {
+		this.departmentnew = departmentnew;
+	}
+									
+	public String getFunctionnew() {
+		return functionnew;
+	}
+														 
+	public void setFunctionnew(String functionnew) {
+		this.functionnew = functionnew;
+	}
+	  
+	@Override
     protected void setDropDownValues(final Model model) {
         super.setDropDownValues(model);
-										
-	 
-										   
-									
-														 
-	  
         //model.addAttribute(BILL_TYPES, BillType.values());
         model.addAttribute(SUPPLIERS, supplierService.getAllActiveSuppliers());
         model.addAttribute(NET_PAYABLE_CODES, chartOfAccountsService.getSupplierNetPayableAccountCodes());
@@ -224,12 +265,6 @@ public class CreateSupplierBillController extends BaseBillController {
     		   
     	   }
     	}
-										  
-	 
-										   
-									
-														 
-		
     	//end
     	setDropDownValues(model);
         model.addAttribute("billNumberGenerationAuto", supplierBillService.isBillNumberGenerationAuto());
@@ -237,7 +272,40 @@ public class CreateSupplierBillController extends BaseBillController {
         prepareWorkflow(model, egBillregister, new WorkflowContainer());
         prepareValidActionListByCutOffDate(model);
         model.addAttribute("validActionList", validActions);
-												   
+        List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","fund");
+       for(AppConfigValues value:appConfigValuesList)
+       {
+       	setFundnew(value.getValue());
+       	model.addAttribute("fundnew", getFundnew());
+       }
+       appConfigValuesList=null;
+       appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","fundname");
+       for(AppConfigValues value:appConfigValuesList)
+       {
+       	setFundnamenew(value.getValue());
+       	model.addAttribute("fundnamenew", getFundnamenew());
+       }
+       appConfigValuesList=null;
+       appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","department");
+       for(AppConfigValues value:appConfigValuesList)
+       {
+       	setDepartmentnew(value.getValue());
+       	model.addAttribute("departmentnew", getDepartmentnew());
+       }
+       appConfigValuesList=null;
+       appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","departmentname");
+       for(AppConfigValues value:appConfigValuesList)
+       {
+       	setDepartmentnamenew(value.getValue());
+       	model.addAttribute("departmentnamenew", getDepartmentnamenew());
+       }
+       appConfigValuesList=null;
+       appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","function");
+       for(AppConfigValues value:appConfigValuesList)
+       {
+       	setFunctionnew(value.getValue());
+       	model.addAttribute("functionnew", getFunctionnew());
+       }										   
         if(isBillDateDefaultValue){
             egBillregister.setBilldate(new Date());            
         }

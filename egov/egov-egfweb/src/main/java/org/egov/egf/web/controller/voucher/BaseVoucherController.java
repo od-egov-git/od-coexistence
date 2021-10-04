@@ -118,10 +118,20 @@ public abstract class BaseVoucherController extends GenericWorkFlowController {
             if ("M".equals(mandate))
                 mandatoryFields.add(header);
         }
+        
+        final List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"department");
+        
+        String dept="";
+        for(AppConfigValues value:appConfigValuesList)
+        {
+        	dept=value.getValue();
+        }
         mandatoryFields.add("voucherdate");
         if (headerFields.contains("department")) {
         	
-        	model.addAttribute("departments", this.getDepartmentsFromMs());
+        	//model.addAttribute("departments", this.getDepartmentsFromMs(""));
+        	model.addAttribute("departments", this.getDepartmentsFromMs(dept));//modified by abhishek on 28Sept2021
         
         }
         if (headerFields.contains("functionary"))

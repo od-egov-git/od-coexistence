@@ -76,6 +76,7 @@ import org.egov.egf.expensebill.service.ExpenseBillService;
 import org.egov.egf.utils.FinancialUtils;
 import org.egov.egf.web.controller.microservice.FinanceController;
 import org.egov.eis.web.contract.WorkflowContainer;
+import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.exception.ApplicationException;
@@ -149,7 +150,33 @@ public class CreateExpenseBillController extends BaseBillController {
     @Qualifier("persistenceService")
     private PersistenceService persistenceService;
     
-    //private String fileNo;
+    private String fundnew;
+    private String departmentnew;
+    private String functionnew;
+
+    public String getFundnew() {
+		return fundnew;
+	}
+
+	public void setFundnew(String fundnew) {
+		this.fundnew = fundnew;
+	}
+
+	public String getDepartmentnew() {
+		return departmentnew;
+	}
+
+	public void setDepartmentnew(String departmentnew) {
+		this.departmentnew = departmentnew;
+	}
+
+	public String getFunctionnew() {
+		return functionnew;
+	}
+
+	public void setFunctionnew(String functionnew) {
+		this.functionnew = functionnew;
+	}
 
     public CreateExpenseBillController(final AppConfigValueService appConfigValuesService) {
         super(appConfigValuesService);
@@ -158,6 +185,7 @@ public class CreateExpenseBillController extends BaseBillController {
     @Override
     protected void setDropDownValues(final Model model) {
         super.setDropDownValues(model);
+       
        
     }
 
@@ -178,6 +206,29 @@ public class CreateExpenseBillController extends BaseBillController {
         prepareWorkflow(model, egBillregister, new WorkflowContainer());
        model.addAttribute("validActionList", validActions);
        model.addAttribute(BILL_TYPES, BillType.values());
+       List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"fund");
+       for(AppConfigValues value:appConfigValuesList)
+       {
+       	setFundnew(value.getValue());
+       	model.addAttribute("fundnew", getFundnew());
+       }
+       appConfigValuesList=null;
+       appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"department");
+       for(AppConfigValues value:appConfigValuesList)
+       {
+       	setDepartmentnew(value.getValue());
+       	model.addAttribute("departmentnew", getDepartmentnew());
+       }
+       appConfigValuesList=null;
+       appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"function");
+       for(AppConfigValues value:appConfigValuesList)
+       {
+       	setFunctionnew(value.getValue());
+       	model.addAttribute("functionnew", getFunctionnew());
+       }
         //prepareValidActionListByCutOffDate(model);
         if(isBillDateDefaultValue){
             egBillregister.setBilldate(new Date());            

@@ -63,9 +63,19 @@
 <meta http-equiv="Content-Type"
 	content="text/html; charset=windows-1252">
 <title><s:text name="remit.recovery.create.title" /></title>
+<script>
+window.onload=function(){
+	document.getElementById("fundId").value=document.getElementById("fundnew").value;
+	document.getElementById("departmentid").value=document.getElementById("departmentnew").value;
+	document.getElementById("vouchermis.function").value=document.getElementById("functionnew").value;
+}
+</script>
 </head>
 <body>
 	<s:form action="remitRecovery" theme="simple" name="remitRecoveryForm">
+	<input type="hidden" path="" id="fundnew" value="${fundnew}"/>
+	<input type="hidden" path="" id="departmentnew" value="${departmentnew}"/>
+	<input type="hidden" path="" id="functionnew" value="${functionnew}"/>
 	<s:hidden type="hidden" id="selectedRows" name="selectedRows" />
 	<s:hidden type="hidden" id="departmentId" name="departmentId" value="%{departmentId}" />
 	<s:hidden type="hidden" id="functionId" name="functionId" value="%{functionId}" />

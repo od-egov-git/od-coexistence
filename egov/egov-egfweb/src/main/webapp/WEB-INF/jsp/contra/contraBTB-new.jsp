@@ -66,7 +66,7 @@
 <meta http-equiv="Content-Type"
 	content="text/html; charset=windows-1252">
 </head>
-<body onload="onLoadTask_new()">
+<body onload="onLoadTask_new();onloadtriple();">
 	<s:form action="contraBTB" theme="simple" name="cbtbform">
 		<s:push value="model">
 			<jsp:include page="../budget/budgetHeader.jsp">
@@ -122,6 +122,9 @@
 			</br>
 			</br>
 			<%@include file="../voucher/SaveButtons.jsp"%>
+			<input type="hidden" path="" id="contraBean.fundnew" value="${contraBean.fundnew}"/>
+			<input type="hidden" path="" id="contraBean.departmentnew" value="${contraBean.departmentnew}"/>
+			<input type="hidden" path="" id="contraBean.functionnew" value="${contraBean.functionnew}"/>
 			<input type="hidden" id=name name="name" value="BankToBank" />
 			<input type="hidden" id="type" name="type" value="Contra" />
 			<s:hidden id="bankBalanceMandatory" name="bankBalanceMandatory"

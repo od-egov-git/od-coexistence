@@ -68,7 +68,7 @@
 </head>
 
 <body
-	onload="loadDropDownCodes();loadDropDownCodesFunction();onloadtask();documentdep();">
+	onload="loadDropDownCodes();loadDropDownCodesFunction();onloadtask();documentdep();onloadtriple();">
 
 	<s:form action="journalVoucher" theme="simple" name="jvcreateform"  enctype = "multipart/form-data">
 		<s:token />
@@ -201,6 +201,15 @@
 
 		<div id="codescontainer"></div>
 		<s:hidden name="actionName" id="actionName" />
+		<input type="hidden" id="voucherTypeBean.fundnew"
+			name="voucherTypeBean.fundnew"
+			value="${voucherTypeBean.fundnew}" />
+			<input type="hidden" id="voucherTypeBean.departmentnew"
+			name="voucherTypeBean.departmentnew"
+			value="${voucherTypeBean.departmentnew}" />
+			<input type="hidden" id="voucherTypeBean.functionnew"
+			name="voucherTypeBean.functionnew"
+			value="${voucherTypeBean.functionnew}" />
 		<input type="hidden" id="voucherTypeBean.voucherName"
 			name="voucherTypeBean.voucherName"
 			value="${voucherTypeBean.voucherName}" />

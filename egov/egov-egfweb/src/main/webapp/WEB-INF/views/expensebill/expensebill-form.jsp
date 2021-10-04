@@ -85,6 +85,13 @@
 		color: white;
     }
 </style>
+<script>
+window.onload=function(){
+	document.getElementById("fund").value=document.getElementById("fundnew").value;
+	document.getElementById("department").value=document.getElementById("departmentnew").value;
+	document.getElementById("egBillregistermis.function").value=document.getElementById("functionnew").value;
+}
+</script>
     <form:form name="expenseBillForm" role="form" method="post" action="create" modelAttribute="egBillregister" id="egBillregister" class="form-horizontal form-groups-bordered" enctype="multipart/form-data">
 	
   <!--   <div class="position_alert">
@@ -103,6 +110,9 @@
             value="${expenseBillTotalCreditAmount}" default="0.0"></c:out></span>
     </div>
 
+	<form:hidden path="" id="fundnew" value="${fundnew}"/>
+	<form:hidden path="" id="departmentnew" value="${departmentnew}"/>
+	<form:hidden path="" id="functionnew" value="${functionnew}"/>
     <form:hidden path="" id="cutOffDate" value="${cutOffDate}"/>
     <form:hidden path="" name="mode" id="mode" value="${mode}"/>
     <form:hidden path="billamount" id="billamount" class="billamount"/>

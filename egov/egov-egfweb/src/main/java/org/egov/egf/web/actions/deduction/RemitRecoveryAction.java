@@ -240,10 +240,36 @@ public class RemitRecoveryAction extends BasePaymentAction {
     private List<TDSEntry> remittedTDS = new ArrayList<TDSEntry>();
     List<Long> remDtlIds;
 	List<String> remAssignNumbers;
-    
+	private String fundnew="";
+    private String departmentnew="";
+    private String functionnew="";
 	private String firstsignatory="-1";
     private String secondsignatory="-1";
     
+    public String getFundnew() {
+		return fundnew;
+	}
+
+	public void setFundnew(String fundnew) {
+		this.fundnew = fundnew;
+	}
+
+	public String getDepartmentnew() {
+		return departmentnew;
+	}
+
+	public void setDepartmentnew(String departmentnew) {
+		this.departmentnew = departmentnew;
+	}
+
+	public String getFunctionnew() {
+		return functionnew;
+	}
+
+	public void setFunctionnew(String functionnew) {
+		this.functionnew = functionnew;
+	}
+
     public BigDecimal getBalance() {
         return balance;
     }
@@ -296,6 +322,26 @@ public class RemitRecoveryAction extends BasePaymentAction {
             LOGGER.debug("RemitRecoveryAction | newform | start");
         reset();
         loadDefalutDates();
+        List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","fund");
+        for(AppConfigValues value:appConfigValuesList)
+        {
+        	setFundnew(value.getValue());
+        	//model.addAttribute("fundnew", getFundnew());
+        }
+        appConfigValuesList=null;
+        appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","department");
+        for(AppConfigValues value:appConfigValuesList)
+        {
+        	setDepartmentnew(value.getValue());
+        	//model.addAttribute("departmentnew", getDepartmentnew());
+        }
+        appConfigValuesList=null;
+        appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","function");
+        for(AppConfigValues value:appConfigValuesList)
+        {
+        	setFunctionnew(value.getValue());
+        	//model.addAttribute("functionnew", getFunctionnew());
+        }
         return NEW;
     }
 
@@ -580,7 +626,7 @@ public class RemitRecoveryAction extends BasePaymentAction {
 
         if (FinancialConstants.BUTTONREJECT.equalsIgnoreCase(workflowBean.getWorkFlowAction()))
             addActionMessage(getText("payment.voucher.rejected", new String[] {this.getEmployeeName(paymentheader.getState()
-                    .getInitiatorPosition())}));
+                    .getOwnerPosition())}));
         if (FinancialConstants.BUTTONFORWARD.equalsIgnoreCase(workflowBean.getWorkFlowAction()))
             addActionMessage(getText("payment.voucher.approved", new String[] {this.getEmployeeName(paymentheader.getState()
             		.getOwnerPosition()) }));
