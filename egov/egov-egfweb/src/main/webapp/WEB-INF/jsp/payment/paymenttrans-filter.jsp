@@ -58,9 +58,8 @@
 			</s:if></td>
 		<td class="greybox"><s:select name="fundId" id="fundId"
 				list="dropdownData.fundList" listKey="id" listValue="name"
-				headerKey="-1" headerValue="%{getText('lbl.choose.options')}"
 				onChange="populateSchemes(this);loadBank(this);"
-				value="%{fundId.id}" /></td>
+				value="%{fundId.id}" readonly="true"/></td>
 	</s:if>
 	<s:else>
 		<td class="greybox"></td>
@@ -134,8 +133,7 @@
 			</s:if></td>
 		<td class="greybox"><s:select name="vouchermis.departmentcode"
 				id="departmentid" list="dropdownData.departmentList"
-				listKey="code" listValue="name" headerKey="-1"
-				headerValue="%{getText('lbl.choose.options')}" value="-1"
+				listKey="code" listValue="name"  readonly="true"
 				 /></td>
 	<s:if test="%{shouldShowHeaderField('field')}">
 		<td class="greybox"><s:text name="voucher.field" /> <s:if
@@ -162,8 +160,7 @@
 			</s:if></td>
 		<td class="bluebox"><s:select name="vouchermis.function"
 				id="vouchermis.function" list="dropdownData.functionList"
-				listKey="id" listValue="name" headerKey="-1"
-				headerValue="%{getText('lbl.choose.options')}" value="%{vouchermis.function.id}" /></td>
+				listKey="id" listValue="name" value="%{vouchermis.function.id}" readonly="true"/></td>
 
 	<s:if test="%{shouldShowHeaderField('functionary')}">
 		<td class="bluebox"><s:text name="voucher.functionary" /> <s:if
@@ -182,6 +179,9 @@
 	</s:else>
 
 </tr>
+
+
+
 <script type="text/javascript">
 function populateSchemes(fund){
 	if(null != document.getElementById("schemeid")){

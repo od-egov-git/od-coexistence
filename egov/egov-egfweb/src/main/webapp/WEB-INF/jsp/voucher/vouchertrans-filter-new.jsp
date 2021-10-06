@@ -58,9 +58,8 @@
 			</s:if></td>
 		<td class="greybox"><s:select name="fundId" id="fundId"
 				list="dropdownData.fundList" listKey="id" listValue="name"
-				headerKey="" headerValue="%{getText('lbl.choose.options')}"
 				onChange="populateSchemes(this);loadBank(this);"
-				value="%{fundId.id}" /></td>
+				value="%{fundId.id}" readonly="true"/></td>
 	</s:if>
 	<%-- <s:if test="%{shouldShowHeaderField('scheme')}">
 		<egov:ajaxdropdown id="scheme" fields="['Text','Value']"
@@ -117,9 +116,8 @@
 			</s:if></td>
 		<td class="greybox"><s:select name="vouchermis.departmentcode"
 				id="vouchermis.departmentid" list="dropdownData.departmentList" 
-				listKey="code" listValue="name" headerKey=""
-				headerValue="%{getText('lbl.choose.options')}"
-				value="%{voucherHeader.vouchermis.departmentcode}"
+				listKey="code" listValue="name" 
+				value="%{voucherHeader.vouchermis.departmentcode}" readonly="true"
 				 /></td>
 	</s:if>
 	<s:if test="%{shouldShowHeaderField('field')}">
@@ -153,8 +151,7 @@
 			</td>
 		<td class="bluebox"><s:select name="vouchermis.function"
 				id="vouchermis.function" list="dropdownData.functionList"
-				listKey="id" listValue="name" headerKey="" 
-				headerValue="%{getText('lbl.choose.options')}" value="%{vouchermis.function.id}" /></td>
+				listKey="id" listValue="name" value="%{vouchermis.function.id}" readonly="true"/></td>
 	</s:if>
 
 </tr>

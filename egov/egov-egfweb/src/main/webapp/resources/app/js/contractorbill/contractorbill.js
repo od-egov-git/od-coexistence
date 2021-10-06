@@ -95,10 +95,10 @@ $('#contractor').change(function () {
 });
 
 $('#workOrder').change(function () {
-	$('#fundId').val("");
-	$('#fundName').val("");
-	$('#departmentCode').val("");
-	$('#departmentName').val("");
+	//$('#fundId').val("");
+	//$('#fundName').val("");
+	//$('#departmentCode').val("");
+	//$('#departmentName').val("");
 	$('#schemeId').val("");
 	$('#schemeName').val("");
 	$('#subSchemeId').val("");
@@ -535,10 +535,10 @@ function loadWorkOrder(contractorId){
 
 function loadMisAttributes(orderNumber){
 	if (!orderNumber) {
-		$('#fundId').val("");
-		$('#fundName').val("");
-		$('#departmentCode').val("");
-		$('#departmentName').val("");
+		//$('#fundId').val("");
+		//$('#fundName').val("");
+		//$('#departmentCode').val("");
+		//$('#departmentName').val("");
 		$('#schemeId').val("");
 		$('#schemeName').val("");
 		$('#subSchemeId').val("");
@@ -557,13 +557,13 @@ function loadMisAttributes(orderNumber){
 				function(response) {
 					$.each(response, function(index, value) {
 						//$('#fundId').val(value.fund.id);
-						$('#fundId').val(document.getElementById("fundnew").value);
+						//$('#fundId').val(document.getElementById("fundnew").value);
 						//$('#fundName').val(value.fund.name);
-						$('#fundName').val(document.getElementById("fundnamenew").value);
+						//$('#fundName').val(document.getElementById("fundnamenew").value);
 						//$('#departmentCode').val(value.department);
-						$('#departmentCode').val(document.getElementById("departmentnew").value);
+						//$('#departmentCode').val(document.getElementById("departmentnew").value);
 						//$('#departmentName').val(value.description);
-						$('#departmentName').val(document.getElementById("departmentnamenew").value);
+						//$('#departmentName').val(document.getElementById("departmentnamenew").value);
 						$('#schemeId').val(value.scheme.id);
 						$('#schemeName').val(value.scheme.name);
 						$('#subSchemeId').val(value.subScheme.id);

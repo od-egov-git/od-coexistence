@@ -128,19 +128,18 @@ List<String> billtype=new ArrayList<>();
         model.addAttribute("subLedgerTypes", accountdetailtypeService.findAll());
         //model.addAttribute("cFunctions", functionDAO.getAllActiveFunctions());
         List<CFunction> func1=new ArrayList<CFunction>();
-        Long funId=0l;
+        String funCode="";
         final List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
 				"function");
         
         for(AppConfigValues value:appConfigValuesList)
         {
-        	funId=Long.parseLong(value.getValue());
+        	funCode=value.getValue();
         }
-        CFunction fun=functionDAO.getFunctionById(funId);
+        CFunction fun=functionDAO.getFunctionByCode(funCode);
         func1.add(fun);
         model.addAttribute("cFunctions", func1);
         isBillDateDefaultValue = expenseBillService.isDefaultAutoPopulateCurrDateEnable();
-       // model.addAttribute("billTypes", getBillTypes());
     }
 
     public List<EgBillSubType> getBillSubTypes() {

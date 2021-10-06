@@ -58,7 +58,6 @@
 			</s:if></td>
 		<td class="greybox"><s:select name="fundId" id="fundId"
 				list="dropdownData.fundList" listKey="id" listValue="name"
-				headerKey="-1" headerValue="%{getText('lbl.choose.options')}"
 				onChange="populateSchemes(this);loadBank(this);"
 				value="%{fundId.id}" /></td>
 	</s:if>
@@ -74,8 +73,7 @@
 			</s:if></td>
 		<td class="greybox"><s:select name="vouchermis.departmentcode" 
 				id="vouchermis.departmentid" list="dropdownData.departmentList"
-				listKey="code" listValue="name" headerKey="-1"
-				headerValue="%{getText('lbl.choose.options')}"
+				listKey="code" listValue="name" 
 				value="voucherHeader.vouchermis.departmentcode" /></td>
 	</s:if>
 	<s:else>
@@ -169,8 +167,7 @@
 			</td>
 		<td class="bluebox"><s:select name="vouchermis.function"
 				id="vouchermis.function" list="dropdownData.functionList"
-				listKey="id" listValue="name" headerKey="-1"
-				headerValue="%{getText('lbl.choose.options')}" value="%{vouchermis.function.id}" /></td>
+				listKey="id" listValue="name" value="%{vouchermis.function.id}" /></td>
 	</s:if>
 
 	<s:else>
@@ -198,7 +195,8 @@
 <script type="text/javascript">
 function populateSchemes(fund){
 	if(null != document.getElementById("schemeid")){
-		populateschemeid({fundId:fund.options[fund.selectedIndex].value});
+		//populateschemeid({fundId:fund.options[fund.selectedIndex].value});
+		populateschemeid({fundId:"1"});
 		populatesubschemeid({schemeId:-1});
 	//	populatefundsourceId({subSchemeId:-1});	
 	}

@@ -58,7 +58,9 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
@@ -69,26 +71,30 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper;
 import org.apache.struts2.dispatcher.multipart.UploadedFile;
+import org.egov.commons.CFunction;
+import org.egov.commons.Fund;
+import org.egov.commons.dao.FunctionDAO;
+import org.egov.commons.dao.FundHibernateDAO;
 import org.egov.egf.autonumber.ExpenseBillNumberGenerator;
 import org.egov.egf.budget.model.BudgetControlType;
 import org.egov.egf.budget.service.BudgetControlTypeService;
 import org.egov.egf.expensebill.service.ExpenseBillService;
 import org.egov.egf.utils.FinancialUtils;
-import org.egov.egf.web.controller.microservice.FinanceController;
 import org.egov.eis.web.contract.WorkflowContainer;
 import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.exception.ApplicationException;
 import org.egov.infra.filestore.service.FileStoreService;
-import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
 import org.egov.infra.microservice.models.EmployeeInfo;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
+import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
 import org.egov.infra.validation.exception.ValidationException;
 import org.egov.infstr.services.PersistenceService;
 import org.egov.model.bills.BillType;
 import org.egov.model.bills.DocumentUpload;
 import org.egov.model.bills.EgBillregister;
+import org.egov.model.bills.EgBillregistermis;
 import org.egov.utils.FinancialConstants;
 import org.hibernate.SQLQuery;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -130,6 +136,11 @@ public class CreateExpenseBillController extends BaseBillController {
     private static final int BUFFER_SIZE = 4096;
     private static final String BILL_TYPES = "billTypes";
 
+    @Autowired
+    private FundHibernateDAO fundHibernateDAO;
+    
+    @Autowired
+    private FunctionDAO functionDAO;
     
     @Autowired
     @Qualifier("messageSource")
@@ -150,9 +161,9 @@ public class CreateExpenseBillController extends BaseBillController {
     @Qualifier("persistenceService")
     private PersistenceService persistenceService;
     
-    private String fundnew;
-    private String departmentnew;
-    private String functionnew;
+    private String fundnew="";
+    private String departmentnew="";
+    //private String functionnew="";
 
     public String getFundnew() {
 		return fundnew;
@@ -170,13 +181,6 @@ public class CreateExpenseBillController extends BaseBillController {
 		this.departmentnew = departmentnew;
 	}
 
-	public String getFunctionnew() {
-		return functionnew;
-	}
-
-	public void setFunctionnew(String functionnew) {
-		this.functionnew = functionnew;
-	}
 
     public CreateExpenseBillController(final AppConfigValueService appConfigValuesService) {
         super(appConfigValuesService);
@@ -202,40 +206,51 @@ public class CreateExpenseBillController extends BaseBillController {
     	   }
     	}
         setDropDownValues(model);
-        model.addAttribute(STATE_TYPE, egBillregister.getClass().getSimpleName());
-        prepareWorkflow(model, egBillregister, new WorkflowContainer());
-       model.addAttribute("validActionList", validActions);
-       model.addAttribute(BILL_TYPES, BillType.values());
-       List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
-				"fund");
+        EgBillregistermis mis=new EgBillregistermis();
+        
+		
+       try {
+           Map<String, String> fundCodeNameMap = new HashMap<>();
+           Map<String, String> deptCodeNameMap = new HashMap<>();
+           CFunction function = new CFunction();
+           Fund fund=new Fund();
+           
+           List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","fund");
        for(AppConfigValues value:appConfigValuesList)
        {
        	setFundnew(value.getValue());
-       	model.addAttribute("fundnew", getFundnew());
+          	fund = fundHibernateDAO.fundByCode(getFundnew());
+          	///model.addAttribute("fundnew", fund.getId());
+          	mis.setFund(fund);
        }
-       appConfigValuesList=null;
-       appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
-				"department");
+          appConfigValuesList.clear();
+          appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","department");
        for(AppConfigValues value:appConfigValuesList)
        {
        	setDepartmentnew(value.getValue());
        	model.addAttribute("departmentnew", getDepartmentnew());
        }
        appConfigValuesList=null;
-       appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
-				"function");
+          appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","function");
        for(AppConfigValues value:appConfigValuesList)
        {
-       	setFunctionnew(value.getValue());
-       	model.addAttribute("functionnew", getFunctionnew());
+        	  function= functionDAO.getFunctionByCode(value.getValue());
+        	  //String s=String.valueOf(function.getId());
+        	  //setFunctionnew(s);
+          	  //model.addAttribute("functionnew", function.getId());
+        	  mis.setFunction(function);
+          }
+       }catch(Exception e) {
+       	e.printStackTrace();
        }
-        //prepareValidActionListByCutOffDate(model);
         if(isBillDateDefaultValue){
             egBillregister.setBilldate(new Date());            
         }
-//        User createdBy = new User();
-//        createdBy.setId(ApplicationThreadLocals.getUserId());
-//        egBillregister.setCreatedBy(createdBy);
+        egBillregister.setEgBillregistermis(mis);
+        model.addAttribute(STATE_TYPE, egBillregister.getClass().getSimpleName());
+        prepareWorkflow(model, egBillregister, new WorkflowContainer());
+       model.addAttribute("validActionList", validActions);
+       model.addAttribute(BILL_TYPES, BillType.values());
         return EXPENSEBILL_FORM;
     }
 

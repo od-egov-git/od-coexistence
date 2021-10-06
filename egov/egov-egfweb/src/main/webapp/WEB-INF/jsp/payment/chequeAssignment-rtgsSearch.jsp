@@ -106,15 +106,13 @@
 					<td class="greybox"><s:text name="voucher.fund" /></td>
 					<td class="greybox"><s:select name="fundId" id="fundId"
 							list="dropdownData.fundList" listKey="id" listValue="name"
-							headerKey="-1" headerValue="%{getText('lbl.choose.options')}"
 							onChange="loadBank(this);" value="%{fundId.id}" /></td>
 
 					<td class="greybox" id="deptLabel"><s:text
 							name="voucher.department" /></td>
 					<td class="greybox"><s:select name="vouchermis.departmentcode"
 							id="vouchermis.departmentcode" list="dropdownData.departmentList"
-							listKey="code" listValue="name" headerKey="-1"
-							headerValue="%{getText('lbl.choose.options')}"
+							listKey="code" listValue="name" 
 							value="voucherHeader.vouchermis.departmentcode" /></td>
 				</tr>
 				<tr>
@@ -158,11 +156,17 @@
 			id="rtgsContractorAssignment" />
 		<s:hidden name="billSubType" id="billSubType" value="%{billSubType}" />
 		<s:hidden name="region" id="region" value="%{region}" />
+		<input type="hidden" path="" id="fundnew" value="${fundnew}"/>
+		<input type="hidden" path="" id="departmentnew" value="${departmentnew}"/>
+		<input type="hidden" path="" id="functionnew" value="${functionnew}"/>
 	</s:form>
 	<script>
 		var date = '<s:date name="currentDate" format="dd/MM/yyyy"/>';
 		function onload() {
 			populatebank_branch();
+			document.getElementById("fundId").value=document.getElementById("fundnew").value;
+			document.getElementById("vouchermis.departmentcode").value=document.getElementById("departmentnew").value;
+			//document.getElementById("vouchermis.function").value=document.getElementById("functionnew").value;
 		}
 
 		function loadBank(obj) {

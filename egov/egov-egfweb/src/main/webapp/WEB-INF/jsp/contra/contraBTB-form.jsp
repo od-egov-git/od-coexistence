@@ -115,7 +115,7 @@
 		<td class="greybox"><s:select name="contraBean.toFundId"
 				id="toFundId" list="dropdownData.fundList" listKey="id"
 				listValue="name" onChange="loadToBank(this);checkInterFund();"
-				headerKey="" headerValue="----Choose----" /></td>
+				</td>
 	</s:if>
 	<s:if test="%{shouldShowHeaderField('department')}">
 		<td id="interFundRow1" style="visibility: hidden" class="greybox"><s:text

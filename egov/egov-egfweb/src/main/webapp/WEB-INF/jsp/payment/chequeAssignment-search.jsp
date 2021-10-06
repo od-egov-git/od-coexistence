@@ -117,6 +117,9 @@
 		<s:hidden name="bankbranch" id="bankbranch" />
 		<s:hidden name="functionNonMandatory" id="functionNonMandatory" />
 		<s:hidden name="deptNonMandatory" id="deptNonMandatory" />
+		<input type="hidden" path="" id="fundnew" value="${fundnew}"/>
+		<input type="hidden" path="" id="departmentnew" value="${departmentnew}"/>
+		<input type="hidden" path="" id="functionnew" value="${functionnew}"/>
 	</s:form>
 	<script>
 		var date = '<s:date name="currentDate" format="dd/MM/yyyy"/>';
@@ -128,6 +131,12 @@
 			} else {
 				billTypeObj.disabled = true;
 			}
+			
+			document.getElementById("fundId").value=document.getElementById("fundnew").value;
+			document.getElementById("vouchermis.departmentid").value=document.getElementById("departmentnew").value;
+			document.getElementById("vouchermis.function").value=document.getElementById("functionnew").value;
+			populateSchemes("1");
+			loadBank("1");
 		}
 		function enableOrDisableBillType(obj) {
 			var billTypeObj = document.getElementById('billType');
@@ -137,10 +146,16 @@
 		}
 
 		function loadBank(obj) {
-			var vTypeOfAccount = '<s:property value="%{typeOfAccount}"/>';
+			/* var vTypeOfAccount = '<s:property value="%{typeOfAccount}"/>';
 			if (obj.options[obj.selectedIndex].value != -1)
 				populatebank_branch({
 					fundId : obj.options[obj.selectedIndex].value
+							+ '&asOnDate=' + date
+				}); */
+			var vTypeOfAccount = '<s:property value="%{typeOfAccount}"/>';
+			if (obj != -1)
+				populatebank_branch({
+					fundId : "1"//obj.options[obj.selectedIndex].value
 							+ '&asOnDate=' + date
 				});
 		}

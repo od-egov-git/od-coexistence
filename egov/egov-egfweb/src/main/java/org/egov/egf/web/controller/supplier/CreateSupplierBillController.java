@@ -59,8 +59,10 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
@@ -74,6 +76,10 @@ import org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper;
 import org.apache.struts2.dispatcher.multipart.UploadedFile;
 import org.egov.commons.Accountdetailtype;
 import org.egov.commons.CChartOfAccountDetail;
+import org.egov.commons.CFunction;
+import org.egov.commons.Fund;
+import org.egov.commons.dao.FunctionDAO;
+import org.egov.commons.dao.FundHibernateDAO;
 import org.egov.commons.service.AccountdetailtypeService;
 import org.egov.commons.service.ChartOfAccountsService;
 import org.egov.egf.autonumber.ExpenseBillNumberGenerator;
@@ -90,6 +96,7 @@ import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.filestore.service.FileStoreService;
+import org.egov.infra.microservice.models.Department;
 import org.egov.infra.microservice.models.EmployeeInfo;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
@@ -99,6 +106,7 @@ import org.egov.model.bills.DocumentUpload;
 import org.egov.model.bills.EgBillPayeedetails;
 import org.egov.model.bills.EgBilldetails;
 import org.egov.model.bills.EgBillregister;
+import org.egov.model.bills.EgBillregistermis;
 import org.egov.model.masters.PurchaseOrder;
 import org.egov.utils.FinancialConstants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -158,6 +166,10 @@ public class CreateSupplierBillController extends BaseBillController {
 
     private static final int BUFFER_SIZE = 4096;
 
+    @Autowired
+    private FundHibernateDAO fundHibernateDAO;
+    @Autowired
+    private FunctionDAO functionDAO;
     @Autowired
     @Qualifier("messageSource")
     private MessageSource messageSource;
@@ -272,20 +284,32 @@ public class CreateSupplierBillController extends BaseBillController {
         prepareWorkflow(model, egBillregister, new WorkflowContainer());
         prepareValidActionListByCutOffDate(model);
         model.addAttribute("validActionList", validActions);
+        EgBillregistermis mis=new EgBillregistermis();
+        try {
+        Map<String, String> fundCodeNameMap = new HashMap<>();
+        Map<String, String> deptCodeNameMap = new HashMap<>();
+        CFunction function = new CFunction();
+        Fund fund=new Fund();
+        List<Fund> fundList = fundHibernateDAO.findAllActiveFunds();
+        List<Department> departmentList = microserviceUtils.getDepartments();
+        if (fundList != null)
+            for (Fund f : fundList) {
+                fundCodeNameMap.put(f.getCode(), f.getName());
+            }
+
+        if (departmentList != null)
+            for (Department dept : departmentList) {
+                deptCodeNameMap.put(dept.getCode(), dept.getName());
+            }
         List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","fund");
        for(AppConfigValues value:appConfigValuesList)
        {
        	setFundnew(value.getValue());
-       	model.addAttribute("fundnew", getFundnew());
+        	fund = fundHibernateDAO.fundByCode(getFundnew());
+        	///model.addAttribute("fundnew", fund.getId());
+        	mis.setFund(fund);
        }
-       appConfigValuesList=null;
-       appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","fundname");
-       for(AppConfigValues value:appConfigValuesList)
-       {
-       	setFundnamenew(value.getValue());
-       	model.addAttribute("fundnamenew", getFundnamenew());
-       }
-       appConfigValuesList=null;
+        appConfigValuesList.clear();
        appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","department");
        for(AppConfigValues value:appConfigValuesList)
        {
@@ -293,19 +317,28 @@ public class CreateSupplierBillController extends BaseBillController {
        	model.addAttribute("departmentnew", getDepartmentnew());
        }
        appConfigValuesList=null;
-       appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","departmentname");
+        appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","function");
        for(AppConfigValues value:appConfigValuesList)
        {
-       	setDepartmentnamenew(value.getValue());
-       	model.addAttribute("departmentnamenew", getDepartmentnamenew());
+      	  function= functionDAO.getFunctionByCode(value.getValue());
+      	  //String s=String.valueOf(function.getId());
+      	  //setFunctionnew(s);
+        	  //model.addAttribute("functionnew", function.getId());
+      	  mis.setFunction(function);
        }
+       
        appConfigValuesList=null;
-       appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","function");
-       for(AppConfigValues value:appConfigValuesList)
-       {
-       	setFunctionnew(value.getValue());
-       	model.addAttribute("functionnew", getFunctionnew());
+       setFundnamenew(fundCodeNameMap.get(getFundnew()));
+       	model.addAttribute("fundnamenew", getFundnamenew());
+       
+       	setDepartmentnamenew(deptCodeNameMap.get(getDepartmentnew()));
+       	model.addAttribute("departmentnamenew", getDepartmentnamenew());
+       
+       
+    }catch(Exception e) {
+    	e.printStackTrace();
        }										   
+     
         if(isBillDateDefaultValue){
             egBillregister.setBilldate(new Date());            
         }

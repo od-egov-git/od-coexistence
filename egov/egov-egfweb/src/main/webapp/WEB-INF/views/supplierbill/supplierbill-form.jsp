@@ -87,11 +87,9 @@
 </style>
 <script>
 window.onload=function(){
-	document.getElementById("fundId").value=document.getElementById("fundnew").value;
 	document.getElementById("departmentCode").value=document.getElementById("departmentnew").value;
 	document.getElementById("fundName").value=document.getElementById("fundnamenew").value;
 	document.getElementById("departmentName").value=document.getElementById("departmentnamenew").value;
-	document.getElementById("egBillregistermis.function").value=document.getElementById("functionnew").value;
 }
 </script>
     <form:form name="supplierBillForm" role="form" method="post" action="create" modelAttribute="egBillregister" id="egBillregister" class="form-horizontal form-groups-bordered" enctype="multipart/form-data">
@@ -111,11 +109,11 @@ window.onload=function(){
         : &#8377 <span id="supplierBillTotalCreditAmount"> <c:out
             value="${supplierBillTotalCreditAmount}" default="0.0"></c:out></span>
     </div>
-	<form:hidden path="" id="fundnew" value="${fundnew}"/>
+	<%-- <form:hidden path="" id="fundnew" value="${fundnew}"/> --%>
 	<form:hidden path="" id="fundnamenew" value="${fundnamenew}"/>
 	<form:hidden path="" id="departmentnew" value="${departmentnew}"/>
 	<form:hidden path="" id="departmentnamenew" value="${departmentnamenew}"/>
-	<form:hidden path="" id="functionnew" value="${functionnew}"/>
+	<%-- <form:hidden path="" id="functionnew" value="${functionnew}"/> --%>
     <form:hidden path="" id="cutOffDate" value="${cutOffDate}"/>
     <form:hidden path="" name="mode" id="mode" value="${mode}"/>
     <form:hidden path="" name="netPayableId" id="netPayableId" value="${netPayableId}"/>
