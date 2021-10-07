@@ -697,6 +697,7 @@ System.out.println(":::list size::::: "+list1.size());
 	        	   //voucherTypeBean.setFundnew(value.getValue());
 	           	fund = fundHibernateDAO.fundByCode(value.getValue());
 	           	contraBean.setFundnew(String.valueOf(fund.getId()));
+	           	//contraBean.setToFundId(fund.getId());
 	       }
 	       appConfigValuesList=null;
 	           appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","department");

@@ -45,7 +45,8 @@
  *   In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
  *
  */
-function onloadtriple(){
+function onloadtriple1(){
+	
 		document.getElementById("fundId").value=document.getElementById("contraBean.fundnew").value;
 		document.getElementById("toFundId").value=document.getElementById("contraBean.fundnew").value;
 		document.getElementById("vouchermis.departmentid").value=document.getElementById("contraBean.departmentnew").value;
@@ -55,6 +56,7 @@ function onloadtriple(){
 }						
 
 function loadBank(fund) {
+	
 	// bootbox.alert(fund.options[fund.selectedIndex].value);
 	//loadFromDepartment();
 	if(fund==null ||fund =='')
@@ -99,6 +101,7 @@ function loadToDepartment() {
 	}
 }
 function loadToBank(fund) {
+	
 	//loadToDepartment();
 	if(fund==null ||fund =='')
 		fund="1";  
@@ -206,6 +209,7 @@ function nextChqNo() {
 		document.getElementById("chequeNum").value = sRtn;
 }
 function checkInterFund() {
+	
 	var fromFund = '1';//document.getElementById('fundId').value;
 	var toFund ='1';//document.getElementById('toFundId').value;
 	var splitStr = new Array();

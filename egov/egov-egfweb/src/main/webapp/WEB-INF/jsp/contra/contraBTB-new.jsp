@@ -66,7 +66,7 @@
 <meta http-equiv="Content-Type"
 	content="text/html; charset=windows-1252">
 </head>
-<body onload="onLoadTask_new();onloadtriple();">
+<body onload="onLoadTask_new();onloadtriple1();">
 	<s:form action="contraBTB" theme="simple" name="cbtbform">
 		<s:push value="model">
 			<jsp:include page="../budget/budgetHeader.jsp">

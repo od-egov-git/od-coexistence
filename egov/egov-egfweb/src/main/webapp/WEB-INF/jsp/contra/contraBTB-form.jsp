@@ -115,8 +115,9 @@
 		<td class="greybox"><s:select name="contraBean.toFundId"
 				id="toFundId" list="dropdownData.fundList" listKey="id"
 				listValue="name" onChange="loadToBank(this);checkInterFund();"
-				</td>
+				 /></td>
 	</s:if>
+	
 	<s:if test="%{shouldShowHeaderField('department')}">
 		<td id="interFundRow1" style="visibility: hidden" class="greybox"><s:text
 				name="voucher.department" /> <s:if
@@ -131,6 +132,7 @@
 				onChange="populateApproverDept(this);" /></td>
 	</s:if>
 </tr>
+
 <tr>
 	<td class="bluebox"></td>
 	<egov:ajaxdropdown id="toBankId" fields="['Text','Value']"
@@ -180,22 +182,6 @@
 			headerValue="----Choose----" /></td>
 </tr>
 
-<!-- comment by Abhishek on 10042021
-<tr> 
-	<td class="bluebox">&nbsp;</td>
-	<td class="bluebox">First Signatory<span class="mandatory1">*</span></td>
-	<td class="bluebox"><s:select name="firstsignatory" headerKey="-1"
-			headerValue="Select First Signatory" value="%{firstsignatory}"
-			list="#{'Additional Commissioner':'Additional Commissioner' ,'Chief Accounts Officer':'Chief Accounts Officer' ,'Assistant Controller (F and A)':'Assistant Controller (F and A)'}"
-			id="firstsignatory" /></td>
-	<td class="bluebox" width="15%">Second Signatory<span
-		class="mandatory1">*</span></td>
-	<td class="bluebox" colspan="4"><s:select name="secondsignatory"
-			headerKey="-1" headerValue="Select Second Signatory"
-			list="#{'Chief Accounts Officer':'Chief Accounts Officer' ,'Assistant Controller (F and A)':'Assistant Controller (F and A)' ,'Section Officer':'Section Officer'}"
-			id="secondsignatory" /></td>
-</tr>
--->
 
 <tr>
 	<td class="bluebox"></td>
@@ -249,7 +235,6 @@
 	<td class="greybox"></td>
 	<td class="greybox"></td>
 </tr>
-
 <script>
 	var fund_map = new Array();
 	var i=0;
