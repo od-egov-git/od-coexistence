@@ -81,6 +81,8 @@ import org.egov.commons.EgwStatus;
 import org.egov.commons.Fund;
 import org.egov.commons.dao.EgwStatusHibernateDAO;
 import org.egov.commons.dao.FinancialYearHibernateDAO;
+import org.egov.commons.dao.FunctionDAO;
+import org.egov.commons.dao.FundHibernateDAO;
 import org.egov.commons.service.FunctionService;
 import org.egov.commons.utils.BankAccountType;
 import org.egov.egf.utils.FinancialUtils;
@@ -163,7 +165,10 @@ public class PaymentAction extends BasePaymentAction {
     private DepartmentService departmentService;
     @Autowired
     private FunctionService functionService;
-
+    @Autowired
+    private FundHibernateDAO fundHibernateDAO;
+    @Autowired
+    private FunctionDAO functionDAO;
     private Integer bankaccount, bankbranch;
     private Integer departmentId;
     private Integer defaultDept;
@@ -284,25 +289,39 @@ public class PaymentAction extends BasePaymentAction {
             setEnablePensionType(true);
             setDisableExpenditureType(true);
         }
+        try {
+        Map<String, String> fundCodeNameMap = new HashMap<>();
+        Map<String, String> deptCodeNameMap = new HashMap<>();
+        CFunction function = new CFunction();
+        Fund fund=new Fund();
+        List<Fund> fundList = fundHibernateDAO.findAllActiveFunds();
+        if (fundList != null)
+            for (Fund f : fundList) {
+                fundCodeNameMap.put(f.getCode(), f.getName());
+            }
+
+        
         List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","fund");
         for(AppConfigValues value:appConfigValuesList)
         {
-        	setFundnew(value.getValue());
-        	//model.addAttribute("fundnew", getFundnew());
+       	fund = fundHibernateDAO.fundByCode(value.getValue());
+       	setFundnew(String.valueOf(fund.getId()));
         }
         appConfigValuesList=null;
         appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","department");
         for(AppConfigValues value:appConfigValuesList)
         {
         	setDepartmentnew(value.getValue());
-        	//model.addAttribute("departmentnew", getDepartmentnew());
         }
         appConfigValuesList=null;
         appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","function");
         for(AppConfigValues value:appConfigValuesList)
         {
-        	setFunctionnew(value.getValue());
-        	//model.addAttribute("functionnew", getFunctionnew());
+    	   function= functionDAO.getFunctionByCode(value.getValue());
+    	   setFunctionnew(function.getId().toString());
+       }
+        }catch(Exception e) {
+        	e.printStackTrace();
         }
         if (parameters.get("fundId") != null && !parameters.get("fundId")[0].equals("-1")) {
             final Fund fund = (Fund) persistenceService.find("from Fund where id=?",

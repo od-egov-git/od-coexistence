@@ -56,14 +56,19 @@ import org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper;
 import org.apache.struts2.dispatcher.multipart.UploadedFile;
 import org.apache.struts2.interceptor.validation.SkipValidation;
 import org.egov.common.contstants.CommonConstants;
+import org.egov.commons.CFunction;
 import org.egov.commons.CVoucherHeader;
 import org.egov.commons.DocumentUploads;
+import org.egov.commons.Fund;
+import org.egov.commons.dao.FunctionDAO;
+import org.egov.commons.dao.FundHibernateDAO;
 import org.egov.egf.budget.service.BudgetControlTypeService;
 import org.egov.eis.service.EisCommonService;
 import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.exception.ApplicationRuntimeException;
+import org.egov.infra.microservice.models.Department;
 import org.egov.infra.microservice.models.EmployeeInfo;
 import org.egov.infra.script.service.ScriptService;
 import org.egov.infra.validation.exception.ValidationError;
@@ -94,7 +99,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @ParentPackage("egov")
 @Results({ @Result(name = JournalVoucherAction.NEW, location = "journalVoucher-new.jsp") })
@@ -110,6 +117,10 @@ public class JournalVoucherAction extends BaseVoucherAction
     @Autowired
     @Qualifier("voucherService")
     private VoucherService voucherService;
+    @Autowired
+    private FundHibernateDAO fundHibernateDAO;
+    @Autowired
+    private FunctionDAO functionDAO;
     @Autowired
     @Qualifier("journalVoucherActionHelper")
     private JournalVoucherActionHelper journalVoucherActionHelper;
@@ -150,25 +161,44 @@ public class JournalVoucherAction extends BaseVoucherAction
         addDropdownData("approvaldepartmentList", Collections.EMPTY_LIST);
         addDropdownData("designationList", Collections.EMPTY_LIST);
         addDropdownData("userList", Collections.EMPTY_LIST);
-        List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
-				"fund");
+		
+        try {
+            Map<String, String> fundCodeNameMap = new HashMap<>();
+            Map<String, String> deptCodeNameMap = new HashMap<>();
+            CFunction function = new CFunction();
+            Fund fund=new Fund();
+            List<Fund> fundList = fundHibernateDAO.findAllActiveFunds();
+            List<Department> departmentList = microserviceUtils.getDepartments();
+            if (fundList != null)
+                for (Fund f : fundList) {
+                    fundCodeNameMap.put(f.getCode(), f.getName());
+                }
+
+            if (departmentList != null)
+                for (Department dept : departmentList) {
+                    deptCodeNameMap.put(dept.getCode(), dept.getName());
+                }
+            List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","fund");
         for(AppConfigValues value:appConfigValuesList)
         {
-        	voucherTypeBean.setFundnew(value.getValue());
+           	fund = fundHibernateDAO.fundByCode(value.getValue());
+           	voucherTypeBean.setFundnew(String.valueOf(fund.getId()));
         }
         appConfigValuesList=null;
-        appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
-				"department");
+           appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","department");
         for(AppConfigValues value:appConfigValuesList)
         {
         	voucherTypeBean.setDepartmentnew(value.getValue());
         }
         appConfigValuesList=null;
-        appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
-				"function");
+           appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","function");
         for(AppConfigValues value:appConfigValuesList)
         {
-        	voucherTypeBean.setFunctionnew(value.getValue());
+        	   function= functionDAO.getFunctionByCode(value.getValue());
+        	   voucherTypeBean.setFunctionnew(function.getId().toString());
+           }
+        }catch(Exception e) {
+        	e.printStackTrace();
         }
     }
 

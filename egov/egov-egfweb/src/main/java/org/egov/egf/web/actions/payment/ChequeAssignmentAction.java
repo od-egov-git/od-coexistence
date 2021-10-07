@@ -89,6 +89,8 @@ import org.egov.commons.EgwStatus;
 import org.egov.commons.Fund;
 import org.egov.commons.dao.BankBranchHibernateDAO;
 import org.egov.commons.dao.FinancialYearDAO;
+import org.egov.commons.dao.FunctionDAO;
+import org.egov.commons.dao.FundHibernateDAO;
 import org.egov.commons.service.BankAccountService;
 import org.egov.commons.utils.EntityType;
 import org.egov.egf.autonumber.PexNumberGenerator;
@@ -224,7 +226,36 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
     private transient List<ChequeAssignment> pexList = new LinkedList<>();
     private boolean pexNoGenerationAuto;
     private boolean containsPEX = false;
+    private String fundnew="";
+    private String departmentnew="";
+    private String functionnew="";
+    @Autowired
+    private FundHibernateDAO fundHibernateDAO;
+    @Autowired
+    private FunctionDAO functionDAO;
+    public String getFundnew() {
+		return fundnew;
+	}
+
+	public void setFundnew(String fundnew) {
+		this.fundnew = fundnew;
+	}
+
+	public String getDepartmentnew() {
+		return departmentnew;
+	}
+
+	public void setDepartmentnew(String departmentnew) {
+		this.departmentnew = departmentnew;
+	}
     
+	public String getFunctionnew() {
+		return functionnew;
+	}
+
+	public void setFunctionnew(String functionnew) {
+		this.functionnew = functionnew;
+	}
 
     @Autowired
     @Qualifier("persistenceService")
@@ -440,6 +471,41 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
         mandatoryFields.remove("function");
         deptNonMandatory = true;
         functionNonMandatory = true;
+        //added abhishek on  04102021
+        try {
+            Map<String, String> fundCodeNameMap = new HashMap<>();
+            Map<String, String> deptCodeNameMap = new HashMap<>();
+            CFunction function = new CFunction();
+            Fund fund=new Fund();
+            List<Fund> fundList = fundHibernateDAO.findAllActiveFunds();
+            if (fundList != null)
+                for (Fund f : fundList) {
+                    fundCodeNameMap.put(f.getCode(), f.getName());
+                }
+
+            
+            List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","fund");
+           for(AppConfigValues value:appConfigValuesList)
+           {
+           	fund = fundHibernateDAO.fundByCode(value.getValue());
+           	setFundnew(String.valueOf(fund.getId()));
+           }
+           appConfigValuesList=null;
+           appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","department");
+           for(AppConfigValues value:appConfigValuesList)
+           {
+        	   setDepartmentnew(value.getValue());
+           }
+           appConfigValuesList=null;
+           appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","function");
+           for(AppConfigValues value:appConfigValuesList)
+           {
+        	   function= functionDAO.getFunctionByCode(value.getValue());
+        	   setFunctionnew(function.getId().toString());
+           }
+            }catch(Exception e) {
+            	e.printStackTrace();
+            }
         return "search";
     }
 
@@ -454,6 +520,41 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
         // typeOfAccount = FinancialConstants.TYPEOFACCOUNT_PAYMENTS+","+FinancialConstants.TYPEOFACCOUNT_RECEIPTS_PAYMENTS;
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Completed beforeRtgsSearch.");
+        
+      //added abhishek on  04102021
+        try {
+            Map<String, String> fundCodeNameMap = new HashMap<>();
+            Map<String, String> deptCodeNameMap = new HashMap<>();
+            CFunction function = null;
+            Fund fund=null;
+            List<Fund> fundList = fundHibernateDAO.findAllActiveFunds();
+            if (fundList != null)
+                for (Fund f : fundList) {
+                    fundCodeNameMap.put(f.getCode(), f.getName());
+                }
+
+            
+            List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","fund");
+           for(AppConfigValues value:appConfigValuesList)
+           {
+           	fund = fundHibernateDAO.fundByCode(value.getValue());
+           	setFundnew(String.valueOf(fund.getId()));
+           }
+           appConfigValuesList=null;
+           appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","department");
+           for(AppConfigValues value:appConfigValuesList)
+           {
+        	   setDepartmentnew(value.getValue());
+           }
+           appConfigValuesList=null;
+           appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","function");
+           for(AppConfigValues value:appConfigValuesList)
+           {
+        	   setFunctionnew(value.getValue());
+           }
+            }catch(Exception e) {
+            	e.printStackTrace();
+            }
         return "rtgsSearch";
     }
 

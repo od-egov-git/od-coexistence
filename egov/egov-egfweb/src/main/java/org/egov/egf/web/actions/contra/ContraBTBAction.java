@@ -62,11 +62,14 @@ import org.egov.billsaccounting.services.CreateVoucher;
 import org.egov.billsaccounting.services.VoucherConstant;
 import org.egov.commons.Bankaccount;
 import org.egov.commons.CChartOfAccounts;
+import org.egov.commons.CFunction;
 import org.egov.commons.CGeneralLedger;
 import org.egov.commons.CVoucherHeader;
 import org.egov.commons.EgwStatus;
 import org.egov.commons.Fund;
 import org.egov.commons.Vouchermis;
+import org.egov.commons.dao.FunctionDAO;
+import org.egov.commons.dao.FundHibernateDAO;
 import org.egov.egf.commons.EgovCommon;
 import org.egov.egf.web.actions.voucher.BaseVoucherAction;
 import org.egov.infra.admin.master.entity.AppConfigValues;
@@ -172,7 +175,10 @@ public class ContraBTBAction extends BaseVoucherAction {
 	@Qualifier("fundFlowService")
 	private FundFlowService fundFlowService;
 	private CGeneralLedger generalled;
-
+    @Autowired
+    private FundHibernateDAO fundHibernateDAO;
+    @Autowired
+    private FunctionDAO functionDAO;
 	private CChartOfAccounts chartofAccountsList;
 	private List<CGeneralLedger> generalLedgerDesList = new ArrayList<CGeneralLedger>();
 	private List<CGeneralLedger> generalLedgerSrcList = new ArrayList<CGeneralLedger>();
@@ -673,28 +679,41 @@ System.out.println(":::list size::::: "+list1.size());
 			//contraBean.setModeOfCollection(MDC_OTHER);// comment by abhishek
 			contraBean.setModeOfCollection(MDC_PEX);//added by abhishek on 08042021
 			voucherDate = sdf.parse(sdf.format(currDate));
-			List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
-					"fund");
+			
+	            Map<String, String> fundCodeNameMap = new HashMap<>();
+	            Map<String, String> deptCodeNameMap = new HashMap<>();
+	            CFunction function = new CFunction();
+	            Fund fund=new Fund();
+	            List<Fund> fundList = fundHibernateDAO.findAllActiveFunds();
+	            if (fundList != null)
+	                for (Fund f : fundList) {
+	                    fundCodeNameMap.put(f.getCode(), f.getName());
+	                }
+
+	            
+	            List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","fund");
 	       for(AppConfigValues value:appConfigValuesList)
 	       {
-	    	   contraBean.setFundnew(value.getValue());
+	        	   //voucherTypeBean.setFundnew(value.getValue());
+	           	fund = fundHibernateDAO.fundByCode(value.getValue());
+	           	contraBean.setFundnew(String.valueOf(fund.getId()));
 	       }
 	       appConfigValuesList=null;
-	       appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
-					"department");
+	           appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","department");
 	       for(AppConfigValues value:appConfigValuesList)
 	       {
 	    	   contraBean.setDepartmentnew(value.getValue());
 	       }
 	       appConfigValuesList=null;
-	       appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
-					"function");
+	           appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","function");
 	       for(AppConfigValues value:appConfigValuesList)
 	       {
-	    	   contraBean.setFunctionnew(value.getValue());
+	        	   function= functionDAO.getFunctionByCode(value.getValue());
+	        	   contraBean.setFunctionnew(function.getId().toString());
 	       }
-		} catch (ParseException e) {
 
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		return NEW;
 	}

@@ -72,7 +72,10 @@ import org.egov.commons.CFunction;
 import org.egov.commons.CGeneralLedger;
 import org.egov.commons.CGeneralLedgerDetail;
 import org.egov.commons.CVoucherHeader;
+import org.egov.commons.Fund;
 import org.egov.commons.Vouchermis;
+import org.egov.commons.dao.FunctionDAO;
+import org.egov.commons.dao.FundHibernateDAO;
 import org.egov.commons.utils.EntityType;
 import org.egov.egf.commons.EgovCommon;
 import org.egov.infra.admin.master.entity.AppConfigValues;
@@ -169,7 +172,10 @@ public class DirectBankPaymentAction extends BasePaymentAction {
     private CommonBean commonBean;
     private Paymentheader paymentheader = new Paymentheader();
     public boolean showApprove = false;
-
+    @Autowired
+    private FundHibernateDAO fundHibernateDAO;
+    @Autowired
+    private FunctionDAO functionDAO;
     private Integer departmentId;
     private String wfitemstate;
     private String typeOfAccount;
@@ -258,25 +264,43 @@ public class DirectBankPaymentAction extends BasePaymentAction {
             }
         voucherHeader.reset();
         commonBean.reset();
-        List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
-				"fund");
+       
+       try {
+
+           Map<String, String> fundCodeNameMap = new HashMap<>();
+           Map<String, String> deptCodeNameMap = new HashMap<>();
+           CFunction function = new CFunction();
+           Fund fund=new Fund();
+           List<Fund> fundList = fundHibernateDAO.findAllActiveFunds();
+           if (fundList != null)
+               for (Fund f : fundList) {
+                   fundCodeNameMap.put(f.getCode(), f.getName());
+               }
+
+           
+           List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","fund");
        for(AppConfigValues value:appConfigValuesList)
        {
-    	   commonBean.setFundnew(value.getValue());
+       	   //voucherTypeBean.setFundnew(value.getValue());
+          	fund = fundHibernateDAO.fundByCode(value.getValue());
+          	commonBean.setFundnew(String.valueOf(fund.getId()));
        }
        appConfigValuesList=null;
-       appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
-				"department");
+          appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","department");
        for(AppConfigValues value:appConfigValuesList)
        {
     	   commonBean.setDepartmentnew(value.getValue());
        }
        appConfigValuesList=null;
-       appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
-				"function");
+          appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","function");
        for(AppConfigValues value:appConfigValuesList)
        {
-    	   commonBean.setFunctionnew(value.getValue());
+        	  	function= functionDAO.getFunctionByCode(value.getValue());
+       	   		commonBean.setFunctionnew(function.getId().toString());
+          }
+       
+	} catch (Exception e) {
+		e.printStackTrace();
        }
         //commonBean.setModeOfPayment(MDP_PEX);
         voucherHeader.setVouchermis(new Vouchermis());
