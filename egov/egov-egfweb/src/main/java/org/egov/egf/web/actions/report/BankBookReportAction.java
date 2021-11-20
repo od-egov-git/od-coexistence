@@ -75,6 +75,8 @@ import org.egov.commons.Scheme;
 import org.egov.commons.SubScheme;
 import org.egov.commons.Vouchermis;
 import org.egov.commons.dao.FinancialYearDAO;
+import org.egov.commons.dao.FunctionDAO;
+import org.egov.commons.dao.FundHibernateDAO;
 import org.egov.egf.commons.EgovCommon;
 import org.egov.egf.model.BankBookEntry;
 import org.egov.egf.model.BankBookViewEntry;
@@ -150,7 +152,10 @@ public class BankBookReportAction extends BaseFormAction {
 	private PersistenceService persistenceService;
 	@Autowired
 	private AppConfigValueService appConfigValuesService;
-
+	@Autowired
+    private FundHibernateDAO fundHibernateDAO;
+    @Autowired
+    private FunctionDAO functionDAO;
 	private final SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 	private final List<String> voucherNo = new ArrayList<String>();
 	private boolean isCreditOpeningBalance = false;
@@ -216,17 +221,51 @@ public class BankBookReportAction extends BaseFormAction {
 			addDropdownData("accNumList", Collections.EMPTY_LIST);
 
 			getHeaderFields();
+			//modified by abhishek on 09/11/2021
 			if (headerFields.contains(Constants.DEPARTMENT))
-				addDropdownData("departmentList", masterDataCache.get("egi-department"));
+			{
+				//addDropdownData("departmentList", masterDataCache.get("egi-department"));
+				List dept1=new ArrayList();
+				List<AppConfigValues>appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","department");
+		        for(AppConfigValues value:appConfigValuesList)
+		        {
+		        	dept1=microserviceUtils.getDepartments(value.getValue());
+		        }
+				addDropdownData("departmentList", dept1);
+			}
 			if (headerFields.contains(Constants.FUNCTION))
-				addDropdownData("functionList", persistenceService
-						.findAllBy("from CFunction where isactive=true and isnotleaf=false  order by name"));
+			{
+				/*
+				 * addDropdownData("functionList", persistenceService
+				 * .findAllBy("from CFunction where isactive=true and isnotleaf=false  order by name"
+				 * ));
+				 */
+				List<CFunction> func1 = new ArrayList();
+				List<AppConfigValues>appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","function");
+		           for(AppConfigValues value:appConfigValuesList)
+		           {
+		        	   func1.add(functionDAO.getFunctionByCode(value.getValue()));
+		           }
+				addDropdownData("functionList", func1);
+			}
 			if (headerFields.contains(Constants.FUNCTIONARY))
 				addDropdownData("functionaryList",
 						persistenceService.findAllBy(" from Functionary where isactive=true order by name"));
 			if (headerFields.contains(Constants.FUND))
-				addDropdownData("fundList", persistenceService
-						.findAllBy(" from Fund where isactive=true and isnotleaf=false order by name"));
+			{
+				/*
+				 * addDropdownData("fundList", persistenceService
+				 * .findAllBy(" from Fund where isactive=true and isnotleaf=false order by name"
+				 * ));
+				 */
+				List<Fund> fund1 = new ArrayList();
+				List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","fund");
+		        for(AppConfigValues value:appConfigValuesList)
+		        {
+		           	fund1.add(fundHibernateDAO.fundByCode(value.getValue()));
+		        }
+				addDropdownData("fundList", fund1);
+			}
 			if (headerFields.contains(Constants.FUNDSOURCE))
 				addDropdownData("fundsourceList",
 						persistenceService.findAllBy(" from Fundsource where isactive=true order by name"));

@@ -307,6 +307,14 @@ public class BalanceSheetReportAction extends BaseFormAction {
     }
 
     private void populateDataSourceForAllSchedules() {
+    	System.out.println("department before--->> "+balanceSheet.getDepartment().getCode());
+        String dept=balanceSheet.getDepartment().getCode();
+        if(dept.equalsIgnoreCase("-1")) {
+        	dept="";
+        	balanceSheet.getDepartment().setCode(dept);
+        }
+        System.out.println("department after --->> "+balanceSheet.getDepartment().getCode());
+        
         setRelatedEntitesOn();
         if (balanceSheet.getFund() != null && balanceSheet.getFund().getId() != null && balanceSheet.getFund().getId() != 0) {
             final List<Fund> selFund = new ArrayList<Fund>();
@@ -319,6 +327,13 @@ public class BalanceSheetReportAction extends BaseFormAction {
 
     /* for detailed */
     private void populateDataSourceForAllSchedulesDetailed() {
+    	System.out.println("department before--->> "+balanceSheet.getDepartment().getCode());
+        String dept=balanceSheet.getDepartment().getCode();
+        if(dept.equalsIgnoreCase("-1")) {
+        	dept="";
+        	balanceSheet.getDepartment().setCode(dept);
+        }
+        System.out.println("department after --->> "+balanceSheet.getDepartment().getCode());
         setRelatedEntitesOn();
         if (balanceSheet.getFund() != null && balanceSheet.getFund().getId() != null && balanceSheet.getFund().getId() != 0) {
             final List<Fund> selFund = new ArrayList<Fund>();
@@ -326,6 +341,7 @@ public class BalanceSheetReportAction extends BaseFormAction {
             balanceSheet.setFunds(selFund);
         } else
             balanceSheet.setFunds(balanceSheetService.getFunds());
+        
         balanceSheetScheduleService.populateDataForAllSchedulesDetailed(balanceSheet);
     }
 
