@@ -317,12 +317,15 @@ public class JournalVoucherAction extends BaseVoucherAction
                 System.out.println("before save");
               //  voucherHeader = journalVoucherActionHelper.createVcouher(billDetailslist, subLedgerlist, voucherHeader,
                //         voucherTypeBean, workflowBean);
-                if (workFlowAction.equalsIgnoreCase("Save As Draft")) 
+                if (workFlowAction.equalsIgnoreCase("Save As Draft")) {
+                	LOGGER.info(":::::In Save As Draft ::: ");
                     voucherHeader = journalVoucherActionHelper.createVcouher(billDetailslist, subLedgerlist, voucherHeader,
                             voucherTypeBean, workflowBean);
-                else
+                }
+                else {
                 voucherHeader = journalVoucherActionHelper.createVcouher(billDetailslist, subLedgerlist, voucherHeader,
                         voucherTypeBean, workflowBean);
+                }
                 voucherHeader.setDocumentDetail(documentDetail);               
                 journalVoucherActionHelper.saveDocuments(voucherHeader);
                

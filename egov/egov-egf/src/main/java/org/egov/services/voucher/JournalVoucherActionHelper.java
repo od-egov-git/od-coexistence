@@ -161,7 +161,7 @@ public class JournalVoucherActionHelper {
             } 
 			else {
                 voucherHeader = transitionWorkFlow(voucherHeader, workflowBean);
-             
+                LOGGER.info("Voucher State ::: "+voucherHeader.getState());
                 voucherService.applyAuditing(voucherHeader.getState());
             }
             voucherService.create(voucherHeader);
@@ -308,6 +308,8 @@ public class JournalVoucherActionHelper {
         final DateTime currentDate = new DateTime();
         final User user = securityUtils.getCurrentUser();
         EmployeeInfo info = null;
+        LOGGER.info(":::: Transition start:::::::");
+        LOGGER.info("WorkFlowAction ::: "+workflowBean.getWorkFlowAction());
         if (user != null && user.getId() != null)
             info = microserviceUtils.getEmployeeById(user.getId());
 
@@ -383,7 +385,7 @@ public class JournalVoucherActionHelper {
                 		voucherHeader.setStatus(6);
                 }
                
-                System.out.println("::::::::"+workflowBean.getApproverPositionId());
+                LOGGER.info("ApproverPositionId ::::::::"+workflowBean.getApproverPositionId());
                 
                 voucherHeader.transition().start().withSenderName(user.getName())
                         .withComments(workflowBean.getApproverComments())
@@ -413,6 +415,7 @@ public class JournalVoucherActionHelper {
                 		ststeValue =FinancialConstants.WORKFLOW_STATE_SAVEASDRAFT;
                 		owner = populatePosition();
                 		voucherHeader.setStatus(6);
+                		LOGGER.info("Voucher status::: "+voucherHeader.getStatus());
                 		
                 }
           ///////added abhishek//////////////////////////////
@@ -445,6 +448,7 @@ public class JournalVoucherActionHelper {
                         .withNextAction(wfmatrix.getNextAction());
             }
         }
+        LOGGER.info(":::::Transition Complete ::: ");
         return voucherHeader;
     }
 
