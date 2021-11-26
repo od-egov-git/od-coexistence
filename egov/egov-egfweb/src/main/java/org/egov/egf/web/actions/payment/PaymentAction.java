@@ -568,11 +568,12 @@ public class PaymentAction extends BasePaymentAction {
         	LOGGER.info("inside exp type = -1");
             egwStatus = egwStatusHibernateDAO.getStatusByModuleAndCode("SBILL", "Approved");//77
             final EgwStatus egwStatus1 = egwStatusHibernateDAO.getStatusByModuleAndCode("PURCHBILL", "Passed");//47
+            final EgwStatus egwStatus3 = egwStatusHibernateDAO.getStatusByModuleAndCode("EXPENSEBILL", "Voucher Approved"); // for 481
             String statusCheck = "";
             if (egwStatus == null)
                 statusCheck = " and bill.status in (" + egwStatus1.getId() + ") ";
             else
-                statusCheck = " and bill.status in (" + egwStatus.getId() + "," + egwStatus1.getId() + ") ";
+                statusCheck = " and bill.status in (" + egwStatus.getId() + "," + egwStatus1.getId() + "," + egwStatus3.getId() + ") ";
 
             final String supplierBillSql = mainquery + statusCheck + sql.toString() + " order by bill.billdate desc";
             final String supplierBillSql1 = mainquery1 + statusCheck + sql.toString() + " order by bill.billdate desc";
@@ -582,7 +583,7 @@ public class PaymentAction extends BasePaymentAction {
                         .addAll(getPersistenceService().findPageBy(supplierBillSql1, 1, 1000, "Purchase").getList());
             else
                 supplierBillList = getPersistenceService()
-                        .findPageBy(supplierBillSql1, 1, 1000, "Purchase", egwStatus, egwStatus1).getList();
+                        .findPageBy(supplierBillSql1, 1, 1000, "Purchase", egwStatus, egwStatus1,egwStatus3).getList();
             final Set<EgBillregister> tempBillList = new LinkedHashSet<EgBillregister>(supplierBillList);
             supplierBillList.clear();
             supplierBillList.addAll(tempBillList);
@@ -596,13 +597,14 @@ public class PaymentAction extends BasePaymentAction {
             egwStatus = egwStatusHibernateDAO.getStatusByModuleAndCode("WORKSBILL", "Passed");
             final EgwStatus egwStatus1 = egwStatusHibernateDAO.getStatusByModuleAndCode("CONTRACTORBILL", "APPROVED"); // for 67
             final EgwStatus egwStatus2 = egwStatusHibernateDAO.getStatusByModuleAndCode("EXPENSEBILL", "Bill Payment Approved"); // for 481
+            final EgwStatus egwStatus3 = egwStatusHibernateDAO.getStatusByModuleAndCode("EXPENSEBILL", "Voucher Approved"); // for 481
             // external
             // systems
             String statusCheck = "";
             if (egwStatus1 == null && egwStatus2 == null)
                 statusCheck = " and bill.status in (" + egwStatus.getId() + ") ";
             else
-                statusCheck = " and bill.status in (" + egwStatus.getId() + "," + egwStatus1.getId() +","+ egwStatus2.getId()+") ";
+                statusCheck = " and bill.status in (" + egwStatus.getId() + "," + egwStatus1.getId() +","+ egwStatus2.getId()+","+ egwStatus3.getId()+") ";
 
             final String contractorBillSql = mainquery + statusCheck + sql.toString() + " order by bill.billdate desc";
             final String contractorBillSql1 = mainquery1 + statusCheck + sql.toString()

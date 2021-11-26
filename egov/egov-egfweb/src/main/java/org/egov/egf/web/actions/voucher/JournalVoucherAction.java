@@ -266,6 +266,7 @@ public class JournalVoucherAction extends BaseVoucherAction
         String voucherDate = formatter1.format(voucherHeader.getVoucherDate());
         String cutOffDate1 = null;
         //removeEmptyRowsAccoutDetail(billDetailslist);
+        LOGGER.info("workFlowAction :::"+workFlowAction);
         if (workFlowAction.equalsIgnoreCase("Save As Draft")) 
         	removeEmptyRowsAccoutDraftDetail(billDetailslist);
         else
@@ -275,10 +276,9 @@ public class JournalVoucherAction extends BaseVoucherAction
         // for manual voucher number.
         // voucherNumType
         final String voucherNumber = voucherHeader.getVoucherNumber();
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Bill details List size  : " + billDetailslist.size());
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Sub ledger details List size  : " + subLedgerlist.size());
+        LOGGER.info("voucherNumber :::"+voucherNumber);
+            LOGGER.info("Bill details List size  : " + billDetailslist.size());
+            LOGGER.info("Sub ledger details List size  : " + subLedgerlist.size());
         loadSchemeSubscheme();
         
 
@@ -328,8 +328,8 @@ public class JournalVoucherAction extends BaseVoucherAction
                 }
                 voucherHeader.setDocumentDetail(documentDetail);               
                 journalVoucherActionHelper.saveDocuments(voucherHeader);
-               
-
+                
+                LOGGER.info(":::::1 ::: ");
                 if (!cutOffDate.isEmpty() && cutOffDate!=null )
                 {
                     try {
@@ -411,9 +411,9 @@ public class JournalVoucherAction extends BaseVoucherAction
                 }
 				
 
-                if (LOGGER.isDebugEnabled())
-                    LOGGER.debug("JournalVoucherAction | create  | Success | message === " + message);
+                    LOGGER.info("JournalVoucherAction | create  | Success | message === " + message);
 				getValidActions();
+				LOGGER.info(":::::3 ::: ");
                 return viewform();
             }
 
