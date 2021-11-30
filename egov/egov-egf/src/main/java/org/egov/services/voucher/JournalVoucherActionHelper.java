@@ -380,13 +380,24 @@ public class JournalVoucherActionHelper {
                 final WorkFlowMatrix wfmatrix = voucherHeaderWorkflowService.getWfMatrix(voucherHeader.getStateType(), null,
                         null, null, workflowBean.getCurrentState(), null);
                 String ststeValue=wfmatrix.getNextState();
+                
                 if ("Save As Draft".equalsIgnoreCase(workflowBean.getWorkFlowAction())) {
                 		ststeValue =FinancialConstants.WORKFLOW_STATE_SAVEASDRAFT;
                 		voucherHeader.setStatus(6);
+            		LOGGER.info("Saveasdraft ownerposition taken from user ::::::::");
+            		LOGGER.info("ApproverPositionId ::::::::"+user.getId());
+            		
+                    voucherHeader.transition().start().withSenderName(user.getName())
+                    .withComments(workflowBean.getApproverComments())
+                   // .withStateValue(wfmatrix.getNextState()).withDateInfo(currentDate.toDate())
+                    .withStateValue(ststeValue).withDateInfo(currentDate.toDate())
+                    .withOwner(user.getId()).withOwnerName((user.getId() != null && user.getId() > 0L) ? getEmployeeName(user.getId()):"")
+                    .withNextAction(wfmatrix.getNextAction())
+                    .withInitiator(user.getId());
                 }
-               
+                else 
+                {
                 LOGGER.info("ApproverPositionId ::::::::"+workflowBean.getApproverPositionId());
-                
                 voucherHeader.transition().start().withSenderName(user.getName())
                         .withComments(workflowBean.getApproverComments())
                        // .withStateValue(wfmatrix.getNextState()).withDateInfo(currentDate.toDate())
@@ -396,6 +407,7 @@ public class JournalVoucherActionHelper {
                         .withInitiator(user.getId());
                         //.withInitiator((info != null && info.getAssignments() != null && !info.getAssignments().isEmpty())
                                 //? info.getAssignments().get(0).getPosition() : null);
+                }
             } else if (voucherHeader.getCurrentState().getNextAction().equalsIgnoreCase("END"))
                 voucherHeader.transition().end().withSenderName(user.getName())
                         .withComments(workflowBean.getApproverComments())
