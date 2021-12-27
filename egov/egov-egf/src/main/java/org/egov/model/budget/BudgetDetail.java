@@ -88,13 +88,13 @@ import static org.egov.model.budget.BudgetDetail.SEQ_BUDGETDETAIL;
 @Entity
 @Table(name = "EGF_BUDGETDETAIL")
 @SequenceGenerator(name = SEQ_BUDGETDETAIL, sequenceName = SEQ_BUDGETDETAIL, allocationSize = 1)
-public class BudgetDetail extends StateAware {
+public class BudgetDetail extends StateAware implements java.io.Serializable{
     public static final String SEQ_BUDGETDETAIL = "SEQ_EGF_BUDGETDETAIL";
     private static final long serialVersionUID = 5908792258911500512L;
     @Id
     @GeneratedValue(generator = SEQ_BUDGETDETAIL, strategy = GenerationType.SEQUENCE)
     private Long id;
-
+    private String type;
     @Transient
     private Long nextYrId = null;
 
@@ -183,9 +183,28 @@ public class BudgetDetail extends StateAware {
 
     @Transient
     private String comment;
-    
+    @Transient
+    private String approvalDepartment;
+    @Transient
+    private String approvalComent;
     @Transient
     private static final Logger LOGGER = Logger.getLogger(BudgetDetail.class);
+
+    public String getApprovalDepartment() {
+		return approvalDepartment;
+	}
+
+	public void setApprovalDepartment(String approvalDepartment) {
+		this.approvalDepartment = approvalDepartment;
+	}
+
+	public String getApprovalComent() {
+		return approvalComent;
+	}
+
+	public void setApprovalComent(String approvalComent) {
+		this.approvalComent = approvalComent;
+	}
 
     public Set<BudgetReAppropriation> getBudgetReAppropriations() {
         return budgetReAppropriations;
@@ -573,6 +592,14 @@ public class BudgetDetail extends StateAware {
 
 	public void setQuarterpercent(BigDecimal quarterpercent) {
 		this.quarterpercent = quarterpercent;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
 	}
 
 	

@@ -157,7 +157,7 @@ public abstract class BaseBudgetDetailAction extends GenericWorkFlowAction {
     private static final String BUDGETBE = "budgetDetail.be.amount";
     @Autowired
     @Qualifier("persistenceService")
-    private PersistenceService persistenceService;
+    protected PersistenceService persistenceService;
     @Autowired
     protected BudgetDetailConfig budgetDetailConfig;
 
@@ -203,7 +203,7 @@ public abstract class BaseBudgetDetailAction extends GenericWorkFlowAction {
     protected abstract void approve();
 
     @Override
-    public String execute() {
+    public String execute() throws Exception {
         return NEW;
     }
 
@@ -709,17 +709,17 @@ public abstract class BaseBudgetDetailAction extends GenericWorkFlowAction {
         return headerDisabled;
     }
 
-    public final boolean shouldShowHeaderField(final String field) {
+    public boolean shouldShowHeaderField(final String field) {
         return headerFields.isEmpty() || headerFields.contains(field);
     }
 
-    public final boolean shouldShowField(final String field) {
+    public boolean shouldShowField(final String field) {
         if (headerFields.isEmpty() && gridFields.isEmpty())
             return true;
         return shouldShowHeaderField(field) || shouldShowGridField(field);
     }
 
-    public final boolean shouldShowGridField(final String field) {
+    public boolean shouldShowGridField(final String field) {
         return gridFields.isEmpty() || gridFields.contains(field);
     }
 
