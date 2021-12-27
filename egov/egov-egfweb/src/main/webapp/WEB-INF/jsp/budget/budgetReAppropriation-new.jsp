@@ -71,7 +71,7 @@
 	<script>
 					
 	function populateSubSchemes(scheme){
-		populatebudgetReAppropriation_subScheme({schemeId:scheme.options[scheme.selectedIndex].value})
+		populatebudgetReAppropriation_subScheme({schemeId:scheme.options[scheme.selectedIndex].value});
 	}
 	
 	function onHeaderSubSchemePopulation(req,res){
@@ -82,11 +82,11 @@
 				if(element) copyOptions(headerSubScheme,element)
 			},pattern)
 		}
-		if(typeof preselectSubScheme=='function') preselectSubScheme()
+		if(typeof preselectSubScheme=='function') preselectSubScheme();
     }
     
     <s:if test="%{shouldShowHeaderField('scheme') and shouldShowHeaderField('subScheme')}">
-	populateSubSchemes(document.getElementById('budgetReAppropriation_scheme'))
+	populateSubSchemes(document.getElementById('budgetReAppropriation_scheme'));
 	function preselectSubScheme(){
 		subSchemes =  document.getElementById('budgetReAppropriation_subScheme');
 		selectedValue="<s:property value='subScheme.id'/>"
@@ -108,6 +108,46 @@
 				opener.top.document.getElementById('inboxframe').contentWindow.egovInbox.refresh();
 			}
 		
+			//$('.btn-wf-primary').click(function(){
+				function button(){
+				var button = $(this).attr('id');
+				document.getElementById("workFlowAction").value = button;
+				var department=document.getElementById("approvalDepartment").value;
+				var designation=document.getElementById("approvalDesignation").value;
+				var position=document.getElementById("approvalPosition").value;
+				var comment=document.getElementById("approvalComent").value;
+				if (button != null && button == 'Reject') {
+					if(comment=='' || comment==null)
+					{
+						bootbox.alert("Enter Comments");
+						return false;
+					}
+					
+				}
+				if (button != null && button == 'Forward') {
+				 	if(department=='-1'||department=='')
+				 	{
+				 		bootbox.alert("Select Approver Department Details");
+				 		return false;
+				 	}
+					if(designation=='-1'||designation=='')
+					{
+						bootbox.alert("Select Approver Designation Details"); 
+						return false;
+					}
+					if(position=='-1'||position=='')
+					{
+						bootbox.alert("Select Approver Details");
+						return false;
+					}
+					validate(false,'create');
+				}
+				if ($('form').valid()) {
+				} else {
+					e.preventDefault();
+				}
+			}
+			
 			function validate(checkUser,method){
 				if(validateMandatoryFields() == false)
 					return false;
@@ -458,7 +498,7 @@
 			hideColumns();
 			document.getElementById('budgetDetailTable').getElementsByTagName('table')[0].width = "100%";
 			addGridRows();
-			updateAllGridValues()
+			updateAllGridValues();
 			<s:if test="%{getActionErrors().size()>0 || getFieldErrors().size()>0}">
 				setValues();
 			</s:if>
@@ -488,7 +528,7 @@
 			hideReAppropriationTableColumns();
 			document.getElementById('budgetReAppropriationsTable').getElementsByTagName('table')[0].width = "70%";
 			addReAppGridRows();
-			updateAllReAppGridValues()
+			updateAllReAppGridValues();
 			<s:if test="%{getActionErrors().size()>0 || getFieldErrors().size()>0}">
 				setValuesForReAppropriation();
 			</s:if>
@@ -498,6 +538,8 @@
 						<tr>
 							<td>
 								<div class="buttonbottom" style="padding-bottom: 10px;">
+								<%@ include file='../budget/commonWorkflowMatrix.jsp'%>
+								<%@ include file='../workflow/commonWorkflowMatrix-button.jsp'%>
 									<input type="submit" value="Forward to CAO"
 										id="budgetReAppropriation__create" name="method:create"
 										onClick="javascript: return validate(false,'create');"
@@ -509,6 +551,7 @@
 							</td>
 						</tr>
 					</table>
+					
 				</div>
 				
 				<!-- Individual tab -->

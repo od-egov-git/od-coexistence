@@ -53,6 +53,9 @@ import org.egov.commons.Fund;
 import org.egov.infra.microservice.models.Department;
 
 import java.math.BigDecimal;
+import java.util.List;
+
+import javax.persistence.Transient;
 
 public class BudgetUploadReport {
 
@@ -81,6 +84,36 @@ public class BudgetUploadReport {
     private String glCode;
 
     private String beBudgetName;
+    @Transient
+    private String approvalDepartment;
+    @Transient
+    private String approvalComent;
+    @Transient
+    private List<BudgetDetail> budgetDetailsList;
+    
+    public List<BudgetDetail> getBudgetDetailsList() {
+		return budgetDetailsList;
+	}
+
+	public void setBudgetDetailsList(List<BudgetDetail> budgetDetailsList) {
+		this.budgetDetailsList = budgetDetailsList;
+	}
+
+	public String getApprovalDepartment() {
+		return approvalDepartment;
+	}
+
+	public void setApprovalDepartment(String approvalDepartment) {
+		this.approvalDepartment = approvalDepartment;
+	}
+
+	public String getApprovalComent() {
+		return approvalComent;
+	}
+
+	public void setApprovalComent(String approvalComent) {
+		this.approvalComent = approvalComent;
+	}
 
     public Fund getFund() {
         return fund;

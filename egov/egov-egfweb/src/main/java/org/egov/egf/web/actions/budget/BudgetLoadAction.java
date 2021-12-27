@@ -61,22 +61,30 @@ import org.apache.struts2.convention.annotation.Results;
 import org.egov.commons.CChartOfAccounts;
 import org.egov.commons.CFinancialYear;
 import org.egov.commons.CFunction;
+import org.egov.commons.CVoucherHeader;
 import org.egov.commons.Fund;
 import org.egov.commons.dao.FinancialYearDAO;
 import org.egov.commons.dao.FunctionDAO;
 import org.egov.commons.dao.FundHibernateDAO;
 import org.egov.commons.service.ChartOfAccountsService;
+import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.service.DepartmentService;
+import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.filestore.entity.FileStoreMapper;
 import org.egov.infra.filestore.service.FileStoreService;
 import org.egov.infra.microservice.models.Department;
+import org.egov.infra.microservice.models.EmployeeInfo;
 import org.egov.infra.validation.exception.ValidationError;
 import org.egov.infra.validation.exception.ValidationException;
 import org.egov.infra.web.struts.actions.BaseFormAction;
 import org.egov.infra.web.struts.annotation.ValidationErrorPage;
+import org.egov.infra.workflow.entity.StateAware;
 import org.egov.infstr.services.PersistenceService;
 import org.egov.infstr.utils.EgovMasterDataCaching;
 import org.egov.model.budget.BudgetUpload;
+import org.egov.model.voucher.WorkflowBean;
+import org.egov.model.budget.Budget;
+import org.egov.model.budget.BudgetDetail;
 import org.egov.services.budget.BudgetDetailService;
 import org.egov.utils.FinancialConstants;
 import org.slf4j.Logger;
@@ -84,7 +92,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.multipart.MultipartFile;
-
+import org.egov.egf.web.actions.budget.BaseBudgetDetailAction;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -95,6 +103,7 @@ import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -105,7 +114,7 @@ import java.util.Map;
         @Result(name = "upload", location = "budgetLoad-upload.jsp"),
         @Result(name = "result", location = "budgetLoad-result.jsp")
 })
-public class BudgetLoadAction extends BaseFormAction {
+public class BudgetLoadAction extends BaseBudgetDetailAction {
 
     private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LoggerFactory.getLogger(BudgetLoadAction.class);
@@ -170,16 +179,41 @@ public class BudgetLoadAction extends BaseFormAction {
     @Qualifier("masterDataCache")
     private EgovMasterDataCaching masterDataCache;
 
-    @Override
     @SuppressWarnings("unchecked")
-    public void prepare()
-    {
+    @Override
+    public void prepare() {
+        super.prepare();
+        addDropdownData("approvaldepartmentList", Collections.EMPTY_LIST);
+        addDropdownData("designationList", Collections.EMPTY_LIST);
+        addDropdownData("userList", Collections.EMPTY_LIST);
 
     }
 
     @Override
-    public Object getModel() {
-        return null;
+    public StateAware getModel() {
+        budgetDetail = (BudgetDetail) super.getModel();
+        budgetDetail.setType(FinancialConstants.BUDGETDETAIL);
+        return budgetDetail;
+
+    };
+    
+    public List<String> getValidActions() {
+        List<String> validActions = Collections.emptyList();
+        
+            if (null == budgetDetail || null == budgetDetail.getId()
+                    || budgetDetail.getCurrentState().getValue().endsWith("NEW")) {
+				validActions = Arrays.asList(FinancialConstants.BUTTONFORWARD);
+				
+            } else {
+                if (budgetDetail.getCurrentState() != null) {
+                    validActions = this.customizedWorkFlowService.getNextValidActions(budgetDetail
+                            .getStateType(), getWorkFlowDepartment(), getAmountRule(),
+                            getAdditionalRule(), budgetDetail.getCurrentState().getValue(),
+                            getPendingActions(), budgetDetail.getCreatedDate());
+                }
+            }
+        
+        return validActions;
     }
 
     @Action(value = "/budget/budgetLoad-beforeUpload")
@@ -266,12 +300,20 @@ public class BudgetLoadAction extends BaseFormAction {
 
             budgetUploadList = removeEmptyRows(budgetUploadList);
             System.out.println("13");
-            budgetUploadList = budgetDetailService.loadBudget(budgetUploadList, reFYear, beFYear);
+            populateWorkflowBean();
+			/*
+			 * if(workflowBean.getCurrentState()==null
+			 * ||workflowBean.getCurrentState().equalsIgnoreCase("")) {
+			 * workflowBean.setCurrentState("NEW"); }
+			 */
+            //budgetUploadList = budgetDetailService.loadBudget(budgetUploadList, reFYear, beFYear);
+            budgetUploadList = budgetDetailService.loadBudgetNew(budgetDetail,budgetUploadList, reFYear, beFYear,workflowBean);
             System.out.println("14");
             fsIP.close();
             prepareOutPutFileWithFinalStatus(budgetUploadList);
-
-            addActionMessage(getText("budget.load.sucessful.cao"));
+            String ApproverName=budgetDetailService.getEmployeeName(workflowBean.getApproverPositionId());
+            addActionMessage("Budget upload is successful and sent to "+ApproverName);
+            //addActionMessage(getText("budget.load.sucessful.cao"));
 
         } catch (final ValidationException e)
         {
@@ -813,4 +855,63 @@ public class BudgetLoadAction extends BaseFormAction {
         this.timeStamp = timeStamp;
     }
 
+	@Override
+	public void populateSavedbudgetDetailListFor(Budget budget) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void populateSavedbudgetDetailListForDetail(BudgetDetail bd) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void saveAndStartWorkFlow(BudgetDetail detail, WorkflowBean workflowBean) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void saveAndStartWorkFlowForRe(BudgetDetail detail, int index, CFinancialYear finYear, Budget refBudget,
+			WorkflowBean workflowBean) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void approve() {
+		// TODO Auto-generated method stub
+		
+	}
+
+public void populateWorkflowBean() {
+		
+		if (workFlowAction.equalsIgnoreCase("Save As Draft")) {
+			
+			Long position = populatePosition();
+			workflowBean.setApproverPositionId(position);
+		} else {
+			workflowBean.setApproverPositionId(approverPositionId);
+		}
+		workflowBean.setApproverComments(approverComments);
+		workflowBean.setWorkFlowAction(workFlowAction);
+		if (workFlowAction.equalsIgnoreCase("Save As Draft")) {
+			workflowBean.setCurrentState("SaveAsDraft");
+		} else {
+			workflowBean.setCurrentState(currentState);
+		}
+
+	}
+	private Long populatePosition() {
+		Long empId = ApplicationThreadLocals.getUserId();
+		Long pos = null;
+		List<EmployeeInfo> employs = microserviceUtils.getEmployee(empId, null, null, null);
+		if (null != employs && employs.size() > 0) {
+			pos = employs.get(0).getAssignments().get(0).getPosition();
+	
+		}
+	return pos;
+	}
 }

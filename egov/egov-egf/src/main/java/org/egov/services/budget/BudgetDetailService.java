@@ -71,6 +71,7 @@ import org.egov.infra.admin.master.service.DepartmentService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.exception.ApplicationRuntimeException;
 import org.egov.infra.microservice.models.Department;
+import org.egov.infra.microservice.models.EmployeeInfo;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.persistence.utils.DatabaseSequenceProvider;
 import org.egov.infra.script.entity.Script;
@@ -79,17 +80,20 @@ import org.egov.infra.security.utils.SecurityUtils;
 import org.egov.infra.validation.exception.ValidationError;
 import org.egov.infra.validation.exception.ValidationException;
 import org.egov.infra.workflow.entity.State;
+import org.egov.infra.workflow.matrix.entity.WorkFlowMatrix;
 import org.egov.infra.workflow.service.SimpleWorkflowService;
 import org.egov.infra.workflow.service.WorkflowService;
 import org.egov.infstr.services.PersistenceService;
 import org.egov.infstr.utils.EgovMasterDataCaching;
+import org.egov.model.bills.EgBillregister;
 import org.egov.model.budget.Budget;
 import org.egov.model.budget.BudgetDetail;
 import org.egov.model.budget.BudgetGroup;
 import org.egov.model.budget.BudgetUpload;
+import org.egov.model.budget.BudgetUploadReport;
 import org.egov.model.repository.BudgetDetailRepository;
 import org.egov.model.voucher.WorkflowBean;
-import org.egov.pims.commons.Designation;
+import org.egov.infra.microservice.models.Designation;
 import org.egov.pims.commons.Position;
 import org.egov.pims.model.PersonalInformation;
 import org.egov.utils.BudgetAccountType;
@@ -136,7 +140,10 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
     private static final String RE = "RE";
     @Autowired
     protected EisCommonService eisCommonService;
-    protected WorkflowService<BudgetDetail> budgetDetailWorkflowService;
+    @Autowired
+    @Qualifier("workflowService")
+    private SimpleWorkflowService<BudgetDetail> budgetDetailWorkflowService;
+   // protected WorkflowService<BudgetDetail> budgetDetailWorkflowService;
     private ScriptService scriptExecutionService;
     @Autowired
     private AppConfigValueService appConfigValuesService;
@@ -172,6 +179,8 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
 
     @Autowired
     private DepartmentService departmentService;
+    @Autowired
+    private MicroserviceUtils microServiceUtil;
 
     @Autowired
     private SecurityUtils securityUtils;
@@ -1711,7 +1720,11 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
         return eisCommonService.getEmployeeByUserId(ApplicationThreadLocals.getUserId());
     }
 
-    public void setBudgetDetailWorkflowService(final WorkflowService<BudgetDetail> budgetDetailWorkflowService) {
+    public SimpleWorkflowService<BudgetDetail> getBudgetDetailWorkflowService() {
+		return budgetDetailWorkflowService;
+	}
+
+	public void setBudgetDetailWorkflowService(SimpleWorkflowService<BudgetDetail> budgetDetailWorkflowService) {
         this.budgetDetailWorkflowService = budgetDetailWorkflowService;
     }
 
@@ -1728,7 +1741,7 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
         final Assignment empAssignment = eisCommonService
                 .getLatestAssignmentForEmployeeByToDate(ApplicationThreadLocals.getUserId(), new Date());
         final Functionary empfunctionary = empAssignment.getFunctionary();
-        final Designation designation = empAssignment.getDesignation();
+        final Designation designation =null;// empAssignment.getDesignation();
         Boolean consolidateBudget = Boolean.FALSE;
         final List<AppConfigValues> list = appConfigValuesService.getConfigValuesByModuleAndKey(Constants.EGF,
                 "budget_toplevel_approver_designation");
@@ -1782,9 +1795,69 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
             }
             final EgwStatus budgetDetailStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "CAO Verify");
 
-            budgetUploadList = createBudgetDetails(RE, budgetUploadList, reFYear, budgetDetailStatus);
+			/*
+			 * budgetUploadList = createBudgetDetails(RE, budgetUploadList, reFYear,
+			 * budgetDetailStatus);
+			 * 
+			 * budgetUploadList = createBudgetDetails(BE, budgetUploadList, beFYear,
+			 * budgetDetailStatus);
+			 */
 
-            budgetUploadList = createBudgetDetails(BE, budgetUploadList, beFYear, budgetDetailStatus);
+        } catch (final ValidationException e) {
+        	System.out.println("issue V4 :"+e.getMessage());
+            throw new ValidationException(Arrays
+                    .asList(new ValidationError(e.getErrors().get(0).getMessage(), e.getErrors().get(0).getMessage())));
+        } catch (final Exception e) {
+            throw new ValidationException(Arrays.asList(new ValidationError(e.getMessage(), e.getMessage())));
+        }
+        return budgetUploadList;
+    }
+    
+    @Transactional
+    public List<BudgetUpload> loadBudgetNew(BudgetDetail budgetdetail, List<BudgetUpload> budgetUploadList, final CFinancialYear reFYear,
+            final CFinancialYear beFYear, WorkflowBean workflowBean) {
+
+        try {
+
+            final Budget budget = budgetService.getByName("RE-" + reFYear.getFinYearRange());
+            if (budget == null) {
+                final Set<String> deptSet = new TreeSet<String>();
+                final List<String> deptList = new ArrayList<String>();
+                final List<Department> departments =   masterDataCache.get("egi-department");
+
+                for (final Department dept : departments)
+                    deptSet.add(dept.getCode());
+
+                deptList.addAll(deptSet);
+                final EgwStatus budgetStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGET", "Created");
+                createRootBudget(RE, beFYear, reFYear, deptList, budgetStatus);
+
+                createRootBudget(BE, beFYear, reFYear, deptList, budgetStatus);
+
+            }
+            try {
+            	
+            budgetdetail = transitionWorkFlow(budgetdetail, workflowBean);
+            BudgetDetailService.applyAuditingNew(budgetdetail.getState());
+            }
+            catch(Exception e)
+            {
+            	System.out.println("error "+e.getMessage());
+            	e.printStackTrace();
+            }
+            final EgwStatus budgetDetailStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "Created");
+
+			/* old code
+			 * budgetUploadList = createBudgetDetails(RE, budgetUploadList, reFYear,
+			 * budgetDetailStatus);
+			 * 
+			 * budgetUploadList = createBudgetDetails(BE, budgetUploadList, beFYear,
+			 * budgetDetailStatus);
+			 */
+            
+            budgetUploadList = createBudgetDetails(RE, budgetUploadList, reFYear, budgetDetailStatus,budgetdetail);
+
+            budgetUploadList = createBudgetDetails(BE, budgetUploadList, beFYear, budgetDetailStatus,budgetdetail);
 
         } catch (final ValidationException e) {
         	System.out.println("issue V4 :"+e.getMessage());
@@ -1796,9 +1869,10 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
         return budgetUploadList;
     }
 
+    
     @Transactional
     public List<BudgetUpload> createBudgetDetails(final String budgetType, final List<BudgetUpload> budgetUploadList,
-            final CFinancialYear fyear, final EgwStatus status) {
+            final CFinancialYear fyear, final EgwStatus status, final BudgetDetail budgetDetailPrev) {
         final List<BudgetUpload> tempList = new ArrayList<BudgetUpload>();
         try {
         	System.out.println("bbbbbb");
@@ -1874,6 +1948,7 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
                             budgetUpload.getDeptCode(), budgetType, fyear.getFinYearRange()));
                     budgetDetail.setMaterializedPath(getmaterializedpathforbudget(budgetDetail.getBudget()));
                     budgetDetail.setStatus(status);
+                    budgetDetail.setState(budgetDetailPrev.getState());
                     // budgetDetail = setBudgetDetailStatus(budgetDetail);
                     applyAuditing(budgetDetail);
                     persist(budgetDetail);
@@ -2210,6 +2285,13 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
 
     }
 
+    public BudgetDetail getBudgetDetailNew(final Integer fundId, final Long functionId, final String deptCode, final Long budgetId) {
+		System.out.println("getBudgetDetailNew");
+		return find(
+                "from BudgetDetail bd where bd.fund.id = ? and bd.function.id = ? and bd.executingDepartment = ? and bd.budget.id = ? ",
+                fundId, functionId, deptCode, budgetId);
+	}
+    
     public BudgetDetail getBudgetDetail(final Integer fundId, final Long functionId, final String deptCode,
             final Long budgetGroupId) {
         return find(
@@ -2270,8 +2352,330 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
                 .findByEmployeeAndGivenDate(budgetDetail.getCreatedBy(), new Date()).get(0);
     }
 
+    public BudgetDetail transitionWorkFlow(BudgetDetail budgetDetail, Long approvalPosition, String approvalComment,
+			String workFlowAction, String approvalDesignation) {
+    	final User user = securityUtils.getCurrentUser();
+        final DateTime currentDate = new DateTime();
+        Assignment wfInitiator = null;
+        Map<String, String> finalDesignationNames = new HashMap<>();
+        final String currState = "";
+        String stateValue = "";
+        System.out.println("desig********:"+approvalDesignation);
+        if (null != budgetDetail.getId())
+     
+        	wfInitiator = this.getCurrentUserAssignmet(budgetDetail.getCreatedBy());
+            WorkFlowMatrix wfmatrix;
+           Designation designation = this.getDesignationDetails(approvalDesignation);
+           if(designation != null)
+           {
+        	   System.out.println("Designation:::::::::::"+designation.getName().toUpperCase());
+           }
+           Position owenrPos = new Position();
+           owenrPos.setId(approvalPosition);
+            wfmatrix = budgetDetailWorkflowService.getWfMatrix(budgetDetail.getStateType(), null,
+                    null,null, FinancialConstants.WF_STATE_FINAL_APPROVAL_PENDING, null);
+            if (wfmatrix != null && wfmatrix.getCurrentDesignation() != null) {
+                final List<String> finalDesignationName = Arrays.asList(wfmatrix.getCurrentDesignation().split(","));
+                for (final String desgName : finalDesignationName)
+                    if (desgName != null && !"".equals(desgName.trim()))
+                        finalDesignationNames.put(desgName.toUpperCase(), desgName.toUpperCase());
+            }
+            if (null == budgetDetail.getState()) {
+            	System.out.println("state value "+budgetDetail.getState().getValue());
+                wfmatrix = budgetDetailWorkflowService.getWfMatrix(budgetDetail.getStateType(), null,
+                        null, null, budgetDetail.getState().getValue(), null);
+                if (stateValue.isEmpty())
+                {
+                	if(!wfmatrix.getNextState().equalsIgnoreCase(FinancialConstants.WF_STATE_FINAL_APPROVAL_PENDING))
+                	{
+                		stateValue = wfmatrix.getNextState()+ " "+designation.getName().toUpperCase();
+                	}
+                	else
+                	{
+                		stateValue = wfmatrix.getNextState();
+                	}
+                }
+                if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT)){
+                	stateValue = FinancialConstants.BUTTONSAVEASDRAFT;
+            	}
+                budgetDetail.transition().start().withSenderName(user.getUsername() + "::" + user.getName())
+                        .withComments(approvalComment)
+                        //.withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
+                        .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"") //added abhishek on 05042021
+                        .withNextAction(wfmatrix.getNextAction())
+                        .withNatureOfTask(FinancialConstants.BUDGETDETAIL)
+                        .withCreatedBy(user.getId())
+                        .withtLastModifiedBy(user.getId());
+            } else if (FinancialConstants.BUTTONCANCEL.equalsIgnoreCase(workFlowAction)) {
+                stateValue = FinancialConstants.WORKFLOW_STATE_CANCELLED;
+                budgetDetail.transition().end().withSenderName(user.getUsername() + "::" + user.getName())
+                        .withComments(approvalComment)
+                        .withStateValue(stateValue).withDateInfo(currentDate.toDate())
+                        .withNextAction("")
+                        .withNatureOfTask(FinancialConstants.BUDGETDETAIL);
+            } else if (FinancialConstants.BUTTONAPPROVE.equalsIgnoreCase(workFlowAction)) {
+                wfmatrix = budgetDetailWorkflowService.getWfMatrix(budgetDetail.getStateType(), null,
+                        null, null, budgetDetail.getState().getValue(), null);
+
+                if (stateValue.isEmpty())
+                    stateValue = wfmatrix.getNextState();
+
+                budgetDetail.transition().end().withSenderName(user.getUsername() + "::" + user.getName())
+                        .withComments(approvalComment)
+                        .withStateValue(stateValue).withDateInfo(new Date())
+                        .withNextAction(wfmatrix.getNextAction())
+                        .withNatureOfTask(FinancialConstants.BUDGETDETAIL);
+            } else {
+
+                wfmatrix = budgetDetailWorkflowService.getWfMatrix(budgetDetail.getStateType(), null,
+                        null, null, budgetDetail.getState().getValue(), null);
+                
+                if (stateValue.isEmpty())
+                {
+                	if(!wfmatrix.getNextState().equalsIgnoreCase(FinancialConstants.WF_STATE_FINAL_APPROVAL_PENDING) && !wfmatrix.getNextState().equalsIgnoreCase("NEW"))
+                	{
+                		stateValue = wfmatrix.getNextState();//+ " "+designation.getName().toUpperCase();
+                	}
+                	else if(wfmatrix.getNextState().equalsIgnoreCase("NEW"))
+                	{
+                		stateValue = "Pending With "+ designation.getName().toUpperCase();
+                	}
+                	else
+                	{
+                		stateValue = wfmatrix.getNextState();	
+                	}
+                }
+				if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
+            	{
+                	stateValue = FinancialConstants.BUTTONSAVEASDRAFT;
+            	}
+				if (FinancialConstants.BUTTONREJECT.equalsIgnoreCase(workFlowAction)) {
+					int size=budgetDetail.getStateHistory().size();//added abhishek on 12042021
+					Position owenrPosName = new Position();
+					owenrPosName.setId(approvalPosition);
+					HashMap<Long, Long> positionmap = new HashMap<>();
+					for(int i=0;i<size;i++)
+					{
+						positionmap.put(budgetDetail.getStateHistory().get(i).getOwnerPosition(),
+								budgetDetail.getStateHistory().get(i).getPreviousownerposition());
+					}
+					if(size>0)
+					{
+						Long owenrPos1=0l;
+						if(positionmap.containsKey(user.getId()))
+							owenrPos1=positionmap.get(user.getId());
+						else
+							owenrPos1=(long) budgetDetail.getStateHistory().get(size-1).getOwnerPosition();
+						
+						if(owenrPos1==null|| owenrPos1.equals(""))
+							owenrPos1=(long) budgetDetail.getCreatedBy();
+						owenrPosName.setId(owenrPos1);
+						
+						System.out.println("E owner position "+owenrPos1);
+						owenrPos.setId(owenrPos1);
+					}
+					else
+					{
+						owenrPos.setId(budgetDetail.getState().getCreatedBy());
+						owenrPosName.setId(budgetDetail.getState().getCreatedBy());
+					}
+		            System.out.println("ownerPostion id- "+owenrPos);
+		            System.out.println("ownerPostion Nameid- "+owenrPosName);
+					stateValue = FinancialConstants.WORKFLOW_STATE_REJECTED;
+					budgetDetail.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
+                    .withComments(approvalComment)
+                    .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPosName).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
+                    .withNextAction("")
+                    .withNatureOfTask(FinancialConstants.BUDGETDETAIL);
+		        
+		        }
+				else
+				{
+					//////added abhishek for forward when current state is rejected
+					if(budgetDetail.getState().getValue().equalsIgnoreCase("Rejected")) 
+	                {
+		                HashMap<Long, String> positionmap = new HashMap<>();
+		                HashMap<Long, String> positionmap1 = new HashMap<>();
+		                int size=budgetDetail.getStateHistory().size();
+		    			for(int i=0;i<size;i++)
+		    			{
+		    				positionmap.put(budgetDetail.getStateHistory().get(i).getLastModifiedBy(),
+		    						budgetDetail.getStateHistory().get(i).getValue());
+		    				positionmap1.put(budgetDetail.getStateHistory().get(i).getLastModifiedBy(),
+		    						budgetDetail.getStateHistory().get(i).getNextAction());
+		    			}
+		    			if(positionmap.containsKey(user.getId()))
+		    			{
+		    				stateValue=positionmap.get(user.getId());
+		    				wfmatrix.setNextAction(positionmap1.get(user.getId()));
+		    			}
+	                }
+					////////end
+	                
+					budgetDetail.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
+                        .withComments(approvalComment)
+                        .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
+                        .withNextAction(wfmatrix.getNextAction())
+                        .withNatureOfTask(FinancialConstants.BUDGETDETAIL);
+            }
+        }
+        return budgetDetail;
+	}
+
     @Transactional
-    public BudgetDetail transitionWorkFlow(final BudgetDetail budgetDetail, final WorkflowBean workflowBean) {
+    public BudgetDetail transitionWorkFlow(final BudgetDetail budgetDetail, WorkflowBean workflowBean) {
+        final DateTime currentDate = new DateTime();
+        final User user = securityUtils.getCurrentUser();
+        String stateValue = "";
+        Designation designation = this.getDesignationDetails(this.getEmployeeDesignation(workflowBean.getApproverPositionId()));
+        EmployeeInfo info = null;
+        
+        if (user != null && user.getId() != null)
+            info = microserviceUtils.getEmployeeById(user.getId());
+
+        if (FinancialConstants.BUTTONREJECT.equalsIgnoreCase(workflowBean.getWorkFlowAction())) {
+            stateValue = FinancialConstants.WORKFLOW_STATE_REJECTED;
+            int size=budgetDetail.getStateHistory().size();//added abhishek on 12042021
+			Position owenrPosName = new Position();
+			Position owenrPos = new Position();
+	        owenrPos.setId(workflowBean.getApproverPositionId());
+			owenrPosName.setId(workflowBean.getApproverPositionId());
+			HashMap<Long, Long> positionmap = new HashMap<>();
+			for(int i=0;i<size;i++)
+			{
+				positionmap.put(budgetDetail.getStateHistory().get(i).getOwnerPosition(),
+						budgetDetail.getStateHistory().get(i).getPreviousownerposition());
+			}
+			if(size>0)
+			{
+				Long owenrPos1=0l;
+				if(positionmap.containsKey(user.getId()))
+					owenrPos1=positionmap.get(user.getId());
+				else
+					owenrPos1=(long) budgetDetail.getStateHistory().get(size-1).getOwnerPosition();
+				
+				if(owenrPos1==null|| owenrPos1.equals(""))
+					owenrPos1=(long) budgetDetail.getCreatedBy();
+				owenrPosName.setId(owenrPos1);
+				System.out.println("Budget owner position "+owenrPos1);
+				owenrPos.setId(owenrPos1);
+			}
+			else
+			{
+				owenrPos.setId(budgetDetail.getState().getCreatedBy());
+				owenrPosName.setId(budgetDetail.getState().getCreatedBy());
+			}
+            System.out.println("ownerPostion id- "+owenrPos);
+            System.out.println("ownerPostion Nameid- "+owenrPosName);
+			
+            budgetDetail.transition().progressWithStateCopy().withSenderName(user.getName())
+                    .withComments(workflowBean.getApproverComments())
+                    //.withStateValue(stateValue).withDateInfo(currentDate.toDate())
+                    //.withOwner(budgetDetail.getState().getInitiatorPosition()).withOwnerName((budgetDetail.getState().getInitiatorPosition() != null && budgetDetail.getState().getInitiatorPosition() > 0L) ? getEmployeeName(budgetDetail.getState().getInitiatorPosition()):"")
+                    .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPosName).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
+                    //.withNextAction(FinancialConstants.WF_STATE_EOA_Approval_Pending);
+                    .withNextAction("");
+
+        } else if (FinancialConstants.BUTTONAPPROVE.equalsIgnoreCase(workflowBean.getWorkFlowAction())) {
+            final WorkFlowMatrix wfmatrix = budgetDetailWorkflowService.getWfMatrix(budgetDetail.getStateType(), null,
+                    null, null, budgetDetail.getCurrentState().getValue(), null);
+            Position pos=new Position();
+            pos.setId(user.getId());
+            budgetDetail.transition().end().withSenderName(user.getName()).withComments(workflowBean.getApproverComments())
+                    .withStateValue(wfmatrix.getCurrentDesignation() + " Approved").withDateInfo(currentDate.toDate())
+                    .withOwner(pos)/*withOwner((info != null && info.getAssignments() != null && !info.getAssignments().isEmpty())
+                            ? info.getAssignments().get(0).getPosition() : null)*/
+                    .withNextAction(wfmatrix.getNextAction());
+
+            budgetDetail.setStatus(egwStatusHibernateDAO.getStatusByModuleAndCode(FinancialConstants.BUDGETDETAIL,
+                    FinancialConstants.BUDGETDETAIL_CREATED_STATUS));
+        } else if (FinancialConstants.BUTTONCANCEL.equalsIgnoreCase(workflowBean.getWorkFlowAction())) {
+        	budgetDetail.setStatus(egwStatusHibernateDAO.getStatusByModuleAndCode(FinancialConstants.BUDGETDETAIL,
+                    FinancialConstants.BUDGETDETAIL_CANCELLED_STATUS));
+            budgetDetail.transition().end().withStateValue(FinancialConstants.WORKFLOW_STATE_CANCELLED)
+                    .withSenderName(user.getName()).withComments(workflowBean.getApproverComments())
+                    .withDateInfo(currentDate.toDate());
+        } else {
+        	
+            if (null == budgetDetail.getState()) {
+                final WorkFlowMatrix wfmatrix = budgetDetailWorkflowService.getWfMatrix(budgetDetail.getStateType(), null,
+                        null, null, workflowBean.getCurrentState(), null);
+                if (stateValue.isEmpty())
+                {
+                	if(!wfmatrix.getNextState().equalsIgnoreCase(FinancialConstants.WF_STATE_FINAL_APPROVAL_PENDING) && !wfmatrix.getNextState().equalsIgnoreCase("NEW"))
+                	{
+                		stateValue = wfmatrix.getNextState();//+ " "+designation.getName().toUpperCase();
+                	}
+                	else if(wfmatrix.getNextState().equalsIgnoreCase("NEW"))
+                	{
+                		stateValue = "Pending With "+ designation.getName().toUpperCase();
+                	}
+                	else
+                	{
+                		stateValue = wfmatrix.getNextState();
+                	}
+                    
+                }
+                if ("Save As Draft".equalsIgnoreCase(workflowBean.getWorkFlowAction())) {
+                	stateValue =FinancialConstants.WORKFLOW_STATE_SAVEASDRAFT;
+                		//budgetDetail.setStatus(6);
+                }
+               
+                System.out.println("::::::::"+workflowBean.getApproverPositionId());
+                
+                budgetDetail.transition().start().withSenderName(user.getName())
+                        .withComments(workflowBean.getApproverComments())
+                       // .withStateValue(wfmatrix.getNextState()).withDateInfo(currentDate.toDate())
+                        .withStateValue(stateValue).withDateInfo(currentDate.toDate())
+                        .withNatureOfTask(FinancialConstants.BUDGETDETAIL)
+                        .withOwner(workflowBean.getApproverPositionId()).withOwnerName((workflowBean.getApproverPositionId() != null && workflowBean.getApproverPositionId() > 0L) ? getEmployeeName(workflowBean.getApproverPositionId()):"")
+                        .withNextAction(wfmatrix.getNextAction())
+                        .withCreatedBy(user.getId())
+                        .withtLastModifiedBy(user.getId());
+            } else if (budgetDetail.getCurrentState().getNextAction().equalsIgnoreCase("END"))
+                budgetDetail.transition().end().withSenderName(user.getName())
+                        .withComments(workflowBean.getApproverComments())
+                        .withDateInfo(currentDate.toDate());
+            else {
+				final WorkFlowMatrix wfmatrix = budgetDetailWorkflowService.getWfMatrix(budgetDetail.getStateType(), null,
+                        null, null,budgetDetail.getCurrentState().getValue(), null);
+                String ststeValue=wfmatrix.getNextState();
+                Long owner = workflowBean.getApproverPositionId();
+                if ("Save As Draft".equalsIgnoreCase(workflowBean.getWorkFlowAction()))
+                {
+                		ststeValue =FinancialConstants.WORKFLOW_STATE_SAVEASDRAFT;
+                		owner = populatePosition();
+                }
+                if(budgetDetail.getState().getValue().equalsIgnoreCase("Rejected")) 
+                {
+	                HashMap<Long, String> positionmap = new HashMap<>();
+	                HashMap<Long, String> positionmap1 = new HashMap<>();
+	                int size=budgetDetail.getStateHistory().size();
+	    			for(int i=0;i<size;i++)
+	    			{
+	    				positionmap.put(budgetDetail.getStateHistory().get(i).getLastModifiedBy(),
+	    						budgetDetail.getStateHistory().get(i).getValue());
+	    				positionmap1.put(budgetDetail.getStateHistory().get(i).getLastModifiedBy(),
+	    						budgetDetail.getStateHistory().get(i).getNextAction());
+	    			}
+	    			if(positionmap.containsKey(user.getId()))
+	    			{
+	    				ststeValue=positionmap.get(user.getId());
+	    				wfmatrix.setNextAction(positionmap1.get(user.getId()));
+	    			}
+                }
+                budgetDetail.transition().progressWithStateCopy().withSenderName(user.getName())
+                        .withComments(workflowBean.getApproverComments())
+                        .withStateValue(ststeValue).withDateInfo(currentDate.toDate())
+                        .withOwner(owner).withOwnerName((owner != null && owner > 0L) ? getEmployeeName(owner):"")
+                        .withNextAction(wfmatrix.getNextAction());
+            }
+        }
+        return budgetDetail;
+    }
+    
+    @Transactional
+    public BudgetDetail transitionWorkFlow_old(final BudgetDetail budgetDetail, final WorkflowBean workflowBean) {
         final User user = securityUtils.getCurrentUser();
         final Assignment userAssignment = assignmentService.findByEmployeeAndGivenDate(user.getId(), new Date()).get(0);
         Position pos = null;
@@ -2605,8 +3009,67 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
     }
 
     public String getEmployeeName(Long empId){
-        
         return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+     }
+    public String getEmployeeDesignation(Long empId) {
+    	return microserviceUtils.getEmployee(empId, null, null, null).get(0).getAssignments().get(0).getDesignation();
+    }
+    private String populateEmpName() {
+		Long empId = ApplicationThreadLocals.getUserId();
+		String name = null;
+		List<EmployeeInfo> employs = microserviceUtils.getEmployee(empId, null, null, null);
+		if (null != employs && employs.size() > 0) {
+			name = employs.get(0).getAssignments().get(0).getEmployeeName();
+
+		}
+		return name;
+	}
+    
+    private Long populatePosition() {
+		Long empId = ApplicationThreadLocals.getUserId();
+		Long pos = null;
+		List<EmployeeInfo> employs = microserviceUtils.getEmployee(empId, null, null, null);
+		if (null != employs && employs.size() > 0) {
+			pos = employs.get(0).getAssignments().get(0).getPosition();
+
+		}
+		return pos;
+	}
+
+    private Assignment getCurrentUserAssignmet(Long userId){
+//    	Long userId = ApplicationThreadLocals.getUserId();
+    	List<EmployeeInfo> emplist = microServiceUtil.getEmployee(userId, null, null, null);
+    	Assignment assignment =new Assignment();
+    	if(null!=emplist && emplist.size()>0 && emplist.get(0).getAssignments().size()>0){
+    		Position position = new Position();
+    		position.setId(emplist.get(0).getAssignments().get(0).getPosition());
+    		assignment.setPosition(position);
+        
+    		org.egov.pims.commons.Designation designation = new org.egov.pims.commons.Designation();
+            Designation _desg = this.getDesignationDetails(emplist.get(0).getAssignments().get(0).getDesignation());
+            designation.setCode(_desg.getCode());
+            designation.setName(_desg.getName());
+            assignment.setDesignation(designation);
+            
+            org.egov.infra.admin.master.entity.Department department = new org.egov.infra.admin.master.entity.Department();
+            Department _dept = this.getDepartmentDetails(emplist.get(0).getAssignments().get(0).getDepartment());
+            department.setCode(_dept.getCode());
+            department.setName(_dept.getName());
+            
+            return assignment;
+    	}
+    	return null;
+    }
+    private Department getDepartmentDetails(String deptCode){
+    	
+    	Department dept = microServiceUtil.getDepartmentByCode(deptCode);
+    	return dept;
+    	
+    }
+    
+    private org.egov.infra.microservice.models.Designation getDesignationDetails(String desgnCode){
+    	List<org.egov.infra.microservice.models.Designation> designation = microServiceUtil.getDesignation(desgnCode);
+    	return designation.get(0);
      }
 
 }

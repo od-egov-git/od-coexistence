@@ -49,22 +49,36 @@
 package org.egov.egf.web.controller;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.struts2.convention.annotation.Action;
+import org.egov.commons.EgwStatus;
+import org.egov.commons.dao.EgwStatusHibernateDAO;
 import org.egov.commons.service.ChartOfAccountsService;
 import org.egov.commons.service.FunctionService;
 import org.egov.commons.service.FundService;
-import org.egov.dao.budget.BudgetDetailsDAO;
+import org.egov.egf.utils.FinancialUtils;
 import org.egov.egf.web.controller.expensebill.BaseBillController;
+import org.egov.eis.web.contract.WorkflowContainer;
 import org.egov.infra.admin.master.entity.Department;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.admin.master.service.DepartmentService;
+import org.egov.infra.config.core.ApplicationThreadLocals;
+import org.egov.infra.microservice.models.EmployeeInfo;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
+import org.egov.infstr.services.PersistenceService;
+import org.egov.model.bills.EgBillregister;
 import org.egov.model.budget.Budget;
 import org.egov.model.budget.BudgetDetail;
 import org.egov.model.budget.BudgetUploadReport;
 import org.egov.model.budget.BudgetWrapper;
-import org.egov.model.repository.BudgetDetailRepository;
+import org.egov.model.voucher.WorkflowBean;
 import org.egov.services.budget.BudgetDetailService;
 import org.egov.services.budget.BudgetService;
 import org.egov.utils.FinancialConstants;
@@ -74,6 +88,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -81,10 +96,19 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/approvebudget")
-public class ApproveBudgetController {
+public class ApproveBudgetController extends BaseBillController{
    
+
+	public ApproveBudgetController(AppConfigValueService appConfigValuesService) {
+		super(appConfigValuesService);
+		// TODO Auto-generated constructor stub
+	}
+
+	private static final String APPROVAL_POSITION = "approvalPosition";
+	private static final String APPROVAL_DESIGNATION = "approvalDesignation";
     private final static String APPROVEBUDGET_SEARCH = "approvebudget-search";
     private final static String APPROVEBUDGET_SEARCH_CAO = "approvebudget-searchCAO";
+    private final static String APPROVEBUDGET_SEARCH_CAO_NEW = "approvebudget-searchCAO_New";
     private final static String APPROVEBUDGET_SEARCH_SO = "approvebudget-searchSO";
     private final static String APPROVEBUDGET_SEARCH_ACMC = "approvebudget-searchACMC";
     private List<BudgetDetail> budgetDetailsList=new ArrayList<BudgetDetail>();
@@ -92,11 +116,20 @@ public class ApproveBudgetController {
     @Autowired
     @Qualifier("budgetService")
     private BudgetService budgetService;
+	/*
+	 * @Autowired private final BudgetUploadReportRepository
+	 * budgetUploadReportRepository;
+	 */
     @Autowired
     @Qualifier("budgetDetailService")
     private BudgetDetailService budgetDetailService;
-    
-   
+    @Autowired
+    private EgwStatusHibernateDAO egwStatusDAO;
+    public WorkflowBean workflowBean = new WorkflowBean();
+    private BudgetDetail budgetDetail;
+    @Autowired
+    @Qualifier("persistenceService")
+    private PersistenceService persistenceService;
     
     @Autowired
     @Qualifier("chartOfAccountsService")
@@ -109,7 +142,8 @@ public class ApproveBudgetController {
     
     @Autowired
     private FundService fundService;  
-    
+    @Autowired
+    private FinancialUtils financialUtils;
     
     @Autowired
     private DepartmentService departmentService;
@@ -143,7 +177,7 @@ public class ApproveBudgetController {
         {
         	for(BudgetDetail bd:budgetDetailsList)
             {
-        		Department dept=departmentService.getDepartmentById(Long.parseLong(bd.getExecutingDepartment()));
+        		Department dept=departmentService.getDepartmentByCode(bd.getExecutingDepartment());
         		if(null != dept)
         		{
         			bd.setExecDeptName(dept.getName());
@@ -224,6 +258,42 @@ public class ApproveBudgetController {
         return APPROVEBUDGET_SEARCH_CAO;
 
     }
+    @RequestMapping(value = "/verifyCAONew/{budgetId}", method = {RequestMethod.GET,RequestMethod.POST})
+    public String verifyCAONew(Model model,@PathVariable final String budgetId)
+    {
+    	System.out.println("budgetId---->> "+budgetId);
+    	if(budgetId!=null) 
+    	{
+	    	budgetDetail = (BudgetDetail) persistenceService.find("from BudgetDetail where budget.id=?",
+	                Long.valueOf(budgetId));
+	    }
+	    ////////
+	    List<BudgetDetail> budgetDetailList1 = new ArrayList<BudgetDetail>();
+	    try {
+	        budgetDetailList1=persistenceService.findAllBy("from BudgetDetail where state.id=?",budgetDetail.getState().getId());
+	        if (budgetDetail.getState() != null)
+	        {
+	        	model.addAttribute("stateType", budgetDetail.getClass().getSimpleName());
+	        	model.addAttribute("currentState", budgetDetail.getState().getValue());
+	        }
+	        model.addAttribute("workflowHistory",
+	                financialUtils.getHistory(budgetDetail.getState(), budgetDetail.getStateHistory()));
+	        //List<String>  validActions = Arrays.asList("Forward","SaveAsDraft");
+	            prepareWorkflow(model, budgetDetail, new WorkflowContainer());
+	    }
+	    catch(Exception e)
+	    {
+	    	e.printStackTrace();
+	    }
+	   
+		
+		BudgetUploadReport budgetUploadReport = new BudgetUploadReport();
+		model.addAttribute("budgetUploadReport",budgetUploadReport);
+		model.addAttribute("budgetDetails",budgetDetailList1);
+		 
+        return APPROVEBUDGET_SEARCH_CAO_NEW;
+
+    }
     
     @RequestMapping(value = "/rejectedBudgetSO", method = {RequestMethod.GET,RequestMethod.POST})
     public String rejectedBudgetSO(Model model)
@@ -302,6 +372,175 @@ public class ApproveBudgetController {
         return "redirect:/approvebudget/search";
     }
     
+    public BudgetDetail budgetDetailStatusChange(final BudgetDetail budgetDetail, final String workFlowAction) {
+        if (null != budgetDetail && null != budgetDetail.getStatus()
+                && null != budgetDetail.getStatus().getCode())
+            if (FinancialConstants.BUDGETDETAIL_CREATED_STATUS.equals(budgetDetail.getStatus().getCode())
+                    && budgetDetail.getState() != null && workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONFORWARD))
+            	budgetDetail.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.BUDGETDETAIL,
+                FinancialConstants.BUDGETDETAIL_VERIFIED_STATUS));
+            else if (workFlowAction.equals(FinancialConstants.BUTTONREJECT))
+            	budgetDetail.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.BUDGETDETAIL,
+                        FinancialConstants.BUDGETDETAIL_REJECTED_STATUS));
+            else if (FinancialConstants.BUDGETDETAIL_REJECTED_STATUS.equals(budgetDetail.getStatus().getCode())
+                    && workFlowAction.equals(FinancialConstants.BUTTONCANCEL))
+            	budgetDetail.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.BUDGETDETAIL,
+                        FinancialConstants.BUDGETDETAIL_CANCELLED_STATUS));
+            else if (FinancialConstants.BUDGETDETAIL_REJECTED_STATUS.equals(budgetDetail.getStatus().getCode())
+                    && workFlowAction.equals(FinancialConstants.BUTTONFORWARD))
+            	budgetDetail.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.BUDGETDETAIL,
+                        FinancialConstants.BUDGETDETAIL_CREATED_STATUS));
+            else if (FinancialConstants.BUDGETDETAIL_VERIFIED_STATUS.equals(budgetDetail.getStatus().getCode())
+                    && workFlowAction.equals(FinancialConstants.BUTTONAPPROVE))
+            	budgetDetail.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.BUDGETDETAIL,
+                        FinancialConstants.BUDGETDETAIL_APPROVED_STATUS));
+
+        return budgetDetail;
+    }
+    
+    @RequestMapping(value = "/verifyCAONew/updateCAO", method = RequestMethod.POST)
+    public String updateCAONew(@ModelAttribute("budgetUploadReport") final BudgetUploadReport budgetUploadReport, final BindingResult errors,
+    		final HttpServletRequest request,final RedirectAttributes redirectAttrs,final Model model,@RequestParam final String workFlowAction) {
+    	try {
+    		System.out.println("updateCAONew");
+    		Long approvalPosition = 0l;
+            String approvalComment = "";
+            String apporverDesignation = "";
+
+            if (request.getParameter("approvalComent") != null)
+                approvalComment = request.getParameter("approvalComent");
+
+            if (request.getParameter(APPROVAL_POSITION) != null && !request.getParameter(APPROVAL_POSITION).isEmpty())
+                approvalPosition = Long.valueOf(request.getParameter(APPROVAL_POSITION));
+
+            if ((approvalPosition == null || approvalPosition.equals(Long.valueOf(0)))
+                    && request.getParameter(APPROVAL_POSITION) != null
+                    && !request.getParameter(APPROVAL_POSITION).isEmpty())
+                approvalPosition = Long.valueOf(request.getParameter(APPROVAL_POSITION));
+            
+           
+        	if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
+        	{
+        		approvalPosition =populatePosition();    		
+        	}
+            if (request.getParameter(APPROVAL_DESIGNATION) != null && !request.getParameter(APPROVAL_DESIGNATION).isEmpty())
+                apporverDesignation = String.valueOf(request.getParameter(APPROVAL_DESIGNATION));
+            System.out.println("Approval designation :: "+apporverDesignation);
+    		List<BudgetDetail> budgetDetailsList2 = budgetUploadReport.getBudgetDetailsList();
+    		System.out.println("Size  "+budgetDetailsList2.size());
+			//String currentstate="";
+    		Long ownerposition=0l;
+			String ApproverName=budgetDetailService.getEmployeeName(approvalPosition);
+			int i=1;
+			for(BudgetDetail ss:budgetDetailsList2) {
+				System.out.println("originalAmount "+ss.getOriginalAmount());
+				System.out.println("antipacitryAmount "+ss.getAnticipatoryAmount());
+				System.out.println("planningPercent "+ss.getPlanningPercent());
+				System.out.println("onepercent "+ss.getQuarterpercent());
+				System.out.println("ssId "+ss.getId());
+				System.out.println("budgetUploadReport.getDeptCode() "+budgetUploadReport.getDeptCode());
+				BudgetDetail budgetDetail = new BudgetDetail();
+				BudgetDetail temp = (BudgetDetail) persistenceService.find("from BudgetDetail where id=?",Long.valueOf(ss.getId()));
+
+                if (temp != null) {
+                	temp.setOriginalAmount(ss.getOriginalAmount());
+                	temp.setAnticipatoryAmount(ss.getAnticipatoryAmount());
+                	temp.setPlanningPercent(ss.getPlanningPercent());
+                	temp.setQuarterpercent(ss.getQuarterpercent());
+                	temp.setQuartertwopercent(ss.getQuartertwopercent());
+                	temp.setQuarterthreepercent(ss.getQuarterthreepercent());
+                	temp.setQuarterfourpercent(ss.getQuarterfourpercent());
+                	System.out.println("before status "+temp.getStatus().getCode());
+                	temp=budgetDetailStatusChange(temp,workFlowAction);
+                	if(i==budgetDetailsList2.size())
+                	{
+                		temp=budgetDetailService.transitionWorkFlow(temp,approvalPosition, approvalComment,workFlowAction, apporverDesignation);
+                    	System.out.println("after state--> "+temp.getState().getOwnerPosition());
+                    	ownerposition=temp.getState().getOwnerPosition();
+                    	budgetDetailService.applyAuditingNew(temp.getState());
+                	}
+                	System.out.println("before status "+temp.getStatus().getCode());
+                	budgetDetailService.applyAuditing(temp);
+                	budgetDetail = budgetDetailService.update(temp);
+                	i++;
+                }
+	    		
+			}
+			if(workFlowAction.equalsIgnoreCase("Reject"))
+			{
+				ApproverName=getEmployeeName(ownerposition);
+			}
+			System.out.println("approver name "+ApproverName);
+    			model.addAttribute("approverName", ApproverName);
+    			String message="";
+    			if (FinancialConstants.BUTTONAPPROVE.equals(workFlowAction))
+    	            message = "Budget Approved Successfully";
+    	        else if (FinancialConstants.BUTTONREJECT.equals(workFlowAction))
+    	            message = "Budget Rejected Successfully and sent back to " +ApproverName;
+    	        else
+    	            message = "Budget Verified Successfully and sent to " +ApproverName;
+
+    	        model.addAttribute("message", message);
+
+    		
+    			
+    			//final EgwStatus budgetDetailStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "Verified");
+    			
+    			//redirectAttrs.addFlashAttribute("Budget Verified successful and sent to " +ApproverName);
+			/*
+			 * if(FinancialConstants.BUTTONREJECT.equalsIgnoreCase(workFlowAction)) { Budget
+			 * reBudget = budgetService.findById(budgetUploadReport.getReBudget().getId(),
+			 * false); Budget beBudget = budgetService.getReferenceBudgetFor(reBudget);
+			 * budgetService.updateByMaterializedPathSO(reBudget.getMaterializedPath());
+			 * budgetDetailService.updateByMaterializedPathSO(reBudget.getMaterializedPath()
+			 * ); budgetService.updateByMaterializedPathSO(beBudget.getMaterializedPath());
+			 * budgetDetailService.updateByMaterializedPathSO(beBudget.getMaterializedPath()
+			 * );
+			 * //chartOfAccountsService.updateActiveForPostingByMaterializedPath(reBudget.
+			 * getMaterializedPath()); //redirectAttrs.addFlashAttribute("message",
+			 * "msg.uploaded.budget.cao.Return"); } else
+			 * if(FinancialConstants.BUTTONCANCEL.equalsIgnoreCase(workFlowAction)) { Budget
+			 * reBudget = budgetService.findById(budgetUploadReport.getReBudget().getId(),
+			 * false); Budget beBudget = budgetService.getReferenceBudgetFor(reBudget);
+			 * budgetService.updateByMaterializedPathSTATUSCancelByCAO(reBudget.
+			 * getMaterializedPath());
+			 * budgetDetailService.updateByMaterializedPathSTATUSCancelByCAO(reBudget.
+			 * getMaterializedPath());
+			 * budgetService.updateByMaterializedPathSTATUSCancelByCAO(beBudget.
+			 * getMaterializedPath());
+			 * budgetDetailService.updateByMaterializedPathSTATUSCancelByCAO(beBudget.
+			 * getMaterializedPath());
+			 * //chartOfAccountsService.updateActiveForPostingByMaterializedPath(reBudget.
+			 * getMaterializedPath()); //redirectAttrs.addFlashAttribute("message",
+			 * "msg.uploaded.budget.cancel"); } else { Budget reBudget =
+			 * budgetService.findById(budgetUploadReport.getReBudget().getId(), false);
+			 * Budget beBudget = budgetService.getReferenceBudgetFor(reBudget);
+			 * budgetService.updateByMaterializedPathCAO(reBudget.getMaterializedPath());
+			 * budgetDetailService.updateByMaterializedPathCAO(reBudget.getMaterializedPath(
+			 * ));
+			 * budgetService.updateByMaterializedPathCAO(beBudget.getMaterializedPath());
+			 * budgetDetailService.updateByMaterializedPathCAO(beBudget.getMaterializedPath(
+			 * ));
+			 * //chartOfAccountsService.updateActiveForPostingByMaterializedPath(reBudget.
+			 * getMaterializedPath()); //redirectAttrs.addFlashAttribute("message",
+			 * "msg.uploaded.budget.cao.success");
+			 * redirectAttrs.addFlashAttribute("Budget Verified successful and sent to "
+			 * +ApproverName); }
+			 */	
+			
+    	       
+
+    	        
+    		
+    	}
+    	catch(Exception e) {
+    		e.printStackTrace();
+    	}
+    	 return "expensebill-success";
+    }
+    
+   
+
     @RequestMapping(value = "/updateCAO", method = RequestMethod.POST)
     public String updateCAO(@ModelAttribute final BudgetUploadReport budgetUploadReport, final BindingResult errors,
             final RedirectAttributes redirectAttrs,@RequestParam final String workAction) {
@@ -317,9 +556,7 @@ public class ApproveBudgetController {
         budgetService.updateByMaterializedPathCAO(beBudget.getMaterializedPath());
         budgetDetailService.updateByMaterializedPathCAO(beBudget.getMaterializedPath());
         //chartOfAccountsService.updateActiveForPostingByMaterializedPath(reBudget.getMaterializedPath());
-        redirectAttrs.addFlashAttribute("message", "msg.uploaded.budget.cao.success");
-
-    	       
+	        //redirectAttrs.addFlashAttribute("message", "msg.uploaded.budget.cao.success");
     	}
     	else if(workAction.equalsIgnoreCase("REJECT"))
     	{
@@ -330,11 +567,7 @@ public class ApproveBudgetController {
  	        budgetService.updateByMaterializedPathSO(beBudget.getMaterializedPath());
  	        budgetDetailService.updateByMaterializedPathSO(beBudget.getMaterializedPath());
  	        //chartOfAccountsService.updateActiveForPostingByMaterializedPath(reBudget.getMaterializedPath());
- 	        redirectAttrs.addFlashAttribute("message", "msg.uploaded.budget.cao.Return");
-
- 	      
-    		
-    		
+ 	        //redirectAttrs.addFlashAttribute("message", "msg.uploaded.budget.cao.Return");
     	}
     	else if(workAction.equalsIgnoreCase("CANCEL"))
     	{
@@ -345,7 +578,7 @@ public class ApproveBudgetController {
  	        budgetService.updateByMaterializedPathSTATUSCancelByCAO(beBudget.getMaterializedPath());
  	        budgetDetailService.updateByMaterializedPathSTATUSCancelByCAO(beBudget.getMaterializedPath());
  	        //chartOfAccountsService.updateActiveForPostingByMaterializedPath(reBudget.getMaterializedPath());
- 	        redirectAttrs.addFlashAttribute("message", "msg.uploaded.budget.cancel");
+ 	        //redirectAttrs.addFlashAttribute("message", "msg.uploaded.budget.cancel");
 
  	      
     		
@@ -459,4 +692,35 @@ public class ApproveBudgetController {
         return "redirect:/approvebudget/verifyACMC";
     }
 
+    private Long populatePosition() {
+    	Long empId = ApplicationThreadLocals.getUserId();
+    	Long pos=null;
+    	List<EmployeeInfo> employs = microserviceUtils.getEmployee(empId, null,null, null);
+    	if(null !=employs && employs.size()>0 )
+    	{
+    		pos=employs.get(0).getAssignments().get(0).getPosition();
+    		
+    	}
+    	//System.out.println("pos-----populatePosition---()----------------------"+pos);
+		return pos;
+	}
+    private String populateEmpName() {
+    	Long empId = ApplicationThreadLocals.getUserId();
+    	String empName=null;
+    	Long pos=null;
+    	List<EmployeeInfo> employs = microserviceUtils.getEmployee(empId, null,null, null);
+    	if(null !=employs && employs.size()>0 )
+    	{
+    		//pos=employs.get(0).getAssignments().get(0).getPosition();
+    		empName=employs.get(0).getUser().getName();
+    		
+    	}
+		return empName;
+	}
+    
+    public String getEmployeeName(Long empId){
+        
+        return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+     }
+    
 }

@@ -65,6 +65,7 @@ import org.egov.commons.dao.EgwStatusHibernateDAO;
 import org.egov.dao.budget.BudgetDetailsDAO;
 import org.egov.egf.model.BudgetReAppropriationView;
 import org.egov.eis.service.EisCommonService;
+import org.egov.eis.web.actions.workflow.GenericWorkFlowAction;
 import org.egov.infra.admin.master.entity.Boundary;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
@@ -73,6 +74,7 @@ import org.egov.infra.validation.exception.ValidationError;
 import org.egov.infra.validation.exception.ValidationException;
 import org.egov.infra.web.struts.actions.BaseFormAction;
 import org.egov.infra.web.struts.annotation.ValidationErrorPage;
+import org.egov.infra.workflow.entity.StateAware;
 import org.egov.infra.workflow.service.WorkflowService;
 import org.egov.infstr.utils.EgovMasterDataCaching;
 import org.egov.model.budget.Budget;
@@ -87,6 +89,7 @@ import org.egov.services.budget.BudgetService;
 import org.egov.utils.BudgetDetailConfig;
 import org.egov.utils.BudgetDetailHelper;
 import org.egov.utils.Constants;
+import org.egov.utils.FinancialConstants;
 import org.hibernate.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -109,7 +112,7 @@ import java.util.Map;
         @Result(name = "search", location = "budgetReAppropriation-search.jsp"),
         @Result(name = "beRe", location = "budgetReAppropriation-beRe.jsp")
 })
-public class BudgetReAppropriationAction extends BaseFormAction {
+public class BudgetReAppropriationAction extends GenericWorkFlowAction {
     private static final long serialVersionUID = 1L;
     private static final String BERE = "beRe";
     private static final Logger LOGGER = Logger.getLogger(BudgetReAppropriationAction.class);
@@ -332,10 +335,30 @@ public class BudgetReAppropriationAction extends BaseFormAction {
     }
 
     @Override
-    public Object getModel() {
+    public StateAware getModel() {
         return budgetDetail;
     }
 
+    public List<String> getValidActions() {
+        List<String> validActions = Collections.emptyList();
+        
+            if (null == budgetDetail || null == budgetDetail.getId()
+                    || budgetDetail.getCurrentState().getValue().endsWith("NEW")) {
+				validActions = Arrays.asList(FinancialConstants.BUTTONFORWARD);
+				
+            } else {
+                if (budgetDetail.getCurrentState() != null) {
+                    validActions = this.customizedWorkFlowService.getNextValidActions(budgetDetail
+                            .getStateType(), getWorkFlowDepartment(), getAmountRule(),
+                            getAdditionalRule(), budgetDetail.getCurrentState().getValue(),
+                            getPendingActions(), budgetDetail.getCreatedDate());
+                }
+            }
+        
+        return validActions;
+    }
+
+    
     @Action(value = "/budget/budgetReAppropriation-create")
     public String create() {
         save(ApplicationThreadLocals.getUserId().intValue());

@@ -90,6 +90,7 @@ import org.egov.utils.FinancialConstants;
 import org.egov.utils.ReportHelper;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -111,12 +112,14 @@ import java.util.TreeMap;
         @Result(name = BudgetProposalAction.MESSAGE, location = "budgetProposal-message.jsp"),
         @Result(name = Constants.DETAILLIST, location = "budgetProposal-" + Constants.DETAILLIST + ".jsp"),
         @Result(name = Constants.LIST, location = "budgetproposal-" + Constants.LIST + ".jsp"),
+        @Result(name = "editBudget", location = "budgetProposal-editBudget.jsp"),
         @Result(name = BudgetProposalAction.FAILURE, location = "budgetProposal-failure.jsp"),
         @Result(name = BudgetProposalAction.REPORTVIEW, type = "stream", location = "inputStream", params = {
                 "contentType", "${contentType}", "contentDisposition", "attachment; filename=${fileName}" }) })
 public class BudgetProposalAction extends GenericWorkFlowAction {
     private static final String BUDGET_DETAIL_BUDGET_ID = "budgetDetail.budget.id";
     public static final String MESSAGE = "message";
+    public static final String EDITBUDGET = "editBudget";
     private static final long serialVersionUID = 1L;
     private static final String ACTIONNAME = "actionName";
     public static final String REPORTVIEW = "reportview";
@@ -265,7 +268,7 @@ public class BudgetProposalAction extends GenericWorkFlowAction {
         return Constants.DETAILLIST;
     }
 
-    @Action(value = "/budget/budgetProposal-modifyBudgetDetailList")
+    @Action(value = "/budgetProposal-modifyBudgetDetailList")
     public String modifyBudgetDetailList() {
         if (LOGGER.isInfoEnabled())
             LOGGER.info("Starting modifyBudgetDetailList..............");
@@ -274,9 +277,19 @@ public class BudgetProposalAction extends GenericWorkFlowAction {
                     Long.valueOf(parameters.get(BUDGET_DETAIL_BUDGET_ID)[0]));
             setTopBudget(budgetDetail.getBudget());
         }
+        ////////
+        List<BudgetDetail> budgetDetailList1 = new ArrayList<BudgetDetail>();
+        try {
+            budgetDetailList1=persistenceService.findAllBy("from BudgetDetail where state.id=?",budgetDetail.getState().getId());
+        }
+        catch(Exception e)
+        {
+        	e.printStackTrace();
+        }
+        //populateBudgetDetailReport();
 
-        populateBudgetDetailReport();
-        return Constants.LIST;
+        return "editBudget";//BudgetProposalAction.EDITBUDGET;
+        //return Constants.LIST;
     }
 
     private void populateBudgetDetailReport() {
