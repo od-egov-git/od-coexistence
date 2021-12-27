@@ -125,7 +125,7 @@
         </repository>
         <repository>
             <id>JSPRESSO</id>
-            <url>http://repository.jspresso.org/maven2/</url>
+            <url>http://www.javaxt.com/maven</url>
         </repository>
     </repositories>
 

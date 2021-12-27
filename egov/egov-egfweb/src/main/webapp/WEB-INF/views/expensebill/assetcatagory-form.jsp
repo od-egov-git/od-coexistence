@@ -1,0 +1,171 @@
+<%--
+  ~    eGov  SmartCity eGovernance suite aims to improve the internal efficiency,transparency,
+  ~    accountability and the service delivery of the government  organizations.
+  ~
+  ~     Copyright (C) 2017  eGovernments Foundation
+  ~
+  ~     The updated version of eGov suite of products as by eGovernments Foundation
+  ~     is available at http://www.egovernments.org
+  ~
+  ~     This program is free software: you can redistribute it and/or modify
+  ~     it under the terms of the GNU General Public License as published by
+  ~     the Free Software Foundation, either version 3 of the License, or
+  ~     any later version.
+  ~
+  ~     This program is distributed in the hope that it will be useful,
+  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~     GNU General Public License for more details.
+  ~
+  ~     You should have received a copy of the GNU General Public License
+  ~     along with this program. If not, see http://www.gnu.org/licenses/ or
+  ~     http://www.gnu.org/licenses/gpl.html .
+  ~
+  ~     In addition to the terms of the GPL license to be adhered to in using this
+  ~     program, the following additional terms are to be complied with:
+  ~
+  ~         1) All versions of this program, verbatim or modified must carry this
+  ~            Legal Notice.
+  ~            Further, all user interfaces, including but not limited to citizen facing interfaces,
+  ~            Urban Local Bodies interfaces, dashboards, mobile applications, of the program and any
+  ~            derived works should carry eGovernments Foundation logo on the top right corner.
+  ~
+  ~            For the logo, please refer http://egovernments.org/html/logo/egov_logo.png.
+  ~            For any further queries on attribution, including queries on brand guidelines,
+  ~            please contact contact@egovernments.org
+  ~
+  ~         2) Any misrepresentation of the origin of the material is prohibited. It
+  ~            is required that all modified versions of this material be marked in
+  ~            reasonable ways as different from the original version.
+  ~
+  ~         3) This license does not grant any rights to any user of the program
+  ~            with regards to rights under trademark law for use of the trade names
+  ~            or trademarks of eGovernments Foundation.
+  ~
+  ~   In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
+  ~
+  --%>
+
+<%@ page contentType="text/html;charset=UTF-8" language="java"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+
+<div class="panel panel-primary" data-collapsed="0">
+	<div class="panel-heading"></div>
+
+	<form:form action="/asset/createAssetCatagory" modelAttribute="assetCatagory" method="POST">
+	
+	<div class="form-group">
+		<label class="col-sm-3 control-label text-right"><spring:message code="lbl.name" text="Name" /> 
+			<span class="mandatory"></span>
+		</label>
+		<div class="col-sm-3 add-margin">
+			<form:input class="form-control" path="" />
+		</div>
+		<label class="col-sm-3 control-label text-right">
+			<spring:message code="lbl.parent.catagory" text="Parent Catagory" /> 
+		</label>
+		<div class="col-sm-3 add-margin">
+			<form:select path="" class="form-control"> 
+			<form:option value="">-select value-</form:option>
+			<form:options items=""/>
+			</form:select>
+		</div>
+		<label class="col-sm-3 control-label text-right">
+			<spring:message code="lbl.asset.account.code" text="Asset Account Code" /> 
+		</label>
+		<div class="col-sm-3 add-margin">
+			<form:select path="" class="form-control"> 
+			<form:option value="">-select value-</form:option>
+			<form:options items=""/>
+			</form:select>
+		</div>
+		<label class="col-sm-3 control-label text-right">
+			<spring:message code="lbl.revolution.reserve.account.code" text="Revolution Reserve Account Code" /> 
+		</label>
+		<div class="col-sm-3 add-margin">
+			<form:select path="" class="form-control"> 
+			<form:option value="">-select value-</form:option>
+			<form:options items=""/>
+			</form:select>
+		</div>
+		<label class="col-sm-3 control-label text-right">
+			<spring:message code="lbl.uom" text="UOM" /> 
+		</label>
+		<div class="col-sm-3 add-margin">
+			<form:select path="" class="form-control"> 
+			<form:option value="">-select value-</form:option>
+			<form:options items=""/>
+			</form:select>
+		</div>
+		<label class="col-sm-3 control-label text-right">
+			<spring:message code="lbl.depriciation.rate" text="Depriciation Rate" /> 
+		</label>
+		<div class="col-sm-3 add-margin">
+			<form:input class="form-control patternvalidation" data-pattern="alphanumericwithspecialcharacters" path="" />
+		</div>
+	</div>
+	
+	<div class="form-group">
+	
+		<label class="col-sm-2 control-label text-right"> <spring:message code="lbl.asset.catagory.type" text="Asset Catagory Type" />
+			<span class="mandatory"></span>
+		</label>
+		<div class="col-sm-3 add-margin">
+			<form:select path="" class="form-control"> 
+				<form:option value="">-select value-</form:option>
+				<form:options items=""/>
+			</form:select>
+			<form:errors path="" cssClass="add-margin error-msg" />
+		</div>
+		<label class="col-sm-2 control-label text-right">
+			<spring:message code="lbl.depriciation.method" text="Depriciation Method" />
+		</label>
+		<div class="col-sm-3 add-margin">
+			<form:select path="" class="form-control"> 
+				<form:option value="">-select value-</form:option>
+				<form:options items=""/>
+			</form:select>
+			<form:errors path="" cssClass="add-margin error-msg" />
+		</div>
+		<label class="col-sm-2 control-label text-right">
+			<spring:message code="lbl.accumulated.depriciation.code" text="Accumulated Depriciation Code" />
+		</label>
+		<div class="col-sm-3 add-margin">
+			<form:select path="" class="form-control"> 
+				<form:option value="">-select value-</form:option>
+				<form:options items=""/>
+			</form:select>
+			<form:errors path="" cssClass="add-margin error-msg" />
+		</div>
+		<label class="col-sm-2 control-label text-right">
+			<spring:message code="lbl.depriciation.expense.account" text="Depriciation Expense Account" />
+		</label>
+		<div class="col-sm-3 add-margin">
+			<form:select path="" class="form-control"> 
+				<form:option value="">-select value-</form:option>
+				<form:options items=""/>
+			</form:select>
+			<form:errors path="" cssClass="add-margin error-msg" />
+		</div>
+		<label class="col-sm-2 control-label text-right">
+			<spring:message code="lbl.version" text="Version" />
+		</label>
+		<div class="col-sm-3 add-margin">
+			<form:input class="form-control" path="" />
+			<form:errors path="" cssClass="add-margin error-msg" />
+		</div>
+		<label class="col-sm-2 control-label text-right">
+			<spring:message code="lbl.used.for.lease.and.agreement" text="Used For Lease and Aggrement" />
+		</label>
+		<div class="col-sm-3 add-margin">
+			<form:checkbox class="form-control" path="" value="true"/> 
+			<form:errors path="" cssClass="add-margin error-msg" />
+		</div>
+	</div>
+		<td align="center">
+			<input type="submit" class="btn btn-primary" value="Create" />
+		</td>
+		</form:form>
+	</div>
