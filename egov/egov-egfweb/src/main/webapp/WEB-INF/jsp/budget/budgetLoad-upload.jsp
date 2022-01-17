@@ -183,9 +183,9 @@ function onSubmit(){
 					<table>
 						<%-- <tr>
 
-							<td><s:submit type="submit" cssClass="buttonsubmit"
+							 <td><s:submit type="submit" cssClass="buttonsubmit"
 									key="lbl.upload.budget" name="upload" method="upload"
-									onclick="return validate();" /></td>
+									onclick="return validate();" /></td> 
 							<td><input type="button" value="<s:text name='lbl.close'/>"
 								onclick="javascript:window.close()" class="buttonsubmit" /></td>
 						</tr> --%>

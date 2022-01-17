@@ -55,21 +55,33 @@ import org.egov.dao.budget.BudgetDetailsHibernateDAO;
 import org.egov.egf.autonumber.BudgetReAppropriationSequenceNumberGenerator;
 import org.egov.egf.model.BudgetReAppropriationView;
 import org.egov.infra.admin.master.entity.AppConfigValues;
+import org.egov.infra.admin.master.entity.User;
 import org.egov.infra.admin.master.service.AppConfigValueService;
+import org.egov.infra.config.core.ApplicationThreadLocals;
+import org.egov.infra.microservice.models.Designation;
+import org.egov.infra.microservice.models.EmployeeInfo;
+import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.persistence.utils.GenericSequenceNumberGenerator;
 import org.egov.infra.script.service.ScriptService;
+import org.egov.infra.security.utils.SecurityUtils;
 import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
 import org.egov.infra.validation.exception.ValidationError;
 import org.egov.infra.validation.exception.ValidationException;
+import org.egov.infra.workflow.matrix.entity.WorkFlowMatrix;
+import org.egov.infra.workflow.service.SimpleWorkflowService;
 import org.egov.infra.workflow.service.WorkflowService;
 import org.egov.infstr.services.PersistenceService;
+import org.egov.model.bills.EgBillregister;
 import org.egov.model.budget.Budget;
 import org.egov.model.budget.BudgetDetail;
 import org.egov.model.budget.BudgetReAppropriation;
 import org.egov.model.budget.BudgetReAppropriationMisc;
+import org.egov.model.voucher.WorkflowBean;
 import org.egov.pims.commons.Position;
 import org.egov.utils.BudgetDetailConfig;
 import org.egov.utils.Constants;
+import org.egov.utils.FinancialConstants;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.transaction.annotation.Transactional;
@@ -78,6 +90,7 @@ import javax.script.ScriptContext;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -91,7 +104,9 @@ public class BudgetReAppropriationService extends PersistenceService<BudgetReApp
     @Qualifier("budgetDetailService")
     private BudgetDetailService budgetDetailService;
 
-    protected WorkflowService<BudgetDetail> budgetDetailWorkflowService;
+    @Autowired
+    @Qualifier("workflowService")
+    private SimpleWorkflowService<BudgetDetail> budgetDetailWorkflowService;
     @Autowired
     private BudgetDetailConfig budgetDetailConfig;
     @Autowired
@@ -114,7 +129,14 @@ public class BudgetReAppropriationService extends PersistenceService<BudgetReApp
 
     @Autowired
     private AutonumberServiceBeanResolver beanResolver;
-
+    
+    @Autowired
+    private SecurityUtils securityUtils;
+    @Autowired
+    public MicroserviceUtils microserviceUtils;
+    @Autowired
+    private EgwStatusHibernateDAO egwStatusHibernateDAO;
+    
     public BudgetReAppropriationService() {
         super(BudgetReAppropriation.class);
     }
@@ -131,12 +153,15 @@ public class BudgetReAppropriationService extends PersistenceService<BudgetReApp
         this.sequenceGenerator = sequenceGenerator;
     }
 
-    public void setBudgetDetailWorkflowService(
-            final WorkflowService<BudgetDetail> budgetDetailWorkflowService) {
-        this.budgetDetailWorkflowService = budgetDetailWorkflowService;
-    }
+    public SimpleWorkflowService<BudgetDetail> getBudgetDetailWorkflowService() {
+		return budgetDetailWorkflowService;
+	}
 
-    public void setBudgetDetailService(final BudgetDetailService budgetDetailService) {
+	public void setBudgetDetailWorkflowService(SimpleWorkflowService<BudgetDetail> budgetDetailWorkflowService) {
+		this.budgetDetailWorkflowService = budgetDetailWorkflowService;
+	}
+
+	public void setBudgetDetailService(final BudgetDetailService budgetDetailService) {
         this.budgetDetailService = budgetDetailService;
     }
 
@@ -377,7 +402,208 @@ public class BudgetReAppropriationService extends PersistenceService<BudgetReApp
          */
         return misc;
     }
+    @Transactional
+    public BudgetReAppropriationMisc createReAppropriationMiscNew(final String actionName,
+            final BudgetReAppropriationMisc appropriationMisc, final BudgetDetail detail, WorkflowBean workflowBean) {
+        BudgetReAppropriationMisc misc = new BudgetReAppropriationMisc();
+        misc.setReAppropriationDate(appropriationMisc.getReAppropriationDate());
+        misc.setRemarks(appropriationMisc.getRemarks());
+        misc.setSequenceNumber(getSequenceNumber(detail));
+        misc.setCreatedDate(new Date());
+        misc.setStatus(egwStatusDAO.getStatusByModuleAndCode("REAPPROPRIATIONMISC", "Created"));//change from Approved 
+        //misc = transitionWorkFlow(misc, workflowBean);
+        //budgetReAppropriationMiscService.applyAuditingNew(misc.getState());
+        budgetReAppropriationMiscService.applyAuditing(misc);
+        budgetReAppropriationMiscService.persist(misc);
+        
+        return misc;
+    }
+    
+    @Transactional
+    public BudgetReAppropriation transitionWorkFlow(final BudgetReAppropriation appropriation, WorkflowBean workflowBean) {
+        final DateTime currentDate = new DateTime();
+        final User user = securityUtils.getCurrentUser();
+        String stateValue = "";
+        Designation designation = this.getDesignationDetails(this.getEmployeeDesignation(workflowBean.getApproverPositionId()));
+        EmployeeInfo info = null;
+        
+        if (user != null && user.getId() != null)
+            info = microserviceUtils.getEmployeeById(user.getId());
 
+        if (FinancialConstants.BUTTONREJECT.equalsIgnoreCase(workflowBean.getWorkFlowAction())) {
+            stateValue = FinancialConstants.WORKFLOW_STATE_REJECTED;
+            int size=appropriation.getStateHistory().size();//added abhishek on 12042021
+			Position owenrPosName = new Position();
+			Position owenrPos = new Position();
+	        owenrPos.setId(workflowBean.getApproverPositionId());
+			owenrPosName.setId(workflowBean.getApproverPositionId());
+			HashMap<Long, Long> positionmap = new HashMap<>();
+			for(int i=0;i<size;i++)
+			{
+				positionmap.put(appropriation.getStateHistory().get(i).getOwnerPosition(),
+						appropriation.getStateHistory().get(i).getPreviousownerposition());
+			}
+			if(size>0)
+			{
+				Long owenrPos1=0l;
+				if(positionmap.containsKey(user.getId()))
+					owenrPos1=positionmap.get(user.getId());
+				else
+					owenrPos1=(long) appropriation.getStateHistory().get(size-1).getOwnerPosition();
+				
+				if(owenrPos1==null|| owenrPos1.equals(""))
+					owenrPos1=(long) appropriation.getCreatedBy();
+				owenrPosName.setId(owenrPos1);
+				System.out.println("Budget owner position "+owenrPos1);
+				owenrPos.setId(owenrPos1);
+			}
+			else
+			{
+				owenrPos.setId(appropriation.getState().getCreatedBy());
+				owenrPosName.setId(appropriation.getState().getCreatedBy());
+			}
+            System.out.println("ownerPostion id- "+owenrPos);
+            System.out.println("ownerPostion Nameid- "+owenrPosName);
+			
+            appropriation.transition().progressWithStateCopy().withSenderName(user.getName())
+                    .withComments(workflowBean.getApproverComments())
+                    //.withStateValue(stateValue).withDateInfo(currentDate.toDate())
+                    //.withOwner(budgetDetail.getState().getInitiatorPosition()).withOwnerName((budgetDetail.getState().getInitiatorPosition() != null && budgetDetail.getState().getInitiatorPosition() > 0L) ? getEmployeeName(budgetDetail.getState().getInitiatorPosition()):"")
+                    .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPosName).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
+                    //.withNextAction(FinancialConstants.WF_STATE_EOA_Approval_Pending);
+                    .withNextAction("");
+
+        } else if (FinancialConstants.BUTTONAPPROVE.equalsIgnoreCase(workflowBean.getWorkFlowAction())) {
+        	System.out.println("appropriation.getStateType() "+appropriation.getStateType());
+        	System.out.println("appropriation.getCurrentState().getValue() "+appropriation.getCurrentState().getValue());
+            final WorkFlowMatrix wfmatrix = budgetDetailWorkflowService.getWfMatrix(appropriation.getStateType(), null,
+                    null, null, appropriation.getCurrentState().getValue(), null);
+            Position pos=new Position();
+            pos.setId(user.getId());
+            appropriation.transition().end().withSenderName(user.getName()).withComments(workflowBean.getApproverComments())
+                    .withStateValue(wfmatrix.getCurrentDesignation() + " Approved").withDateInfo(currentDate.toDate())
+                    .withOwner(pos)/*withOwner((info != null && info.getAssignments() != null && !info.getAssignments().isEmpty())
+                            ? info.getAssignments().get(0).getPosition() : null)*/
+                    .withNextAction(wfmatrix.getNextAction());
+
+            appropriation.setStatus(egwStatusHibernateDAO.getStatusByModuleAndCode(FinancialConstants.BUDGETDETAILAPP,
+                    FinancialConstants.BUDGETDETAIL_APPROVED_STATUS));
+        } else if (FinancialConstants.BUTTONCANCEL.equalsIgnoreCase(workflowBean.getWorkFlowAction())) {
+        	appropriation.setStatus(egwStatusHibernateDAO.getStatusByModuleAndCode(FinancialConstants.BUDGETDETAILAPP,
+                    FinancialConstants.BUDGETDETAIL_CANCELLED_STATUS));
+            appropriation.transition().end().withStateValue(FinancialConstants.WORKFLOW_STATE_CANCELLED)
+                    .withSenderName(user.getName()).withComments(workflowBean.getApproverComments())
+                    .withDateInfo(currentDate.toDate());
+        } else {
+        	
+            if (null == appropriation.getState()) {
+            	System.out.println("budgetDetail.getStateType() "+appropriation.getStateType());
+            	System.out.println("workflowBean.getCurrentState() "+workflowBean.getCurrentState());
+            	final WorkFlowMatrix wfmatrix = budgetDetailWorkflowService.getWfMatrix(appropriation.getStateType(), null,
+                        null, null, workflowBean.getCurrentState(), null);
+                if (stateValue.isEmpty())
+                {
+                	if(!wfmatrix.getNextState().equalsIgnoreCase(FinancialConstants.WF_STATE_FINAL_APPROVAL_PENDING) && !wfmatrix.getNextState().equalsIgnoreCase("NEW"))
+                	{
+                		stateValue = wfmatrix.getNextState();//+ " "+designation.getName().toUpperCase();
+                	}
+                	else if(wfmatrix.getNextState().equalsIgnoreCase("NEW"))
+                	{
+                		stateValue = "Pending With "+ designation.getName().toUpperCase();
+                	}
+                	else
+                	{
+                		stateValue = wfmatrix.getNextState();
+                	}
+                    
+                }
+                if ("Save As Draft".equalsIgnoreCase(workflowBean.getWorkFlowAction())) {
+                	stateValue =FinancialConstants.WORKFLOW_STATE_SAVEASDRAFT;
+                		//budgetDetail.setStatus(6);
+                }
+               
+                System.out.println("::::::::"+workflowBean.getApproverPositionId());
+                
+                appropriation.transition().start().withSenderName(user.getName())
+                        .withComments(workflowBean.getApproverComments())
+                       // .withStateValue(wfmatrix.getNextState()).withDateInfo(currentDate.toDate())
+                        .withStateValue(stateValue).withDateInfo(currentDate.toDate())
+                        .withNatureOfTask(FinancialConstants.BUDGETDETAILAPP)
+                        .withOwner(workflowBean.getApproverPositionId()).withOwnerName((workflowBean.getApproverPositionId() != null && workflowBean.getApproverPositionId() > 0L) ? getEmployeeName(workflowBean.getApproverPositionId()):"")
+                        .withNextAction(wfmatrix.getNextAction())
+                        .withCreatedDate(new Date())
+                        .withCreatedBy(user.getId())
+                        .withtLastModifiedBy(user.getId());
+                appropriationStatusChange(appropriation, workflowBean.getWorkFlowAction());
+            } else if (appropriation.getCurrentState().getNextAction().equalsIgnoreCase("END"))
+                appropriation.transition().end().withSenderName(user.getName())
+                        .withComments(workflowBean.getApproverComments())
+                        .withDateInfo(currentDate.toDate());
+            else {
+				final WorkFlowMatrix wfmatrix = budgetDetailWorkflowService.getWfMatrix(appropriation.getStateType(), null,
+                        null, null,appropriation.getCurrentState().getValue(), null);
+                String ststeValue=wfmatrix.getNextState();
+                Long owner = workflowBean.getApproverPositionId();
+                if ("Save As Draft".equalsIgnoreCase(workflowBean.getWorkFlowAction()))
+                {
+                		ststeValue =FinancialConstants.WORKFLOW_STATE_SAVEASDRAFT;
+                		owner = populatePosition();
+                }
+                if(appropriation.getState().getValue().equalsIgnoreCase("Rejected")) 
+                {
+	                HashMap<Long, String> positionmap = new HashMap<>();
+	                HashMap<Long, String> positionmap1 = new HashMap<>();
+	                int size=appropriation.getStateHistory().size();
+	    			for(int i=0;i<size;i++)
+	    			{
+	    				positionmap.put(appropriation.getStateHistory().get(i).getLastModifiedBy(),
+	    						appropriation.getStateHistory().get(i).getValue());
+	    				positionmap1.put(appropriation.getStateHistory().get(i).getLastModifiedBy(),
+	    						appropriation.getStateHistory().get(i).getNextAction());
+	    			}
+	    			if(positionmap.containsKey(user.getId()))
+	    			{
+	    				ststeValue=positionmap.get(user.getId());
+	    				wfmatrix.setNextAction(positionmap1.get(user.getId()));
+	    			}
+                }
+                appropriation.transition().progressWithStateCopy().withSenderName(user.getName())
+                        .withComments(workflowBean.getApproverComments())
+                        .withStateValue(ststeValue).withDateInfo(currentDate.toDate())
+                        .withOwner(owner).withOwnerName((owner != null && owner > 0L) ? getEmployeeName(owner):"")
+                        .withNextAction(wfmatrix.getNextAction());
+                appropriationStatusChange(appropriation, workflowBean.getWorkFlowAction());
+            }
+        }
+        return appropriation;
+    }
+    
+    public void appropriationStatusChange(final BudgetReAppropriation appropriation, final String workFlowAction) {
+        if (null == appropriation.getStatus())
+        {
+        	appropriation.setStatus(egwStatusHibernateDAO.getStatusByModuleAndCode(FinancialConstants.BUDGETDETAILAPP,
+                    FinancialConstants.BUDGETDETAIL_CREATED_STATUS));
+        }
+        else {
+            if (FinancialConstants.BUDGETDETAIL_APPROVED_STATUS.equals(appropriation.getStatus().getCode())
+                    && appropriation.getState() != null && workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONAPPROVE))
+            	appropriation.setStatus(egwStatusHibernateDAO.getStatusByModuleAndCode(FinancialConstants.BUDGETDETAILAPP,
+                        FinancialConstants.BUDGETDETAIL_APPROVED_STATUS));
+            else if (workFlowAction.equals(FinancialConstants.BUTTONREJECT))
+            	appropriation.setStatus(egwStatusHibernateDAO.getStatusByModuleAndCode(FinancialConstants.BUDGETDETAILAPP,
+                        FinancialConstants.BUDGETDETAIL_REJECTED_STATUS));
+            else if (FinancialConstants.BUDGETDETAIL_REJECTED_STATUS.equals(appropriation.getStatus().getCode())
+                    && workFlowAction.equals(FinancialConstants.BUTTONCANCEL))
+            	appropriation.setStatus(egwStatusHibernateDAO.getStatusByModuleAndCode(FinancialConstants.BUDGETDETAILAPP,
+                        FinancialConstants.BUDGETDETAIL_CANCELLED_STATUS));
+            else if (FinancialConstants.BUDGETDETAIL_CREATED_STATUS.equals(appropriation.getStatus().getCode())
+                    && workFlowAction.equals(FinancialConstants.BUTTONFORWARD))
+            	appropriation.setStatus(egwStatusHibernateDAO.getStatusByModuleAndCode(FinancialConstants.BUDGETDETAILAPP,
+                        FinancialConstants.BUDGETDETAIL_VERIFIED_STATUS));
+        }
+    }
+    
+    
     protected String getSequenceNumber(final BudgetDetail detail) {
         BudgetReAppropriationSequenceNumberGenerator b = beanResolver.getAutoNumberServiceFor(BudgetReAppropriationSequenceNumberGenerator.class);
 
@@ -390,6 +616,11 @@ public class BudgetReAppropriationService extends PersistenceService<BudgetReApp
         return (BudgetReAppropriation) persistenceService.find(
                 "from BudgetReAppropriation b where b.reAppropriationMisc.sequenceNumber=? and b.budgetDetail.id=?",
                 sequenceNumber, budgetDetailId);
+    }
+    
+    public BudgetReAppropriation findByBudgetDetail(final Long budgetDetailId) {
+        return (BudgetReAppropriation) persistenceService.find(
+                "from BudgetReAppropriation b where b.id=?", budgetDetailId);
     }
 
     public BudgetReAppropriationMisc performActionOnMisc(final String action, final BudgetReAppropriationMisc reApp,
@@ -437,7 +668,7 @@ public class BudgetReAppropriationService extends PersistenceService<BudgetReApp
         planningBudgetUsage = budgetDetailsDAO.getPlanningBudgetUsage(budgetDetail);
         budgetAvailable = planningBudgetApproved.subtract(planningBudgetUsage);
         budgetDetail.setBudgetAvailable(budgetAvailable);
-        EgwStatus status =  egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "REAPP CAO");
+        EgwStatus status =  egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "Approved");
         budgetDetail.setStatus(status);
         budgetDetailService.update(budgetDetail);
         getSession().flush();
@@ -474,14 +705,35 @@ public class BudgetReAppropriationService extends PersistenceService<BudgetReApp
         planningBudgetUsage = budgetDetailsDAO.getPlanningBudgetUsage(budgetDetail);
         budgetAvailable = planningBudgetApproved.subtract(planningBudgetUsage);
         budgetDetail.setBudgetAvailable(budgetAvailable);*/
+
         List<BudgetDetail> detailList = budgetDetailService.getBudgetDetailsForReAppCao();
+       
+       if(detailList != null && !detailList.isEmpty())
+       {
+    	   for(BudgetReAppropriation row:detailList.get(0).getBudgetReAppropriations())
+           {
+        	   //if(row.getStatus().getCode().equalsIgnoreCase("New"))
+        	   //{
+        		   EgwStatus status =  egwStatusDAO.getStatusByModuleAndCode("BudgetReAppropriation", "Approved");
+        		   row.setStatus(status);
+        		   
+        		   applyAuditing(row);
+        	        persist(row);
+        		   
+        	   //}
+           }
+       }
+       
+       //budgetReAppropriations.iterator().next()
+        
         for(BudgetDetail bd:detailList)
         {
-        	EgwStatus status =  egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "Approved");
+        	EgwStatus status =  egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "REAPP ACMC");
             bd.setStatus(status);
             budgetDetailService.update(bd);
             getSession().flush();
         }
+        
         
     }
     
@@ -651,6 +903,74 @@ public class BudgetReAppropriationService extends PersistenceService<BudgetReApp
     }
     
     @Transactional
+    public boolean createReAppropriationNew(final String actionName,
+            final List<BudgetReAppropriationView> budgetReAppropriationList,
+            final Position position, final CFinancialYear financialYear, final String beRe, final BudgetReAppropriationMisc misc,
+            final String asOnDate,WorkflowBean workflowBean) {
+        try {
+        	System.out.println("Inside create");
+            if (budgetReAppropriationList.isEmpty()
+                    || !rowsToAddForExistingDetails(budgetReAppropriationList))
+                return false;
+            validateMandatoryFields(budgetReAppropriationList);
+            System.out.println("After validate");
+            final List<BudgetReAppropriationView> addedList = new ArrayList<BudgetReAppropriationView>();
+            for (final BudgetReAppropriationView appropriation : budgetReAppropriationList) {
+                validateDuplicates(addedList, appropriation);
+                System.out.println("Loop 1");
+                saveAndStartWorkFlowForExistingdetailsNew(actionName, appropriation, position, financialYear, beRe, misc, asOnDate,workflowBean);
+                System.out.println("Loop 2");
+                addedList.add(appropriation);
+            }
+        } catch (final ValidationException e)
+        {
+        	System.out.println("issueV "+e.getMessage());
+        	e.printStackTrace();
+            throw new ValidationException(Arrays.asList(new ValidationError(e.getErrors().get(0).getMessage(),
+                    e.getErrors().get(0).getMessage())));
+        } catch (final Exception e)
+        {
+        	System.out.println("issueE "+e.getMessage());
+        	e.printStackTrace();
+            throw new ValidationException(Arrays.asList(new ValidationError(e.getMessage(),
+                    e.getMessage())));
+        }
+        System.out.println("End");
+        return true;
+    }
+    @Transactional
+    public boolean createReAppropriationCaoNew(final String actionName,final BudgetReAppropriation reApp,
+            final List<BudgetReAppropriationView> budgetReAppropriationList,
+            final Position position, final CFinancialYear financialYear, final String beRe, final BudgetReAppropriationMisc misc,
+            final String asOnDate,WorkflowBean workflowBean,BudgetDetail tempBudgetDetail) {
+        try {
+            if (budgetReAppropriationList.isEmpty()
+                    || !rowsToAddForExistingDetails(budgetReAppropriationList))
+                return false;
+            validateMandatoryFields(budgetReAppropriationList);
+            System.out.println("CAO11");
+            final List<BudgetReAppropriationView> addedList = new ArrayList<BudgetReAppropriationView>();
+            for (final BudgetReAppropriationView appropriation : budgetReAppropriationList) {
+                validateDuplicates(addedList, appropriation);
+                System.out.println("CAO22");
+                saveAndStartWorkFlowForExistingdetailsCaoNew(actionName, reApp,appropriation, position, financialYear, beRe, misc, asOnDate,workflowBean,tempBudgetDetail);
+                System.out.println("CAO33");
+                addedList.add(appropriation);
+            }
+        } catch (final ValidationException e)
+        {
+        	System.out.println("issueV"+e.getMessage());
+            throw new ValidationException(Arrays.asList(new ValidationError(e.getErrors().get(0).getMessage(),
+                    e.getErrors().get(0).getMessage())));
+        } catch (final Exception e)
+        {
+        	System.out.println("issueE"+e.getMessage());
+            throw new ValidationException(Arrays.asList(new ValidationError(e.getMessage(),
+                    e.getMessage())));
+        }
+        return true;
+    }
+    @Transactional
     public boolean createReAppropriationCao(final String actionName,
             final List<BudgetReAppropriationView> budgetReAppropriationList,
             final Position position, final CFinancialYear financialYear, final String beRe, final BudgetReAppropriationMisc misc,
@@ -764,12 +1084,47 @@ public class BudgetReAppropriationService extends PersistenceService<BudgetReApp
         else
             appropriation.setDeductionAmount(reAppView.getDeltaAmount());
 
-        appropriation.setStatus(egwStatusDAO.getStatusByModuleAndCode("BudgetReAppropriation", "Approved"));
+        appropriation.setStatus(egwStatusDAO.getStatusByModuleAndCode("BudgetReAppropriation", "Created"));//change from approved
         validateDeductionAmount(appropriation);
+        
         /*
          * appropriation.start().withOwner(position); budgetReAppropriationWorkflowService.transition(actionName, appropriation,
          * "");
          */
+        applyAuditing(appropriation);
+        persist(appropriation);
+        // Need to call on approve (After implementing workflow)
+        updatePlanningBudget(appropriation);
+    }
+    
+    @Transactional
+    public void saveAndStartWorkFlowForExistingdetailsNew(final String actionName, final BudgetReAppropriationView reAppView,
+            final Position position, final CFinancialYear financialYear, final String beRe, final BudgetReAppropriationMisc misc,
+            final String asOnDate, WorkflowBean workflowBean) {
+        final BudgetReAppropriation appropriation = new BudgetReAppropriation();
+        EgwStatus status = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "Approved");
+        reAppView.getBudgetDetail().setStatus(status);
+        final List<BudgetDetail> searchBy = budgetDetailService.searchByCriteriaWithTypeAndFY(financialYear.getId(), beRe,
+                reAppView.getBudgetDetail());
+        if (searchBy.size() != 1)
+            throw new ValidationException(Arrays.asList(new ValidationError("budget.reappropriation.invalid.combination",
+                    "budget.reappropriation.invalid.combination")));
+        appropriation.setBudgetDetail(searchBy.get(0));
+        appropriation.setReAppropriationMisc(misc);
+        appropriation.setAnticipatoryAmount(reAppView.getAnticipatoryAmount());
+        try {
+            appropriation.setAsOnDate(Constants.DDMMYYYYFORMAT2.parse(asOnDate));
+        } catch (final Exception e) {
+            LOGGER.error("Error while parsing date");
+        }
+        if ("Addition".equalsIgnoreCase(reAppView.getChangeRequestType()))
+            appropriation.setAdditionAmount(reAppView.getDeltaAmount());
+        else
+            appropriation.setDeductionAmount(reAppView.getDeltaAmount());
+
+        //appropriation.setStatus(egwStatusDAO.getStatusByModuleAndCode("BudgetReAppropriation", "Created"));//change from approved
+        validateDeductionAmount(appropriation);
+        transitionWorkFlow(appropriation, workflowBean);
         applyAuditing(appropriation);
         persist(appropriation);
         // Need to call on approve (After implementing workflow)
@@ -821,7 +1176,38 @@ public class BudgetReAppropriationService extends PersistenceService<BudgetReApp
         // Need to call on approve (After implementing workflow)
         updatePlanningBudgetCao(appropriation);
     }
-    
+    @Transactional
+    public void saveAndStartWorkFlowForExistingdetailsCaoNew(final String actionName, final BudgetReAppropriation reApp,final BudgetReAppropriationView reAppView,
+            final Position position, final CFinancialYear financialYear, final String beRe, final BudgetReAppropriationMisc misc,
+            final String asOnDate,WorkflowBean workflowBean,BudgetDetail tempBudgetDetail) {
+    	System.out.println("A1");
+    	EgwStatus status = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "Approved");
+    	tempBudgetDetail.setStatus(status);
+        final List<BudgetDetail> searchBy = budgetDetailService.searchByCriteriaWithTypeAndFY(financialYear.getId(), beRe,
+        		tempBudgetDetail);
+        final BudgetReAppropriation appropriation = new BudgetReAppropriation();
+        appropriation.setBudgetDetail(searchBy.get(0));
+        appropriation.setReAppropriationMisc(misc);
+        appropriation.setAnticipatoryAmount(reAppView.getAnticipatoryAmount());
+        try {
+            //appropriation.setAsOnDate(Constants.DDMMYYYYFORMAT2.parse(asOnDate));
+        	appropriation.setAsOnDate(new Date());
+        } catch (final Exception e) {
+            LOGGER.error("Error while parsing date");
+        }
+        if ("Addition".equalsIgnoreCase(reAppView.getChangeRequestType()))
+            appropriation.setAdditionAmount(reAppView.getDeltaAmount());
+        else
+            appropriation.setDeductionAmount(reAppView.getDeltaAmount());
+        
+       // appropriation.setStatus(egwStatusDAO.getStatusByModuleAndCode("BudgetReAppropriation", "Approved"));//change from approved
+        transitionWorkFlow(reApp, workflowBean);
+        appropriation.setStatus(reApp.getStatus());
+        applyAuditing(reApp);
+        applyAuditing(appropriation);
+        //updatePlanningBudgetCao(appropriation);
+        persist(appropriation);
+    }
     @Transactional
     public void saveAndStartWorkFlowForExistingdetailsAcmc(final String actionName, final BudgetReAppropriationView reAppView,
             final Position position, final CFinancialYear financialYear, final String beRe, final BudgetReAppropriationMisc misc,
@@ -909,6 +1295,18 @@ public class BudgetReAppropriationService extends PersistenceService<BudgetReApp
     }
 
     @Transactional
+    public BudgetReAppropriationMisc createBudgetReAppropriationMiscNew(final String actionName, final String beRe,
+            final CFinancialYear financialYear, final BudgetReAppropriationMisc appropriationMisc, WorkflowBean workflowBean) {
+    	System.out.println("inide createBudgetReAppropriationMiscNew");
+        final Budget budget = new Budget();
+        budget.setIsbere(beRe);
+        budget.setFinancialYear(financialYear);
+        final BudgetDetail budgetDetail = new BudgetDetail();
+        budgetDetail.setBudget(budget);
+        return createReAppropriationMiscNew(actionName, appropriationMisc, budgetDetail, workflowBean);
+    }
+    
+    @Transactional
     public boolean createReAppropriationForNewBudgetDetail(final String actionName,
             final List<BudgetReAppropriationView> newBudgetReAppropriationList, final Position position,
             final BudgetReAppropriationMisc misc) {
@@ -971,4 +1369,36 @@ public class BudgetReAppropriationService extends PersistenceService<BudgetReApp
          * reAppropriation, "");
          */
     }
+    private org.egov.infra.microservice.models.Designation getDesignationDetails(String desgnCode){
+    	List<org.egov.infra.microservice.models.Designation> designation = microserviceUtils.getDesignation(desgnCode);
+    	return designation.get(0);
+    }   
+	
+    public String getEmployeeName(Long empId){
+        return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+     }
+    public String getEmployeeDesignation(Long empId) {
+    	return microserviceUtils.getEmployee(empId, null, null, null).get(0).getAssignments().get(0).getDesignation();
+    }
+    private String populateEmpName() {
+		Long empId = ApplicationThreadLocals.getUserId();
+		String name = null;
+		List<EmployeeInfo> employs = microserviceUtils.getEmployee(empId, null, null, null);
+		if (null != employs && employs.size() > 0) {
+			name = employs.get(0).getAssignments().get(0).getEmployeeName();
+
+		}
+		return name;
+	}
+    
+    private Long populatePosition() {
+		Long empId = ApplicationThreadLocals.getUserId();
+		Long pos = null;
+		List<EmployeeInfo> employs = microserviceUtils.getEmployee(empId, null, null, null);
+		if (null != employs && employs.size() > 0) {
+			pos = employs.get(0).getAssignments().get(0).getPosition();
+
+		}
+		return pos;
+	}
 }

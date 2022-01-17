@@ -67,9 +67,9 @@
 	<%@ include file='common-includes.jsp'%>
 	<jsp:include page="budgetHeader.jsp" />
 	<%@ include file='budgetReAppropriationSetUp.jsp'%>
-	 <%@ include file='addReAppropriationSetUp.jsp'%> 
+	<%--  <%@ include file='addReAppropriationSetUp.jsp'%>  --%>
 	<script>
-					
+				
 	function populateSubSchemes(scheme){
 		populatebudgetReAppropriation_subScheme({schemeId:scheme.options[scheme.selectedIndex].value});
 	}
@@ -99,6 +99,9 @@
 		updateGrid('subScheme.id',document.getElementById('budgetReAppropriation_subScheme').selectedIndex);
 	}
 	</s:if>
+	function onSubmit(){
+		
+	}
 </script>
 	<script type="text/javascript"
 		src="${pageContext.request.contextPath}/resources/javascript/calenderNew.js"></script>
@@ -107,7 +110,7 @@
 			if(opener != null && opener.top != null && opener.top.document.getElementById('inboxframe')!=null){
 				opener.top.document.getElementById('inboxframe').contentWindow.egovInbox.refresh();
 			}
-		
+			
 			//$('.btn-wf-primary').click(function(){
 				function button(){
 				var button = $(this).attr('id');
@@ -147,11 +150,17 @@
 					e.preventDefault();
 				}
 			}
-			
+			function onSubmit(){
+				alert("submit");
+					if(!validate(false,'create'))
+						return false;
+					else
+						return true;
+				}
 			function validate(checkUser,method){
 				if(validateMandatoryFields() == false)
 					return false;
-				anticipatory = false;
+				/* anticipatory = false;
 				estimate = false;
 				invalidNumber = "";
 				for(i=0;i<budgetDetailsTable.getRecordSet().getLength();i++){
@@ -201,7 +210,7 @@
 				}
 				if(!checkUser){
 					document.getElementById("actionName").value = 'save';
-				}
+				} */
 				document.budgetDetailForm.action='/services/EGF/budget/budgetReAppropriation-'+method+'.action';
 	    		document.budgetDetailForm.submit();
 				return;
@@ -475,7 +484,7 @@
 								</td>
 							</tr>
 						</table>
-						<table width="100%" border="0" cellspacing="0" cellpadding="0"
+						<%-- <table width="100%" border="0" cellspacing="0" cellpadding="0"
 							id="budgetDetailFormTable">
 							<tr>
 								<td>&nbsp;</td>
@@ -488,7 +497,7 @@
 									</div>
 								</td>
 							</tr>
-						</table>
+						</table> --%>
 						<div class="yui-skin-sam"
 							style="width: 100%; overflow-x: auto; overflow-y: hidden;">
 							<div id="budgetDetailTable"></div>
@@ -506,7 +515,7 @@
 				computeAvailable("budgetReAppropriationList",i);
 			}
 		</script> <br />
-						<table width="100%" border="0" cellspacing="0" cellpadding="0"
+						<%-- <table width="100%" border="0" cellspacing="0" cellpadding="0"
 							id="budgetReAppropriationFormTable">
 							<tr>
 								<td>&nbsp;</td>
@@ -518,7 +527,7 @@
 									</div>
 								</td>
 							</tr>
-						</table>
+						</table> --%>
 						<div class="yui-skin-sam"
 							style="width: 100%; overflow-x: auto; overflow-y: hidden;">
 							<div id="budgetReAppropriationsTable"></div>
@@ -534,19 +543,20 @@
 			</s:if>
 		</script>
 					</span>
+					
 					<table width="60%" border="0" cellspacing="0" cellpadding="0">
 						<tr>
 							<td>
 								<div class="buttonbottom" style="padding-bottom: 10px;">
 								<%@ include file='../budget/commonWorkflowMatrix.jsp'%>
 								<%@ include file='../workflow/commonWorkflowMatrix-button.jsp'%>
-									<input type="submit" value="Forward to CAO"
+									<%-- <input type="submit" value="Forward"
 										id="budgetReAppropriation__create" name="method:create"
 										onClick="javascript: return validate(false,'create');"
 										class="buttonsubmit" />
 									
 									<s:submit onclick="javascript: self.close()" key="lbl.close"
-										cssClass="button" />
+										cssClass="button" /> --%>
 								</div>
 							</td>
 						</tr>
@@ -558,8 +568,11 @@
 
 			</div>
 
+					
+					
 			<s:hidden name="actionName" id="actionName" />
 		</div>
+		
 	</s:form>
 	<div id="beReGrid" style="display: none"></div>
 </body>

@@ -64,9 +64,11 @@ var accCodeFuncFuncIdArray
 var slAccountCodes = new Array();
 
 function onloadtriple(){
+	
 		document.getElementById("fundId").value=document.getElementById("voucherTypeBean.fundnew").value;
 		document.getElementById("vouchermis.departmentid").value=document.getElementById("voucherTypeBean.departmentnew").value;
 		document.getElementById("vouchermis.function").value=document.getElementById("voucherTypeBean.functionnew").value;
+		
 }
 
 //function onloadPayment(){

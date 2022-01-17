@@ -115,7 +115,7 @@ public class BudgetUploadReport {
 		this.approvalComent = approvalComent;
 	}
 
-    public Fund getFund() {
+	public Fund getFund() {
         return fund;
     }
 

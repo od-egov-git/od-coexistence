@@ -106,6 +106,7 @@
 	    		return false;
 	    }
 	    </s:if>
+	    //return true;
 	    return  onSubmit();
 	}
 </script>
@@ -119,8 +120,7 @@
 							value="%{validAction}" id="%{validAction}" name="%{validAction}"
 							onclick="return validateWorkFlowApprover('%{validAction}','jsValidationErrors');" />
 					</s:if>
-				</s:iterator> <input type="button" name="button2" id="button2" value="<s:text name='lbl.close'/>"
-				class="button" onclick="window.parent.postMessage('close','*');window.close();" /></td>
+				</s:iterator> </td>
 		</tr>
 	</table>
 </div>

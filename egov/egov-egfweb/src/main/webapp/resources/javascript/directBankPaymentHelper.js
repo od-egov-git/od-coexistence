@@ -62,11 +62,11 @@ function validate() {
 		undoLoadingMask();
 		return false;
 	}
-	if(!balanceCheck()){
+	if (!balanceCheck()) {
 		bootbox.alert("Insuffiecient Bank Balance. Do you want to process",
 				function() {
-			return true;
-		});
+					return true;
+				});
 	}
 	return true;
 }
@@ -83,7 +83,7 @@ function updateAndCheckAmount() {
 	if (amt != dbcr) {
 		bootbox.alert(totalsnotmatchingamount);
 		return false;
-	}else {
+	} else {
 		return true;
 	}
 
@@ -239,10 +239,10 @@ function openViewVouchers() {
 	}
 }
 var postTypeFrom = {
-		success : function(o) {
-			//document.getElementById('accnumnar').value = o.responseText;
-		},
-		failure : function(o) {
-			bootbox.alert('failure');
-		}
+	success : function(o) {
+		// document.getElementById('accnumnar').value = o.responseText;
+	},
+	failure : function(o) {
+		bootbox.alert('failure');
 	}
+}

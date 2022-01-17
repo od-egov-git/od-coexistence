@@ -851,12 +851,23 @@
         <put-attribute name="body" value="/WEB-INF/views/cheque/surrender_cheque.jsp"/>
     </definition>
     <definition name="approvebudget-searchCAO" extends="base_layout">
-        <put-attribute name="page-title" value="title.approvebudget.search.cao"
+        <put-attribute name="page-title" value="title.approvebudget.search"
                        cascade="true"/>
         <put-attribute name="body"
                        value="/WEB-INF/views/approvebudget/approvebudget-searchCAO.jsp"/>
     </definition>
-    
+    <definition name="approvebudget-searchCAO_New" extends="base_layout">
+        <put-attribute name="page-title" value="title.approvebudget.search.cao"
+                       cascade="true"/>
+        <put-attribute name="body"
+                       value="/WEB-INF/views/approvebudget/approvebudget-searchCAONew.jsp"/>
+    </definition>
+    <definition name="budgetReAppropriation_EditNew_bkp" extends="base_layout">
+        <put-attribute name="page-title" value="title.approvebudget.search.cao"
+                       cascade="true"/>
+        <put-attribute name="body"
+                       value="/WEB-INF/views/approvebudget/budgetReAppropriation-EditNew_bkp.jsp"/>
+    </definition>
     <definition name="approvebudget-searchACMC" extends="base_layout">
         <put-attribute name="page-title" value="title.approvebudget.search.acmc"
                        cascade="true"/>
@@ -892,5 +903,21 @@
         <put-attribute name="page-title" value="title.pr.request" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/paymentrefund/pr-request-form.jsp"/>
     </definition>
-
+    <definition name="payRefund-request-form" extends="base_layout">
+        <put-attribute name="page-title" value="title.pr.request" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/paymentrefund/payment-refund-request.jsp"/>
+    </definition>
+    
+     <definition name="payRefund-request-form-update" extends="base_layout">
+        <put-attribute name="page-title" value="title.pr.request" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/paymentrefund/payment-refund-request-update.jsp"/>
+    </definition>
+	<definition name="ol-payRefund-request-form" extends="base_layout">
+		<put-attribute name="page-title" value="title.pr.request" cascade="true" />
+		<put-attribute name="body" value="/WEB-INF/views/paymentrefund/ol-payment-refund-request.jsp" />
+	</definition>
+	<definition name="ol-payRefund-request-form-update" extends="base_layout">
+		<put-attribute name="page-title" value="title.pr.request" cascade="true" />
+		<put-attribute name="body" value="/WEB-INF/views/paymentrefund/ol-payment-refund-request-update.jsp" />
+	</definition>
 </tiles-definitions>

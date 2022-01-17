@@ -108,7 +108,7 @@ public class BillsAccountingService {
                 voucherStatus = appVal.getValue();
             } else
                 throw new ApplicationRuntimeException("PREAPPROVEDVOUCHERSTATUS" + MISSINGMSG);
-           vh = createVoucher.createVoucherFromBill(billId, voucherStatus, voucherNumber, voucherDate);
+           vh = createVoucher.createVoucherFromBill(billId, voucherStatus, voucherNumber, voucherDate,null);
         } catch (final ValidationException e) {
             LOGGER.error(e.getErrors());
             throw new ValidationException(e.getErrors());
@@ -199,7 +199,7 @@ public class BillsAccountingService {
                 voucherStatus = appVal.getValue();
             } else
                 throw new ApplicationRuntimeException("DEFAULTVOUCHERCREATIONSTATUS" + MISSINGMSG);
-             final long vh = createVoucher.createVoucherFromBill(billId, voucherStatus, null, null);
+             final long vh = createVoucher.createVoucherFromBill(billId, voucherStatus, null, null,null);
             return vh;
         } catch (final Exception e)
         {

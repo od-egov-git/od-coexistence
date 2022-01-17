@@ -57,6 +57,12 @@ function createTextFieldFormatter(prefix,suffix){
 		el.innerHTML = "<input type='text' readonly id='"+prefix+"["+budgetDetailsTable.getRecordIndex(oRecord)+"]"+suffix+"' name='"+prefix+"["+budgetDetailsTable.getRecordIndex(oRecord)+"]"+suffix+"' value='"+value+"' style='text-align:right;width:90px;' maxlength='15'/>";
 	}
 }
+function createButtonFormatter(prefix,suffix){
+    return function(el, oRecord, oColumn, oData) {
+		var value = (YAHOO.lang.isValue(oData))?oData:0.00;
+		el.innerHTML = "<input type='button' onclick=button(); id='"+prefix+"["+budgetDetailsTable.getRecordIndex(oRecord)+"]"+suffix+"' name='"+prefix+"["+budgetDetailsTable.getRecordIndex(oRecord)+"]"+suffix+"'  />";
+	}
+}
 function updateGrid(field,index){
 	if(budgetDetailsTable != null){
 		len = budgetDetailsTable.getRecordSet().getLength()
@@ -245,7 +251,10 @@ function createAmountFieldFormatter(values,prefix,suffix){
 		<s:iterator value="budgetReAppropriationList" status="stat">
 			availableList.push('<s:text name="format.number"><s:param name="value" value="budgetReAppropriationList[#stat.index].availableAmount"/></s:text>');
 		</s:iterator>
+	function button(){
+		alert("button");
 		
+	}
 	var makeBudgetDetailTable = function() {
 		var budgetDetailColumns = [ 
 			{key:"budgetDetail.budgetGroup.id",label:'Budget Group ',width:120, formatter:createDropdownFormatter(BUDGETDETAILLIST),dropdownOptions:budgetGroupOptions},
@@ -284,8 +293,9 @@ function createAmountFieldFormatter(values,prefix,suffix){
 			{key:"amount",label:'Addition of <br/>Funds sought(Rs)',width:"50em", formatter:createTextFieldFormatterWithOnBlur('budgetDetailsTable',BUDGETDETAILLIST,".deltaAmount")},
 			{key:"total_available",label:'Budget Provision avail<br/> after Additional Appropriation(Rs)',width:"50em", formatter:createAmountFieldFormatter(actualsList,BUDGETDETAILLIST,".remainingAmount")},
 			{key:"newPlanningBudgetAvailable",label:'New Planning Budget<br/> Available(Rs)',width:"50em", formatter:createAmountFieldFormatter(planningBudgetAvailableList,BUDGETDETAILLIST,".newPlanningBudgetAvailable")},
-			
+			/* {key:"history",label:'History',width:"50em",formatter:createButtonFormatter(BUDGETDETAILLIST,".history") }, */
 		];
+		
 	    var budgetDetailDS = new YAHOO.util.DataSource(); 
 		budgetDetailsTable = new YAHOO.widget.DataTable("budgetDetailTable",budgetDetailColumns, budgetDetailDS);	
 		budgetDetailsTable.on('cellClickEvent',function (oArgs) {

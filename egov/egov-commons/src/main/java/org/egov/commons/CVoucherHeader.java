@@ -97,6 +97,7 @@ public class CVoucherHeader extends StateAware implements java.io.Serializable{
     private Integer isConfirmed;
     private Long refvhId;
     private String cgvn;
+    private String refundable;
     private Integer moduleId;
     private String reasoncancel;
     @Transient
@@ -164,8 +165,16 @@ public class CVoucherHeader extends StateAware implements java.io.Serializable{
     private String postauditprocessing;
     private String backdateentry;
     private String fileno;
-    
-    
+    @Transient
+    private String narration;
+	
+    public String getNarration() {
+		return narration;
+	}
+
+	public void setNarration(String narration) {
+		this.narration = narration;
+	}
    	public String getFileno() {
 		return fileno;
 	}
@@ -631,5 +640,12 @@ public class CVoucherHeader extends StateAware implements java.io.Serializable{
 
 	public void setReasoncancel(String reasoncancel) {
 		this.reasoncancel = reasoncancel;
+	}
+	public String getRefundable() {
+		return refundable;
+	}
+
+	public void setRefundable(String refundable) {
+		this.refundable = refundable;
 	}
 }

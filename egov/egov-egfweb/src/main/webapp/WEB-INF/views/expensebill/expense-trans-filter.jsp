@@ -53,6 +53,8 @@
 
 <div class="form-group">
 	<c:choose>
+     <c:when test="${refundable != null && !refundable.isEmpty()}">
+      <c:choose>
 		<c:when test="${headerFields.contains('fund')}">
 			<c:choose>
 				<c:when test="${mandatoryFields.contains('fund')}">
@@ -86,7 +88,51 @@
 			</div>
 		</c:otherwise>
 	</c:choose>
-	<c:choose>
+     </c:when>
+     <c:otherwise>
+       <c:choose>
+		<c:when test="${headerFields.contains('fund')}">
+			<c:choose>
+				<c:when test="${mandatoryFields.contains('fund')}">
+				<form:hidden path="" name="fundId" id="fundId" value="${egBillregister.egBillregistermis.fund.id }"/>
+					<label class="col-sm-3 control-label text-right"><spring:message code="lbl.fund" />
+						<span class="mandatory"></span>
+					</label>
+					<div class="col-sm-3 add-margin">
+						<form:select path="egBillregistermis.fund" data-first-option="false" id="fund" class="form-control" required="required"  >
+							<form:option value=""><spring:message code="lbl.select" /></form:option>
+							<form:options items="${funds}" itemValue="id" itemLabel="name" />
+						</form:select>
+						<form:errors path="egBillregistermis.fund" cssClass="add-margin error-msg" />
+					</div>
+				</c:when>
+				<c:otherwise>
+				<form:hidden path="" name="fundId" id="fundId" value="${egBillregister.egBillregistermis.fund.id }"/>
+					<label class="col-sm-3 control-label text-right"><spring:message code="lbl.fund" />
+					</label>
+					<div class="col-sm-3 add-margin">
+						<form:select path="egBillregistermis.fund" data-first-option="false" id="fund" class="form-control"  >
+							<form:option value=""><spring:message code="lbl.select" /></form:option>
+							<form:options items="${funds}" itemValue="id" itemLabel="name" />
+						</form:select>
+						<form:errors path="egBillregistermis.fund" cssClass="add-margin error-msg" />
+					</div>
+				</c:otherwise>
+			</c:choose>
+		</c:when>
+		<c:otherwise>
+			<label class="col-sm-3 control-label text-right"></label>
+			<div class="col-sm-3 add-margin">
+			</div>
+		</c:otherwise>
+	</c:choose>
+     </c:otherwise>
+    </c:choose>
+
+
+    <c:choose>
+     <c:when test="${refundable != null && !refundable.isEmpty()}">
+        <c:choose>
 		<c:when test="${headerFields.contains('department')}">
 			<c:choose>
 				<c:when test="${mandatoryFields.contains('department')}">
@@ -118,11 +164,87 @@
 			</div>
 		</c:otherwise>
 	</c:choose>
+     </c:when>
+     <c:otherwise>
+	<c:choose>
+		<c:when test="${headerFields.contains('department')}">
+			<c:choose>
+				<c:when test="${mandatoryFields.contains('department')}">
+					<label class="col-sm-2 control-label text-right"><spring:message code="lbl.department" />
+						<span class="mandatory"></span>
+					</label>
+					<div class="col-sm-3 add-margin">
+						<form:select path="egBillregistermis.departmentcode" data-first-option="false" id="department" class="form-control" required="required">
+							<form:option value=""><spring:message code="lbl.select" /></form:option>
+							<form:options items="${departments}" itemValue="code" itemLabel="name" />
+						</form:select>
+						<form:errors path="egBillregistermis.departmentcode" cssClass="add-margin error-msg" />
+					</div>
+				</c:when>
+				<c:otherwise>
+					<label class="col-sm-2 control-label text-right"><spring:message code="lbl.department" />
+					</label>
+					<div class="col-sm-3 add-margin">
+						<form:select path="egBillregistermis.departmentcode" data-first-option="false" id="department" class="form-control">
+							<form:option value=""><spring:message code="lbl.select" /></form:option>
+							<form:options items="${departments}" itemValue="id" itemLabel="name" />
+						</form:select>
+						<form:errors path="egBillregistermis.departmentcode" cssClass="add-margin error-msg" />
+					</div>
+				</c:otherwise>
+			</c:choose>
+		</c:when>
+		<c:otherwise>
+			<label class="col-sm-2 control-label text-right"></label>
+			<div class="col-sm-3 add-margin">
+			</div>
+		</c:otherwise>
+	</c:choose>
+   </c:otherwise>
+  </c:choose>
+
 	
 </div>
 
 <div class="form-group">
 	<c:choose>
+     <c:when test="${refundable != null && !refundable.isEmpty()}">
+        <c:choose>
+		<c:when test="${headerFields.contains('scheme')}">
+			<form:hidden path="" name="schemeId" id="schemeId" value="${egBillregister.egBillregistermis.scheme.id }"/>
+			<c:choose>
+				<c:when test="${mandatoryFields.contains('scheme')}">
+					<label class="col-sm-3 control-label text-right"><spring:message code="lbl.scheme" />
+						<span class="mandatory"></span>
+					</label>
+					<div class="col-sm-3 add-margin">
+						<form:select path="egBillregistermis.schemeId" disabled="true" data-first-option="false" id="scheme" class="form-control" required="required">
+							<form:option value=""><spring:message code="lbl.select" /></form:option>
+						</form:select>
+						<form:errors path="egBillregistermis.schemeId" cssClass="add-margin error-msg" />
+					</div>
+				</c:when>
+				<c:otherwise>
+					<label class="col-sm-3 control-label text-right"><spring:message code="lbl.scheme" />
+					</label>
+					<div class="col-sm-3 add-margin">
+						<form:select path="egBillregistermis.schemeId" disabled="true" data-first-option="false" id="scheme" class="form-control">
+							<form:option value=""><spring:message code="lbl.select" /></form:option>
+						</form:select>
+						<form:errors path="egBillregistermis.schemeId" cssClass="add-margin error-msg" />
+					</div>
+				</c:otherwise>
+			</c:choose>
+		</c:when>
+		<c:otherwise>
+			<label class="col-sm-3 control-label text-right"></label>
+			<div class="col-sm-3 add-margin">
+			</div>
+		</c:otherwise>
+	</c:choose>
+     </c:when>
+     <c:otherwise>
+      <c:choose>
 		<c:when test="${headerFields.contains('scheme')}">
 			<form:hidden path="" name="schemeId" id="schemeId" value="${egBillregister.egBillregistermis.scheme.id }"/>
 			<c:choose>
@@ -155,7 +277,49 @@
 			</div>
 		</c:otherwise>
 	</c:choose>
+     </c:otherwise>
+  </c:choose>
 	
+
+<c:choose>
+     <c:when test="${refundable != null && !refundable.isEmpty()}">
+     <c:choose>
+		<c:when test="${headerFields.contains('subscheme')}">
+		<form:hidden path="" name="subSchemeId" id="subSchemeId" value="${egBillregister.egBillregistermis.subScheme.id }"/>
+			<c:choose>
+				<c:when test="${mandatoryFields.contains('subscheme')}">
+					<label class="col-sm-2 control-label text-right"><spring:message code="lbl.subscheme" />
+						<span class="mandatory"></span>
+					</label>
+					<div class="col-sm-3 add-margin">
+						<form:select path="egBillregistermis.subSchemeId" disabled="true" data-first-option="false" id="subScheme" class="form-control" required="required">
+							<form:option value=""><spring:message code="lbl.select" /></form:option>
+							<form:options items="${subschemes}" itemValue="id" itemLabel="name" />
+						</form:select>
+						<form:errors path="egBillregistermis.subSchemeId" cssClass="add-margin error-msg" />
+					</div>
+				</c:when>
+				<c:otherwise>
+					<label class="col-sm-2 control-label text-right"><spring:message code="lbl.subscheme" />
+					</label>
+					<div class="col-sm-3 add-margin">
+						<form:select path="egBillregistermis.subSchemeId" disabled="true" data-first-option="false" id="subScheme" class="form-control">
+							<form:option value=""><spring:message code="lbl.select" /></form:option>
+							<form:options items="${subschemes}" itemValue="id" itemLabel="name" />
+						</form:select>
+						<form:errors path="egBillregistermis.subSchemeId" cssClass="add-margin error-msg" />
+					</div>
+				</c:otherwise>
+			</c:choose>
+		</c:when>
+		<c:otherwise>
+			<label class="col-sm-2 control-label text-right"></label>
+			<div class="col-sm-3 add-margin">
+			</div>
+		</c:otherwise>
+	</c:choose>
+     </c:when>
+     <c:otherwise>
 	<c:choose>
 		<c:when test="${headerFields.contains('subscheme')}">
 		<form:hidden path="" name="subSchemeId" id="subSchemeId" value="${egBillregister.egBillregistermis.subScheme.id }"/>
@@ -191,6 +355,9 @@
 			</div>
 		</c:otherwise>
 	</c:choose>
+     </c:otherwise>
+</c:choose>     	
+	
 </div>
 
 <div class="form-group">

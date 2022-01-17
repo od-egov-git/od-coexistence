@@ -72,6 +72,7 @@ function loadDesignationFromMatrix1() {
 	var additionalRule = dom.get('additionalRule').value;
 	var pendingAction = document.getElementById('pendingActions').value;
 	var stateType = '<s:property value="%{stateType}"/>';
+	alert("stateType "+stateType);
 	//var stateType = 'CVoucherHeader';
 	document.getElementById("approverDesignation").value="-1";
 	//alert(stateType+" "+dept+" "+currentState+" "+amountRule+" "+additionalRule+" "+pendingAction);
@@ -132,6 +133,9 @@ function loadDesignationFromMatrix1() {
 		var additionalRule = dom.get('additionalRule').value;
 		var pendingAction = document.getElementById('pendingActions').value;
 		var stateType = '<s:property value="%{stateType}"/>';
+		if(stateType==''||stateType==null)
+			stateType=dom.get('stateType').value;
+		
 		//var stateType = 'CVoucherHeader';
 		loadDesignationByDeptAndType(stateType, dept, currentState, amountRule,
 				additionalRule, pendingAction);
@@ -150,7 +154,8 @@ function loadDesignationFromMatrix1() {
 		document.getElementById("approverPositionId").value = '<s:property value="%{approverPositionId}"/>';
 	}
 </script>
-<s:if test="%{getNextAction()!='END'}">
+<s:hidden id="nextAction" name="nextAction" value="" />
+<%-- <s:if test="%{getNextAction()!='END'}"> --%>
 	<s:if test="%{getCurrentState()!='Closed'}">
 		<s:hidden id="currentState" name="currentState"
 			value="%{getCurrentState()}" />
@@ -158,6 +163,7 @@ function loadDesignationFromMatrix1() {
 	<s:else>
 		<s:hidden id="currentState" name="currentState" value="" />
 	</s:else>
+	<s:hidden id="stateType" name="stateType" value="%{getType()}" />
 	<s:hidden id="currentDesignation" name="currentDesignation"
 		value="%{currentDesignation}" />
 	<s:hidden id="additionalRule" name="additionalRule"
@@ -178,8 +184,9 @@ function loadDesignationFromMatrix1() {
 		<c:set var="approverEvenTextCSS" value="bluebox" scope="request" />
 		<c:set var="approverEvenCSS" value="bluebox" scope="request" />
 	</s:if>
-
+<s:if test="%{getNextAction()!='END'}">
 	<table width="100%" border="0" cellspacing="0" cellpadding="0">
+		<%-- <s:if test="%{getNextAction()!='END'}"> --%>
 		<tr>
 			<div class="headingsmallbg">
 				<span class="bold"><s:text name="title.approval.information" /></span>

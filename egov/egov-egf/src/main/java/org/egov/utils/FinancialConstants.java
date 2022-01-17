@@ -71,6 +71,7 @@ public interface FinancialConstants {
 	public static final String CONTINGENCYBILL = "CBILL";
 	// this is the one which is used by financials from 13/03/2010
 	public static final String CONTINGENCYBILL_FIN = "EXPENSEBILL";
+	public static final String REFUNDBILL_FIN = "REFUNDBILL";
 	public static final String SUPPLIERBILL = "PURCHBILL";
 	public static final String CONTRACTORBILL = "WORKSBILL";
 	public static final String PENSIONBILL = "PENSIONBILL";
@@ -80,6 +81,7 @@ public interface FinancialConstants {
 	// Standard Bill Types or Expernditure type
 
 	public static final String STANDARD_EXPENDITURETYPE_CONTINGENT = "Expense";
+	public static final String STANDARD_EXPENDITURETYPE_REFUND = "Refund";
 	public static final String STANDARD_EXPENDITURETYPE_CONTINGENT_CS = "ContractorSupplier";
 	public static final String STANDARD_EXPENDITURETYPE_WORKS = "Works";
 	public static final String STANDARD_EXPENDITURETYPE_PURCHASE = "Purchase";
@@ -379,9 +381,14 @@ public interface FinancialConstants {
 
 	public static final String BUDGET = "BUDGET";
 	public static final String BUDGETDETAIL = "BUDGETDETAIL";
+	public static final String BUDGETDETAILAPP = "BudgetReAppropriation";
 	public static final String BUDGETDETAIL_CREATED_STATUS = "Created";
-	public static final String BUDGETDETAIL_VERIFIED_STATUS = "VERIFIED";
+	public static final String BUDGETDETAIL_VERIFIED_STATUS = "Verified";
+	public static final String BUDGETDETAIL_APPROVED_STATUS = "Approved";
+	public static final String BUDGETDETAIL_REJECTED_STATUS = "Rejected";
+	public static final String BUDGETDETAIL_CANCELLED_STATUS = "Cancelled";
 	public static final String WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME = "Expense Bill";
+	public static final String WORKFLOWTYPE_REFUND_BILL_DISPLAYNAME = "Refund Bill";
 	public static final String WORKFLOWTYPE_WORKS_BILL_DISPLAYNAME = "Works Bill";
 	public static final String WORKFLOWTYPE_SBILL_DISPLAYNAME = "Supplier Bill";
 	public static final String WORKFLOWTYPE_VOUCHER_DISPLAYNAME = "Voucher";

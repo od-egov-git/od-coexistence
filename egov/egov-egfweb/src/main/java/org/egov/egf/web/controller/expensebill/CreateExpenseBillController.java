@@ -78,8 +78,10 @@ import org.egov.commons.dao.FundHibernateDAO;
 import org.egov.egf.autonumber.ExpenseBillNumberGenerator;
 import org.egov.egf.budget.model.BudgetControlType;
 import org.egov.egf.budget.service.BudgetControlTypeService;
+import org.egov.egf.expensebill.repository.ExpenseBillRepository;
 import org.egov.egf.expensebill.service.ExpenseBillService;
 import org.egov.egf.utils.FinancialUtils;
+import org.egov.egf.web.controller.microservice.FinanceController;
 import org.egov.eis.web.contract.WorkflowContainer;
 import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.service.AppConfigValueService;
@@ -248,7 +250,7 @@ public class CreateExpenseBillController extends BaseBillController {
             egBillregister.setBilldate(new Date());            
         }
         egBillregister.setEgBillregistermis(mis);
-        model.addAttribute(STATE_TYPE, egBillregister.getClass().getSimpleName());
+		model.addAttribute(STATE_TYPE, egBillregister.getClass().getSimpleName());
         prepareWorkflow(model, egBillregister, new WorkflowContainer());
        model.addAttribute("validActionList", validActions);
        model.addAttribute(BILL_TYPES, BillType.values());
@@ -289,6 +291,13 @@ public class CreateExpenseBillController extends BaseBillController {
         }
 
         populateBillDetails(egBillregister);
+       
+        if(!workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
+    	{ 
+        	  populateEgBillregistermisDetails(egBillregister);
+    	}
+     
+        
         validateBillNumber(egBillregister, resultBinder);
         if(!workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
     	{ 

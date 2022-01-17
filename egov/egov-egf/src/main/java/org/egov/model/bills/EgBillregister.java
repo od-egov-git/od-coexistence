@@ -85,6 +85,7 @@ public class EgBillregister extends StateAware implements java.io.Serializable {
     private BigDecimal fieldid;
     private String billstatus;
     private String narration;
+    private String refundnarration;
     private BigDecimal passedamount;
     private String billtype;
     @NotNull
@@ -122,6 +123,8 @@ public class EgBillregister extends StateAware implements java.io.Serializable {
     @Transient
     private List<EgBillPayeedetails> billPayeedetails = new ArrayList<>();
     @Transient
+    private List<EgBillPayeedetails> billPayeeDetailsNotLink = new ArrayList<>();
+	@Transient
     private List<EgChecklists> checkLists = new ArrayList<>();
     @Transient
     private List<DocumentUpload> documentDetail = new ArrayList<>();
@@ -133,6 +136,8 @@ public class EgBillregister extends StateAware implements java.io.Serializable {
     private String sanctionnumber;
     //@Transient
     private String fileno;
+private String refundable;
+    private String isCitizenRefund;
     
     public EgBillregister() {
     }
@@ -148,7 +153,7 @@ public class EgBillregister extends StateAware implements java.io.Serializable {
     }
 
     public EgBillregister(final String billnumber, final Date billdate, final BigDecimal billamount,
-                          final BigDecimal fieldid, final String billstatus, final String narration, final BigDecimal passedamount,
+                          final BigDecimal fieldid, final String billstatus, final String narration,final String refundnarration, final BigDecimal passedamount,
                           final String billtype, final String expendituretype, final BigDecimal advanceadjusted,
                           final BigDecimal createdby, final Date createddate, final BigDecimal lastmodifiedby,
                           final Date lastmodifieddate, final String zone, final String division, final String workordernumber,
@@ -161,6 +166,7 @@ public class EgBillregister extends StateAware implements java.io.Serializable {
         this.fieldid = fieldid;
         this.billstatus = billstatus;
         this.narration = narration;
+        this.refundnarration = refundnarration;
         this.passedamount = passedamount;
         this.billtype = billtype;
         this.expendituretype = expendituretype;
@@ -511,6 +517,38 @@ public class EgBillregister extends StateAware implements java.io.Serializable {
 		this.fileno = fileno;
 	}
 
+public String getRefundable() {
+		return refundable;
+	}
+
+	public void setRefundable(String refundable) {
+		this.refundable = refundable;
+	}
+
+	public String getRefundnarration() {
+		return refundnarration;
+	}
+
+	public void setRefundnarration(String refundnarration) {
+		this.refundnarration = refundnarration;
+	}
+
+	public String getIsCitizenRefund() {
+		return isCitizenRefund;
+	}
+
+	public void setIsCitizenRefund(String isCitizenRefund) {
+		this.isCitizenRefund = isCitizenRefund;
+	}
+	
+	
+    public List<EgBillPayeedetails> getBillPayeeDetailsNotLink() {
+		return billPayeeDetailsNotLink;
+	}
+
+	public void setBillPayeeDetailsNotLink(List<EgBillPayeedetails> billPayeeDetailsNotLink) {
+		this.billPayeeDetailsNotLink = billPayeeDetailsNotLink;
+	}
 	
 	
 	

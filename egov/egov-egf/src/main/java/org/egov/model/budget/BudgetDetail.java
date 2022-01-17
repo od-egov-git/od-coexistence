@@ -206,7 +206,7 @@ public class BudgetDetail extends StateAware implements java.io.Serializable{
 		this.approvalComent = approvalComent;
 	}
 
-    public Set<BudgetReAppropriation> getBudgetReAppropriations() {
+	public Set<BudgetReAppropriation> getBudgetReAppropriations() {
         return budgetReAppropriations;
     }
 

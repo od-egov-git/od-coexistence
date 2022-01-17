@@ -50,7 +50,8 @@ package org.egov.egf.commons.bank.repository;
 import org.egov.commons.Bank;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 /**
@@ -65,5 +66,6 @@ public interface BankRepository extends JpaRepository<Bank, Integer> {
     
     List<Bank> findByIsactiveTrueOrderByNameAsc();
 
-
+    @Query("SELECT u FROM Bank u WHERE  u.name = :name")
+    Bank findBankByName(@Param("name") String name);
 }

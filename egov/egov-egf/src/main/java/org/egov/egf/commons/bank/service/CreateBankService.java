@@ -94,6 +94,9 @@ public class CreateBankService {
     public Bank getById(final Integer id) {
         return bankRepository.findOne(id);
     }
+    public Bank getByName(final String name) {
+        return bankRepository.findBankByName(name);
+    }
 
     public List<Bank> getByIsActive(final Boolean isActive) {
         return bankRepository.findByIsactive(isActive);

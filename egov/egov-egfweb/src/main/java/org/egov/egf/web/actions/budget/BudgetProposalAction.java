@@ -287,7 +287,7 @@ public class BudgetProposalAction extends GenericWorkFlowAction {
         	e.printStackTrace();
         }
         //populateBudgetDetailReport();
-
+        
         return "editBudget";//BudgetProposalAction.EDITBUDGET;
         //return Constants.LIST;
     }

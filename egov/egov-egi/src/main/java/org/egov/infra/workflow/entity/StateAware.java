@@ -353,6 +353,13 @@ public abstract class StateAware extends AbstractAuditable {
             state.setCreatedBy(id);
             return this;
         }
+        
+        public final Transition withCreatedDate(Date date) {
+            checkTransitionStatus();
+            state.setCreatedDate(date);
+            state.setLastModifiedDate(date);
+            return this;
+        }
 
         public final Transition withtLastModifiedBy(long id) {
             checkTransitionStatus();

@@ -66,7 +66,7 @@
 			</div>
 		</c:otherwise>
 	</c:choose>
-	
+	<c:if test="${type!=null && type=='refundbill'}">
 	<c:choose>
 		<c:when test="${headerFields.contains('fundsource')}">
 			<div class="col-md-3 col-xs-6 add-margin">
@@ -83,8 +83,32 @@
 			</div>
 		</c:otherwise>
 	</c:choose>
+	</c:if>
 </div>
 
+<div class="row add-border">
+	<c:choose>
+		<c:when test="${headerFields.contains('subdivision')}">
+			<div class="col-md-3 col-xs-6 add-margin">
+				<spring:message code="lbl.subdivision" text="Sub Division"/>
+			</div>
+			<div class="col-md-3 col-xs-6 add-margin view-content" id="ct-mobno">
+				<c:out default="N/A" value="${egBillregister.egBillregistermis.subdivision }" />
+			</div>
+		</c:when>
+		<c:otherwise>
+			<div class="col-md-3 col-xs-6 add-margin">
+			</div>
+			<div class="col-md-3 col-xs-6 add-margin view-content" id="ct-mobno">
+			</div>
+		</c:otherwise>
+	</c:choose>
+	<div class="col-md-3 col-xs-6 add-margin">
+			</div>
+			<div class="col-md-3 col-xs-6 add-margin view-content" id="ct-mobno">
+			</div>
+</div>
+<c:if test="${type!=null && type=='refundbill'}">
 <div class="row add-border">
 	<c:choose>
 		<c:when test="${headerFields.contains('scheme')}">
@@ -117,6 +141,7 @@
 			</div>
 		</c:otherwise>
 	</c:choose>
+	</c:if>
 </div>
 
 <div class="row add-border">

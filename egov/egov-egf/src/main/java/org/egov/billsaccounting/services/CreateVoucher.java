@@ -318,7 +318,7 @@ public class CreateVoucher {
 	 */
 
 	public long createVoucherFromBill(final int billId, String voucherStatus, final String voucherNumber,
-			final Date voucherDate) throws ApplicationRuntimeException, SQLException, TaskFailedException {
+			final Date voucherDate, final String narration) throws ApplicationRuntimeException, SQLException, TaskFailedException {
 		CVoucherHeader vh = null;
 		try {
 			if (voucherStatus == null) {
@@ -478,8 +478,13 @@ public class CreateVoucher {
 			headerDetails.put(VoucherConstant.VOUCHERDATE, vdt);
 			if (egBillregister.getId() != null)
 				headerDetails.put("billid", egBillregister.getId());
-			if (egBillregister.getNarration() != null)
+			/*if (egBillregister.getNarration() != null)
+				headerDetails.put(VoucherConstant.NARRATION, egBillregister.getNarration());*/
+			if (narration != null) {
+				headerDetails.put(VoucherConstant.NARRATION, narration);
+			} else {
 				headerDetails.put(VoucherConstant.NARRATION, egBillregister.getNarration());
+			}
 			if (billMis.getSourcePath() != null)
 				headerDetails.put(VoucherConstant.SOURCEPATH, billMis.getSourcePath());
 			if (billMis.getDepartmentcode() != null) {
@@ -501,8 +506,8 @@ public class CreateVoucher {
 			// TODO- read the fnction from billdetails. We can remove this
 			if (billMis.getFunction() != null)
 				headerDetails.put(VoucherConstant.FUNCTIONCODE, billMis.getFunction().getCode());
-			if (billMis.getBudgetaryAppnumber() != null)
-				headerDetails.put(VoucherConstant.BUDGETARYAPPNUMBER, billMis.getBudgetaryAppnumber());
+			//if (billMis.getBudgetaryAppnumber() != null)
+				//headerDetails.put(VoucherConstant.BUDGETARYAPPNUMBER, billMis.getBudgetaryAppnumber());
 
 			for (final EgBilldetails egBilldetails : billDetailslist) {
 

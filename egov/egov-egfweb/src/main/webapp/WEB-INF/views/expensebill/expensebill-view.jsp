@@ -96,10 +96,20 @@
         <spring:message code="lbl.total.debit.amount" text="Total Debit Amount"/> : &#8377 <span id="expenseBillTotalDebitAmount"> <c:out
             value="${expenseBillTotalDebitAmount}" default="0.0"></c:out></span>
     </div>
+     <c:choose>
+	   <c:when test="${empty egBillregister.refundable}">
     <div class="position_alert2">
         <spring:message code="lbl.total.credit.amount" text="Total Credit Amount"/> : &#8377 <span id="expenseBillTotalCreditAmount"> <c:out
             value="${expenseBillTotalCreditAmount}" default="0.0"></c:out></span>
     </div>
+	   </c:when>
+	   <c:otherwise>
+		<div class="position_alert2" style="display: none;">
+        <spring:message code="lbl.total.credit.amount" text="Total Credit Amount"/> : &#8377 <span id="expenseBillTotalCreditAmount"> <c:out
+            value="${expenseBillTotalCreditAmount}" default="0.0"></c:out></span>
+       </div>	
+	   </c:otherwise>
+	 </c:choose>
 
     <div>
         <spring:hasBindErrors name="egBillregister">
@@ -114,6 +124,7 @@
     <%--<form:hidden path="budgetDetails" id="budgetDetails" class="budgetDetail" value="${budgetDetails}"/>--%>
     <form:hidden path="billamount" id="billamount" class="billamount" value="${egBillregister.billamount }"/>
     <form:hidden path="" name="netPayableAmount" id="netPayableAmount" value="${netPayableAmount}"/>
+	<form:hidden path="refundable"  id="refundable" value="${egBillregister.refundable}" />
     <div class="panel-title text-center" style="color: green;">
         <c:out value="${message}"/><br/>
     </div>

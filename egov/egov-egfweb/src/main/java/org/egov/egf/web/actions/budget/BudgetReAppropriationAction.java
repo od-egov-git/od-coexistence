@@ -49,6 +49,9 @@ package org.egov.egf.web.actions.budget;
 
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.util.ValueStack;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.ParentPackage;
@@ -64,17 +67,27 @@ import org.egov.commons.SubScheme;
 import org.egov.commons.dao.EgwStatusHibernateDAO;
 import org.egov.dao.budget.BudgetDetailsDAO;
 import org.egov.egf.model.BudgetReAppropriationView;
+import org.egov.egf.web.actions.voucher.BaseVoucherAction;
+import org.egov.egf.web.controller.ApproveBudgetController;
+import org.egov.egf.web.controller.expensebill.BaseBillController;
+import org.egov.egf.web.controller.expensebill.UpdateExpenseBillController;
 import org.egov.eis.service.EisCommonService;
 import org.egov.eis.web.actions.workflow.GenericWorkFlowAction;
+import org.egov.eis.web.contract.WorkflowContainer;
 import org.egov.infra.admin.master.entity.Boundary;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.microservice.models.Department;
+import org.egov.infra.microservice.models.EmployeeInfo;
 import org.egov.infra.validation.exception.ValidationError;
 import org.egov.infra.validation.exception.ValidationException;
 import org.egov.infra.web.struts.actions.BaseFormAction;
 import org.egov.infra.web.struts.annotation.ValidationErrorPage;
+import org.egov.infra.workflow.entity.State;
 import org.egov.infra.workflow.entity.StateAware;
+import org.egov.infra.workflow.matrix.entity.WorkFlowDeptDesgMap;
+import org.egov.infra.workflow.matrix.entity.WorkFlowMatrix;
+import org.egov.infra.workflow.matrix.service.WorkFlowDeptDesgMapService;
 import org.egov.infra.workflow.service.WorkflowService;
 import org.egov.infstr.utils.EgovMasterDataCaching;
 import org.egov.model.budget.Budget;
@@ -82,8 +95,10 @@ import org.egov.model.budget.BudgetDetail;
 import org.egov.model.budget.BudgetGroup;
 import org.egov.model.budget.BudgetReAppropriation;
 import org.egov.model.budget.BudgetReAppropriationMisc;
+import org.egov.model.voucher.WorkflowBean;
 import org.egov.pims.commons.Position;
 import org.egov.services.budget.BudgetDetailService;
+import org.egov.services.budget.BudgetReAppropriationMiscService;
 import org.egov.services.budget.BudgetReAppropriationService;
 import org.egov.services.budget.BudgetService;
 import org.egov.utils.BudgetDetailConfig;
@@ -93,26 +108,32 @@ import org.egov.utils.FinancialConstants;
 import org.hibernate.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @ParentPackage("egov")
 @Results({
         @Result(name = "new", location = "budgetReAppropriation-new.jsp"),
+        @Result(name = "edit", location = "budgetReAppropriation-newCaoEdit.jsp"),
         @Result(name = "newCao", location = "budgetReAppropriation-newCao.jsp"),
         @Result(name = "newAcmc", location = "budgetReAppropriation-newAcmc.jsp"),
         @Result(name = "newMc", location = "budgetReAppropriation-newMc.jsp"),
         @Result(name = "search", location = "budgetReAppropriation-search.jsp"),
         @Result(name = "beRe", location = "budgetReAppropriation-beRe.jsp")
 })
-public class BudgetReAppropriationAction extends GenericWorkFlowAction {
+public class BudgetReAppropriationAction extends BaseVoucherAction    {
     private static final long serialVersionUID = 1L;
     private static final String BERE = "beRe";
     private static final Logger LOGGER = Logger.getLogger(BudgetReAppropriationAction.class);
@@ -121,10 +142,17 @@ public class BudgetReAppropriationAction extends GenericWorkFlowAction {
     @Autowired
     protected BudgetDetailConfig budgetDetailConfig;
     private BudgetDetail budgetDetail;
+    private BudgetReAppropriation budgetReAppropriation;
     protected Budget budget;
     protected List<String> headerFields = new ArrayList<String>();
     protected List<String> gridFields = new ArrayList<String>();
     protected List<String> mandatoryFields = new ArrayList<String>();
+    private static final String CURRENT_STATE = "currentState";
+	private static final String ADDITIONALRULE = "additionalRule";
+	private static final String APPROVAL_POSITION = "approvalPosition";
+	private static final String APPROVAL_DESIGNATION = "approvalDesignation";
+	@Autowired
+    protected WorkFlowDeptDesgMapService workFlowDeptDesgMapService;
     @Autowired
     private BudgetDetailHelper budgetDetailHelper;
     @Autowired
@@ -139,6 +167,9 @@ public class BudgetReAppropriationAction extends GenericWorkFlowAction {
     @Qualifier("budgetReAppropriationService")
     private BudgetReAppropriationService budgetReAppropriationService;
     @Autowired
+    @Qualifier("budgetReAppropriationMiscService")
+    private BudgetReAppropriationMiscService budgetReAppropriationMisc;
+    @Autowired
     @Qualifier("workflowService")
     private WorkflowService<BudgetReAppropriation> budgetReAppropriationWorkflowService;
     @Autowired
@@ -146,22 +177,50 @@ public class BudgetReAppropriationAction extends GenericWorkFlowAction {
     private CFinancialYear financialYear;
     private String beRe = Constants.BE;
     private String sequenceNumber;
+    private Long budgetAppId=0l;
     private BudgetReAppropriationMisc appropriationMisc = new BudgetReAppropriationMisc();
     private List<BudgetReAppropriation> reAppropriationList = null;
     private String type = "";
     private String finalStatus = "";
-    private static final String ACTIONNAME = "actionName";
+    private String approverDesignation="-1";
+    
+    public Long getBudgetAppId() {
+		return budgetAppId;
+	}
+
+	public void setBudgetAppId(Long budgetAppId) {
+		this.budgetAppId = budgetAppId;
+	}
+
+	public String getApproverDesignation() {
+		return approverDesignation;
+	}
+
+	public void setApproverDesignation(String approverDesignation) {
+		this.approverDesignation = approverDesignation;
+	}
+
+	private static final String ACTIONNAME = "actionName";
     @Autowired
     private AppConfigValueService appConfigValuesService;
-
+    public WorkflowBean workflowBean = new WorkflowBean();
     @Autowired
     private EgovMasterDataCaching masterDataCache;
 
     @Autowired
     private EgwStatusHibernateDAO egwStatusDAO;
     private String message = "";
+    private String nextAction="";
+    
+    public String getNextAction() {
+		return nextAction;
+	}
 
-    public BudgetReAppropriationMisc getAppropriationMisc() {
+	public void setNextAction(String nextAction) {
+		this.nextAction = nextAction;
+	}
+
+	public BudgetReAppropriationMisc getAppropriationMisc() {
         return appropriationMisc;
     }
 
@@ -206,7 +265,15 @@ public class BudgetReAppropriationAction extends GenericWorkFlowAction {
         this.budgetDetail = budgetDetail;
     }
 
-    public void setEisCommonService(final EisCommonService eisCommonService) {
+    public BudgetReAppropriation getBudgetReAppropriation() {
+		return budgetReAppropriation;
+	}
+
+	public void setBudgetReAppropriation(BudgetReAppropriation budgetReAppropriation) {
+		this.budgetReAppropriation = budgetReAppropriation;
+	}
+
+	public void setEisCommonService(final EisCommonService eisCommonService) {
         this.eisCommonService = eisCommonService;
     }
 
@@ -291,7 +358,70 @@ public class BudgetReAppropriationAction extends GenericWorkFlowAction {
         
         return NEWCAO;
     }
-    
+
+	
+	@Action(value = "/budget/budgetReAppropriation-edit") 
+	public String budgetCAOEdit() {
+	  //System.out.println("budgetId---->> "+budgetId); 
+	  System.out.println("billId "+Long.valueOf(parameters.get("id")[0]));
+	  Model model=new Model() {
+		@Override
+		public Model mergeAttributes(Map<String, ?> attributes) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+		@Override
+		public boolean containsAttribute(String attributeName) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+		@Override
+		public Map<String, Object> asMap() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+		@Override
+		public Model addAttribute(String attributeName, Object attributeValue) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+		@Override
+		public Model addAttribute(Object attributeValue) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+		@Override
+		public Model addAllAttributes(Map<String, ?> attributes) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+		@Override
+		public Model addAllAttributes(Collection<?> attributeValues) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+	};
+	  final BudgetReAppropriation reApp = budgetReAppropriationService.findByBudgetDetail(Long.valueOf(parameters.get("id")[0]));
+	  setBudgetReAppropriation(reApp);
+	  	if (reApp.getState() != null)
+	    {
+	  		setCurrentState(reApp.getState().getValue());
+	  		setType(reApp.getStateType());
+	      	model.addAttribute("stateType", reApp.getClass().getSimpleName());
+	      	model.addAttribute("currentState", reApp.getState().getValue());
+	      	
+	    }
+	  	setBudgetAppId(Long.valueOf(parameters.get("id")[0]));
+	  	model.addAttribute("budgetAppId",Long.valueOf(parameters.get("id")[0]));
+	  	System.out.println("reApp.getState().getValue() "+reApp.getState().getValue()+" "+reApp.getStateType());
+	  	loadActualsCao(Long.valueOf(parameters.get("id")[0]));
+	  	List<String>  validActions = Arrays.asList("Forward","SaveAsDraft");
+        prepareWorkflow(model, reApp, new WorkflowContainer());
+  	//prepareWorkflow(model, reApp, new WorkflowContainer());
+	  return EDIT; 
+	}
+	
+	
     @Action(value = "/budget/budgetReAppropriation-budgetACMC")
     public String budgetACMC() {
         
@@ -329,38 +459,60 @@ public class BudgetReAppropriationAction extends GenericWorkFlowAction {
         if (financialYear != null && financialYear.getId() != 0L && budgetService.hasApprovedReForYear(financialYear.getId()))
             beRe = Constants.RE;
         setupDropdownsInHeader();
-        dropdownData.put("departmentList", masterDataCache.get("egi-department"));
-        dropdownData.put("designationList", Collections.EMPTY_LIST);
-        dropdownData.put("userList", Collections.EMPTY_LIST);
+		/*
+		 * dropdownData.put("departmentList", masterDataCache.get("egi-department"));
+		 * dropdownData.put("designationList", Collections.EMPTY_LIST);
+		 * dropdownData.put("userList", Collections.EMPTY_LIST);
+		 */
+        addDropdownData("approvaldepartmentList", Collections.EMPTY_LIST);
+        addDropdownData("designationList", Collections.EMPTY_LIST);
+        addDropdownData("userList", Collections.EMPTY_LIST);
     }
 
     @Override
     public StateAware getModel() {
+    	//budgetDetail = (BudgetDetail) getModel();
+    	//budgetDetail.setType(FinancialConstants.BUDGETDETAIL);
         return budgetDetail;
     }
 
     public List<String> getValidActions() {
+        List<String> validActions = Collections.emptyList();
+        validActions = Arrays.asList(FinancialConstants.BUTTONFORWARD);
+        if (null == budgetReAppropriation || null == budgetReAppropriation.getId()
+                    || budgetReAppropriation.getCurrentState().getValue().endsWith("NEW")) {
+				validActions = Arrays.asList(FinancialConstants.BUTTONFORWARD);
+		} 
+		else { 
+			System.out.println("budgetReAppropriation.getStateType() "+budgetReAppropriation.getStateType());
+			System.out.println("budgetReAppropriation.getCurrentState() "+budgetReAppropriation.getCurrentState());
+			setCurrentState(budgetReAppropriation.getCurrentState().getValue());
+			setType(budgetReAppropriation.getStateType());
+				validActions = this.customizedWorkFlowService.getNextValidActions(budgetReAppropriation
+						  .getStateType(), getWorkFlowDepartment(), getAmountRule(),getAdditionalRule(), 
+						  budgetReAppropriation.getCurrentState().getValue(),getPendingActions(), budgetReAppropriation.getCreatedDate());
+			
+		}
+			 
+        
+        return validActions;
+    }
+    public List<String> getValidActionsNew() {
         List<String> validActions = Collections.emptyList();
         
             if (null == budgetDetail || null == budgetDetail.getId()
                     || budgetDetail.getCurrentState().getValue().endsWith("NEW")) {
 				validActions = Arrays.asList(FinancialConstants.BUTTONFORWARD);
 				
-            } else {
-                if (budgetDetail.getCurrentState() != null) {
-                    validActions = this.customizedWorkFlowService.getNextValidActions(budgetDetail
-                            .getStateType(), getWorkFlowDepartment(), getAmountRule(),
-                            getAdditionalRule(), budgetDetail.getCurrentState().getValue(),
-                            getPendingActions(), budgetDetail.getCreatedDate());
-                }
-            }
-        
+            } 
         return validActions;
     }
 
     
     @Action(value = "/budget/budgetReAppropriation-create")
     public String create() {
+    	System.out.println("create called");
+    	populateWorkflowBean();
         save(ApplicationThreadLocals.getUserId().intValue());
         System.out.println("XXXXX");
         return NEW;
@@ -369,6 +521,7 @@ public class BudgetReAppropriationAction extends GenericWorkFlowAction {
     @Action(value = "/budget/budgetReAppropriation-createCao")
     public String createCao() {
     	System.out.println("Cao");
+    	populateWorkflowBean();
         saveCao(ApplicationThreadLocals.getUserId().intValue());
         System.out.println("End Cao");
         return NEWCAO;
@@ -407,6 +560,7 @@ public class BudgetReAppropriationAction extends GenericWorkFlowAction {
     }
 
     private BudgetReAppropriationMisc save(final Integer userId) {
+    	System.out.println("save called");
         boolean reAppropriationCreated = false;
         boolean reAppForNewBudgetCreated = false;
         BudgetReAppropriationMisc misc = null;
@@ -420,16 +574,36 @@ public class BudgetReAppropriationAction extends GenericWorkFlowAction {
             newBudgetReAppropriationList.stream().forEach(reAppr -> {
                 reAppr.getBudgetDetail().setExecutingDepartment(executingDepartment);
             });
-            misc = budgetReAppropriationService.createBudgetReAppropriationMisc(parameters.get(ACTIONNAME)[0] + "|" + userId,
-                    beRe, financialYear, appropriationMisc, null);
+            populateWorkflowBean();
+			
+			
+			  misc =budgetReAppropriationService.createBudgetReAppropriationMisc(parameters.get(
+			  ACTIONNAME)[0] + "|" + userId, beRe, financialYear, appropriationMisc, null);
+			
+			/*
+			 * misc =
+			 * budgetReAppropriationService.createBudgetReAppropriationMiscNew(parameters.
+			 * get(ACTIONNAME)[0] + "|" + userId, beRe, financialYear, appropriationMisc,
+			 * workflowBean);
+			 */
+			
             System.out.println("11");
             removeEmptyReAppropriation(budgetReAppropriationList);
-            reAppropriationCreated = budgetReAppropriationService.createReAppropriation(parameters.get(ACTIONNAME)[0] + "|"
-                    + userId,
-                    budgetReAppropriationList, null, financialYear, beRe, misc,
-                    parameters.get("appropriationMisc.reAppropriationDate")[0]);
+            
+			/*
+			 * reAppropriationCreated
+			 * =budgetReAppropriationService.createReAppropriation(parameters.get(
+			 * ACTIONNAME) [0] + "|" + userId, budgetReAppropriationList, null,
+			 * financialYear, beRe, misc,
+			 * parameters.get("appropriationMisc.reAppropriationDate")[0]);
+			 */
+			  reAppropriationCreated =budgetReAppropriationService.createReAppropriationNew(parameters.get(ACTIONNAME)
+					  [0] + "|" + userId, budgetReAppropriationList, null, financialYear, beRe,
+					  misc, parameters.get("appropriationMisc.reAppropriationDate")[0],workflowBean); 
+           
             System.out.println("22");
             removeEmptyReAppropriation(newBudgetReAppropriationList);
+            
             reAppForNewBudgetCreated = budgetReAppropriationService.createReAppropriationForNewBudgetDetail(
                     parameters.get(ACTIONNAME)[0] + "|" + userId,
                     newBudgetReAppropriationList, null, misc);
@@ -439,6 +613,8 @@ public class BudgetReAppropriationAction extends GenericWorkFlowAction {
                         "budgetDetail.budgetGroup.mandatory")));
             newBudgetReAppropriationList.clear();
             budgetReAppropriationList.clear();
+            String ApproverName=budgetDetailService.getEmployeeName(workflowBean.getApproverPositionId());
+            addActionMessage("Budget Additional appropriation for existing combination saved successfully and forwarded to "+ApproverName);
         } catch (final ValidationException e) {
         	e.printStackTrace();
             throw new ValidationException(Arrays.asList(new ValidationError(e.getErrors().get(0).getMessage(),
@@ -448,8 +624,10 @@ public class BudgetReAppropriationAction extends GenericWorkFlowAction {
             throw new ValidationException(Arrays.asList(new ValidationError(e.getMessage(),
                     e.getMessage())));
         }
-        if (reAppropriationCreated)
-            addActionMessage(getText("budget.reappropriation.existing.new.saved"));
+		/*
+		 * if (reAppropriationCreated)
+		 * addActionMessage(getText("budget.reappropriation.existing.new.saved"));
+		 */
         if (reAppForNewBudgetCreated)
             addActionMessage(getText("budget.reappropriation.new.saved") + misc.getSequenceNumber());
         clearFields();
@@ -457,17 +635,87 @@ public class BudgetReAppropriationAction extends GenericWorkFlowAction {
     }
     
     private BudgetReAppropriationMisc saveCao(final Integer userId) {
+    	Model model=new Model() {
+			@Override
+			public Model mergeAttributes(Map<String, ?> attributes) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			@Override
+			public boolean containsAttribute(String attributeName) {
+				// TODO Auto-generated method stub
+				return false;
+			}
+			@Override
+			public Map<String, Object> asMap() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			@Override
+			public Model addAttribute(String attributeName, Object attributeValue) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			@Override
+			public Model addAttribute(Object attributeValue) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			@Override
+			public Model addAllAttributes(Map<String, ?> attributes) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			@Override
+			public Model addAllAttributes(Collection<?> attributeValues) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+		};
         boolean reAppropriationCreated = false;
-        BudgetReAppropriationMisc misc = null;
+        
+        Long approvalPosition = 0l;
+        String approvalComment = "";
+        String apporverDesignation = "";
+
+        if (workflowBean.getApproverComments() != null)
+            approvalComment = workflowBean.getApproverComments();
+
+        if (workflowBean.getApproverPositionId()!= null)
+            approvalPosition = Long.valueOf(workflowBean.getApproverPositionId());
+
+        if ((approvalPosition == null || approvalPosition.equals(Long.valueOf(0)))
+                && workflowBean.getApproverPositionId() != null)
+            approvalPosition = Long.valueOf(workflowBean.getApproverPositionId());
+        
+        if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
+    	{
+    		approvalPosition =populatePosition();    		
+    	}
+        if (workflowBean.getDesignationId() != null)
+            apporverDesignation = String.valueOf(workflowBean.getDesignationId());
+        else
+        	apporverDesignation=getApproverDesignation();
+        System.out.println("Approval designation :: "+apporverDesignation);
+        Long ownerposition=0l;
+        String ApproverName=budgetDetailService.getEmployeeName(approvalPosition);
+        System.out.println("billId "+budgetAppId);
+        BudgetReAppropriation approList=budgetReAppropriationService.findByBudgetDetail(budgetAppId);
+        BudgetReAppropriationMisc misc =budgetReAppropriationMisc.findByMiscId(approList.getReAppropriationMisc().getId());
+        BudgetDetail tempBudgetdetail = (BudgetDetail) persistenceService.find("from BudgetDetail where id=?",Long.valueOf(approList.getBudgetDetail().getId()));
+        financialYear=approList.getBudgetDetail().getBudget().getFinancialYear();
+    	beRe=approList.getBudgetDetail().getBudget().getIsbere();
+    	System.out.println("financialYear "+financialYear);
+    	System.out.println("beRe "+beRe);
         if (financialYear != null && financialYear.getId() != 0)
             financialYear = (CFinancialYear) persistenceService.find("from CFinancialYear where id=?", financialYear.getId());
         try {
             removeEmptyReAppropriation(budgetReAppropriationList);
             System.out.println("CAO1");
-            reAppropriationCreated = budgetReAppropriationService.createReAppropriationCao(parameters.get(ACTIONNAME)[0] + "|"
-                    + userId,
+            reAppropriationCreated = budgetReAppropriationService.createReAppropriationCaoNew(parameters.get(ACTIONNAME)[0] + "|"
+                    + userId,approList,
                     budgetReAppropriationList, null, financialYear, beRe, misc,
-                    parameters.get("appropriationMisc.reAppropriationDate")[0]);
+                    String.valueOf(new Date()),workflowBean,tempBudgetdetail);
             System.out.println("CAO2");
             if (!reAppropriationCreated)
                 throw new ValidationException(Arrays.asList(new ValidationError("budgetDetail.budgetGroup.mandatory",
@@ -480,8 +728,23 @@ public class BudgetReAppropriationAction extends GenericWorkFlowAction {
             throw new ValidationException(Arrays.asList(new ValidationError(e.getMessage(),
                     e.getMessage())));
         }
-        if (reAppropriationCreated)
-            addActionMessage(getText("budget.reappropriation.existing.cao.saved"));
+        //if (reAppropriationCreated)
+        	if(workFlowAction.equalsIgnoreCase("Reject"))
+			{
+				ApproverName=getEmployeeName(ownerposition);
+			}
+			System.out.println("approver name "+ApproverName);
+    			model.addAttribute("approverName", ApproverName);
+    			String message="";
+    			if (FinancialConstants.BUTTONAPPROVE.equals(workFlowAction))
+    	            message = "Budget Approved Successfully";
+    	        else if (FinancialConstants.BUTTONREJECT.equals(workFlowAction))
+    	            message = "Budget Rejected Successfully and sent back to " +ApproverName;
+    	        else
+    	            message = "Budget Verified Successfully and sent to " +ApproverName;
+
+    	        model.addAttribute("message", message);
+        	addActionMessage(message);
         
         clearFields();
         return misc;
@@ -561,7 +824,8 @@ public class BudgetReAppropriationAction extends GenericWorkFlowAction {
         budget.setFinancialYear(financialYear);
         final BudgetDetail budgetDetail = new BudgetDetail();
         budgetDetail.setBudget(budget);
-        return budgetReAppropriationService.createReAppropriationMisc(actionName, appropriationMisc, budgetDetail, null);
+        //return budgetReAppropriationService.createReAppropriationMisc(actionName, appropriationMisc, budgetDetail, null);
+        return budgetReAppropriationService.createReAppropriationMiscNew(actionName, appropriationMisc, budgetDetail, null);
     }
 
     public void setBudgetDetailService(final BudgetDetailService budgetDetailService) {
@@ -608,6 +872,54 @@ public class BudgetReAppropriationAction extends GenericWorkFlowAction {
         if (budgetReAppropriationService.rowsToAddExists(newBudgetReAppropriationList))
             loadData(newBudgetReAppropriationList);
         System.out.println("Processed");
+        List<String>  validActions = Arrays.asList("Forward");
+        final Model model=new Model() {
+			
+			@Override
+			public Model mergeAttributes(Map<String, ?> attributes) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			
+			@Override
+			public boolean containsAttribute(String attributeName) {
+				// TODO Auto-generated method stub
+				return false;
+			}
+			
+			@Override
+			public Map<String, Object> asMap() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			
+			@Override
+			public Model addAttribute(String attributeName, Object attributeValue) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			
+			@Override
+			public Model addAttribute(Object attributeValue) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			
+			@Override
+			public Model addAllAttributes(Map<String, ?> attributes) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			
+			@Override
+			public Model addAllAttributes(Collection<?> attributeValues) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+		};
+        //prepareWorkflow(model, budgetDetail, new WorkflowContainer());
+        model.addAttribute("validActionList", validActions);
+        getValidActionsNew();
         return NEW;
     }
     
@@ -628,6 +940,23 @@ public class BudgetReAppropriationAction extends GenericWorkFlowAction {
     		budgetReAppropriationList.add(vw);
     	}
             loadData(budgetReAppropriationList);
+        
+        return NEWCAO;
+    }
+    
+    @Action(value = "/budget/budgetReAppropriation-loadActualsCao")
+    public String loadActualsCao(Long id) {
+    	BudgetReAppropriation approList=budgetReAppropriationService.findByBudgetDetail(id);
+        List<BudgetDetail> detailList = budgetDetailService.getBudgetDetailsForReAppCaoEdit(approList.getBudgetDetail().getId());
+    	budgetReAppropriationList.clear();
+    	BudgetReAppropriationView vw=null;
+    	for(BudgetDetail bd:detailList)
+    	{
+    		vw=new BudgetReAppropriationView();
+    		vw.setBudgetDetail(bd);
+    		budgetReAppropriationList.add(vw);
+    	}
+            loadDataNew(budgetReAppropriationList);
         
         return NEWCAO;
     }
@@ -730,7 +1059,66 @@ public class BudgetReAppropriationAction extends GenericWorkFlowAction {
             }
         }
     }
+    private void loadDataNew(final List<BudgetReAppropriationView> reAppList) {
+    	System.out.println("Inside load");
+        budgetReAppropriationService.validateMandatoryFields(reAppList);
+        for (final BudgetReAppropriationView entry : reAppList) {
+        	financialYear=entry.getBudgetDetail().getBudget().getFinancialYear();
+        	beRe=entry.getBudgetDetail().getBudget().getIsbere();
+            entry.setBudgetDetail(budgetReAppropriationService.setRelatedValues(entry.getBudgetDetail()));
+			
+			  final List<BudgetDetail> detailList = new ArrayList();
+			  //budgetDetailService.searchByCriteriaWithTypeAndFY(financialYear.getId(),beRe, entry.getBudgetDetail());
+			 detailList.add(entry.getBudgetDetail());
+            //final List<BudgetDetail> detailList = (List<BudgetDetail>) entry.getBudgetDetail();
+            System.out.println("detailSize ::"+financialYear.getId()+":::"+beRe);
+            System.out.println("detailSize ::"+detailList.size());
+            if (detailList.size() == 1) {
+            	System.out.println("1");
+                final BudgetDetail budgetDetail = detailList.get(0);
+                System.out.println("2");
+                final Map<String, Object> paramMap = budgetDetailHelper.constructParamMap(getValueStack(), budgetDetail);
+                System.out.println("3");
+                paramMap.put(Constants.ASONDATE, appropriationMisc.getReAppropriationDate());
+                budgetDetail.getBudgetReAppropriations().stream().forEach(app -> {
+                    LOGGER.info("app.getStatus()  :: "+app.getStatus());
+                });
+                System.out.println("4");
+                BigDecimal totalActualsFor = budgetDetailHelper.getTotalActualsFor(paramMap, appropriationMisc.getReAppropriationDate());
+                System.out.println("5 : "+totalActualsFor);
+                entry.setActuals(totalActualsFor);
+                System.out.println("6 : ");
+                entry.setApprovedAmount(budgetDetail.getApprovedAmount());
+                System.out.println("7 : "+budgetDetail.getPlanningPercent());
+                // this is total of reappropriated amount
+                entry.setAppropriatedAmount(budgetDetail.getApprovedReAppropriationsTotalReapp());
+                System.out.println("8");
+                entry.setAvailableAmount(entry.getApprovedAmount().add(entry.getAppropriatedAmount())
+                        .subtract(entry.getActuals()));
+                if (budgetDetail.getPlanningPercent() == null)
+                    // TODO change the planningPercentage to planningPercent
+                    entry.setPlanningPercent(BigDecimal.ZERO);
+                else
+                    entry.setPlanningPercent(budgetDetail.getPlanningPercent());
+                System.out.println("quarter :"+budgetDetail.getQuarterpercent());
+                if (budgetDetail.getQuarterpercent() == null)
+                    // TODO change the planningPercentage to planningPercent
+                    entry.setQuarterPercent(BigDecimal.ZERO);
+                else
+                    entry.setQuarterPercent(budgetDetail.getQuarterpercent());
 
+                if (budgetDetail.getPlanningPercent() == BigDecimal.ZERO)
+                    entry.setPlanningBudgetApproved(entry.getApprovedAmount().add(entry.getAppropriatedAmount()));
+                else
+                    // TODO put the division after the multiplication
+                    entry.setPlanningBudgetApproved(entry.getApprovedAmount().add(entry.getAppropriatedAmount())
+                            .multiply(entry.getPlanningPercent()).divide(new BigDecimal(String.valueOf(100))));
+                entry.setPlanningBudgetUsage(budgetDetailsDAO.getPlanningBudgetUsage(budgetDetail));
+                entry.setPlanningBudgetAvailable(entry.getPlanningBudgetApproved().subtract(entry.getPlanningBudgetUsage()));
+                // entry.setActuals(entry.getActuals().add(budgetDetailHelper.getBillAmountForBudgetCheck(paramMap)));
+            }
+        }
+    }
     @Action(value = "/budget/budgetReAppropriation-ajaxLoadBeRe")
     public String ajaxLoadBeRe() {
         if (parameters.get("id") != null) {
@@ -858,5 +1246,155 @@ public class BudgetReAppropriationAction extends GenericWorkFlowAction {
     public void setBudgetDetailsDAO(final BudgetDetailsDAO budgetDetailsDAO) {
         this.budgetDetailsDAO = budgetDetailsDAO;
     }
+    public String getEmployeeName(Long empId){
+        
+        return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+     }
+	public void populateWorkflowBean() {
+		if (workFlowAction.equalsIgnoreCase("Save As Draft")) {
+			
+			Long position = populatePosition();
+			workflowBean.setApproverPositionId(position);
+		} else {
+			workflowBean.setApproverPositionId(approverPositionId);
+		}
+		workflowBean.setApproverComments(approverComments);
+		workflowBean.setWorkFlowAction(workFlowAction);
+		if (workFlowAction.equalsIgnoreCase("Save As Draft")) {
+			workflowBean.setCurrentState("SaveAsDraft");
+		} else {
+			workflowBean.setCurrentState(currentState);
+		}
 
+	}
+	private Long populatePosition() {
+		Long empId = ApplicationThreadLocals.getUserId();
+		Long pos = null;
+		List<EmployeeInfo> employs = microserviceUtils.getEmployee(empId, null, null, null);
+		if (null != employs && employs.size() > 0) {
+			pos = employs.get(0).getAssignments().get(0).getPosition();
+	
+		}
+	return pos;
+	}
+	public void prepareWorkflow(final Model prepareModel, final StateAware model,
+            final WorkflowContainer container) {
+    	if(null != model)
+    	{
+    		System.out.println("Type  : "+model.getStateType());
+    	}
+    	prepareWorkflow(prepareModel, model, container, false);
+    }
+    
+    protected void prepareWorkflow(final Model prepareModel, final StateAware model,
+            final WorkflowContainer container, boolean isWfDeptFromMap) {
+
+    	if(isWfDeptFromMap) {
+    		List<Department> departments=null;
+    		String currentState = "";
+    		String additionalRule = "";
+    		String objectType= model.getStateType();
+
+    		if(prepareModel.containsAttribute(CURRENT_STATE)) {
+            	currentState = prepareModel.asMap().get(CURRENT_STATE).toString();
+            }
+    		if(prepareModel.containsAttribute(ADDITIONALRULE)) {
+    			additionalRule = prepareModel.asMap().get(ADDITIONALRULE).toString();
+            }
+    		
+    		List<WorkFlowDeptDesgMap> deptDesgMap = null;
+    		if(!StringUtils.isBlank(additionalRule)) {
+    			deptDesgMap = workFlowDeptDesgMapService.findByObjectTypeAndCurrentStateAndAddRule(objectType, currentState, additionalRule);
+    		}else {
+    			deptDesgMap = workFlowDeptDesgMapService.findByObjectTypeAndCurrentState(objectType, currentState);
+    		}
+    		if(!CollectionUtils.isEmpty(deptDesgMap)) {
+    			String deptCodes = deptDesgMap.stream().map(WorkFlowDeptDesgMap::getNextDepartment).collect(Collectors.joining(","));
+    			departments = getDepartmentsFromMs(deptCodes);
+    		}
+    		
+    		prepareModel.addAttribute("approverDepartmentList", departments);
+    	}else {
+    		prepareModel.addAttribute("approverDepartmentList", addAllDepartments());
+    	}
+    	populateActions(prepareModel, model, container);
+    }
+    
+    private void populateActions(final Model prepareModel, final StateAware model,
+            final WorkflowContainer container) {
+
+        prepareModel.addAttribute("validActionList", getValidActions(model, container));
+        prepareModel.addAttribute("nextAction", getNextAction(model, container));
+
+    }
+    @ModelAttribute(value = "approvalDepartmentList")
+    public List<Department> addAllDepartments() {
+        List<Department> deptlist = getDepartmentsFromMs();
+
+        return deptlist;
+    }
+    public String getNextAction(final StateAware model, final WorkflowContainer container) {
+
+        WorkFlowMatrix wfMatrix = null;
+        if (model != null && model.getId() != null)
+            if (model.getCurrentState() == null)
+                wfMatrix = customizedWorkFlowService.getWfMatrix(model.getStateType(),
+                        container.getWorkFlowDepartment(), container.getAmountRule(), container.getAdditionalRule(),
+                        State.DEFAULT_STATE_VALUE_CREATED, container.getPendingActions(), model.getCreatedDate(),
+                        container.getCurrentDesignation());
+            else
+                wfMatrix = customizedWorkFlowService.getWfMatrix(model.getStateType(),
+                        container.getWorkFlowDepartment(), container.getAmountRule(), container.getAdditionalRule(),
+                        model.getCurrentState().getValue(), container.getPendingActions(), model.getCreatedDate(),
+                        container.getCurrentDesignation());
+        if(null != wfMatrix)
+        {
+        	System.out.println("NextAction : "+wfMatrix.getNextAction());
+        	setNextAction(wfMatrix.getNextAction());
+        }
+        
+        return wfMatrix == null ? "" : wfMatrix.getNextAction();
+    }
+    
+    public List<String> getValidActions(final StateAware model, final WorkflowContainer container) {
+        List<String> validActions = null;
+        if (model == null || model.getId() == null || model.getCurrentState() == null
+                || model.getCurrentState().getValue().equals("Closed")
+                || model.getCurrentState().getValue().equals("END"))
+            validActions = Arrays.asList("Forward");
+        	 
+         if (model.getCurrentState() != null)
+        	 
+        	
+            validActions = customizedWorkFlowService.getNextValidActions(model.getStateType(),
+                    container.getWorkFlowDepartment(), container.getAmountRule(), container.getAdditionalRule(),
+                    model.getCurrentState().getValue(), container.getPendingActions(), model.getCreatedDate(),
+                    container.getCurrentDesignation());
+        
+        		
+        	
+        else
+            validActions = customizedWorkFlowService.getNextValidActions(model.getStateType(),
+                    container.getWorkFlowDepartment(), container.getAmountRule(), container.getAdditionalRule(),
+                    State.DEFAULT_STATE_VALUE_CREATED, container.getPendingActions(), model.getCreatedDate(),
+                    container.getCurrentDesignation());
+        System.out.println("Valid Actions : "+validActions);
+        return validActions;
+    }
+
+    public List<Department> getDepartmentsFromMs() {
+
+        List<Department> departments = microserviceUtils.getDepartments();
+
+        return departments;
+
+    }
+
+    public List<Department> getDepartmentsFromMs(String codes) {
+
+        List<Department> departments = microserviceUtils.getDepartments(codes);
+
+        return departments;
+
+    }
 }

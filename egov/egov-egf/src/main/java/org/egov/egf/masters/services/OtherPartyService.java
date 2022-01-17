@@ -61,6 +61,15 @@ public class OtherPartyService implements EntityTypeService {
     }
 
     @Transactional
+    public OtherParty create1(OtherParty otherParty, Long approver) {
+
+        //setAuditDetails1(otherParty,approver);
+        otherParty = otherpartyRepository.save(otherParty);
+        //saveAccountDetailKey(otherParty);
+        return otherParty;
+    }
+
+    @Transactional
     public void saveAccountDetailKey(OtherParty otherparty) {
 
         Accountdetailkey accountdetailkey = new Accountdetailkey();
@@ -151,4 +160,13 @@ public class OtherPartyService implements EntityTypeService {
         return null;
     }
 
+	public OtherParty getByNameOrAccount(String name, String bankAccount) {
+		
+		return otherpartyRepository.getByNameOrAccount(name,bankAccount);
+	}
+
+	public OtherParty getByBankAccount( String bankAccount) {
+		
+		return otherpartyRepository.getByBankAccount(bankAccount);
+	}
 }

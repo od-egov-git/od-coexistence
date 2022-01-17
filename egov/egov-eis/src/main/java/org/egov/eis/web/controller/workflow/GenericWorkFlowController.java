@@ -109,7 +109,7 @@ public abstract class GenericWorkFlowController {
      * @param model
      * @param container This method we are calling In GET Method..
      */
-    protected void prepareWorkflow(final Model prepareModel, final StateAware model,
+    public void prepareWorkflow(final Model prepareModel, final StateAware model,
             final WorkflowContainer container) {
     	if(null != model)
     	{

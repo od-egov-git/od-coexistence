@@ -199,7 +199,7 @@ public class State/* <T extends OwnerGroup> */ extends AbstractAuditable {
 		return type;
 	}
 
-	protected void setType(final String type) {
+	public void setType(final String type) {
 		this.type = type;
 	}
 
@@ -207,7 +207,7 @@ public class State/* <T extends OwnerGroup> */ extends AbstractAuditable {
 		return value;
 	}
 
-	protected void setValue(final String value) {
+	public void setValue(final String value) {
 		this.value = value;
 	}
 
@@ -215,7 +215,7 @@ public class State/* <T extends OwnerGroup> */ extends AbstractAuditable {
 		return ownerPosition;
 	}
 
-	protected void setOwnerPosition(final Long ownerPosition) {
+	public void setOwnerPosition(final Long ownerPosition) {
 		this.ownerPosition = ownerPosition;
 	}
 

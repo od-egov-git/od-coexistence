@@ -412,6 +412,7 @@ public class VoucherHelper {
 			add(FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT);
 			add(FinancialConstants.STANDARD_EXPENDITURETYPE_WORKS);
 			add(FinancialConstants.STANDARD_EXPENDITURETYPE_PURCHASE);
+			add(FinancialConstants.STANDARD_EXPENDITURETYPE_REFUND);
 			/*
 			 * add(FinancialConstants.STANDARD_EXPENDITURETYPE_SALARY);
 			 * add(FinancialConstants.STANDARD_EXPENDITURETYPE_PENSION);

@@ -99,11 +99,23 @@
 		: &#8377 <span id="expenseBillTotalDebitAmount"> <c:out
 				value="${expenseBillTotalDebitAmount}" default="0.0"></c:out></span>
 	</div>
+	 <c:choose>
+            <c:when test="${refundable != null && !refundable.isEmpty()}">
+             <div class="position_alert2" style="display:none;">
+		      <spring:message code="lbl.total.credit.amount" text="Total Credit Amount"/>
+		       : &#8377 <span id="expenseBillTotalCreditAmount"> <c:out
+			  value="${expenseBillTotalCreditAmount}" default="0.0"></c:out></span>
+	        </div>
+            </c:when>
+            <c:otherwise>
 	<div class="position_alert2">
 		<spring:message code="lbl.total.credit.amount" text="Total Credit Amount"/>
 		: &#8377 <span id="expenseBillTotalCreditAmount"> <c:out
 				value="${expenseBillTotalCreditAmount}" default="0.0"></c:out></span>
 	</div>
+            </c:otherwise>
+            </c:choose>
+	<%----%>
 
 	<form:hidden path="" id="selectedCheckList"
 		value="${selectedCheckList}" />
@@ -114,6 +126,8 @@
 		value="${netPayableId}" />
 	<form:hidden path="" name="netPayableAmount" id="netPayableAmount"
 		value="${netPayableAmount}" />
+		<form:hidden path="refundable" id="refundable" value="${egBillregister.refundable}" />
+	<form:hidden path="expendituretype" id="expendituretype" value="${egBillregister.expendituretype}" />
 	<div class="panel-title text-center" style="color: green;">
 		<c:out value="${message}" />
 		<br />
@@ -136,12 +150,27 @@
 		<div class="tab-pane fade in active" id="expensebillheader">
 			<jsp:include page="expensebill-header.jsp" />
 			
+			<c:choose>
+             <c:when test="${refundable != null && !refundable.isEmpty()}">
+             
+             <div class="panel panel-primary" data-collapsed="0" style="display:none;">
+				<jsp:include page="expensebill-debitdetails.jsp" />
+				<jsp:include page="expensebill-creditdetails.jsp" />
+				<jsp:include page="expensebill-subledgerdetails.jsp" />
+				<jsp:include page="expensebill-netpayable.jsp" />
+			</div>
+             </c:when>
+             <c:otherwise>
 			<div class="panel panel-primary" data-collapsed="0">
 				<jsp:include page="expensebill-debitdetails.jsp" />
 				<jsp:include page="expensebill-creditdetails.jsp" />
 				<jsp:include page="expensebill-subledgerdetails.jsp" />
 				<jsp:include page="expensebill-netpayable.jsp" />
 			</div>
+             </c:otherwise>
+			</c:choose>
+			
+			
 			<jsp:include page="expensebill-accountdetails.jsp" />
 			<jsp:include page="expensebill-subledgeraccountdetails.jsp" />
             <c:if test="${egBillregister.documentDetail != null &&  !egBillregister.documentDetail.isEmpty()}">
@@ -164,6 +193,8 @@
 	src="<cdn:url value='/resources/app/js/common/helper.js?rnd=${app_release_no}'/>"></script>
 <script
 	src="<cdn:url value='/resources/app/js/expensebill/expensebill.js?rnd=${app_release_no}'/>"></script>
+<script
+	src="<cdn:url value='/resources/app/js/expensebill/refundbill.js?rnd=${app_release_no}'/>"></script>
 <script
 	src="<cdn:url value='/resources/app/js/common/voucherBillHelper.js?rnd=${app_release_no}'/>"></script>
 <script

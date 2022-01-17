@@ -64,8 +64,15 @@ public interface AccountDetailKeyRepository extends JpaRepository<Accountdetailk
     @Query("from Accountdetailkey where accountdetailtype.id=:detailtypeid and (upper(detailname) like upper(:detailname)) ")
     public List<Accountdetailkey> findBy20(@Param("detailtypeid") Integer typeid,@Param("detailname") String detailname);  
     
+    @Query("from Accountdetailkey where accountdetailtype.id=:detailtypeid and detailkey=:detailkeyId ")
+    public List<Accountdetailkey> findForContra(@Param("detailtypeid") Integer typeid,@Param("detailkeyId") Integer detailkeyId);  
+    
     @Query("from Accountdetailkey where accountdetailtype.id=:detailtypeid")
     public List<Accountdetailkey> findByDetailType(@Param("detailtypeid")Integer typeid);
     
     Accountdetailkey findById(Integer typeid);
+    
+    @Query("from Accountdetailkey where accountdetailtype.id=:detailtypeid and (upper(detailname) like upper(:detailname)) ")
+    public Accountdetailkey findByNameNew(@Param("detailtypeid") Integer typeid,@Param("detailname") String detailname);
+    
 }

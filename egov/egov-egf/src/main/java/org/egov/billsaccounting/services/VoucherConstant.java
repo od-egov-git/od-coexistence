@@ -58,6 +58,7 @@ public interface VoucherConstant {
     public static final String DEPARTMENTCODE = "departmentcode";
     public static final String FUNDCODE = "fundcode";
     public static final String SCHEMECODE = "schemecode";
+    public static final String SUBDIVISON = "subdivison";
     public static final String SUBSCHEMECODE = "subschemecode";
     public static final String FUNDSOURCECODE = "fundsourcecode";
     public static final String DIVISIONID = "divisionid";
@@ -137,5 +138,5 @@ public interface VoucherConstant {
     public static final String FUNCTIONIDDETAILS = "FunctionIdDetail"; 
     public static final String FUNCTIONDETAILS = "FunctionDetail"; 
     public static final String BACKDATE="backdateentry";//added abhishek
-    
+    public static final String SUBDIVISION = "subdivision";
 }

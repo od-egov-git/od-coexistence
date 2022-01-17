@@ -58,6 +58,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -136,7 +141,8 @@ public class PaymentActionHelper {
 
     @Autowired
     protected AssignmentService assignmentService;
-
+    @PersistenceContext
+	private EntityManager entityManager;
     @Autowired
     @Qualifier("workflowService")
     private SimpleWorkflowService<Paymentheader> paymentHeaderWorkflowService;
@@ -173,6 +179,37 @@ public class PaymentActionHelper {
         	voucherHeader.setFirstsignatory(firstsignatory);
         	voucherHeader.setSecondsignatory(secondsignatory);
             voucherHeader = createVoucherAndledger(voucherHeader, commonBean, billDetailslist, subLedgerlist);
+            SQLQuery query=null;
+			List list1= new ArrayList();
+			List list2= new ArrayList();
+			String budgetAppNo="";
+			String refundable="";
+			try {
+				String queryString = "select eb2.budgetary_appnumber from eg_billregister eb,eg_billregistermis eb2 where eb2.billid = eb.id and eb.billnumber ='"+commonBean.getDocumentNumber()+"'";
+				Query q = entityManager.createNativeQuery(queryString.toString());
+				list1 = q.getResultList();
+				
+				String queryString1 = "select eb.refundable from eg_billregister eb,eg_billregistermis eb2 where eb2.billid = eb.id and eb.billnumber ='"+commonBean.getDocumentNumber()+"'";
+				Query q1 = entityManager.createNativeQuery(queryString1.toString());
+				list2 = q1.getResultList();
+	    	if(list1!=null)
+	    	{
+	    		budgetAppNo=(String) list1.get(0);
+	    	}
+	    	if(list2!=null)
+	    	{
+	    		refundable=(String) list2.get(0);
+	    		voucherHeader.setRefundable(refundable);
+	    	}
+	    		
+			}
+			catch(Exception e) {
+				e.printStackTrace();
+			}
+			if(voucherHeader.getRefundable()!=null && voucherHeader.getRefundable().equalsIgnoreCase("Y"))
+			{
+				voucherHeader.getVouchermis().setBudgetaryAppnumber(budgetAppNo);
+			}
             System.out.println("Part 2");
             paymentheader = paymentService.createPaymentHeader2(voucherHeader,
                     Integer.valueOf(commonBean.getAccountNumberId()), commonBean
@@ -184,6 +221,7 @@ public class PaymentActionHelper {
             System.out.println("Part 4");
             createMiscBillDetail(billVhId, commonBean, voucherHeader);
             System.out.println("Part 5");
+            workflowBean.setBillNumber(commonBean.getDocumentNumber());
             paymentheader = sendForApproval(paymentheader, workflowBean);
             System.out.println("Part 6");
         } catch (final ValidationException e) {
@@ -329,6 +367,21 @@ public class PaymentActionHelper {
         calendar.set(Calendar.MILLISECOND, 0);
         Date currentDate = calendar.getTime(); 
         CVoucherHeader voucherHeader =null;
+        
+        if(workflowBean.getWorkFlowAction().equals("Forward"))
+        {
+        	if(workflowBean.getBillNumber() != null)
+        	{
+        		expenseBill = expenseBillService.getByBillnumber(workflowBean.getBillNumber());
+        		if(expenseBill != null && expenseBill.getRefundable() != null && expenseBill.getRefundable().equalsIgnoreCase("Y"))
+				 {
+					 expenseBill.setStatus(egwStatusDAO.getStatusByModuleAndCode("REFUNDBILL", "Bill Payment Processing"));
+		       		 expenseBillService.create(expenseBill);
+				 }
+        	}
+        			 
+        			 
+        }
         if(workflowBean.getWorkFlowAction().equals("Approve"))
         {
         	voucherHeader = paymentheader.getVoucherheader();
@@ -355,15 +408,26 @@ public class PaymentActionHelper {
         			 expenseBill = expenseBillService.getByBillnumber(row.getBillnumber());
         			 if(expenseBill != null)
         			 {
-        				 expenseBill.setStatus(egwStatusDAO.getStatusByModuleAndCode("EXPENSEBILL", "Bill Payment Created"));
-						/*
-						 * expenseBill.getState().setId(paymentheader.getState().getId());
-						 * expenseBillService.create(expenseBill);
-						 */
+        				 if(expenseBill.getRefundable() != null && expenseBill.getRefundable().equalsIgnoreCase("Y"))
+        				 {
+        					 expenseBill.setStatus(egwStatusDAO.getStatusByModuleAndCode("REFUNDBILL", "Bill Payment Approved"));
+        					 ///set voucherheader id in billregistermis table for redund bill
+            				 System.out.println("vouhcerHearderId "+voucherHeader.getId());
+            				 expenseBill.getEgBillregistermis().setVoucherHeader(voucherHeader);
+        				 }
+        				 else
+        				 {
+        					 expenseBill.setStatus(egwStatusDAO.getStatusByModuleAndCode("EXPENSEBILL", "Bill Payment Approved"));
+        				 }
+        				 
+                		 expenseBillService.create(expenseBill);
         			 }
         		}
         	}
         }
+        paymentService.getSession().flush();
+        persistenceService.getSession().flush();
+        finDashboardService.billPaymentUpdatedAction(paymentheader);
         return paymentheader;
     }
 
@@ -669,6 +733,8 @@ public class PaymentActionHelper {
         {
         	headerdetails.put("fileno", voucherHeader.getFileno());
         }
+        if(voucherHeader.getVouchermis().getBudgetaryAppnumber() != null)
+        	headerdetails.put(VoucherConstant.BUDGETARYAPPNUMBER,voucherHeader.getVouchermis().getBudgetaryAppnumber());
         if (voucherHeader.getVouchermis().getDepartmentcode() != null)
             headerdetails.put(VoucherConstant.DEPARTMENTCODE,voucherHeader.getVouchermis().getDepartmentcode());
         if (voucherHeader.getFundId() != null)

@@ -64,6 +64,8 @@ import org.apache.commons.lang.StringUtils;
 import org.egov.commons.CChartOfAccountDetail;
 import org.egov.commons.CChartOfAccounts;
 import org.egov.commons.CFinancialYear;
+import org.egov.commons.EgwStatus;
+import org.egov.commons.dao.EgwStatusHibernateDAO;
 import org.egov.commons.service.CFinancialYearService;
 import org.egov.commons.service.ChartOfAccountDetailService;
 import org.egov.commons.service.CheckListService;
@@ -106,6 +108,7 @@ import org.egov.services.masters.SubSchemeService;
 import org.egov.services.voucher.VoucherService;
 import org.egov.utils.Constants;
 import org.egov.utils.FinancialConstants;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -133,6 +136,8 @@ public class ExpenseBillService {
     private DocumentUploadRepository documentUploadRepository;
     @PersistenceContext
     private EntityManager entityManager;
+    @Autowired
+    private EgwStatusHibernateDAO egwStatusDAO;
     @Autowired
     private EgBillSubTypeService egBillSubTypeService;
     @Autowired
@@ -340,14 +345,20 @@ public class ExpenseBillService {
 
             deleteCheckList(updatedegBillregister);
             createCheckList(updatedegBillregister, checkLists);
-            egBillregister.getEgBillregistermis().setBudgetaryAppnumber(null);
+            //egBillregister.getEgBillregistermis().setBudgetaryAppnumber(null);
       
 //            commented as budget check was disabled
+            if(egBillregister.getRefundable()==null) {           
+                
            try {
-           checkBudgetAndGenerateBANumber(egBillregister);
+        	   if(egBillregister.getEgBillregistermis().getBudgetaryAppnumber() == null || (egBillregister.getEgBillregistermis().getBudgetaryAppnumber() != null && egBillregister.getEgBillregistermis().getBudgetaryAppnumber().isEmpty()))
+        	   {
+        		   checkBudgetAndGenerateBANumber(egBillregister); 
+        	   }
            } catch (final ValidationException e) {
                throw new ValidationException(e.getErrors());
             }
+           }
 
         }
         if (updatedegBillregister != null) {
@@ -524,14 +535,23 @@ public class ExpenseBillService {
                         .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME)
                         .withCreatedBy(user.getId())
                         .withtLastModifiedBy(user.getId());
-            } else if (FinancialConstants.BUTTONCANCEL.equalsIgnoreCase(workFlowAction)) {
+            } else if (FinancialConstants.BUTTONCANCEL.equalsIgnoreCase(workFlowAction) || "Approve".equalsIgnoreCase(workFlowAction)) {
                 stateValue = FinancialConstants.WORKFLOW_STATE_CANCELLED;
                 egBillregister.transition().end().withSenderName(user.getUsername() + "::" + user.getName())
                         .withComments(approvalComent)
                         .withStateValue(stateValue).withDateInfo(currentDate.toDate())
                         .withNextAction("")
                         .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME);
-            } else if (FinancialConstants.BUTTONAPPROVE.equalsIgnoreCase(workFlowAction)) {
+                if (egBillregister.getRefundable() != null && !egBillregister.getRefundable().isEmpty()
+        				&& egBillregister.getRefundable().equalsIgnoreCase("Y") && egBillregister.getExpendituretype()
+        				.equalsIgnoreCase(FinancialConstants.STANDARD_EXPENDITURETYPE_REFUND)) {
+        			egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.REFUNDBILL_FIN,
+                            "Cancelled"));
+        		}else {
+        		 egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
+                         "Cancelled"));
+        		}
+            } else if (FinancialConstants.BUTTONVERIFY.equalsIgnoreCase(workFlowAction)) {
                 wfmatrix = egBillregisterRegisterWorkflowService.getWfMatrix(egBillregister.getStateType(), null,
                         null, additionalRule, egBillregister.getCurrentState().getValue(), null);
 
@@ -544,6 +564,9 @@ public class ExpenseBillService {
                         .withNextAction(wfmatrix.getNextAction())
                         .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME);
             } else {
+                if (designation != null
+                        && finalDesignationNames.get(designation.getName().toUpperCase()) != null)
+                    stateValue = FinancialConstants.WF_STATE_FINAL_APPROVAL_PENDING;
 
              
                 
@@ -551,10 +574,11 @@ public class ExpenseBillService {
                         null, additionalRule, egBillregister.getCurrentState().getValue(), null);
 
                 	
-                
+                System.out.println("stateValue ::: "+stateValue);
+                System.out.println("wfmatrix.getNextState() ::: "+wfmatrix.getNextState());
                 if (stateValue.isEmpty())
                 {
-                	if(!wfmatrix.getNextState().equalsIgnoreCase(FinancialConstants.WF_STATE_FINAL_APPROVAL_PENDING) && !wfmatrix.getNextState().equalsIgnoreCase("NEW"))
+                	if(!wfmatrix.getNextState().equalsIgnoreCase(FinancialConstants.WF_STATE_FINAL_APPROVAL_PENDING) && !wfmatrix.getNextState().equalsIgnoreCase("Pending for Cancellation") && !wfmatrix.getNextState().equalsIgnoreCase("Final Cancellation Pending") && !wfmatrix.getNextState().equalsIgnoreCase("NEW"))
                 	{
                 		stateValue = wfmatrix.getNextState()+ " "+designation.getName().toUpperCase();
                 	}
@@ -565,8 +589,11 @@ public class ExpenseBillService {
                 	else
                 	{
                 		stateValue = wfmatrix.getNextState();
-                		//egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
-                          //      FinancialConstants.CONTINGENCYBILL_PENDING_FINANCE));
+                		if(!egBillregister.getStatus().getDescription().equals("Pending for Cancellation"))
+                		{
+                			egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
+                                    FinancialConstants.CONTINGENCYBILL_PENDING_FINANCE));
+                		}
                 		
                 	}
                     

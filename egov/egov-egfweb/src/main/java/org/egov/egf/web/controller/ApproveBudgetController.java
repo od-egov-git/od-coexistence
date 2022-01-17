@@ -76,10 +76,12 @@ import org.egov.infstr.services.PersistenceService;
 import org.egov.model.bills.EgBillregister;
 import org.egov.model.budget.Budget;
 import org.egov.model.budget.BudgetDetail;
+import org.egov.model.budget.BudgetReAppropriation;
 import org.egov.model.budget.BudgetUploadReport;
 import org.egov.model.budget.BudgetWrapper;
 import org.egov.model.voucher.WorkflowBean;
 import org.egov.services.budget.BudgetDetailService;
+import org.egov.services.budget.BudgetReAppropriationService;
 import org.egov.services.budget.BudgetService;
 import org.egov.utils.FinancialConstants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -106,11 +108,13 @@ public class ApproveBudgetController extends BaseBillController{
 
 	private static final String APPROVAL_POSITION = "approvalPosition";
 	private static final String APPROVAL_DESIGNATION = "approvalDesignation";
-    private final static String APPROVEBUDGET_SEARCH = "approvebudget-search";
+	private final static String APPROVEBUDGET_SEARCH = "approvebudget-search";
     private final static String APPROVEBUDGET_SEARCH_CAO = "approvebudget-searchCAO";
     private final static String APPROVEBUDGET_SEARCH_CAO_NEW = "approvebudget-searchCAO_New";
     private final static String APPROVEBUDGET_SEARCH_SO = "approvebudget-searchSO";
     private final static String APPROVEBUDGET_SEARCH_ACMC = "approvebudget-searchACMC";
+    private final static String APPROPRIATION_NEW = "appropriation_New";
+    private final static String APPROPRIATION_EDIT = "budgetReAppropriation_EditNew_bkp";
     private List<BudgetDetail> budgetDetailsList=new ArrayList<BudgetDetail>();
 
     @Autowired
@@ -147,7 +151,9 @@ public class ApproveBudgetController extends BaseBillController{
     
     @Autowired
     private DepartmentService departmentService;
-
+    @Autowired
+    BudgetReAppropriationService budgetReAppropriationService;
+    
     private void prepareNewForm(Model model) {
         model.addAttribute("budgets", budgetService.getBudgetsForUploadReport());
         budgetDetailsList=budgetDetailService.getBudgetDetailsForUploadReport();
@@ -258,6 +264,20 @@ public class ApproveBudgetController extends BaseBillController{
         return APPROVEBUDGET_SEARCH_CAO;
 
     }
+    
+    @RequestMapping(value = "/budgetReAppropriation-edit/{budgetId}", method = {RequestMethod.GET,RequestMethod.POST})
+    public String budgetCAOEdit(Model model,@PathVariable Long budgetId) {
+    	System.out.println("budgetId---->> "+budgetId);
+    	final BudgetReAppropriation reApp = budgetReAppropriationService.findByBudgetDetail(budgetId);
+    	if (reApp.getState() != null)
+        {
+        	model.addAttribute("stateType", reApp.getClass().getSimpleName());
+        	model.addAttribute("currentState", reApp.getState().getValue());
+        }
+    	prepareWorkflow(model, reApp, new WorkflowContainer());
+        return APPROPRIATION_EDIT;
+    }
+    
     @RequestMapping(value = "/verifyCAONew/{budgetId}", method = {RequestMethod.GET,RequestMethod.POST})
     public String verifyCAONew(Model model,@PathVariable final String budgetId)
     {
@@ -294,7 +314,37 @@ public class ApproveBudgetController extends BaseBillController{
         return APPROVEBUDGET_SEARCH_CAO_NEW;
 
     }
-    
+    /////budget appropriation new task
+    @RequestMapping(value = "/verifyAppropriationNew/{budgetId}", method = {RequestMethod.GET,RequestMethod.POST})
+    public String verifyAppropriationNew(Model model,@PathVariable final String budgetId)
+    {
+    	System.out.println("budgetId---->> "+budgetId);
+    	if(budgetId!=null) 
+    	{
+	    	budgetDetail = (BudgetDetail) persistenceService.find("from BudgetDetail where budget.id=?",
+	                Long.valueOf(budgetId));
+	    }
+	    List<BudgetDetail> budgetDetailList1 = new ArrayList<BudgetDetail>();
+	    try {
+	        budgetDetailList1=persistenceService.findAllBy("from BudgetDetail where state.id=?",budgetDetail.getState().getId());
+	        if (budgetDetail.getState() != null)
+	        {
+	        	model.addAttribute("stateType", budgetDetail.getClass().getSimpleName());
+	        	model.addAttribute("currentState", budgetDetail.getState().getValue());
+	        }
+	        model.addAttribute("workflowHistory",
+	                financialUtils.getHistory(budgetDetail.getState(), budgetDetail.getStateHistory()));
+	            prepareWorkflow(model, budgetDetail, new WorkflowContainer());
+	    }
+	    catch(Exception e)
+	    {
+	    	e.printStackTrace();
+	    }
+		BudgetUploadReport budgetUploadReport = new BudgetUploadReport();
+		model.addAttribute("budgetUploadReport",budgetUploadReport);
+		model.addAttribute("budgetDetails",budgetDetailList1);
+        return APPROVEBUDGET_SEARCH_CAO_NEW;
+    }
     @RequestMapping(value = "/rejectedBudgetSO", method = {RequestMethod.GET,RequestMethod.POST})
     public String rejectedBudgetSO(Model model)
     {   BudgetWrapper budgetWrapper= new BudgetWrapper();
@@ -549,18 +599,18 @@ public class ApproveBudgetController extends BaseBillController{
     		//
     	if(workAction.equalsIgnoreCase("VERIFY"))
     	{ 
-        Budget reBudget = budgetService.findById(budgetUploadReport.getReBudget().getId(), false);
-        Budget beBudget = budgetService.getReferenceBudgetFor(reBudget);
-        budgetService.updateByMaterializedPathCAO(reBudget.getMaterializedPath());
-        budgetDetailService.updateByMaterializedPathCAO(reBudget.getMaterializedPath());
-        budgetService.updateByMaterializedPathCAO(beBudget.getMaterializedPath());
-        budgetDetailService.updateByMaterializedPathCAO(beBudget.getMaterializedPath());
-        //chartOfAccountsService.updateActiveForPostingByMaterializedPath(reBudget.getMaterializedPath());
+	        Budget reBudget = budgetService.findById(budgetUploadReport.getReBudget().getId(), false);
+	        Budget beBudget = budgetService.getReferenceBudgetFor(reBudget);
+	        budgetService.updateByMaterializedPathCAO(reBudget.getMaterializedPath());
+	        budgetDetailService.updateByMaterializedPathCAO(reBudget.getMaterializedPath());
+	        budgetService.updateByMaterializedPathCAO(beBudget.getMaterializedPath());
+	        budgetDetailService.updateByMaterializedPathCAO(beBudget.getMaterializedPath());
+	        //chartOfAccountsService.updateActiveForPostingByMaterializedPath(reBudget.getMaterializedPath());
 	        //redirectAttrs.addFlashAttribute("message", "msg.uploaded.budget.cao.success");
     	}
     	else if(workAction.equalsIgnoreCase("REJECT"))
     	{
-    		 Budget reBudget = budgetService.findById(budgetUploadReport.getReBudget().getId(), false);
+    		Budget reBudget = budgetService.findById(budgetUploadReport.getReBudget().getId(), false);
  	        Budget beBudget = budgetService.getReferenceBudgetFor(reBudget);
  	        budgetService.updateByMaterializedPathSO(reBudget.getMaterializedPath());
  	        budgetDetailService.updateByMaterializedPathSO(reBudget.getMaterializedPath());
@@ -571,7 +621,7 @@ public class ApproveBudgetController extends BaseBillController{
     	}
     	else if(workAction.equalsIgnoreCase("CANCEL"))
     	{
-    		 Budget reBudget = budgetService.findById(budgetUploadReport.getReBudget().getId(), false);
+    		Budget reBudget = budgetService.findById(budgetUploadReport.getReBudget().getId(), false);
  	        Budget beBudget = budgetService.getReferenceBudgetFor(reBudget);
  	        budgetService.updateByMaterializedPathSTATUSCancelByCAO(reBudget.getMaterializedPath());
  	        budgetDetailService.updateByMaterializedPathSTATUSCancelByCAO(reBudget.getMaterializedPath());

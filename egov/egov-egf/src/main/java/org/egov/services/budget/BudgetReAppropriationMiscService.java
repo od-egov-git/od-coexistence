@@ -48,15 +48,26 @@
 package org.egov.services.budget;
 
 import org.egov.infstr.services.PersistenceService;
+import org.egov.model.budget.BudgetReAppropriation;
 import org.egov.model.budget.BudgetReAppropriationMisc;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 public class BudgetReAppropriationMiscService extends PersistenceService<BudgetReAppropriationMisc, Long> {
-    
+	@Autowired
+    @Qualifier("persistenceService")
+    private PersistenceService persistenceService;
+	
     public BudgetReAppropriationMiscService() {
         super(BudgetReAppropriationMisc.class);
     }
 
     public BudgetReAppropriationMiscService(final Class<BudgetReAppropriationMisc> type) {
         super(type);
+    }
+    
+    public BudgetReAppropriationMisc findByMiscId(final Long miscId) {
+        return (BudgetReAppropriationMisc) persistenceService.find(
+                "from BudgetReAppropriationMisc b where b.id=?", miscId);
     }
 }

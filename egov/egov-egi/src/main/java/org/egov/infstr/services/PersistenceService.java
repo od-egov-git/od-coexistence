@@ -322,6 +322,16 @@ public class PersistenceService<T, ID extends Serializable> {
 		auditable.setLastModifiedBy(ApplicationThreadLocals.getUserId());
 		auditable.setLastModifiedDate(currentDate);
 	}
+	
+	public static void applyAuditingNew(AbstractAuditable auditable) {
+		Date currentDate = new Date();
+		if (auditable.isNew()) {
+			auditable.setCreatedBy(ApplicationThreadLocals.getUserId());
+			auditable.setCreatedDate(currentDate);
+		}
+		auditable.setLastModifiedBy(ApplicationThreadLocals.getUserId());
+		auditable.setLastModifiedDate(currentDate);
+	}
 
 	public void applyAuditing(BaseModel baseModel) {
 		Date currentDate = new Date();
