@@ -217,7 +217,7 @@ public class RemitRecoveryService {
         StringBuilder query = new StringBuilder();
         query.append("SELECT vh.NAME,  vh.VOUCHERNUMBER,  vh.VOUCHERDATE, egr.glamt, egr.ID, ");
         query.append("(select  case when sum(egd.remittedamt) is null then 0 else sum(egd.remittedamt) end from EG_REMITTANCE_GL egr1,eg_remittance_detail egd,eg_remittance  eg,voucherheader vh where vh.status!=4 and  eg.PAYMENTVHID=vh.id and egd.remittanceid=eg.id and egd.REMITTANCEGLID=egr1.id and egr1.id=egr.id) As col_7_0 , ");
-        query.append("mis.departmentcode,mis.functionid  ");
+        query.append("mis.departmentcode,mis.functionid,vh.description  ");
         query.append("FROM VOUCHERHEADER vh,  VOUCHERMIS mis,  GENERALLEDGER gl,  EG_REMITTANCE_GL egr,  TDS recovery5_ ");
         query.append("WHERE recovery5_.GLCODEID  =gl.GLCODEID AND gl.id=egr.glid and ");
         query.append("vh.ID =gl.VOUCHERHEADERID AND mis.VOUCHERHEADERID  =vh.ID AND ");
@@ -500,9 +500,9 @@ public class RemitRecoveryService {
                     }
                 }
                 remitBean.setRemittance_gl_Id(Integer.valueOf(element[4].toString()));
-                if(element[9] != null)
+                if(element[8] != null)
                 {
-                	remitBean.setNaration(element[9].toString());
+                	remitBean.setNaration(element[8].toString());
                 }
             }catch (Exception e) {
 				e.printStackTrace();
