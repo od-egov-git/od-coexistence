@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @RequestMapping(value = "/revaluate")
 public class RevaluationController {
 
-	@RequestMapping(value = "/newform", method = RequestMethod.GET)
+	@RequestMapping(value = "/newform", method = RequestMethod.POST)
 	public String showNewForm(final Model model, HttpServletRequest request) {
 		System.out.println("XXXX");
 

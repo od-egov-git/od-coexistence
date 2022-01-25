@@ -22,7 +22,41 @@
 		<put-attribute name="body" value="" />
 
 	</definition>
-	<definition name="test" extends="base_layout">
-        <put-attribute name="body" value="/WEB-INF/views/asset/revaluation/test.jsp"/>
+    <definition name="assetcatagory-form" extends="base_layout">
+        <put-attribute name="page-title" value="title.asset.catagory.create" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/asset/assetcatagory-form.jsp"/>
+    </definition>
+	<definition name="view-assetcatagory-form" extends="base_layout">
+        <put-attribute name="page-title" value="title.asset.catagory.view" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/asset/view-assetcatagory-form.jsp"/>
+    </definition>
+    <definition name="search-assetcatagory-form" extends="base_layout">
+        <put-attribute name="page-title" value="title.asset.catagory.search" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/asset/search-assetcatagory-form.jsp"/>
+    </definition>
+    <definition name="update-assetcatagory-form" extends="base_layout">
+        <put-attribute name="page-title" value="title.asset.catagory.update" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/asset/update-assetcatagory-form.jsp"/>
+    </definition>
+     <definition name="disposal-sale-form" extends="base_layout">
+        <put-attribute name="page-title" value="title.asset.saledisposal" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/asset/disposal-sale-form.jsp"/>
+    </definition>
+    <definition name="asset-create" extends="base_layout">
+        <put-attribute name="page-title" value="lbl-asset-create" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/asset/asset-create.jsp"/>
+    </definition>
+    
+    <definition name="asset-view" extends="base_layout">
+        <put-attribute name="page-title" value="lbl-asset-create" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/asset/asset-view.jsp"/>
+    </definition>
+    <definition name="asset-success" extends="base_layout">
+        <put-attribute name="page-title" value="asset-success" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/asset/asset-success.jsp"/>
+    </definition>
+    <definition name="asset-update" extends="base_layout">
+        <put-attribute name="page-title" value="asset-update" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/asset/asset-update.jsp"/>
     </definition>
 </tiles-definitions>
