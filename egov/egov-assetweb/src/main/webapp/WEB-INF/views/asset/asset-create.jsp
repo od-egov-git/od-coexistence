@@ -4,7 +4,7 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring" %>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
 
-
+<%@ page isELIgnored = "false" %>
 <div class="panel-title" align="center">
 	<spring:message code="lbl-asset-create" text="Create Asset"/>
 </div>
@@ -43,9 +43,10 @@
 							<span class="mandatory"></span>
 						</label>
 						<div class="col-sm-6 add-margin">
-							<form:select path="assetHeader.assetCategory" id="assetHeader.assetCategory" class="form-control">
+							<form:select path="assetHeader.assetCategory" id="assetHeader.assetCategory" class="form-control"
+								onchange="showCategoryDetails(this);">
 									<form:option value=""><spring:message code="lbl.select" /></form:option>
-									<form:options items="${assetCategoryList}" itemValue="id" itemLabel="description"/>  
+									<form:options items="${assetCategoryList}" itemValue="id" itemLabel="name"/>  
 							</form:select>
 						</div>
 					</td>
@@ -90,7 +91,8 @@
 							<span class="mandatory"></span>
 						</label>
 						<div class="col-sm-6 add-margin">
-							<form:select path="assetHeader.modeOfAcquisition" id="assetHeader.modeOfAcquisition" required="required"  class="form-control">
+							<form:select path="assetHeader.modeOfAcquisition"
+							onchange="loadValues();" id="modeOfAcquisition" required="required"  class="form-control">
 									<form:option value=""><spring:message code="lbl.select" /></form:option>
 									<form:options items="${modeOfAcquisitionList}" itemValue="id" itemLabel="description"/>  
 							</form:select>
@@ -309,6 +311,24 @@
 			</table>
 		</div>
 
+		<!-- Category Details -->
+		<br />
+		<br />
+		<div class="formmainbox" id="categoryDetails" style="display:none">
+			<br />
+			<div id="labelAD" align="center">
+				<table width="89%" border=0>
+					<th> <spring:message code="category-details" text="Category Details"/></th>
+				</table>
+			</div>
+			<br />
+			<table border="0" width="100%">
+				<tbody id="result">
+				
+				</tbody>
+			</table>
+		</div>
+		
 		<!-- Asset Status -->
 		<br />
 		<br />
@@ -328,7 +348,8 @@
 							<span class="mandatory"></span>
 						</label>
 						<div class="col-sm-4 add-margin">
-							<form:select path="assetStatus" id="assetStatus"  required="required"  class="form-control">
+							<form:select path="assetStatus" id="assetStatus"  required="required"  class="form-control"
+							onchange="loadValues();">
 									<form:option value=""><spring:message code="lbl.select" /></form:option>
 									<form:options items="${assetStatusList}" itemValue="id" itemLabel="description"/>  
 							</form:select>
@@ -336,6 +357,131 @@
 					</td>
 				</tr>
 			</table>
+			<!-- Value Section -->
+			<br />
+			<br />
+			<%-- <div id="valueSection" style="display:none;">
+				<table width="100%">
+					<tr id="capitalized" style="display:none;">
+						<td>
+							<label class="col-sm-3 control-label text-right">
+								<spring:message code="gross-value" text="grossValue"/>
+								<span class="mandatory"></span>
+							</label>
+							<div class="col-sm-6 add-margin">
+								<form:input class="form-control" path="grossValue" required="required"/>
+							</div>
+						</td>
+						<td>
+							<label class="col-sm-3 control-label text-right">
+								<spring:message code="market-value" text="marketValue"/>
+								<span class="mandatory"></span>
+							</label>
+							<div class="col-sm-6 add-margin">
+								<form:input class="form-control" path="marketValue" required="required"/>
+							</div>
+						</td>
+					</tr>
+					<tr id="capitalized2" style="display:none;">
+						<td>
+							<label class="col-sm-3 control-label text-right">
+								<spring:message code="accumulated-depreciation" text="accumulatedDepreciation"/>
+								<span class="mandatory"></span>
+							</label>
+							<div class="col-sm-6 add-margin">
+								<form:input class="form-control" path="accumulatedDepreciation" required="required"/>
+							</div>
+						</td>
+						<td>
+							<label class="col-sm-3 control-label text-right">
+								<spring:message code="survey-number" text="surveyNumber"/>
+								<span class="mandatory"></span>
+							</label>
+							<div class="col-sm-6 add-margin">
+								<form:input class="form-control" path="surveyNumber" required="required"/>
+							</div>
+						</td>
+					</tr>
+					<tr id="acqPurchase" style="display:none;">
+							<td>
+								<label class="col-sm-3 control-label text-right">
+									<spring:message code="purchase-value" text="purchaseValue"/>
+									<span class="mandatory"></span>
+								</label>
+								<div class="col-sm-6 add-margin">
+									<form:input class="form-control" path="purchaseValue" required="required"/>
+								</div>
+							</td>
+							<td>
+								<label class="col-sm-3 control-label text-right">
+									<spring:message code="purchase-date" text="purchaseDate"/>
+									<span class="mandatory"></span>
+								</label>
+								<div class="col-sm-6 add-margin">
+									<form:input class="form-control datepicker" path="purchaseDate" required="required" data-date-end-date="0d" placeholder="DD/MM/YYYY"/>
+									<form:errors path="purchaseDate" cssClass="add-margin error-msg" />
+								</div>
+							</td>
+						</tr>
+						<tr id="acqDonation" style="display:none;">
+							<td>
+								<label class="col-sm-3 control-label text-right">
+									<spring:message code="donation-date" text="donationDate"/>
+									<span class="mandatory"></span>
+								</label>
+								<div class="col-sm-6 add-margin">
+									<form:input class="form-control datepicker" path="donationDate" required="required" data-date-end-date="0d" placeholder="DD/MM/YYYY"/>
+									<form:errors path="donationDate" cssClass="add-margin error-msg" />
+								</div>
+							</td>
+							<td>
+							</td>
+						</tr>
+						<tr id="acqConstruction" style="display:none;">
+							<td>
+								<label class="col-sm-3 control-label text-right">
+									<spring:message code="construction-value" text="constructionValue"/>
+									<span class="mandatory"></span>
+								</label>
+								<div class="col-sm-6 add-margin">
+									<form:input class="form-control" path="constructionValue" required="required"/>
+								</div>
+							</td>
+							<td>
+								<label class="col-sm-3 control-label text-right">
+									<spring:message code="construction-date" text="constructionDate"/>
+									<span class="mandatory"></span>
+								</label>
+								<div class="col-sm-6 add-margin">
+									<form:input class="form-control datepicker" path="constructionDate" required="required" data-date-end-date="0d" placeholder="DD/MM/YYYY"/>
+									<form:errors path="constructionDate" cssClass="add-margin error-msg" />
+								</div>
+							</td>
+						</tr>
+						<tr id="acqAcquired" style="display:none;">
+							<td>
+								<label class="col-sm-3 control-label text-right">
+									<spring:message code="acquisition-value" text="acquisitionValue"/>
+									<span class="mandatory"></span>
+								</label>
+								<div class="col-sm-6 add-margin">
+									<form:input class="form-control" path="acquisitionValue" required="required"/>
+								</div>
+							</td>
+							<td>
+								<label class="col-sm-3 control-label text-right">
+									<spring:message code="acquisition-date" text="acquisitionDate"/>
+									<span class="mandatory"></span>
+								</label>
+								<div class="col-sm-6 add-margin">
+									<form:input class="form-control datepicker" path="acquisitionDate" required="required" data-date-end-date="0d" placeholder="DD/MM/YYYY"/>
+									<form:errors path="acquisitionDate" cssClass="add-margin error-msg" />
+								</div>
+							</td>
+						</tr>
+				</table>
+			</div> --%>
+			
 		</div>
 		<div align="center" class="buttonbottom">
 			<div class="row text-center">
@@ -343,7 +489,7 @@
 				<input type="button" name="button2" id="button2" value="Close" class="btn btn-default" onclick="window.parent.postMessage('close','*');window.close();"/>
 			</div>
 		</div>
-
+<input type="hidden" id="customFieldsCounts" name="customFieldsCounts"/>
 </form:form>
 
 
@@ -386,5 +532,86 @@ function viewPop(id){
 	//$('#assetReference').val(x);
 }
 
+function loadValues(){//obj
+	//console.log(obj.value);
+	var assetStatusCode = $('#assetStatus').val();//obj.value;
+	var flag = false;
+	//default set
+	$("#valueSection").css("display", "none");
+	$("#capitalized").css("display", "none");
+	$("#capitalized2").css("display", "none");
+	$("#acqPurchase").css("display", "none");
+	$("#acqDonation").css("display", "none");
+	$("#acqConstruction").css("display", "none");
+	$("#acqAcquired").css("display", "none");
 	
+	/*if(assetStatusCode == 'CREATED' || assetStatusCode == 'CAPITALIZED'){
+		$("#valueSection").css("display", "block");
+		flag = true;
+	}
+	if(assetStatusCode == 'CAPITALIZED'){
+		$("#capitalized").css("display", "block");
+		$("#capitalized2").css("display", "block");
+	}
+	var modeOfAcq = $('#modeOfAcquisition').val();
+	console.log(modeOfAcq);
+	if(flag){
+		if(modeOfAcq == 'PURCHASE'){
+			$("#acqPurchase").css("display", "block");
+		}else if(modeOfAcq == 'DONATION'){
+			$("#acqDonation").css("display", "block");
+		}else if(modeOfAcq == 'CONSTRUCTION'){
+			$("#acqConstruction").css("display", "block");
+		}else if(modeOfAcq == 'ACQUIRED'){
+			$("#acqAcquired").css("display", "block");
+		}else{
+			console.log("select modeOfAcq");
+		}
+	}*/
+}
+
+function showCategoryDetails(obj){
+	console.log("Show id..."+obj.value);
+	$('#result').html('');
+	if(obj.value == ''){
+		$("#categoryDetails").css("display", "none");
+	}else{
+		id = obj.value;
+		fetchCustomFieldData(id);
+		//var ret = generateInputField('text','testValue','required');
+		//$('#categoryDetails tbody').html(ret);
+		$("#categoryDetails").css("display", "block");
+	}
+}
+
+function fetchCustomFieldData(id){
+	console.log("Custom id..."+id);
+	 $.ajax({
+		 type : "POST",
+         url: "/services/EGF/asset/categorydetails/"+id,
+         success: function(res){      
+	           console.log("output............"+res);
+	           var jsonObj = JSON.parse(res);
+	           var json = jsonObj.data;
+	           //var output = evaluateJson(json);
+	           var retHtml = "<tr>";
+	           var len = 0;
+			    for (var key in json) {
+			       if (json.hasOwnProperty(key)) {
+			    	   len++;
+			    	  console.log(json[key].id);
+			    	  retHtml += generateCustomField(key, json[key].dataType, json[key].name, json[key].mandatory);
+			    	  if(key > 1 && key%2==0){
+						console.log('Even');
+						retHtml += "</tr><tr>";
+				      }
+			       }
+			    }
+			    retHtml += "</tr>";
+			    console.log("Result..."+retHtml);
+			    $('#customFieldsCounts').val(len);
+	           $('#result').html(retHtml);
+         }
+     });
+}
 </script>

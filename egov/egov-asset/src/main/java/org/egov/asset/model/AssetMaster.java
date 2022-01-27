@@ -13,6 +13,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
@@ -57,8 +58,14 @@ public class AssetMaster implements Serializable{
 	@Transient
 	/* private List<AssetDocumentUpload> documentDetail = new ArrayList<>(); */
 	private List<DocumentUpload> documentDetail = new ArrayList<>();
+	
 	@Column(name="file_no")
 	private String fileno;
+	
+	@OneToMany(targetEntity=AssetCustomFieldMapper.class,cascade = CascadeType.PERSIST)
+	@JoinColumn(name="asset_master_ref",referencedColumnName="id")
+	//@Column(name="asset_master_ref")
+    private List<AssetCustomFieldMapper> customeFields = new ArrayList<AssetCustomFieldMapper>();
 	
 	 //Common Entries
     @Column(name="created_date")
@@ -231,6 +238,12 @@ public class AssetMaster implements Serializable{
 		this.donationDate = donationDate;
 	}
 	
+	public List<AssetCustomFieldMapper> getCustomeFields() {
+		return customeFields;
+	}
+	public void setCustomeFields(List<AssetCustomFieldMapper> customeFields) {
+		this.customeFields = customeFields;
+	}
 	@Override
 	public String toString() {
 		return "AssetMaster [id=" + id + ", code=" + code + ", assetHeader=" + assetHeader + ", assetLocation="

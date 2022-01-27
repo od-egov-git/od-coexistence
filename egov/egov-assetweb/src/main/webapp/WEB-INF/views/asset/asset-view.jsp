@@ -46,7 +46,7 @@
 					<div class="col-sm-6 add-margin">
 						<form:select path="assetHeader.assetCategory" id="assetHeader.assetCategory" required="required" class="form-control">
 								<form:option value=""><spring:message code="lbl.select" /></form:option>
-								<form:options items="${assetCategoryList}" itemValue="id" itemLabel="description"/>  
+								<form:options items="${assetCategoryList}" itemValue="id" itemLabel="name"/>  
 						</form:select>
 					</div>
 				</td>
@@ -133,7 +133,7 @@
 							<td>
 							<a href="assetReference/${asset.id}" target="popup"
                                   onclick="window.open('${contextPath}/asset/editform/${asset.id}','popup','width=700,height=600'); return false;">
-								${asset.assetHeader.assetCategory.code }</a>
+								${asset.assetHeader.assetCategory.name }</a>
 							</td>
 							<td>
 							<a href="assetReference/${asset.id}" target="popup"

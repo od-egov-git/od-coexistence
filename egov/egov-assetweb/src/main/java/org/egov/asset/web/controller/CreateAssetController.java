@@ -19,6 +19,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper;
 import org.apache.struts2.dispatcher.multipart.UploadedFile;
+import org.egov.asset.model.AssetCatagory;
+import org.egov.asset.model.AssetCustomFieldMapper;
 import org.egov.asset.model.AssetHeader;
 import org.egov.asset.model.AssetLocality;
 import org.egov.asset.model.AssetLocation;
@@ -30,8 +32,10 @@ import org.egov.asset.model.AssetLocationZone;
 import org.egov.asset.model.AssetMaster;
 import org.egov.asset.model.AssetModeOfAcquisition;
 import org.egov.asset.model.AssetStatus;
+import org.egov.asset.model.CustomeFields;
 import org.egov.asset.repository.AssetBlockRepository;
 import org.egov.asset.repository.AssetCatagoryRepository;
+import org.egov.asset.repository.AssetCustomFieldMapperRepository;
 import org.egov.asset.repository.AssetElectionWardRepository;
 import org.egov.asset.repository.AssetLocalityRepository;
 import org.egov.asset.repository.AssetLocationStreetRepository;
@@ -40,6 +44,9 @@ import org.egov.asset.repository.AssetMasterRepository;
 import org.egov.asset.repository.AssetModeOfAcquisitionRepository;
 import org.egov.asset.repository.AssetRevenueWardRepository;
 import org.egov.asset.repository.AssetStatusRepository;
+import org.egov.asset.service.AssetService;
+import org.egov.asset.utils.AssetConstant;
+import org.egov.asset.web.controller.adaptor.AssetJsonAdaptor;
 import org.egov.commons.CFunction;
 import org.egov.commons.Fund;
 import org.egov.commons.Scheme;
@@ -61,6 +68,7 @@ import org.hibernate.SQLQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -71,6 +79,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 @Controller
 @RequestMapping(value = "/asset")
@@ -89,8 +100,8 @@ public class CreateAssetController {// extends BaseAssetController{
 	private AssetMaster assetBean;
 	//private AssetHeader assetHeaderBean;
 	//private AssetLocation assetLocationBean;
-	 @Autowired
-	    private DocumentUploadRepository documentUploadRepository;
+	@Autowired
+	private DocumentUploadRepository documentUploadRepository;
 	@Autowired
 	private FundHibernateDAO fundHibernateDAO;
 	@Autowired
@@ -115,6 +126,9 @@ public class CreateAssetController {// extends BaseAssetController{
 	private AssetLocationStreetRepository streetRepo;
 	@Autowired
 	private AssetLocationZoneRepository zoneRepo;
+	@Autowired
+	private AssetCustomFieldMapperRepository customFieldRepo;
+	
 	@Autowired
 	private AssetService assetService;
 	@Autowired
@@ -142,7 +156,7 @@ public class CreateAssetController {// extends BaseAssetController{
 	List<Department> departmentList = new ArrayList<Department>();
 	List<Fund> fundList = new ArrayList<Fund>();
 	List<CFunction> functionList = new ArrayList<CFunction>();
-	List<AssetCategory> assetCategoryList = new ArrayList<AssetCategory>();
+	List<AssetCatagory> assetCategoryList = new ArrayList<AssetCatagory>();
 	List<Scheme> schemeList = new ArrayList<Scheme>();
 	List<SubScheme> subSchemeList = new ArrayList<SubScheme>();
 	List<AssetModeOfAcquisition> modeOfAcquisitionList = new ArrayList<AssetModeOfAcquisition>();
@@ -154,6 +168,7 @@ public class CreateAssetController {// extends BaseAssetController{
 	List<AssetLocationRevenueWard> revenueWardList = new ArrayList<AssetLocationRevenueWard>();
 	List<AssetLocationStreet> streetList = new ArrayList<AssetLocationStreet>();
 	List<AssetLocationZone> zoneList = new ArrayList<AssetLocationZone>();
+	List<AssetCustomFieldMapper> mapperList = new ArrayList<AssetCustomFieldMapper>();
 	
 	@GetMapping("/newform")
 	public String newform(Model model) {
@@ -215,6 +230,8 @@ public class CreateAssetController {// extends BaseAssetController{
 	public String create(@ModelAttribute("assetBean") AssetMaster assetBean,Model model, HttpServletRequest request) {
 
 		LOGGER.info("Creating Asset Object");
+		long userId = ApplicationThreadLocals.getUserId();
+		LOGGER.info("userId..." + userId);
 		LOGGER.info("Asset Header..." + assetBean.toString());
 		LOGGER.info("Asset Header..." + assetBean.getAssetHeader().toString());
 		//File
@@ -241,8 +258,7 @@ public class CreateAssetController {// extends BaseAssetController{
 		assetBean.setDocumentDetail(list);
 		//assetBean.setFileno();
         
-		long userId = ApplicationThreadLocals.getUserId();
-		LOGGER.info("userId..." + userId);
+		
 		assetBean.setCreatedBy(String.valueOf(userId));
 		assetBean.getAssetHeader().setCreatedBy(String.valueOf(userId));
 		assetBean.getAssetLocation().setCreatedBy(String.valueOf(userId));
@@ -253,10 +269,43 @@ public class CreateAssetController {// extends BaseAssetController{
 		
 		String message = "";
 		String assetCode = "";
+		long nextVal = generateNextVal();
+		
+		//Custom Fields
+		List<AssetCustomFieldMapper> mapperList = new ArrayList<AssetCustomFieldMapper>();
+		AssetCustomFieldMapper item = new AssetCustomFieldMapper();
 		try {
-			assetCode = generateAssetCode(assetBean);
+			List<CustomeFields> customeFields = assetBean.getAssetHeader().getAssetCategory().getCustomeFields();
+			LOGGER.info("Custom Fields.."+customeFields);
+			if(!customeFields.isEmpty()) {
+				for(int i=0; i<customeFields.size(); i++) {
+					item = new AssetCustomFieldMapper();
+					String name = customeFields.get(i).getName();
+					item.setName(name);
+					String values = request.getParameter("customField_"+i+"_"+name);
+					LOGGER.info(name+"...Value..."+values);
+					item.setVal(values);
+					item.setCreatedDate(new Date());
+					item.setCreatedBy(String.valueOf(userId));
+					item.setAssetCategory(assetBean.getAssetHeader().getAssetCategory());
+					item.setCustomeFields(customeFields.get(i));
+					
+					//assetBean = masterRepo.findOne(Long.valueOf(nextVal));
+					//item.setAssetMaster(assetBean);
+					//customFieldRepo.save(item);
+					mapperList.add(item);
+				}
+				assetBean.setCustomeFields(mapperList);
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		LOGGER.info("Custom Fields Ends...");
+		try {
+			final StringBuilder generatedCode = new StringBuilder(String.format("%06d", nextVal));
+			assetCode = generatedCode.toString();
 			assetBean.setCode(assetCode);
-			assetService.create(assetBean);
+			assetBean = assetService.create(assetBean);
 			LOGGER.info("Created Successfully");
 		    message = getMessageByStatus(assetBean,"create", true);
 		}catch(Exception e) {
@@ -268,16 +317,18 @@ public class CreateAssetController {// extends BaseAssetController{
 		return "asset-success";
 	}
 	
-	public String generateAssetCode(AssetMaster assetBean) {
-		String code = "";
+	public Long generateNextVal() {
+		//String code = "";
+		long id = 0;
 		try {
-			long id = masterRepo.getNextValMySequence();
-			final StringBuilder generatedCode = new StringBuilder(String.format("%06d", id));
-			code = generatedCode.toString();
+			id = masterRepo.getNextValMySequence();
+			//final StringBuilder generatedCode = new StringBuilder(String.format("%06d", id));
+			//code = generatedCode.toString();
+			//code = String.valueOf(id);
 		}catch(Exception e) {
 			LOGGER.error("Error Occured while generating Asset Code");
 		}
-		return code;
+		return id;
 	}
 
 	
@@ -385,7 +436,7 @@ public class CreateAssetController {// extends BaseAssetController{
 		try {
 			//final List<DocumentUpload> documents = documentUploadRepository.findByObjectId(Long.valueOf(assetId));
 			List<DocumentUpload> documents = assetService.findByObjectIdAndObjectType(assetBean.getId(),
-	                FinancialConstants.FILESTORE_MODULEOBJECT_ASSET);
+	                AssetConstant.FILESTORE_MODULEOBJECT_ASSET);
 	        assetBean.setDocumentDetail(documents);
 	        LOGGER.info(assetBean.getDocumentDetail().get(0).getFileName());
 	        LOGGER.info(assetBean.getDocumentDetail().get(0).getFileStore().getFileName());
@@ -393,6 +444,8 @@ public class CreateAssetController {// extends BaseAssetController{
 			e.printStackTrace();
 		}
 		model.addAttribute("assetBean", assetBean);
+		
+		mapperList = assetBean.getCustomeFields();
 		try {
 			/*Fund fund = fundHibernateDAO.fundById(Integer.parseInt(assetBean.getAssetHeader().getFund()), true);
 			fundList.add(fund);
@@ -470,6 +523,8 @@ public class CreateAssetController {// extends BaseAssetController{
 		model.addAttribute("zoneList", zoneList);
 		model.addAttribute("mode", "update");
 		model.addAttribute("disabled", "disabled");
+		model.addAttribute("mapperList", mapperList);
+		
 		return "asset-update";
 	}
 	
@@ -632,7 +687,7 @@ public class CreateAssetController {// extends BaseAssetController{
 	 
 	 private AssetMaster getBillDocuments(final AssetMaster assetBean) {
 	        List<DocumentUpload> documentDetailsList = assetService.findByObjectIdAndObjectType(assetBean.getId(),
-	                FinancialConstants.FILESTORE_MODULEOBJECT_ASSET);
+	                AssetConstant.FILESTORE_MODULEOBJECT_ASSET);
 	        assetBean.setDocumentDetail(documentDetailsList);
 	        return assetBean;
 	    }
@@ -733,4 +788,52 @@ public class CreateAssetController {// extends BaseAssetController{
         }*/
 	   return assetBean;	
 	}
+	 
+	//@GetMapping("/categorydetails/{categoryid}")
+	@RequestMapping(value = "/categorydetails/{categoryid}", method = RequestMethod.POST, produces = MediaType.TEXT_PLAIN_VALUE)
+	@ResponseBody
+	public String categoryDetails(@PathVariable("categoryid") String assetCategoryId, Model model) {
+		LOGGER.info("Category Details.................."+assetCategoryId);
+		AssetCatagory assetCategory = new AssetCatagory();
+		List<CustomeFields> customeFields=new ArrayList<>();
+		
+		try {
+			assetCategory = categoryRepo.findOne(Long.valueOf(assetCategoryId));
+			customeFields = assetCategory.getCustomeFields();
+			LOGGER.info("Custom Fields.."+customeFields);
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		/*ObjectMapper mapper = new ObjectMapper();
+		String response = "";
+		try {
+			response = mapper.writeValueAsString(customeFields);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		LOGGER.info("Mapoper.........."+response);*/
+		//model.addAttribute("customeFields", customeFields);
+		//final List<Bank> searchResultList = createBankService.search(bank);
+		String retVal = "";
+		try {
+			retVal = new StringBuilder("{ \"data\":")
+	                .append(toSearchResultJson(customeFields)).append("}")
+	                .toString();
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		LOGGER.info("Return Value..."+retVal);
+        return retVal;
+		//return customeFields;
+	}
+	
+	 public Object toSearchResultJson(final Object object) {
+	        final GsonBuilder gsonBuilder = new GsonBuilder();
+	        final Gson gson = gsonBuilder.registerTypeAdapter(CustomeFields.class, new AssetJsonAdaptor()).create();
+	        return gson.toJson(object);
+	 }
+	 
+	
 }

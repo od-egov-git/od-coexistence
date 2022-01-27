@@ -201,3 +201,84 @@ function deletedoc(billid,docid){
 			}
 	});
 }
+
+/*function evaluateJson(jsonObj){
+	console.log("Inside evaluateJson..."+jsonObj);
+	var retHtml = "<tr>";
+	//var json = jsonObj.data;
+	//console.log("Inside evaluateJson.."+json);
+    for (var key in json) {
+       if (json.hasOwnProperty(key)) {
+    	  console.log(json[key].id);
+    	  console.log(json[key].name);
+    	  retHtml += generateInputField(json[key].dataType,json[key].name,json[key].mandatory);
+       }
+    }
+    retHtml += "</tr>";
+    console.log("Result..."+retHtml);
+    return retHtml;
+}*/
+function generateCustomField(key, dataType, name, requiredVal){
+	console.log("key.."+key);
+	console.log("name.."+name);
+	console.log("required.."+requiredVal);
+	console.log("dataType.."+dataType);
+	var returnVal = '';
+	var required = '';
+	var mandatory = '';
+	if(requiredVal == 'true'){
+		mandatory = 'mandatory';
+		required = 'required';
+	}
+	console.log("required.."+required+"..mandatory.."+mandatory);
+	switch (dataType) {
+	  case 'Text':
+		returnVal += "<td><label class='col-sm-3 control-label text-right'>";
+		returnVal += "<span class='"+mandatory+"'>"+name+"</span>";
+		returnVal += "</label>";
+		returnVal += "<div class='col-sm-6 add-margin'>";
+		returnVal += "<input type='text' class='form-control' id='customField_"+key+"_"+name+"' name='customField_"+key+"_"+name+"' required='"+required+"'/>";
+		returnVal += "</div></td>";
+		break;
+	  case 'Select':
+		returnVal += "<td><label class='col-sm-3 control-label text-right'>";
+		returnVal += "<spring:message text='"+name+"'/>";
+		returnVal += "<span class='mandatory'></span>";
+		returnVal += "</label>";
+		returnVal += "<div class='col-sm-6 add-margin'>";
+		returnVal += "<input type='number' class='form-control' id='customField_"+key+"_"+name+"' required='"+required+"'/>";
+		returnVal += "</div></td>";
+		break;
+	  case 'Date':
+		returnVal += "<td><label class='col-sm-3 control-label text-right'>";
+		returnVal += "<spring:message text='"+name+"'/>";
+		returnVal += "<span class='mandatory'></span>";
+		returnVal += "</label>";
+		returnVal += "<div class='col-sm-6 add-margin'>";
+		returnVal += "<input class='form-control datepicker' id='customField_"+key+"_"+name+"' data-date-end-date='0d' placeholder='DD/MM/YYYY' required='"+required+"'/>";
+		returnVal += "</div></td>";
+		break;
+	 case 'File':
+		returnVal += "<td><label class='col-sm-3 control-label text-right'>";
+		returnVal += "<spring:message text='"+name+"'/>";
+		returnVal += "<span class='mandatory'></span>";
+		returnVal += "</label>";
+		returnVal += "<div class='col-sm-6 add-margin'>";
+		returnVal += "<input type='file' class='form-control' id='customField_"+key+"_"+name+"' required='"+required+"'/>";
+		returnVal += "</div></td>";
+		break;
+	 case 'Table':
+		returnVal += "<td><label class='col-sm-3 control-label text-right'>";
+		returnVal += "<spring:message text='"+name+"'/>";
+		returnVal += "<span class='mandatory'></span>";
+		returnVal += "</label>";
+		returnVal += "<div class='col-sm-6 add-margin'>";
+		returnVal += "<input type='file' class='form-control' id='customField_"+key+"_"+name+"' required='"+required+"'/>";
+		returnVal += "</div></td>";
+		break;
+	  default:
+		returnVal += "";
+	}
+return returnVal;
+
+}

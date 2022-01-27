@@ -47,7 +47,7 @@
 					</label>
 					<div class="col-sm-6 add-margin">
 						<form:select path="assetHeader.assetCategory" id="assetHeader.assetCategory" required="required" readonly="true" class="form-control">
-							<form:options items="${assetCategoryList}" itemValue="id" itemLabel="description"/>  
+							<form:options items="${assetCategoryList}" itemValue="id" itemLabel="name"/>  
 						</form:select>
 					</div>
 				</td>
@@ -321,6 +321,42 @@
 		<br />
 		<br />
 		
+		<!-- Category Details -->
+		<!-- Result Table -->
+		<div style="padding:5%">
+			<table class="table table-bordered" id="resultHeader">
+			<thead>
+				<tr>
+					<th><spring:message code="lbl-sl-no" text="Sr. No."/></th>
+					<th><spring:message code="name" text="Name"/></th>
+					<th><spring:message code="value" text="Value"/></th>
+				</tr>
+			</thead>
+			<tbody>
+				<c:choose>
+					<c:when test="${mapperList!=null && mapperList.size() > 0}">
+						 <c:forEach items="${mapperList}" var="asset" varStatus="item">
+							<tr id="assetView">
+								<td>
+                                    ${item.index + 1} 
+	                            </td>
+								<td>
+									${asset.name}
+								</td>
+								<td>
+									${asset.val}
+								</td>
+							</tr>
+						</c:forEach> 
+					</c:when>
+					<c:otherwise>
+			            <td colspan="6">No Records Found..</td>
+			         </c:otherwise>
+				</c:choose>
+			</tbody>
+		</table>	
+		</div>
+		<!-- Result Table Ends -->
 		<!-- Asset Status -->
 		<br />
 		<br />
