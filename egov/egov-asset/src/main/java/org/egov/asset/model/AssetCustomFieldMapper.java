@@ -33,15 +33,9 @@ public class AssetCustomFieldMapper implements Serializable{
     @GeneratedValue(generator = SEQ_asset_custom_field_mapper, strategy = GenerationType.SEQUENCE)
 	private Long id;
 
-	/*
-	 * @OneToOne(fetch=FetchType.LAZY, cascade = CascadeType.ALL)
-	 * 
-	 * @JoinColumn(name="asset_master") private AssetMaster assetMaster;
-	 */
-	
 	@OneToOne(fetch=FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name="asset_category")
-	private AssetCatagory assetCategory;
+	private AssetCatagory assetCatagory;
 	
 	@OneToOne(fetch=FetchType.LAZY, optional=false)
     @JoinColumn(name="custom_fields_ref")
@@ -68,25 +62,23 @@ public class AssetCustomFieldMapper implements Serializable{
 	public void setId(Long id) {
 		this.id = id;
 	}
-	
-	public String getName() {
-		return name;
+	public AssetCatagory getAssetCatagory() {
+		return assetCatagory;
 	}
-	public void setName(String name) {
-		this.name = name;
-	}
-	
-	public AssetCatagory getAssetCategory() {
-		return assetCategory;
-	}
-	public void setAssetCategory(AssetCatagory assetCategory) {
-		this.assetCategory = assetCategory;
+	public void setAssetCatagory(AssetCatagory assetCatagory) {
+		this.assetCatagory = assetCatagory;
 	}
 	public CustomeFields getCustomeFields() {
 		return customeFields;
 	}
 	public void setCustomeFields(CustomeFields customeFields) {
 		this.customeFields = customeFields;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
 	}
 	public String getVal() {
 		return val;
@@ -118,7 +110,11 @@ public class AssetCustomFieldMapper implements Serializable{
 	public void setUpdatedBy(String updatedBy) {
 		this.updatedBy = updatedBy;
 	}
-    
-    
-    
+	
+	@Override
+	public String toString() {
+		return "AssetCustomFieldMapper [id=" + id + ", assetCatagory=" + assetCatagory + ", customeFields="
+				+ customeFields + ", name=" + name + ", val=" + val + ", createdDate=" + createdDate + ", updatedDate="
+				+ updatedDate + ", createdBy=" + createdBy + ", updatedBy=" + updatedBy + "]";
+	}
 }

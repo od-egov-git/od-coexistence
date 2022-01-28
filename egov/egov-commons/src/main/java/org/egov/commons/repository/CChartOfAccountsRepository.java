@@ -55,5 +55,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository 
 public interface CChartOfAccountsRepository extends JpaRepository<CChartOfAccounts,java.lang.Long> {
-
+	public CChartOfAccounts findByPurposeIdAndClassification(Long purposeId,Long classification);
 }

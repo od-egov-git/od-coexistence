@@ -142,7 +142,7 @@
 					<div class="col-sm-6 add-margin">
 					 <c:forEach items="${assetBean.documentDetail}" var="document">
 						<c:choose>
-	  						<c:when test="${document != null}">
+	  						<c:when test="${document.id != null && document.id != ''}">
 					       		<a href="/services/EGF/asset/downloadBillDoc?assetId=${assetBean.id}&fileStoreId=${document.fileStore.fileStoreId }">${document.fileStore.fileName }</a>
 	        					
 	        					<span><input type="button" id="remove" style="background: #265988" value="Remove"
@@ -165,6 +165,7 @@
 					</label>
 					<div class="col-sm-6 add-margin">
 						<form:select path="assetHeader.function" id="assetHeader.function" readonly="true" class="form-control">
+							<form:option value=""><spring:message code="lbl.select" /></form:option>
 							<form:options items="${functionList}" itemValue="id" itemLabel="name"/>  
 						</form:select>
 					</div>
@@ -187,6 +188,7 @@
 					</label>
 					<div class="col-sm-6 add-margin">
 						<form:select path="assetHeader.scheme" id="scheme" class="form-control">
+							<form:option value=""><spring:message code="lbl.select" /></form:option>
 							<form:options items="${schemeList}" itemValue="id" itemLabel="name"/>  
 						</form:select>
 					</div>
@@ -199,6 +201,7 @@
 					<div class="col-sm-6 add-margin">
 						<form:select path="assetHeader.subScheme" id="subScheme" 
 						onChange="getSubSchemelist(this)" class="form-control">
+							<form:option value=""><spring:message code="lbl.select" /></form:option>
 							<form:options items="${subSchemeList}" itemValue="id" itemLabel="name"/>  
 						</form:select>
 					</div>
@@ -236,6 +239,7 @@
 					</label>
 					<div class="col-sm-6 add-margin">
 						<form:select path="assetLocation.revenueWard" id="assetLocation.revenueWard" class="form-control">
+							<form:option value=""><spring:message code="lbl.select" /></form:option>
 							<form:options items="${revenueWardList}" itemValue="id" itemLabel="description"/>  
 						</form:select>
 					</div>
@@ -249,6 +253,7 @@
 					</label>
 					<div class="col-sm-6 add-margin">
 						<form:select path="assetLocation.block" id="assetLocation.block" class="form-control">
+							<form:option value=""><spring:message code="lbl.select" /></form:option>
 							<form:options items="${blockList}" itemValue="id" itemLabel="description"/>  
 						</form:select>
 					</div>
@@ -259,6 +264,7 @@
 					</label>
 					<div class="col-sm-6 add-margin">
 						<form:select path="assetLocation.street" id="assetLocation.street" class="form-control">
+							<form:option value=""><spring:message code="lbl.select" /></form:option>
 							<form:options items="${streetList}" itemValue="id" itemLabel="description"/>  
 						</form:select>
 					</div>
@@ -272,6 +278,7 @@
 					</label>
 					<div class="col-sm-6 add-margin">
 						<form:select path="assetLocation.ward" id="assetLocation.ward" class="form-control">
+							<form:option value=""><spring:message code="lbl.select" /></form:option>
 							<form:options items="${electionWardList}" itemValue="id" itemLabel="description"/>  
 						</form:select>
 					</div>
@@ -293,6 +300,7 @@
 					</label>
 					<div class="col-sm-6 add-margin">
 						<form:select path="assetLocation.zone" id="assetLocation.zone" class="form-control">
+							<form:option value=""><spring:message code="lbl.select" /></form:option>
 							<form:options items="${zoneList}" itemValue="id" itemLabel="description"/>  
 						</form:select>
 					</div>
@@ -333,26 +341,32 @@
 				</tr>
 			</thead>
 			<tbody>
-				<c:choose>
-					<c:when test="${mapperList!=null && mapperList.size() > 0}">
-						 <c:forEach items="${mapperList}" var="asset" varStatus="item">
-							<tr id="assetView">
+				<%-- <c:choose> --%>
+					<%-- <c:when test="${mapperList!=null && mapperList.size() > 0}"> --%>
+					<%-- <c:when test="${customeFields !=null && customeFields.size() > 0}"> --%>
+						 <c:forEach items="${assetBean.assetCustomFieldMappers}" var="assetCustomFieldMappers" varStatus="item">
+							<tr id="assetView_${item.index}">
 								<td>
                                     ${item.index + 1} 
 	                            </td>
 								<td>
-									${asset.name}
+									${assetCustomFieldMappers.name}
+									<%-- ${assetCustomFieldMappers.name}  --%>
+									<%-- ${asset.name} --%>
 								</td>
 								<td>
-									${asset.val}
+									<%-- ${assetCustomFieldMappers.val} --%>
+									<input type="text" id="customField_${item.index}_${asset.name}" 
+										name="customField_${item.index}_${asset.name}" value="${assetCustomFieldMappers.val}"/>
+									<%-- <form:input path="val" class="form-control text-left"/> --%>
 								</td>
 							</tr>
 						</c:forEach> 
-					</c:when>
+					<%-- </c:when>
 					<c:otherwise>
 			            <td colspan="6">No Records Found..</td>
-			         </c:otherwise>
-				</c:choose>
+			         </c:otherwise> --%>
+				<%-- </c:choose> --%>
 			</tbody>
 		</table>	
 		</div>
@@ -377,7 +391,8 @@
 							    <span class="mandatory"></span>
 							</label>
 							<div class="col-sm-6 add-margin">
-								<form:select path="assetStatus" id="assetStatus"  required="required"  class="form-control">
+								<form:select path="assetStatus" id="assetStatus"  required="required"  class="form-control"
+									onchange="loadValues();">
 									<form:options items="${assetStatusList}" itemValue="id" itemLabel="description"/>  
 								</form:select>
 							</div>
@@ -385,6 +400,132 @@
 					</tr>
 				</table>
 			</div>
+			
+			<!-- Value Section -->
+			<br />
+			<br />
+			<div class="formmainbox" id="valueSection" style="display:none;">
+				<table border="0" width="100%">
+					<tr id="capitalized" style="display:none;">
+						<td>
+							<label class="col-sm-3 control-label text-right">
+								<spring:message code="gross-value" text="grossValue"/>
+								
+							</label>
+							<div class="col-sm-6 add-margin">
+								<form:input class="form-control" path="grossValue" />
+							</div>
+						</td>
+						<td>
+							<label class="col-sm-3 control-label text-right">
+								<spring:message code="market-value" text="marketValue"/>
+								
+							</label>
+							<div class="col-sm-6 add-margin">
+								<form:input class="form-control" path="marketValue" />
+							</div>
+						</td>
+					</tr>
+					<tr id="capitalized2" style="display:none;">
+						<td>
+							<label class="col-sm-3 control-label text-right">
+								<spring:message code="accumulated-depreciation" text="accumulatedDepreciation"/>
+								
+							</label>
+							<div class="col-sm-6 add-margin">
+								<form:input class="form-control" path="accumulatedDepreciation" />
+							</div>
+						</td>
+						<td>
+							<label class="col-sm-3 control-label text-right">
+								<spring:message code="survey-number" text="surveyNumber"/>
+								
+							</label>
+							<div class="col-sm-6 add-margin">
+								<form:input class="form-control" path="surveyNumber" />
+							</div>
+						</td>
+					</tr>
+					<tr id="acqPurchase" style="display:none;">
+							<td>
+								<label class="col-sm-3 control-label text-right">
+									<spring:message code="purchase-value" text="purchaseValue"/>
+									
+								</label>
+								<div class="col-sm-6 add-margin">
+									<form:input class="form-control" path="purchaseValue" />
+								</div>
+							</td>
+							<td>
+								<label class="col-sm-3 control-label text-right">
+									<spring:message code="purchase-date" text="purchaseDate"/>
+									
+								</label>
+								<div class="col-sm-6 add-margin">
+									<form:input class="form-control datepicker" path="purchaseDate"  data-date-end-date="0d" placeholder="DD/MM/YYYY"/>
+									<form:errors path="purchaseDate" cssClass="add-margin error-msg" />
+								</div>
+							</td>
+						</tr>
+						<tr id="acqDonation" style="display:none;">
+							<td>
+								<label class="col-sm-3 control-label text-right">
+									<spring:message code="donation-date" text="donationDate"/>
+									
+								</label>
+								<div class="col-sm-6 add-margin">
+									<form:input class="form-control datepicker" path="donationDate"  data-date-end-date="0d" placeholder="DD/MM/YYYY"/>
+									<form:errors path="donationDate" cssClass="add-margin error-msg" />
+								</div>
+							</td>
+							<td>
+							</td>
+						</tr>
+						<tr id="acqConstruction" style="display:none;">
+							<td>
+								<label class="col-sm-3 control-label text-right">
+									<spring:message code="construction-value" text="constructionValue"/>
+									
+								</label>
+								<div class="col-sm-6 add-margin">
+									<form:input class="form-control" path="constructionValue" />
+								</div>
+							</td>
+							<td>
+								<label class="col-sm-3 control-label text-right">
+									<spring:message code="construction-date" text="constructionDate"/>
+									
+								</label>
+								<div class="col-sm-6 add-margin">
+									<form:input class="form-control datepicker" path="constructionDate" 
+										 data-date-end-date="0d" placeholder="DD/MM/YYYY"/>
+									<form:errors path="constructionDate" cssClass="add-margin error-msg" />
+								</div>
+							</td>
+						</tr>
+						<tr id="acqAcquired" style="display:none;">
+							<td>
+								<label class="col-sm-3 control-label text-right">
+									<spring:message code="acquisition-value" text="acquisitionValue"/>
+									
+								</label>
+								<div class="col-sm-6 add-margin">
+									<form:input class="form-control" path="acquisitionValue" />
+								</div>
+							</td>
+							<td>
+								<label class="col-sm-3 control-label text-right">
+									<spring:message code="acquisition-date" text="acquisitionDate"/>
+									
+								</label>
+								<div class="col-sm-6 add-margin">
+									<form:input class="form-control datepicker" path="acquisitionDate"  data-date-end-date="0d" placeholder="DD/MM/YYYY"/>
+									<form:errors path="acquisitionDate" cssClass="add-margin error-msg" />
+								</div>
+							</td>
+						</tr>
+				</table>
+			</div> 
 		</div>
 		
 		<div align="center" class="buttonbottom">
@@ -395,7 +536,9 @@
 				<input type="button" name="button2" id="button2" value="Close" class="btn btn-default" onclick="window.parent.postMessage('close','*');window.close();"/>
 			</div>
 		</div>
-		
+		<input type="hidden" id="statusCode" name="statusCode" value="${assetBean.assetStatus.id}"/>
+		<input type="hidden" id="mode" name="mode" value="${assetBean.assetHeader.modeOfAcquisition.id}"/>
+		<form:hidden path="code" id="assetCodde" value="${assetBean.code}" />
 		<form:hidden path="id" id="assetId" value="${assetBean.id}" />
 		<form:hidden path="assetHeader.id" id="assetHeaderId" value="${assetBean.assetHeader.id}" />
 		<form:hidden path="assetLocation.id" id="assetLocationId" value="${assetBean.assetLocation.id}" />
@@ -419,3 +562,15 @@
 <script src="<cdn:url value='/resources/app/js/common/assetHelper.js?rnd=${app_release_no}' context='/services/EGF'/>"></script> --%>
 <script src="<cdn:url value='/resources/app/js/common/assetHelper.js?rnd=${app_release_no}' context='/services/EGF'/>"></script>
 <script src="<cdn:url value='/resources/app/js/expensebill/documents-upload.js?rnd=${app_release_no}' context='/services/EGF'/>"></script>
+
+
+<script>
+$(document).ready(function(){
+	var statusCode = $('#statusCode').val();
+	var mode = $('#mode').val();
+	console.log($('#statusCode').val());
+	console.log($('#mode').val());
+	fetchdetails(statusCode,mode);
+});
+
+</script>

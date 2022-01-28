@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository;
 public interface AssetMasterRepository extends JpaRepository<AssetMaster, Long> {
 
 	@Query(value = "From AssetMaster am where am.code=:code or am.assetHeader.assetName=:name or am.assetHeader.assetCategory.id=:category or am.assetHeader.department=:department  or am.assetStatus.id=:status")
-	public List<AssetMaster> getAssetMasterDetails(@Param("code") String code, @Param("name") String name, @Param("category") Long category, @Param("department") String department, @Param("status") String status);
+	public List<AssetMaster> getAssetMasterDetails(@Param("code") String code, @Param("name") String name, @Param("category") Long category, @Param("department") String department, @Param("status") Long status);
 	
 	@Query(value = "SELECT nextval('SEQ_asset_master')", nativeQuery =true)
 	public Long getNextValMySequence();

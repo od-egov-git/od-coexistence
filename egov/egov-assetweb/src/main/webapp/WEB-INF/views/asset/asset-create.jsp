@@ -11,7 +11,8 @@
 <br />
 
 <!-- <div class="form-group"> -->
-<form:form name="assetBean" method="post" action="create" modelAttribute="assetBean" class="form-horizontal form-groups-bordered" enctype="multipart/form-data">
+<form:form name="assetBean" method="post" action="create" modelAttribute="assetBean" 
+	class="form-horizontal form-groups-bordered" enctype="multipart/form-data">
 		<!-- Header Details -->
 		<br />
 		<br />
@@ -107,7 +108,8 @@
 						</label>
 						<div class="col-sm-6 add-margin" style="display:inline-flex">
 							<form:input class="form-control" id="assetReference" path="assetHeader.assetReference"/>
-							<input class="form-control" type="button" id="assetRef" onclick="viewPop('${id}')"/> 
+							<input class="form-control search" type="button" id="assetRef" style="width: 25px;margin-left: 10px;" 
+								onclick="viewPop('${id}')"><i class="bi bi-search"></i></input> 
 						</div>
 						<%-- <div class="col-sm-1">
 							<input class="form-control" type="button" id="assetRef" onclick="viewPop('${id}')"/> 
@@ -360,25 +362,25 @@
 			<!-- Value Section -->
 			<br />
 			<br />
-			<%-- <div id="valueSection" style="display:none;">
-				<table width="100%">
+			<div class="formmainbox" id="valueSection" style="display:none;">
+				<table border="0" width="100%">
 					<tr id="capitalized" style="display:none;">
 						<td>
 							<label class="col-sm-3 control-label text-right">
 								<spring:message code="gross-value" text="grossValue"/>
-								<span class="mandatory"></span>
+								
 							</label>
 							<div class="col-sm-6 add-margin">
-								<form:input class="form-control" path="grossValue" required="required"/>
+								<form:input class="form-control" path="grossValue" />
 							</div>
 						</td>
 						<td>
 							<label class="col-sm-3 control-label text-right">
 								<spring:message code="market-value" text="marketValue"/>
-								<span class="mandatory"></span>
+								
 							</label>
 							<div class="col-sm-6 add-margin">
-								<form:input class="form-control" path="marketValue" required="required"/>
+								<form:input class="form-control" path="marketValue" />
 							</div>
 						</td>
 					</tr>
@@ -386,19 +388,19 @@
 						<td>
 							<label class="col-sm-3 control-label text-right">
 								<spring:message code="accumulated-depreciation" text="accumulatedDepreciation"/>
-								<span class="mandatory"></span>
+								
 							</label>
 							<div class="col-sm-6 add-margin">
-								<form:input class="form-control" path="accumulatedDepreciation" required="required"/>
+								<form:input class="form-control" path="accumulatedDepreciation" />
 							</div>
 						</td>
 						<td>
 							<label class="col-sm-3 control-label text-right">
 								<spring:message code="survey-number" text="surveyNumber"/>
-								<span class="mandatory"></span>
+								
 							</label>
 							<div class="col-sm-6 add-margin">
-								<form:input class="form-control" path="surveyNumber" required="required"/>
+								<form:input class="form-control" path="surveyNumber" />
 							</div>
 						</td>
 					</tr>
@@ -406,19 +408,19 @@
 							<td>
 								<label class="col-sm-3 control-label text-right">
 									<spring:message code="purchase-value" text="purchaseValue"/>
-									<span class="mandatory"></span>
+									
 								</label>
 								<div class="col-sm-6 add-margin">
-									<form:input class="form-control" path="purchaseValue" required="required"/>
+									<form:input class="form-control" path="purchaseValue" />
 								</div>
 							</td>
 							<td>
 								<label class="col-sm-3 control-label text-right">
 									<spring:message code="purchase-date" text="purchaseDate"/>
-									<span class="mandatory"></span>
+									
 								</label>
 								<div class="col-sm-6 add-margin">
-									<form:input class="form-control datepicker" path="purchaseDate" required="required" data-date-end-date="0d" placeholder="DD/MM/YYYY"/>
+									<form:input class="form-control datepicker" path="purchaseDate"  data-date-end-date="0d" placeholder="DD/MM/YYYY"/>
 									<form:errors path="purchaseDate" cssClass="add-margin error-msg" />
 								</div>
 							</td>
@@ -427,10 +429,10 @@
 							<td>
 								<label class="col-sm-3 control-label text-right">
 									<spring:message code="donation-date" text="donationDate"/>
-									<span class="mandatory"></span>
+									
 								</label>
 								<div class="col-sm-6 add-margin">
-									<form:input class="form-control datepicker" path="donationDate" required="required" data-date-end-date="0d" placeholder="DD/MM/YYYY"/>
+									<form:input class="form-control datepicker" path="donationDate"  data-date-end-date="0d" placeholder="DD/MM/YYYY"/>
 									<form:errors path="donationDate" cssClass="add-margin error-msg" />
 								</div>
 							</td>
@@ -441,19 +443,20 @@
 							<td>
 								<label class="col-sm-3 control-label text-right">
 									<spring:message code="construction-value" text="constructionValue"/>
-									<span class="mandatory"></span>
+									
 								</label>
 								<div class="col-sm-6 add-margin">
-									<form:input class="form-control" path="constructionValue" required="required"/>
+									<form:input class="form-control" path="constructionValue" />
 								</div>
 							</td>
 							<td>
 								<label class="col-sm-3 control-label text-right">
 									<spring:message code="construction-date" text="constructionDate"/>
-									<span class="mandatory"></span>
+									
 								</label>
 								<div class="col-sm-6 add-margin">
-									<form:input class="form-control datepicker" path="constructionDate" required="required" data-date-end-date="0d" placeholder="DD/MM/YYYY"/>
+									<form:input class="form-control datepicker" path="constructionDate" 
+										 data-date-end-date="0d" placeholder="DD/MM/YYYY"/>
 									<form:errors path="constructionDate" cssClass="add-margin error-msg" />
 								</div>
 							</td>
@@ -462,25 +465,25 @@
 							<td>
 								<label class="col-sm-3 control-label text-right">
 									<spring:message code="acquisition-value" text="acquisitionValue"/>
-									<span class="mandatory"></span>
+									
 								</label>
 								<div class="col-sm-6 add-margin">
-									<form:input class="form-control" path="acquisitionValue" required="required"/>
+									<form:input class="form-control" path="acquisitionValue" />
 								</div>
 							</td>
 							<td>
 								<label class="col-sm-3 control-label text-right">
 									<spring:message code="acquisition-date" text="acquisitionDate"/>
-									<span class="mandatory"></span>
+									
 								</label>
 								<div class="col-sm-6 add-margin">
-									<form:input class="form-control datepicker" path="acquisitionDate" required="required" data-date-end-date="0d" placeholder="DD/MM/YYYY"/>
+									<form:input class="form-control datepicker" path="acquisitionDate"  data-date-end-date="0d" placeholder="DD/MM/YYYY"/>
 									<form:errors path="acquisitionDate" cssClass="add-margin error-msg" />
 								</div>
 							</td>
 						</tr>
 				</table>
-			</div> --%>
+			</div> 
 			
 		</div>
 		<div align="center" class="buttonbottom">
@@ -526,48 +529,10 @@ function viewPop(id){
 	console.log(id);
 	/* var url1 = '/services/EGF/report/budgetVarianceReport-loadData.action?asOnDate='+date+'&dept='+dept+'&funds='+fund+'&func='+func+'&accCode='+accCode+'&vtype=pr';
 	window.open(url1,'Source','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700') */
-	var x = window.open('/services/EGF/asset/viewform/ref','popup','width=800,height=600');
+	var x = window.open('/services/EGF/asset/viewform/ref','popup','width=850,height=600');
 	console.log("Return Obj..:"+x.value); 
 	console.log("Return Obj..:"+Object.values(x)); 
 	//$('#assetReference').val(x);
-}
-
-function loadValues(){//obj
-	//console.log(obj.value);
-	var assetStatusCode = $('#assetStatus').val();//obj.value;
-	var flag = false;
-	//default set
-	$("#valueSection").css("display", "none");
-	$("#capitalized").css("display", "none");
-	$("#capitalized2").css("display", "none");
-	$("#acqPurchase").css("display", "none");
-	$("#acqDonation").css("display", "none");
-	$("#acqConstruction").css("display", "none");
-	$("#acqAcquired").css("display", "none");
-	
-	/*if(assetStatusCode == 'CREATED' || assetStatusCode == 'CAPITALIZED'){
-		$("#valueSection").css("display", "block");
-		flag = true;
-	}
-	if(assetStatusCode == 'CAPITALIZED'){
-		$("#capitalized").css("display", "block");
-		$("#capitalized2").css("display", "block");
-	}
-	var modeOfAcq = $('#modeOfAcquisition').val();
-	console.log(modeOfAcq);
-	if(flag){
-		if(modeOfAcq == 'PURCHASE'){
-			$("#acqPurchase").css("display", "block");
-		}else if(modeOfAcq == 'DONATION'){
-			$("#acqDonation").css("display", "block");
-		}else if(modeOfAcq == 'CONSTRUCTION'){
-			$("#acqConstruction").css("display", "block");
-		}else if(modeOfAcq == 'ACQUIRED'){
-			$("#acqAcquired").css("display", "block");
-		}else{
-			console.log("select modeOfAcq");
-		}
-	}*/
 }
 
 function showCategoryDetails(obj){
@@ -578,8 +543,6 @@ function showCategoryDetails(obj){
 	}else{
 		id = obj.value;
 		fetchCustomFieldData(id);
-		//var ret = generateInputField('text','testValue','required');
-		//$('#categoryDetails tbody').html(ret);
 		$("#categoryDetails").css("display", "block");
 	}
 }

@@ -7,7 +7,7 @@
 
 
 <div class="formmainbox">
-	<form:form name="assetBean" method="post" action="search" modelAttribute="assetBean" 
+	<form:form name="assetBean" method="post" action="${contextPath}/asset/search" modelAttribute="assetBean" 
 		class="form-horizontal form-groups-bordered" enctype="multipart/form-data">
 
 		<br />

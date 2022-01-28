@@ -65,7 +65,7 @@ public class AssetMaster implements Serializable{
 	@OneToMany(targetEntity=AssetCustomFieldMapper.class,cascade = CascadeType.PERSIST)
 	@JoinColumn(name="asset_master_ref",referencedColumnName="id")
 	//@Column(name="asset_master_ref")
-    private List<AssetCustomFieldMapper> customeFields = new ArrayList<AssetCustomFieldMapper>();
+    private List<AssetCustomFieldMapper> assetCustomFieldMappers = new ArrayList<AssetCustomFieldMapper>();
 	
 	 //Common Entries
     @Column(name="created_date")
@@ -100,40 +100,53 @@ public class AssetMaster implements Serializable{
     private Date acquisitionDate;
     @Column(name="donation_date")
     private Date donationDate;
-	
 	public Long getId() {
 		return id;
 	}
 	public void setId(Long id) {
 		this.id = id;
 	}
-			
+	public String getCode() {
+		return code;
+	}
+	public void setCode(String code) {
+		this.code = code;
+	}
 	public AssetHeader getAssetHeader() {
 		return assetHeader;
 	}
 	public void setAssetHeader(AssetHeader assetHeader) {
 		this.assetHeader = assetHeader;
 	}
-	
 	public AssetLocation getAssetLocation() {
 		return assetLocation;
 	}
 	public void setAssetLocation(AssetLocation assetLocation) {
 		this.assetLocation = assetLocation;
 	}
-	
 	public AssetStatus getAssetStatus() {
 		return assetStatus;
 	}
 	public void setAssetStatus(AssetStatus assetStatus) {
 		this.assetStatus = assetStatus;
 	}
-	
-	public String getCode() {
-		return code;
+	public List<DocumentUpload> getDocumentDetail() {
+		return documentDetail;
 	}
-	public void setCode(String code) {
-		this.code = code;
+	public void setDocumentDetail(List<DocumentUpload> documentDetail) {
+		this.documentDetail = documentDetail;
+	}
+	public String getFileno() {
+		return fileno;
+	}
+	public void setFileno(String fileno) {
+		this.fileno = fileno;
+	}
+	public List<AssetCustomFieldMapper> getAssetCustomFieldMappers() {
+		return assetCustomFieldMappers;
+	}
+	public void setAssetCustomFieldMappers(List<AssetCustomFieldMapper> assetCustomFieldMappers) {
+		this.assetCustomFieldMappers = assetCustomFieldMappers;
 	}
 	public Date getCreatedDate() {
 		return createdDate;
@@ -158,18 +171,6 @@ public class AssetMaster implements Serializable{
 	}
 	public void setUpdatedBy(String updatedBy) {
 		this.updatedBy = updatedBy;
-	}
-	public List<DocumentUpload> getDocumentDetail() {
-		return documentDetail;
-	}
-	public void setDocumentDetail(List<DocumentUpload> documentDetail) {
-		this.documentDetail = documentDetail;
-	}
-	public String getFileno() {
-		return fileno;
-	}
-	public void setFileno(String fileno) {
-		this.fileno = fileno;
 	}
 	public Long getGrossValue() {
 		return grossValue;
@@ -238,21 +239,18 @@ public class AssetMaster implements Serializable{
 		this.donationDate = donationDate;
 	}
 	
-	public List<AssetCustomFieldMapper> getCustomeFields() {
-		return customeFields;
-	}
-	public void setCustomeFields(List<AssetCustomFieldMapper> customeFields) {
-		this.customeFields = customeFields;
-	}
 	@Override
 	public String toString() {
 		return "AssetMaster [id=" + id + ", code=" + code + ", assetHeader=" + assetHeader + ", assetLocation="
-				+ assetLocation + ", assetStatus=" + assetStatus + ", createdDate=" + createdDate + ", updatedDate="
-				+ updatedDate + ", createdBy=" + createdBy + ", updatedBy=" + updatedBy + ", grossValue=" + grossValue
-				+ ", marketValue=" + marketValue + ", surveyNumber=" + surveyNumber + ", accumulatedDepreciation="
-				+ accumulatedDepreciation + ", purchaseValue=" + purchaseValue + ", purchaseDate=" + purchaseDate
-				+ ", constructionValue=" + constructionValue + ", constructionDate=" + constructionDate
-				+ ", acquisitionValue=" + acquisitionValue + ", acquisitionDate=" + acquisitionDate + ", donationDate="
-				+ donationDate + "]";
+				+ assetLocation + ", assetStatus=" + assetStatus + ", documentDetail=" + documentDetail + ", fileno="
+				+ fileno + ", assetCustomFieldMappers=" + assetCustomFieldMappers + ", createdDate=" + createdDate
+				+ ", updatedDate=" + updatedDate + ", createdBy=" + createdBy + ", updatedBy=" + updatedBy
+				+ ", grossValue=" + grossValue + ", marketValue=" + marketValue + ", surveyNumber=" + surveyNumber
+				+ ", accumulatedDepreciation=" + accumulatedDepreciation + ", purchaseValue=" + purchaseValue
+				+ ", purchaseDate=" + purchaseDate + ", constructionValue=" + constructionValue + ", constructionDate="
+				+ constructionDate + ", acquisitionValue=" + acquisitionValue + ", acquisitionDate=" + acquisitionDate
+				+ ", donationDate=" + donationDate + "]";
 	}
+	
+	
 }
