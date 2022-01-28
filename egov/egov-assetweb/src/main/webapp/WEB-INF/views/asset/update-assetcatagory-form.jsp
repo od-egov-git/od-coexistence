@@ -68,7 +68,7 @@
 			<div class="alert alert-danger" role="alert">${errorMessage}</div>
 		</c:if>
 			<div class="panel-title">
-				<spring:message code="lbl.asset.catagory" text="Asset Catagory" />
+				<spring:message code="lbl.asset.catagory" text="Asset Category" />
 			</div>
 	</div>
 
@@ -95,10 +95,6 @@
 			<spring:message code="lbl.asset.account.code" text="Asset Account Code" /> 
 		</label>
 		<div class="col-sm-3 add-margin">
-			<%-- <form:select path="assetAccountCode" class="form-control"> 
-			<form:option value="">-select value-</form:option>
-			<form:options items="${assetAccountCode}" itemLabel="description" itemValue="id"/>
-			</form:select> --%>
 		<input type="text" id="assetaccountcode" name="code" class="form-control table-input creditDetailGlcode assetaccountcode"  data-errormsg="Account Code is mandatory!" data-idx="0" data-optional="0"   placeholder="Type any letters of Account code" />
 		<form:hidden path="assetAccountCode.id" value="" name=""  class="form-control table-input hidden-input assetaccountcodeid"/>
 		<form:hidden path="assetAccountCode.glcode" id="assetaccountcodeglcode" value="" name=""  class="form-control table-input hidden-input assetaccountcodeglcode"/>
@@ -109,10 +105,6 @@
 			<spring:message code="lbl.revolution.reserve.account.code" text="Revolution Reserve Account Code" /> 
 		</label>
 		<div class="col-sm-3 add-margin">
-			<%-- <form:select path="revolutionReserveAccountCode" class="form-control"> 
-			<form:option value="">-select value-</form:option>
-			<form:options items="${revolutionReserveAccountCode}" itemLabel="description" itemValue="id"/>
-			</form:select> --%>
 		<input type="text" id="revalutionreserveaccountcode" name="code" class="form-control table-input creditDetailGlcode revalutionreserveaccountcode"  data-errormsg="Account Code is mandatory!" data-idx="0" data-optional="0"   placeholder="Type any letters of Account code" />
 		<form:hidden path="revolutionReserveAccountCode.id" value="" name=""  class="form-control table-input hidden-input revalutionreserveaccountcodeid"/>
 		<form:hidden path="revolutionReserveAccountCode.glcode" id="revalutionreserveaccountcodeglcode" value="" name=""  class="form-control table-input hidden-input revalutionreserveaccountcodeglcode"/>
@@ -158,11 +150,6 @@
 			<spring:message code="lbl.accumulated.depriciation.code" text="Accumulated Depriciation Code" />
 		</label>
 		<div class="col-sm-3 add-margin">
-			<%-- <form:select path="accumulatedDepriciationCode" class="form-control"> 
-				<form:option value="">-select value-</form:option>
-				<form:options items="${accumulatedDepriciationCode}" itemLabel="description" itemValue="id"/>
-			</form:select>
-			<form:errors path="" cssClass="add-margin error-msg" /> --%>
 		<input type="text" id="accumulateddepriciationcode" name="code" class="form-control table-input creditDetailGlcode accumulateddepriciationcode"  data-errormsg="Account Code is mandatory!" data-idx="0" data-optional="0"   placeholder="Type any letters of Account code" />
 		<form:hidden path="accumulatedDepriciationCode.id" value="" name=""  class="form-control table-input hidden-input accumulateddepriciationcodeid"/>
 		<form:hidden path="accumulatedDepriciationCode.glcode" id="accumulateddepriciationcodeglcode" value="" name=""  class="form-control table-input hidden-input accumulateddepriciationcodeglcode"/>
@@ -173,11 +160,6 @@
 			<spring:message code="lbl.depriciation.expense.account" text="Depriciation Expense Account" />
 		</label>
 		<div class="col-sm-3 add-margin">
-			<%-- <form:select path="depriciationExpenseAccount" class="form-control"> 
-				<form:option value="">-select value-</form:option>
-				<form:options items="${depriciationExpenseAccount}" itemLabel="description" itemValue="id"/>
-			</form:select>
-			<form:errors path="" cssClass="add-margin error-msg" /> --%>
 		<input type="text" id="depriciationexpenseaccount" name="code" class="form-control table-input creditDetailGlcode depriciationexpenseaccount"  data-errormsg="Account Code is mandatory!" data-idx="0" data-optional="0"   placeholder="Type any letters of Account code" />
 		<form:hidden path="depriciationExpenseAccount.id" value="" name=""  class="form-control table-input hidden-input depriciationexpenseaccountid"/>
 		<form:hidden path="depriciationExpenseAccount.glcode" id="depriciationexpenseaccountglcode" value="" name=""  class="form-control table-input hidden-input depriciationexpenseaccountglcode"/>
@@ -206,7 +188,7 @@
 	<div class="panel panel-primary" data-collapsed="0">	
 	<div class="panel-heading">
 	<div class="panel-title">
-		<spring:message code="lbl.asset.catagory.custome.feilds" text="Custome Feilds"/>
+		<spring:message code="lbl.asset.catagory.custome.feilds" text="Custom Feilds"/>
 	</div>
 	</div>
 	
@@ -217,7 +199,7 @@
 			<tr>
 				<th><spring:message code="lbl.asset.custome.sino" text="SI No."/></th>
 				<th><spring:message code="lbl.asset.custome.name" text="Name"/></th>
-				<th><spring:message code="lbl.asset.custome.sino" text="Data Type"/></th>
+				<th><spring:message code="lbl.asset.custome.datatype" text="Data Type"/></th>
 				<th><spring:message code="lbl.asset.custome.active" text="Active"/></th>
 				<th><spring:message code="lbl.asset.custome.mandatory" text="Mandatory"/></th>
 				<th><spring:message code="lbl.asset.custome.values" text="Values"/></th>
@@ -229,14 +211,14 @@
 		<c:if test="${not empty assetCatagory.customeFields}">
 		<c:forEach items="${assetCatagory.customeFields}" var="customeField" varStatus="tagStatus">
 			<tr id="debitdetailsrow">
+				<td>${tagStatus.index+1}</td>
 				<td>${customeField.name}</td>
-				<td>${customeField.name}</td>
-				<td>${customeField.name}</td>
+				<td>${customeField.dataType}</td>
 				<td>${customeField.active}</td> 
-				<td>${customeField.name}</td>
+				<td>${customeField.mandatory}</td>
 				<td>${customeField.vlaues}</td>
 				<td>${customeField.orders}</td>
-				<td>${customeField.name}</td>
+				<td>${customeField.columns}</td>
 			</tr>
 		</c:forEach>
 		</c:if>
@@ -293,6 +275,14 @@
 			<form:input class="form-control patternvalidation" data-pattern="alphanumerichyphenbackslash"  path="customeField.orders" maxlength="50" />
 			<form:errors path="" cssClass="add-margin error-msg" />
 		</div>
+		<c:if test="${assetCatagory.customeField.dataType == 'Table'}">
+		<label class="col-sm-3 control-label text-right">
+			<spring:message code="lbl.bill.custom.order" text="No. of Columns"/>
+		</label>
+		<div class="col-sm-3 add-margin">
+			<form:input class="form-control patternvalidation" data-pattern="alphanumerichyphenbackslash"  path="customeField.columns" maxlength="50" />
+		</div>
+		</c:if>
 		<label class="col-sm-3 control-label text-right">
 			<spring:message code="lbl.bill.custom.value" text="Value"/>
 		</label>

@@ -56,7 +56,7 @@
 <script src="<cdn:url value='/resources/app/js/common/helper.js?rnd=${app_release_no}' context='/services/EGF'/>"></script>
 <script src="<cdn:url value='/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}' context='/services/egi'/>"></script>
 <script src="<cdn:url value='/resources/app/js/assetcategory.js?rnd=${app_release_no}' context='/services/asset'/>"></script>
-<c:set var="contextPath" value="${pageContext.request.contextPath}"/>
+
 <style>
 /* .sale-form-popup {
   display: none;
@@ -67,7 +67,7 @@
 </style>
 
 <div class="container">
-<form:form action="${contextPath}/sale/createDisposal" modelAttribute="disposal" method="POST" enctype="multipart/form-data">
+<form:form action="createDisposal" modelAttribute="disposal" method="POST" enctype="multipart/form-data">
 <div class="panel panel-primary" data-collapsed="0">
 	<div class="panel-heading">
 		<c:if test="${not empty successMsg}">
@@ -109,7 +109,7 @@
 			<form:input path="asset.assetHeader.assetCategory.name" value="${asset.assetHeader.assetCategory.name}" readonly="true"/>
 		</div>
 		
-		<form:hidden path="asset.id"/>
+	
 		</div>
 		
 		</div>
@@ -138,75 +138,83 @@
 			</form:select>
 		</div>
 		</div>
-		<div class="disposal-form-popup" style="display: none;" id="disposal">
+		<c:if test="${disposal.transactionType == 'Disposal'}">
+		<div class="disposal-form-popup" id="disposal">
 		<label class="col-sm-3 control-label text-right"><spring:message code="lbl.disposal.date" text="Disposal date" /> 
 		</label>
 		<div class="col-sm-3 add-margin">
-			<form:input path="disposalDate" class="form-control datepicker" data-date-end-date="0d" placeholder="DD/MM/YYYY"/>
+			<form:input path="disposalDate" class="form-control datepicker" readonly="true" data-date-end-date="0d" placeholder="DD/MM/YYYY"/>
 		</div>
 		
 		<label class="col-sm-3 control-label text-right"><spring:message code="lbl.disposal.reason" text="Disposal reason" /> 
 		</label>
 		<div class="col-sm-3 add-margin">
-			<form:textarea path="disposalReason" class="form-control" />
+			<form:textarea path="disposalReason" class="form-control" readonly="true" />
 		</div>
 		<label class="col-sm-3 control-label text-right"><spring:message code="lbl.disposal.assetcurrentvalue" text="Current Value Of The Asset" /> 
 		</label>
 		<div class="col-sm-3 add-margin">
-			<form:input class="form-control" path="assetCurrentValue"/>
+			<form:input class="form-control" path="assetCurrentValue" readonly="true"/>
 		</div>
 		
 		<label class="col-sm-3 control-label text-right"><spring:message code="lbl.disposal.accountcode" text="Asset Disposal Account Code" /> 
 		</label>
 		<div class="col-sm-3 add-margin">
-			<form:select path="assetSaleAccount" class="form-control"> 
+			<form:select path="assetSaleAccount" class="form-control" readonly="true" > 
 			<form:option value="">-select value-</form:option>
 			<form:options items="${assetAccounts}" itemLabel="name" itemValue="id"/>
 			</form:select>
 		</div>
+		<label class="col-sm-3 control-label text-right"><spring:message code="lbl.sale.voucherreferencenumber" text="Voucher Reference number" /> 
+		</label>
+		<div class="col-sm-3 add-margin">
+			<form:input class="form-control" id="profitLossVoucherReference" path="profitLossVoucherReference" readonly="true"/>
+	
 		</div>
-		
-		<div class="sale-form-popup" style="display: none;" id="sale">
+		</div>
+		</c:if>
+		<c:if test="${disposal.transactionType == 'Sale'}">
+		<div class="sale-form-popup" id="sale">
 		
 		<label class="col-sm-3 control-label text-right"><spring:message code="lbl.sale.date" text="Sale date" /> 
 		</label>
 		<div class="col-sm-3 add-margin">
-			<form:input path="saleDate" class="form-control datepicker" data-date-end-date="0d" placeholder="DD/MM/YYYY"/>
+			<form:input path="saleDate" class="form-control datepicker" data-date-end-date="0d" readonly="true" placeholder="DD/MM/YYYY"/>
 		</div>
 		<label class="col-sm-3 control-label text-right"><spring:message code="lbl.sale.reason" text="Sale reason" /> 
 		</label>
 		<div class="col-sm-3 add-margin">
-			<form:textarea path="saleReason" class="form-control" />
+			<form:textarea path="saleReason" class="form-control" readonly="true" />
 		</div>
 		<label class="col-sm-3 control-label text-right"><spring:message code="lbl.sale.buyername" text="Sale party name" /> 
 		</label>
 		<div class="col-sm-3 add-margin">
-			<form:input path="buyerName" class="form-control" />
+			<form:input path="buyerName" class="form-control" readonly="true" />
 		</div>
 		<label class="col-sm-3 control-label text-right"><spring:message code="lbl.sale.buyeraddress" text="Sale party address" /> 
 		</label>
 		<div class="col-sm-3 add-margin">
-			<form:textarea path="buyerAddress" class="form-control" />
+			<form:textarea path="buyerAddress" class="form-control" readonly="true" />
 		</div>
 		<label class="col-sm-3 control-label text-right"><spring:message code="lbl.sale.pancardnumber" text="Pan Card Number" /> 
 		</label>
 		<div class="col-sm-3 add-margin">
-			<form:input path="panCardNumber" class="form-control" />
+			<form:input path="panCardNumber" class="form-control" readonly="true" />
 		</div>
 		<label class="col-sm-3 control-label text-right"><spring:message code="lbl.sale.aadharnumber" text="Aadhar Card Number" /> 
 		</label>
 		<div class="col-sm-3 add-margin">
-			<form:input path="aadharCardNumber" class="form-control" />
+			<form:input path="aadharCardNumber" class="form-control" readonly="true" />
 		</div>
 		<label class="col-sm-3 control-label text-right"><spring:message code="lbl.disposal.assetcurrentvalue" text="Current Value Of The Asset" /> 
 		</label>
 		<div class="col-sm-3 add-margin">
-			<form:input class="form-control patternvalidation" data-pattern="alphanumericwithspecialcharacters" id="assetcurrentvalue" path="assetCurrentValueSale"/>
+			<form:input class="form-control patternvalidation" readonly="true" data-pattern="alphanumericwithspecialcharacters" id="assetcurrentvalue" path="assetCurrentValueSale"/>
 		</div>
 		<label class="col-sm-3 control-label text-right"><spring:message code="lbl.disposal.accountcode" text="Asset Disposal Account Code" /> 
 		</label>
 		<div class="col-sm-3 add-margin">
-			<form:select path="assetSaleAccountSale" class="form-control"> 
+			<form:select path="assetSaleAccountSale" readonly="true" class="form-control"> 
 			<form:option value="">-select value-</form:option>
 			<form:options items="${assetAccounts}" itemLabel="name" itemValue="id"/>
 			</form:select>
@@ -214,29 +222,70 @@
 		<label class="col-sm-3 control-label text-right"><spring:message code="lbl.sale.salevalue" text="Sale Value" /> 
 		</label>
 		<div class="col-sm-3 add-margin">
-			<form:input class="form-control patternvalidation" onkeyup="saleValueValidation()" data-pattern="alphanumericwithspecialcharacters" id="salevalue" oninput="calculateProfitLoss()" path="saleValue"/>
+			<form:input class="form-control patternvalidation" readonly="true" onkeyup="saleValueValidation()" data-pattern="alphanumericwithspecialcharacters" id="salevalue" oninput="calculateProfitLoss()" path="saleValue"/>
 			<p style="color:red" id="salevaluevalidation"></p>
 		</div>
 		<label class="col-sm-3 control-label text-right"><spring:message code="lbl.sale.profiloss" text="Profit/Loss" /> 
 		</label>
 		<div class="col-sm-3 add-margin">
-			<form:input class="form-control" id="profitloss" path="" readonly="true"/>
+			<form:input class="form-control" id="profitloss" value="${disposal.assetCurrentValueSale - disposal.saleValue}" path="" readonly="true"/>
 	
 		</div>
-		<label class="col-sm-3 control-label text-right"><spring:message code="lbl.disposal.attachment" text="Attach Documents" /> 
+		<label class="col-sm-3 control-label text-right"><spring:message code="lbl.sale.voucherreferencenumber" text="Voucher Reference number" /> 
 		</label>
 		<div class="col-sm-3 add-margin">
+			<form:input class="form-control" id="profitLossVoucherReference" path="profitLossVoucherReference" readonly="true"/>
+	
+		</div>
+		</div>
+		</c:if>
+		
+		
+		
+		</div>
+		</div>
+		<div class="panel panel-primary" data-collapsed="0">
+	<div class="panel-heading">
+			<div class="panel-title">
+				<spring:message code="lbl.asset.disposal" text="Documents Details" />
+			</div>
+	</div>
+
+
+	<div class="panel-body">
+		<div class="form-group">
+			<table class="table table-bordered">
+			<thead>
+			<tr>
+				<th><spring:message code="lbl.asset.custome.sino" text="SI No."/></th>
+				<th><spring:message code="lbl.asset.custome.name" text="Uploaded File"/></th>	
+			</tr>
+		</thead>
+			<tbody>
+			<c:if test="${not empty disposal.documents}">
+			<c:forEach items="${disposal.documents}" var="document" varStatus="tagStatus">
 			
-		</div>
+			<tr>
+			<td>${tagStatus.index+1}</td>
+			<td>
+			<a href="/services/EGF/sale/downloadSaleDisposalDoc?disposalId=${disposal.id }&fileStoreId=${document.fileStore.fileStoreId }">${document.fileStore.fileName }</a>
+			</td>
+			
+			</tr>
+			
+			</c:forEach>
+			</c:if>
+			
+			</tbody>
+			</table>
+		
+	
 		</div>
 		
-		
-		
-		</div>
-		</div>
-		<jsp:include page="sale-disposal-upload.jsp"/>
+	</div>
+</div>
 		<div align="center">
-			<input type="submit" class="btn btn-primary" name="create" value="Create" />
+			<input type="submit" class="btn btn-primary" disabled="true" name="create" value="Create" />
 		</div>
 		</form:form>
 		
@@ -246,57 +295,14 @@
 	
 	
 	<script>
-	function displaySaleOrDisposal() {
-	  var x = document.getElementById("saleOrDisposalSelect").value;
-	  var sale="Sale";
-	  var disposal="Disposal";
-	  console.log("calling");
-	  console.log(x);
-	  if(x==sale){
-		  console.log("if sale");
-		  /* document.getElementById("sale").style.display = "block";
-		  document.getElementById("disposal").style.display = "none"; */
-		  $('.sale-form-popup').css("display", "block");
-			$('.disposal-form-popup').css("display", "none");
-		  }else if(x==disposal){
-			  console.log("if disposal");
-		  	/* document.getElementById("sale").style.display = "none";
-		    document.getElementById("disposal").style.display = "block"; */
-			  $('.sale-form-popup').css("display", "none");
-				$('.disposal-form-popup').css("display", "block");
-		  }else{
-			  console.log("else");
-		  	/* document.getElementById("sale").style.display = "none";
-		    document.getElementById("disposal").style.display = "none"; */
-			  $('.sale-form-popup').css("display", "none");
-				$('.disposal-form-popup').css("display", "none");
-		  }
-	  console.log("executed");
-	}
-	/* $("#sale").css("display", "block");
-	$("#disposal").css("display", "block"); */
-
-
-	/* $("#sale").attr("style", "display:block");
-	$("#disposal").attr("style", "display:block"); */
-	function calculateProfitLoss(){
-		console.log("before")
+	
+	/* $(document).ready(function(){
 		const  assetValue= document.getElementById("assetcurrentvalue").value;
 		const  saleValue= document.getElementById("salevalue").value;
 		const profitloss=assetValue-saleValue;
 		document.getElementById("profitloss").value=profitloss;
-		console.log("after")
-	}
-	function saleValueValidation() {
-		  let x = document.getElementById("salevalue").value;
-		  let text;
-		  if (isNaN(x)) {
-		    text = "Please Enter valid Number";
-		  } else {
-		    text = "";
-		  }
-		  document.getElementById("salevaluevalidation").innerHTML = text;
-		}
+	} */
+	
 	</script>
 		
 	

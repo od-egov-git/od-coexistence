@@ -72,7 +72,7 @@
 			<div class="alert alert-danger" role="alert">${errorMessage}</div>
 		</c:if>
 			<div class="panel-title">
-				<spring:message code="lbl.asset.catagory" text="Asset Catagory" />
+				<spring:message code="lbl.asset.catagory" text="Asset Category" />
 			</div>
 	</div>
 
@@ -161,10 +161,6 @@
 			<spring:message code="lbl.depriciation.expense.account" text="Depriciation Expense Account" />
 		</label>
 		<div class="col-sm-3 add-margin">
-			<%-- <form:select path="depriciationExpenseAccount" class="form-control"> 
-				<form:option value="">-select value-</form:option>
-				<form:options items="${depriciationExpenseAccount}" itemLabel="description" itemValue="id"/>
-			</form:select> --%>
 			<input type="text" id="depriciationexpenseaccount" name="code" class="form-control table-input creditDetailGlcode depriciationexpenseaccount"  data-errormsg="Account Code is mandatory!" data-idx="0" data-optional="0"   placeholder="Type any letters of Account code" />
 		<form:hidden path="depriciationExpenseAccount.id" value="" name=""  class="form-control table-input hidden-input depriciationexpenseaccountid"/>
 		<form:hidden path="depriciationExpenseAccount.glcode" id="depriciationexpenseaccountglcode" value="" name=""  class="form-control table-input hidden-input depriciationexpenseaccountglcode"/>
@@ -195,7 +191,7 @@
 	<div class="panel panel-primary" data-collapsed="0">	
 	<div class="panel-heading">
 	<div class="panel-title">
-		<spring:message code="lbl.asset.catagory.custome.feilds" text="Custome Feilds"/>
+		<spring:message code="lbl.asset.catagory.custome.feilds" text="Custom Feilds"/>
 	</div>
 	</div>
 	
@@ -220,12 +216,12 @@
 			<tr id="debitdetailsrow">
 				<td>${tagStatus.index +1}</td>
 				<td>${customeField.name}</td>
-				<td>${customeField.name}</td>
+				<td>${customeField.dataType}</td>
 				<td>${customeField.active}</td> 
-				<td>${customeField.name}</td>
+				<td>${customeField.mandatory}</td>
 				<td>${customeField.vlaues}</td>
 				<td>${customeField.orders}</td>
-				<td>${customeField.name}</td>
+				<td>${customeField.columns}</td>
 				<td class="text-center">
 					<div onclick="openForm()" class="btn btn-primary" ><spring:message code="lbl.custom.field.add" text="Add New" /> </div>
 				</td>
@@ -261,7 +257,7 @@
 			<span class="mandatory"></span>
 		</label>
 		<div class="col-sm-3 add-margin">
-			<form:select path="customeField.customFieldDataType" class="form-control"> 
+			<form:select path="customeField.customFieldDataType" class="form-control" id="columnSelect" onchange="displayColumn()"> 
 			<form:option value="">-select value-</form:option>
 			<form:options items="${customFieldDataType}" itemLabel="DataTypes" itemValue="id"/>
 			</form:select>
@@ -287,6 +283,14 @@
 			<form:input class="form-control patternvalidation" data-pattern="alphanumerichyphenbackslash"  path="customeField.orders" maxlength="50" />
 			<form:errors path="" cssClass="add-margin error-msg" />
 		</div>
+		<div class="column-form-popup" style="display: none;">
+		<label class="col-sm-3 control-label text-right">
+			<spring:message code="lbl.bill.custom.value" text="No. Of Columns"/>
+		</label>
+		<div class="col-sm-3 add-margin">
+			<form:input class="form-control patternvalidation" data-pattern="alphanumerichyphenbackslash"  path="customeField.columns" maxlength="50" />
+		</div>
+		</div>
 		<label class="col-sm-3 control-label text-right">
 			<spring:message code="lbl.bill.custom.value" text="Value"/>
 		</label>
@@ -295,8 +299,8 @@
 			<form:errors path="" cssClass="add-margin error-msg" />
 		</div>
 		<div align="center">
-			<input type="submit" class="btn btn-primary" name="add" value="Add" />
-			<button type="button" class="btn btn-primary" onclick="closeForm()"><spring:message code="lbl.bill.custom.close" text="Close"/></button>
+			<input type="submit" class="btn btn-primary" onclick="show()" name="add" value="Add" />
+			<button type="button" class="btn btn-primary" onclick="closeForm(); show();"><spring:message code="lbl.bill.custom.close" text="Close"/></button>
 		</div>
 	</div>
 		</div>
@@ -313,7 +317,7 @@
 		<form:hidden path="customeFields[${vs.index}].vlaues" value="${customeField.vlaues}" />
 		</c:forEach>
 		</c:if>
-		<div align="center">
+		<div align="center" id="createbotton">
 			<input type="submit" class="btn btn-primary" name="create" value="Create" />
 		</div>
 		</form:form>
@@ -327,11 +331,30 @@
 	function openForm() {
 		console.log("Calling")
 	  document.getElementById("customForm").style.display = "block";
+	  document.getElementById("createbotton").style.display = "none";
+	}
+	function show() {
+	  document.getElementById("createbotton").style.display = "block";
 	}
 
 	function closeForm() {
 	  document.getElementById("customForm").style.display = "none";
 	}
+	function displayColumn() {
+		console.log("calling");
+		  const x = document.getElementById("columnSelect").value;
+		  const table=3;
+		  console.log(x);
+		 
+		  if(x==table){
+			  
+			  $('.column-form-popup').css("display", "block");
+				
+			  }else{
+				  $('.column-form-popup').css("display", "none");
+			  }
+		  console.log("executed");
+		}
 	
 	</script>
 		<script src="<cdn:url value='/resources/app/js/assetcategory.js?rnd=${app_release_no}' context='/services/asset'/>"></script>

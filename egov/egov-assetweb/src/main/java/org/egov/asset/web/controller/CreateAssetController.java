@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper;
 import org.apache.struts2.dispatcher.multipart.UploadedFile;
+import org.egov.asset.model.AssetCatagory;
 import org.egov.asset.model.AssetHeader;
 import org.egov.asset.model.AssetLocality;
 import org.egov.asset.model.AssetLocation;
@@ -40,6 +41,8 @@ import org.egov.asset.repository.AssetMasterRepository;
 import org.egov.asset.repository.AssetModeOfAcquisitionRepository;
 import org.egov.asset.repository.AssetRevenueWardRepository;
 import org.egov.asset.repository.AssetStatusRepository;
+import org.egov.asset.service.AssetService;
+import org.egov.asset.utils.AssetConstant;
 import org.egov.commons.CFunction;
 import org.egov.commons.Fund;
 import org.egov.commons.Scheme;
@@ -142,7 +145,7 @@ public class CreateAssetController {// extends BaseAssetController{
 	List<Department> departmentList = new ArrayList<Department>();
 	List<Fund> fundList = new ArrayList<Fund>();
 	List<CFunction> functionList = new ArrayList<CFunction>();
-	List<AssetCategory> assetCategoryList = new ArrayList<AssetCategory>();
+	List<AssetCatagory> assetCategoryList = new ArrayList<AssetCatagory>();
 	List<Scheme> schemeList = new ArrayList<Scheme>();
 	List<SubScheme> subSchemeList = new ArrayList<SubScheme>();
 	List<AssetModeOfAcquisition> modeOfAcquisitionList = new ArrayList<AssetModeOfAcquisition>();
@@ -385,7 +388,7 @@ public class CreateAssetController {// extends BaseAssetController{
 		try {
 			//final List<DocumentUpload> documents = documentUploadRepository.findByObjectId(Long.valueOf(assetId));
 			List<DocumentUpload> documents = assetService.findByObjectIdAndObjectType(assetBean.getId(),
-	                FinancialConstants.FILESTORE_MODULEOBJECT_ASSET);
+					AssetConstant.FILESTORE_MODULEOBJECT_ASSET);
 	        assetBean.setDocumentDetail(documents);
 	        LOGGER.info(assetBean.getDocumentDetail().get(0).getFileName());
 	        LOGGER.info(assetBean.getDocumentDetail().get(0).getFileStore().getFileName());
@@ -632,7 +635,7 @@ public class CreateAssetController {// extends BaseAssetController{
 	 
 	 private AssetMaster getBillDocuments(final AssetMaster assetBean) {
 	        List<DocumentUpload> documentDetailsList = assetService.findByObjectIdAndObjectType(assetBean.getId(),
-	                FinancialConstants.FILESTORE_MODULEOBJECT_ASSET);
+	                AssetConstant.FILESTORE_MODULEOBJECT_ASSET);
 	        assetBean.setDocumentDetail(documentDetailsList);
 	        return assetBean;
 	    }

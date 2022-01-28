@@ -11,7 +11,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.egov.asset.model.AssetMaster;
 import org.egov.asset.model.AssetStatus;
 import org.egov.asset.model.Disposal;
-import org.egov.infra.microservice.models.TransactionType;
+
+//import org.egov.egf.contract.model.Depreciation;
+//import org.egov.egf.contract.model.Revaluation;
 
 public class DisposalValidator {
 
@@ -29,37 +31,37 @@ public class DisposalValidator {
         validateAssetForCapitalizedStatus(asset);
         validateSaleAndDisposalDate(disposal,asset);
         if (StringUtils.isEmpty(disposal.getDisposalReason()))
-            throw new RuntimeException("Disposal Reason should be present for disposing asset : " + asset.getName());
+            throw new RuntimeException("Disposal Reason should be present for disposing asset : " + asset.getAssetHeader().getAssetName());
 
         verifyPanCardAndAdhaarCardForAssetSale(disposal);
         if (getEnableYearWiseDepreciation("tenantId")) {//ask rajat da
             validateAssetCategoryForVoucherGeneration(asset);
 
             //if (asset.getAssetCategory() != null && asset.getAssetCategory().getAssetAccount() == null)
-            if (asset.getAssetCategory() != null && asset.getAssetCategory().getAssetAccountCode() == null)
-                throw new RuntimeException("Asset account should be present for disposing asset : " + asset.getName());
+            if (asset.getAssetHeader().getAssetCategory() != null && asset.getAssetHeader().getAssetCategory().getAssetAccountCode() == null)
+                throw new RuntimeException("Asset account should be present for disposing asset : " + asset.getAssetHeader().getAssetName());
 
             if (disposal.getAssetSaleAccount() == null)
                 throw new RuntimeException(
                         "Asset sale account should be present for asset disposal voucher generation");
         }
         //if (asset.getAssetCategory().getAssetCategoryType().toString().equals(AssetCategoryType.LAND.toString())) {
-        if (asset.getAssetCategory().getAssetCatagoryType().getDescription().equals("LAND")) {
+        if (asset.getAssetHeader().getAssetCategory().getAssetCatagoryType().getDescription().equals("LAND")) {
 
             /*final List<Revaluation> revaluation = revaluationService.getRevaluation(tenantId, disposal.getAssetId(),
                     disposalRequest.getRequestInfo());*/ //rajat da
-        	List<Revaluation> revaluation =null;
+        	/*List<Revaluation> revaluation =null;
             if (revaluation.isEmpty())
                 throw new RuntimeException(
-                        "Asset has to be revaluation atleast once for sale/disposal");
+                        "Asset has to be revaluation atleast once for sale/disposal");*/
         } else {
             /*final List<DepreciationReportCriteria> depreciation = depreciationService.getDepreciation(tenantId,
                     disposal.getAssetId(),
                     disposalRequest.getRequestInfo());*/ //rajat da and abhishek
-        	List<Depreciation> depreciation =null;
+        	/*List<Depreciation> depreciation =null;
             if (depreciation.isEmpty())
                 throw new RuntimeException(
-                        " Asset has to be depreciated atleast once for sale/disposal");
+                        " Asset has to be depreciated atleast once for sale/disposal");*/
         }
 
     }
@@ -73,18 +75,18 @@ public class DisposalValidator {
 	           // final String status = assetStatus.get(0).getStatusValues().get(0).getCode();
 	        	String status =null;
 	            if (!status.equals(asset.getAssetStatus()))
-	                throw new RuntimeException("Status of Asset " + asset
+	                throw new RuntimeException("Status of Asset " + asset.getAssetHeader().getAssetName()
 	                        + " Should be CAPITALIZED for Revaluation, Depreciation and Disposal/sale");
 	        } else
 	            throw new RuntimeException(
-	                    "Status of asset :" + asset+ "doesn't exists for tenant id : " /*+ asset.getTenantId()*/);
+	                    "Status of asset :" + asset.getAssetHeader().getAssetName() + "doesn't exists for tenant id : " /*+ asset.getTenantId()*/);
 	    }
-	 private void validateSaleAndDisposalDate(final Disposal disposal,final Asset asset) {
-		 Date disposalDate=null;
+	 private void validateSaleAndDisposalDate(final Disposal disposal,final AssetMaster asset) {
+		 Date disposalDate=disposal.getDisposalDate();
 		 Date assetCreationDate=null;
 		try {
-			disposalDate = new SimpleDateFormat("yyyy-mm-dd").parse(disposal.getDisposalDate());
-			assetCreationDate=new SimpleDateFormat("yyyy-mm-dd").parse(asset.getDateOfCreation());
+			
+			assetCreationDate=new SimpleDateFormat("dd-MM-yyyy").parse(asset.getAssetHeader().getDateOfCreation());
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -121,8 +123,8 @@ public class DisposalValidator {
 		 return true;
 	    }
 	 private void validateAssetCategoryForVoucherGeneration(final AssetMaster asset) {
-	        if (asset.getAssetCategory() == null)
+	        if (asset.getAssetHeader().getAssetCategory() == null)
 	            throw new RuntimeException(
-	                    "Asset Category should be present for asset " + asset.getName() + " for voucher generation");
+	                    "Asset Category should be present for asset " + asset.getAssetHeader().getAssetName() + " for voucher generation");
 	    }
 }

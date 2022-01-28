@@ -1,30 +1,19 @@
 package org.egov.asset.web.controller;
 
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.apache.poi.util.SystemOutLogger;
-import org.egov.egf.contract.model.AccumulatedDepriciationCode;
-import org.egov.egf.contract.model.AssetAccountCode;
-import org.egov.egf.contract.model.AssetCatagory;
-import org.egov.egf.contract.model.AssetCatagoryType;
-import org.egov.egf.contract.model.CustomFieldDataType;
-import org.egov.egf.contract.model.CustomeFields;
-import org.egov.egf.contract.model.DepriciationExpenseAccount;
-import org.egov.egf.contract.model.DepriciationMethod;
-import org.egov.egf.contract.model.ParentCatagory;
-import org.egov.egf.contract.model.RevolutionReserveAccountCode;
-import org.egov.egf.contract.model.UnitOfMeasurement;
-import org.egov.egf.expensebill.repository.AssetCatagoryTypeRepository;
-import org.egov.egf.expensebill.service.AssetCatagoryService;
+import org.egov.asset.model.AssetCatagory;
+import org.egov.asset.model.CustomeFields;
+import org.egov.asset.repository.AssetCatagoryTypeRepository;
+import org.egov.asset.service.AssetCatagoryService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,16 +31,19 @@ public class AssetCatagoryController {
 	private AssetCatagoryService assetCatagoryService;
 	@Autowired
 	private AssetCatagoryTypeRepository repo;
+	@Autowired
+    @Qualifier("messageSource")
+    private MessageSource messageSource;
 
 	
 	@ModelAttribute
 	public void addDropDownValuesToModel(Model model) {
-		model.addAttribute("accumulatedDepriciationCode", assetCatagoryService.getAccumulatedDepriciationCode());
-		model.addAttribute("assetAccountCode", assetCatagoryService.getAssetAccountCode());
-		model.addAttribute("depriciationExpenseAccount", assetCatagoryService.getDepriciationExpenseAccount());
+		//model.addAttribute("accumulatedDepriciationCode", assetCatagoryService.getAccumulatedDepriciationCode());
+		//model.addAttribute("assetAccountCode", assetCatagoryService.getAssetAccountCode());
+		//model.addAttribute("depriciationExpenseAccount", assetCatagoryService.getDepriciationExpenseAccount());
 		model.addAttribute("depriciationMethod", assetCatagoryService.getDepriciationMethod());
 		model.addAttribute("parentCatagory", assetCatagoryService.getParentCatagory());
-		model.addAttribute("revolutionReserveAccountCode", assetCatagoryService.getRevolutionReserveAccountCode());
+		//model.addAttribute("revolutionReserveAccountCode", assetCatagoryService.getRevolutionReserveAccountCode());
 		model.addAttribute("unitOfMeasurement", assetCatagoryService.getUnitOfMeasurement());
 		model.addAttribute("customFieldDataType", assetCatagoryService.getCustomFieldDataType());
 		model.addAttribute("assetCatagoryTypes", assetCatagoryService.getAssetCatagoryType());
@@ -94,22 +86,32 @@ public class AssetCatagoryController {
 			HttpServletRequest request) {
 
 		LOGGER.info("crate method assetCatagory request " + assetCatagory);
-
+		String message=null;
+		
 		
 		Long userid = ApplicationThreadLocals.getUserId();
 		assetCatagory.setUserid(String.valueOf(userid));
 
 		AssetCatagory createAssetCatagory = assetCatagoryService.createAssetCatagory(assetCatagory);
 		if (null != createAssetCatagory.getErrorMessage()) {
+			message = messageSource.getMessage("msg.asset.category.duplicate",
+                    new String[]{String.valueOf(createAssetCatagory.getName())}, null);
+        
 			model.addAttribute("assetCatagory", assetCatagory);
-			model.addAttribute("errorMessage", createAssetCatagory.getErrorMessage());
+			//model.addAttribute("errorMessage", createAssetCatagory.getErrorMessage());
+			model.addAttribute("errorMessage", message);
 			return "assetcatagory-form";
 		}
 		if (createAssetCatagory != null) {
 			model.addAttribute("assetCatagory", new AssetCatagory());
-			model.addAttribute("successMsg", createAssetCatagory.getName() + " created successfully..!!");
+			//model.addAttribute("successMsg", createAssetCatagory.getName() + " created successfully..!!");
+			message = messageSource.getMessage("msg.asset.category.create.success",
+                    new String[]{String.valueOf(createAssetCatagory.getAssetCode()),String.valueOf(createAssetCatagory.getName())}, null);
+			//model.addAttribute("message", message);
+			model.addAttribute("successMsg", message);
 		}
 
+		//return "asset-success";
 		return "assetcatagory-form";
 	}
 
@@ -173,11 +175,6 @@ public class AssetCatagoryController {
 	@GetMapping(value = "/editCustomeField/{id}/{name}")
 	public String editCustomField(@PathVariable Long id,@PathVariable String name, Model model) {
 		AssetCatagory assetCatagory = assetCatagoryService.updateCustomField(id, name);
-		if(null!=assetCatagory.getId()) {
-		System.out.println("id sending "+assetCatagory.getId());
-		}else {
-			System.out.println("id is null");
-		}
 		model.addAttribute("assetCatagory",assetCatagory);
 		return "update-assetcatagory-form";
 	}

@@ -34,18 +34,19 @@ public class AssetCatagoryService {
 
 	@Autowired
 	private AssetCatagoryTypeRepository assetCatagoryTypeRepository;
-	@Autowired
+	/*@Autowired
 	private AccumulatedDepriciationCodeRepository accumulatedDepriciationCodeRepository;
 	@Autowired
 	private AssetAccountCodeRepository assetAccountCodeRepository;
 	@Autowired
 	private DepriciationExpenseAccountRepository depriciationExpenseAccountRepository;
 	@Autowired
+	private RevolutionReserveAccountCodeRepository revolutionReserveAccountCodeRepository;*/
+	@Autowired
 	private DepriciationMethodRepository depriciationMethodRepository;
 	@Autowired
 	private ParentCatagoryRepository parentCatagoryRepository;
-	@Autowired
-	private RevolutionReserveAccountCodeRepository revolutionReserveAccountCodeRepository;
+	
 	@Autowired
 	private UnitOfMeasurementRepository unitOfMeasurementRepository;
 	@Autowired
@@ -65,7 +66,7 @@ public class AssetCatagoryService {
 		return unitOfMeasurementRepository.findAll();
 	}
 
-	public List<RevolutionReserveAccountCode> getRevolutionReserveAccountCode() {
+	/*public List<RevolutionReserveAccountCode> getRevolutionReserveAccountCode() {
 		return revolutionReserveAccountCodeRepository.findAll();
 	}
 
@@ -77,9 +78,7 @@ public class AssetCatagoryService {
 		return depriciationExpenseAccountRepository.findAll();
 	}
 
-	public List<DepriciationMethod> getDepriciationMethod() {
-		return depriciationMethodRepository.findAll();
-	}
+	
 
 	public List<AssetAccountCode> getAssetAccountCode() {
 		return assetAccountCodeRepository.findAll();
@@ -87,8 +86,13 @@ public class AssetCatagoryService {
 
 	public List<AccumulatedDepriciationCode> getAccumulatedDepriciationCode() {
 		return accumulatedDepriciationCodeRepository.findAll();
+	}*/
+	public List<DepriciationMethod> getDepriciationMethod() {
+		return depriciationMethodRepository.findAll();
 	}
-
+	public List<ParentCatagory> getParentCatagory() {
+		return parentCatagoryRepository.findAll();
+	}
 	public List<AssetCatagoryType> getAssetCatagoryType() {
 
 		List<AssetCatagoryType> assetCatagoryTypeList = assetCatagoryTypeRepository.findAll();
@@ -337,9 +341,13 @@ public AssetCatagory updateAssetcategory(Long id) {
 public AssetCatagory deleteCustomField(Long AssetCatId,Long cusId) {
 	//customeFieldsRepository.findOne(id).get;
 	//customeFieldsRepository.deleteById(id);
-	customeFieldsRepository.delete(cusId);
+	//customeFieldsRepository.delete(cusId);
+	CustomeFields customField = customeFieldsRepository.findOne(cusId);
+	customField.setMandatory(false);
+	customField.setActive(false);
+	CustomeFields updatedCustomField = customeFieldsRepository.save(customField);
 	AssetCatagory findOne = assetCatagoryRepository.findOne(AssetCatId);
-	findOne.setErrorMessage("recodr deleted..!!");
+	findOne.setErrorMessage("Custom Field "+updatedCustomField.getName()+" Deactivated sucessfully!!");
 	
 	return findOne;
 }
