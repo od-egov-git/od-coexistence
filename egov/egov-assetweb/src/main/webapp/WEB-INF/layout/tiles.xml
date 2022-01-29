@@ -42,15 +42,15 @@
         <put-attribute name="page-title" value="title.asset.saledisposal" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/asset/disposal-sale-form.jsp"/>
     </definition>
-	<definition name="view-sale-disposal" extends="base_layout_expense_form">
+	<definition name="view-sale-disposal" extends="base_layout">
         <put-attribute name="page-title" value="title.asset.view.saledisposal" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/asset/view-sale-disposal.jsp"/>
     </definition>
-    <definition name="search-asset-for-sale-disposal" extends="base_layout_expense_form">
+    <definition name="search-asset-for-sale-disposal" extends="base_layout">
         <put-attribute name="page-title" value="title.asset.search.saledisposal" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/asset/search-asset-for-sale-disposal.jsp"/>
     </definition>
-     <definition name="search-sale-disposal" extends="base_layout_expense_form">
+     <definition name="search-sale-disposal" extends="base_layout">
         <put-attribute name="page-title" value="title.asset.search.saledisposal" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/asset/search-sale-disposal.jsp"/>
     </definition>

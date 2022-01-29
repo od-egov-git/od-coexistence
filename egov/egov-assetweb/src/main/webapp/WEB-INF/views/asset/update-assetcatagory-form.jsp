@@ -58,7 +58,7 @@
 <c:set var="contextPath" value="${pageContext.request.contextPath}"/>
 
 <div class="container">
-<form:form action="${contextPath}/asset/updateAssetCatagory" modelAttribute="assetCatagory" method="POST">
+<form:form action="${contextPath}/assetcategory/updateAssetCategory" modelAttribute="assetCatagory" method="POST">
 <div class="panel panel-primary" data-collapsed="0">
 	<div class="panel-heading">
 		<c:if test="${not empty successMsg}">

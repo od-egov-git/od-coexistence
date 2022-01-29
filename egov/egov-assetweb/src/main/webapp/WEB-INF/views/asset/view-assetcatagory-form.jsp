@@ -63,7 +63,7 @@
 </style>
 
 <div class="container">
-<form:form action="${contextPath}/asset/updateAssetCatagory" modelAttribute="assetCatagory" method="POST">
+<form:form action="${contextPath}/assetcategory/updateAssetCategory" modelAttribute="assetCatagory" method="POST">
 <div class="panel panel-primary" data-collapsed="0">
 	<div class="panel-heading">
 		<c:if test="${not empty successMsg}">
@@ -226,7 +226,7 @@
 				<td>${customeField.orders}</td>
 				<td>${customeField.columns}</td>
 				<td class="text-center">
-					<a class="btn btn-primary" href="${contextPath}/asset/editCustomeField/${customeField.id}/${assetCatagory.name}">Update</a>
+					<a class="btn btn-primary" href="${contextPath}/assetcategory/editCustomField/${customeField.id}/${assetCatagory.name}">Update</a>
 					<%-- <a class="btn btn-primary" href="${contextPath}/asset/deleteCustomeField/${customeField.id}">Delete</a> --%>
 					
 					<form:hidden path="id" name="id" value="${assetCatagory.id}"/>
@@ -313,7 +313,7 @@
 		</c:if>
 		<c:if test="${ empty assetCatagory.customeFields}">
 		<div align="center">
-		<a class="btn btn-primary" href="${contextPath}/asset/editAssetCategory/${assetCatagory.id}">Edit</a>
+		<a class="btn btn-primary" href="${contextPath}/assetcategory/editAssetCategory/${assetCatagory.id}">Edit</a>
 		</div>
 		</c:if>
 		

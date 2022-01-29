@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/asset")
+@RequestMapping("/assetcategory")
 public class AssetCatagoryController {
 
 	private static final Logger LOGGER = Logger.getLogger(AssetCatagoryController.class);
@@ -48,13 +48,13 @@ public class AssetCatagoryController {
 		model.addAttribute("customFieldDataType", assetCatagoryService.getCustomFieldDataType());
 		model.addAttribute("assetCatagoryTypes", assetCatagoryService.getAssetCatagoryType());
 	}
-	@GetMapping("/createAssetCatagory")
+	@GetMapping("/createAssetCategory")
 	public String loadCreateAssetCatagoryForm(Model model) {
 		model.addAttribute("assetCatagory", new AssetCatagory());
 		return "assetcatagory-form";
 	}
 
-	@PostMapping(value = "/createAssetCatagory", params = "add")
+	@PostMapping(value = "/createAssetCategory", params = "add")
 	public String createCustomField(@ModelAttribute("assetCatagory") AssetCatagory catagory, Model model,
 			HttpServletRequest request) {
 
@@ -81,7 +81,7 @@ public class AssetCatagoryController {
 		return "assetcatagory-form";
 	}
 
-	@PostMapping(value = "/createAssetCatagory", params = "create")
+	@PostMapping(value = "/createAssetCategory", params = "create")
 	public String createAssetCatagory(@ModelAttribute("assetCatagory") AssetCatagory assetCatagory, Model model,
 			HttpServletRequest request) {
 
@@ -115,7 +115,7 @@ public class AssetCatagoryController {
 		return "assetcatagory-form";
 	}
 
-	@GetMapping("/searchAssetCatagory")
+	@GetMapping("/searchAssetCategory")
 	public String loadSearchAssetCatagoryForm(Model model) {
 		
 		List<AssetCatagory> assetCategories=new ArrayList<AssetCatagory>();
@@ -124,7 +124,7 @@ public class AssetCatagoryController {
 		model.addAttribute("assetCatagoryTypes", assetCatagoryService.getAssetCatagoryType());
 		return "search-assetcatagory-form";
 	}
-	@PostMapping("/searchAssetCatagory")
+	@PostMapping("/searchAssetCategory")
 	public String loadSearchAssetCatagoryForm(@ModelAttribute AssetCatagory assetCategory,Model model) {
 		String name="";
 		Long id=null;
@@ -150,7 +150,7 @@ public class AssetCatagoryController {
 		return "view-assetcatagory-form";
 	}
 	
-	@PostMapping(value = "/updateAssetCatagory", params = "delete")
+	@PostMapping(value = "/updateAssetCategory", params = "delete")
 	public String deleteCustomField(@ModelAttribute("assetCatagory") AssetCatagory assetCatagory, Model model,HttpServletRequest request) {
 		String id=request.getParameter("id");
 		Long assCatId = Long.parseLong(id);
@@ -172,13 +172,13 @@ public class AssetCatagoryController {
 		model.addAttribute("assetCatagory",assetCatagory);
 		return "update-assetcatagory-form";
 	}
-	@GetMapping(value = "/editCustomeField/{id}/{name}")
+	@GetMapping(value = "/editCustomField/{id}/{name}")
 	public String editCustomField(@PathVariable Long id,@PathVariable String name, Model model) {
 		AssetCatagory assetCatagory = assetCatagoryService.updateCustomField(id, name);
 		model.addAttribute("assetCatagory",assetCatagory);
 		return "update-assetcatagory-form";
 	}
-	@GetMapping(value = "/deleteCustomeField/{id}")
+	@GetMapping(value = "/deleteCustomField/{id}")
 	public String updateAssetCatagory(@PathVariable Long id, Model model) {
 		/*AssetCatagory deleteCustomField = assetCatagoryService.deleteCustomField(id);
 		model.addAttribute("successMsg", deleteCustomField.getErrorMessage());
@@ -186,7 +186,7 @@ public class AssetCatagoryController {
 		
 		return "view-assetcatagory-form";
 	}
-	@PostMapping(value = "/updateAssetCatagory")
+	@PostMapping(value = "/updateAssetCategory")
 	public String updateAssetCategory(@ModelAttribute("assetCatagory") AssetCatagory assetCatagory, Model model,HttpServletRequest request) {
 		Long updatedBy=ApplicationThreadLocals.getUserId();
 		Long id=Long.parseLong(request.getParameter("id"));

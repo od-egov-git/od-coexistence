@@ -7,7 +7,7 @@
 
 
 <div class="formmainbox">
-	<form:form name="assetBean" method="post" action="${contextPath}/sale/search"
+	<form:form name="assetBean" method="post" action="search"
 		modelAttribute="assetBean"
 		class="form-horizontal form-groups-bordered"
 		enctype="multipart/form-data">
@@ -121,23 +121,23 @@
 								<span class="assetView_id_${item.index + 1}">${item.index + 1}</span>
 								</td>
 								--%>
-								<td><a href="sale/createDisposal/${asset.id}" target="popup"
-									onclick="window.open('${contextPath}/sale/createDisposal/${asset.id}','popup','width=700,height=600'); return false;">
+								<td><a href="createDisposal/${asset.id}" target="popup"
+									onclick="window.open('createDisposal/${asset.id}','popup','width=700,height=600'); return false;">
 										${item.index + 1} </a></td>
-								<td><a href="sale/createDisposal/${asset.id}" target="popup"
-									onclick="window.open('${contextPath}/sale/createDisposal/${asset.id}','popup','width=700,height=600'); return false;">
+								<td><a href="createDisposal/${asset.id}" target="popup"
+									onclick="window.open('createDisposal/${asset.id}','popup','width=700,height=600'); return false;">
 										${asset.code } </a></td>
-								<td><a href="sale/createDisposal/${asset.id}" target="popup"
-									onclick="window.open('${contextPath}/sale/createDisposal/${asset.id}','popup','width=700,height=600'); return false;">
+								<td><a href="createDisposal/${asset.id}" target="popup"
+									onclick="window.open('createDisposal/${asset.id}','popup','width=700,height=600'); return false;">
 										${asset.assetHeader.assetName }</a></td>
-								<td><a href="sale/createDisposal/${asset.id}" target="popup"
-									onclick="window.open('${contextPath}/sale/createDisposal/${asset.id}','popup','width=700,height=600'); return false;">
+								<td><a href="createDisposal/${asset.id}" target="popup"
+									onclick="window.open('createDisposal/${asset.id}','popup','width=700,height=600'); return false;">
 										${asset.assetHeader.assetCategory.name }</a></td>
-								<td><a href="sale/createDisposal/${asset.id}" target="popup"
-									onclick="window.open('${contextPath}/sale/createDisposal/${asset.id}','popup','width=700,height=600'); return false;">
+								<td><a href="createDisposal/${asset.id}" target="popup"
+									onclick="window.open('createDisposal/${asset.id}','popup','width=700,height=600'); return false;">
 										${asset.assetHeader.department}</a></td>
-								<td><a href="sale/createDisposal/${asset.id}" target="popup"
-									onclick="window.open('${contextPath}/sale/createDisposal/${asset.id}','popup','width=700,height=600'); return false;">
+								<td><a href="createDisposal/${asset.id}" target="popup"
+									onclick="window.open('createDisposal/${asset.id}','popup','width=700,height=600'); return false;">
 										${asset.assetStatus.description }</a></td>
 								<%-- <td>
 								<a href="${contextPath}/asset/editform/${asset.id}"><input type="button" class="btn btn-default" value="Details"/></a>
