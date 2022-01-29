@@ -64,7 +64,7 @@
 <title>Asset Category</title>
 
 <div class="container">
-<form:form action="searchAssetCatagory" modelAttribute="assetCatagory" method="POST">
+<form:form action="searchAssetCategory" modelAttribute="assetCatagory" method="POST">
 <div class="panel panel-primary" data-collapsed="0">
 	<div class="panel-heading">
 		<c:if test="${not empty successMsg}">

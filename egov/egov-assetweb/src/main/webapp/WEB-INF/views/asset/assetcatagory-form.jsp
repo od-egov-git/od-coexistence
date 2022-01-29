@@ -62,7 +62,7 @@
 </style>
 
 <div class="container">
-<form:form action="createAssetCatagory" modelAttribute="assetCatagory" method="POST">
+<form:form action="createAssetCategory" modelAttribute="assetCatagory" method="POST">
 <div class="panel panel-primary" data-collapsed="0">
 	<div class="panel-heading">
 		<c:if test="${not empty successMsg}">
