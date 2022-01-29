@@ -74,7 +74,7 @@
     <table>
         <c:forEach items="${assetBean.documentDetail }" var="documentDetials">
         <tr>    
-        	<td class="padding-10"><a href="/services/EGF/asset/downloadBillDoc?assetId=${assetBean.id }&fileStoreId=${documentDetials.fileStore.fileStoreId }">${documentDetials.fileStore.fileName }</a></td>
+        	<td class="padding-10"><a href="/services/asset/assetcreate/downloadBillDoc?assetId=${assetBean.id }&fileStoreId=${documentDetials.fileStore.fileStoreId }">${documentDetials.fileStore.fileName }</a></td>
         	<td class="padding-10"><span><input type="button" id="remove"
 				style="background: #265988" value="Remove"
 				onclick="deletedoc(${assetBean.id },${documentDetials.id });"></span></td>

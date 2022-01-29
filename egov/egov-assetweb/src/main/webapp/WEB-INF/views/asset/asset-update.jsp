@@ -140,11 +140,10 @@
 						<spring:message code="asset-attach-doc" text="file"/>
 					</label>
 					<div class="col-sm-6 add-margin">
-					 <c:forEach items="${assetBean.documentDetail}" var="document">
 						<c:choose>
-	  						<c:when test="${document.id != null && document.id != ''}">
-					       		<a href="/services/EGF/asset/downloadBillDoc?assetId=${assetBean.id}&fileStoreId=${document.fileStore.fileStoreId }">${document.fileStore.fileName }</a>
-	        					
+	  						<c:when test="${assetBean.documentDetail !=null}">
+					       		<a href="/services/asset/assetcreate/downloadBillDoc?assetId=${assetBean.id}&fileStoreId=${document.fileStore.fileStoreId }">${document.fileStore.fileName }</a>
+	        					<br/>
 	        					<span><input type="button" id="remove" style="background: #265988" value="Remove"
 									onclick="deletedoc(${assetBean.id},${document.id});"></span>
 							</c:when>
@@ -152,7 +151,6 @@
 								<input type="file" name="file" id="file1" class="padding-10">
 							</c:otherwise>
 						</c:choose>
-					</c:forEach>
 					</div>
 				</td>
 			</tr>
@@ -355,9 +353,15 @@
 									<%-- ${asset.name} --%>
 								</td>
 								<td>
-									<%-- ${assetCustomFieldMappers.val} --%>
-									<input type="text" id="customField_${item.index}_${asset.name}" 
-										name="customField_${item.index}_${asset.name}" value="${assetCustomFieldMappers.val}"/>
+								 	<input type="text" id="customField_${item.index}" 
+										name="customField_${item.index}" value="${assetCustomFieldMappers.val}"/>
+									<input type="hidden" id="customField_id_${item.index}" 
+										name="customField_id_${item.index}" value="${assetCustomFieldMappers.id}"/>
+									<%-- <input type="text" id="customField_${item.index}_${assetCustomFieldMappers.name}" 
+										name="customField_${item.index}_${assetCustomFieldMappers.name}" value="${assetCustomFieldMappers.val}"/>
+									<input type="hidden" id="customField_${item.index}_id_${assetCustomFieldMappers.name}" 
+										name="customField_${item.index}_id_${assetCustomFieldMappers.name}" value="${assetCustomFieldMappers.id}"/> --%>
+										
 									<%-- <form:input path="val" class="form-control text-left"/> --%>
 								</td>
 							</tr>
@@ -560,7 +564,7 @@
 <script src="<cdn:url value='/resources/global/js/egov/inbox.js?rnd=${app_release_no}' context='/services/egi'/>"></script>
 <%-- <script src="<cdn:url value='/resources/app/js/common/voucherBillHelper.js?rnd=${app_release_no}' context='/services/EGF'/>"></script>  
 <script src="<cdn:url value='/resources/app/js/common/assetHelper.js?rnd=${app_release_no}' context='/services/EGF'/>"></script> --%>
-<script src="<cdn:url value='/resources/app/js/common/assetHelper.js?rnd=${app_release_no}' context='/services/EGF'/>"></script>
+<script src="<cdn:url value='/resources/app/js/common/assetHelper.js?rnd=${app_release_no}' context='/services/asset'/>"></script>
 <script src="<cdn:url value='/resources/app/js/expensebill/documents-upload.js?rnd=${app_release_no}' context='/services/EGF'/>"></script>
 
 

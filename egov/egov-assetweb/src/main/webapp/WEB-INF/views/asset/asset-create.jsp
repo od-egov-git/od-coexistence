@@ -486,6 +486,8 @@
 			</div> 
 			
 		</div>
+	
+	
 		<div align="center" class="buttonbottom">
 			<div class="row text-center">
 				<input type="submit" class="btn btn-primary" name="create" value="create"/>
@@ -517,7 +519,7 @@ function getSubSchemelist(obj)
 	if(document.getElementById('subschemeid'))
 		populatesubschemeid({schemeId:obj.value});
 } 
-//window.open('popup.jsp?parameter='+param,'mywindow','width=500,height=350,toolba‌​r=no,resizable=no,menubar=no');
+//window.open('popup.jsp?parameter='+param,'mywindow','width=500,height=350,toolbar=no,resizable=no,menubar=no');
 function onPopupClose(returnParameter) {
 
 	   // Process returnParameter here

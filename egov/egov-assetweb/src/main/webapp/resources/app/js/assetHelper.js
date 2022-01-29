@@ -136,7 +136,7 @@ function fetchAssetRefernce(code, name, assetCategory, department, status){
 		console.log("Fetching asset Reference.."+code+"..name.."+name+"..assetCAtegory.."+assetCategory+"..dept.."+department+"..status.."+status);
 		$.ajax({
 			method : "GET",
-			url : "/services/EGF/asset/getassetRef",
+			url : "/services/asset/assetcreate/getassetRef",
 			data : {
 				code : code,
 				name : name,
@@ -190,7 +190,7 @@ function deletedoc(billid,docid){
 	$.ajax({
 			type:"GET",
 			data:"html",
-			url:"/services/EGF/asset/deleteAssetDoc/"+docid,
+			url:"/services/asset/assetcreate/deleteAssetDoc/"+docid,
 			success:function(result){
 				if(result=="success"){
 					location.reload();
@@ -237,16 +237,16 @@ function generateCustomField(key, dataType, name, requiredVal){
 		returnVal += "<span class='"+mandatory+"'>"+name+"</span>";
 		returnVal += "</label>";
 		returnVal += "<div class='col-sm-6 add-margin'>";
-		returnVal += "<input type='text' class='form-control' id='customField_"+key+"_"+name+"' name='customField_"+key+"_"+name+"' required='"+required+"'/>";
+		returnVal += "<input type='text' class='form-control' id='customField_"+key+"' name='customField_"+key+"' required='"+required+"'/>";
 		returnVal += "</div></td>";
 		break;
-	  case 'Select':
+	  case 'Number':
 		returnVal += "<td><label class='col-sm-3 control-label text-right'>";
 		returnVal += "<spring:message text='"+name+"'/>";
 		returnVal += "<span class='mandatory'></span>";
 		returnVal += "</label>";
 		returnVal += "<div class='col-sm-6 add-margin'>";
-		returnVal += "<input type='number' class='form-control' id='customField_"+key+"_"+name+"' required='"+required+"'/>";
+		returnVal += "<input type='number' class='form-control' id='customField_"+key+"' name='customField_"+key+"' required='"+required+"'/>";
 		returnVal += "</div></td>";
 		break;
 	  case 'Date':
@@ -338,7 +338,7 @@ function fetchdetails(status,mode){
 	console.log(mode);
 	$.ajax({
 		type : "GET",
-        url: "/services/EGF/asset/fetchdetails",
+        url: "/services/asset/assetcreate/fetchdetails",
         data: {status: status, mode: mode},
         async : false,
         success: function(res){      
