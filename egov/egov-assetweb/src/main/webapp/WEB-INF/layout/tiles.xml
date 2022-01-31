@@ -71,4 +71,8 @@
         <put-attribute name="page-title" value="asset-update" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/asset/asset-update.jsp"/>
     </definition>
+    <definition name="asset-search-revaluate" extends="base_layout">
+        <put-attribute name="page-title" value="title.asset.catagory.create" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/asset/asset-revaluate-search.jsp"/>
+    </definition>
 </tiles-definitions>
