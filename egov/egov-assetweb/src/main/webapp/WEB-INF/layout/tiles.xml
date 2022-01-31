@@ -75,4 +75,20 @@
         <put-attribute name="page-title" value="title.asset.catagory.create" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/asset/asset-revaluate-search.jsp"/>
     </definition>
+    <definition name="depreciation-create" extends="base_layout">
+        <put-attribute name="page-title" value="asset.depreciation.title" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/asset/depreciation-create.jsp"/>
+    </definition>
+    <definition name="depreciation-search" extends="base_layout">
+        <put-attribute name="page-title" value="asset.depreciation.title" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/asset/depreciation-search.jsp"/>
+    </definition>
+    <definition name="depreciation-view" extends="base_layout">
+        <put-attribute name="page-title" value="asset.depreciation.title" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/asset/depreciation-view.jsp"/>
+    </definition>
+    <definition name="depreciation-success" extends="base_layout">
+        <put-attribute name="page-title" value="asset.depreciation.title" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/asset/depreciation-success.jsp"/>
+    </definition>
 </tiles-definitions>
