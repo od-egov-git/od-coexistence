@@ -1,17 +1,14 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
-<%@ taglib uri="/WEB-INF/tags/cdn.tld" prefix="cdn" %>
 
-<%@ page isELIgnored = "false" %>
 <div class="panel-title" align="center">
 	<spring:message code="lbl-asset-create" text="Create Asset"/>
 </div>
 <br />
 
 <!-- <div class="form-group"> -->
-<form:form name="assetBean" method="post" action="create" modelAttribute="assetBean" 
+<form:form name="assetMaster" method="post" action="create" modelAttribute="assetBean" 
 	class="form-horizontal form-groups-bordered" enctype="multipart/form-data">
 		<!-- Header Details -->
 		<br />
@@ -34,7 +31,7 @@
 						<div class="col-sm-6 add-margin">						
 							<form:select path="assetHeader.department" id="department" required="required"  class="form-control">
 								<form:option value=""><spring:message code="lbl.select" /></form:option>
-								<form:options items="${departmentList}" itemValue="name" itemLabel="name"/>  
+								<form:options items="${departmentList}" itemValue="id" itemLabel="name"/>  
 							</form:select>
 						</div>
 					</td>
@@ -111,7 +108,7 @@
 							<input class="form-control search" type="button" id="assetRef" style="width: 25px;margin-left: 10px;" 
 								onclick="viewPop('${id}')"><i class="bi bi-search"></i></input> 
 						</div>
-						<%-- <div class="col-sm-1">
+					<%-- 	<div class="col-sm-1">
 							<input class="form-control" type="button" id="assetRef" onclick="viewPop('${id}')"/> 
 						</div> --%>
 					</td>
@@ -495,17 +492,7 @@
 			</div>
 		</div>
 <input type="hidden" id="customFieldsCounts" name="customFieldsCounts"/>
-</form:form>
-
-
-<script src="<cdn:url value='/resources/app/js/i18n/jquery.i18n.properties.js?rnd=${app_release_no}' context='/services/EGF'/>"></script>
-<script src="<cdn:url value='/resources/app/js/common/helper.js?rnd=${app_release_no}' context='/services/EGF'/>"></script>
-<script src="<cdn:url value='/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}' context='/services/egi'/>"></script>
-<script src="<cdn:url value='/resources/global/js/egov/inbox.js?rnd=${app_release_no}' context='/services/egi'/>"></script>
-<script src="<cdn:url value='/resources/app/js/common/voucherBillHelper.js?rnd=${app_release_no}' context='/services/EGF'/>"></script>  
-<script src="<cdn:url value='/resources/app/js/assetHelper.js?rnd=${app_release_no}' context='/services/asset'/>"></script>
-<script src="<cdn:url value='/resources/app/js/expensebill/documents-upload.js?rnd=${app_release_no}' context='/services/EGF'/>"></script>
-
+</form:form> 
 
 <script>
 
@@ -578,5 +565,70 @@ function fetchCustomFieldData(id){
 	           $('#result').html(retHtml);
          }
      });
+} 
+
+function loadValues(){//obj
+	var assetStatusCode = $('#assetStatus').val();//obj.value;
+	console.log(assetStatusCode);
+	var modeOfAcq = $('#modeOfAcquisition').val();
+	console.log(modeOfAcq);
+	
+	$("#valueSection").css("display", "none");
+	$("#capitalized").css("display", "none");
+	$("#capitalized2").css("display", "none");
+	$("#acqPurchase").css("display", "none");
+	$("#acqDonation").css("display", "none");
+	$("#acqConstruction").css("display", "none");
+	$("#acqAcquired").css("display", "none");
+	
+	if(assetStatusCode != '' && modeOfAcq != ''){
+		fetchdetails(assetStatusCode,modeOfAcq);
+	}
+}
+
+function fetchdetails(status,mode){
+	console.log(status);
+	console.log(mode);
+	$.ajax({
+		type : "GET",
+        url: "/services/asset/assetcreate/fetchdetails",
+        data: {status: status, mode: mode},
+        async : false,
+        success: function(res){      
+           console.log("output............"+res);
+           var jsonObj = JSON.parse(res);
+           var assetStatusCode = jsonObj.status;
+           var modeOfAcq = jsonObj.mode;
+           console.log(assetStatusCode+"..."+modeOfAcq);
+           
+	        var flag = false;   
+	        if(assetStatusCode == 'CREATED' || assetStatusCode == 'CAPITALIZED'){
+	       		$("#valueSection").css("display", "block");
+	       		flag = true;
+	       	}else{
+	       		console.log("else Part");
+	       		$("#valueSection").css("display", "none");
+	       		flag = false;
+	       	}
+	       	if(assetStatusCode == 'CAPITALIZED'){
+	       		$("#capitalized").css("display", "block");
+	       		$("#capitalized2").css("display", "block");
+	       	}
+	       	if(flag){
+	       		if(modeOfAcq == 'PURCHASE'){
+	       			$("#acqPurchase").css("display", "block");
+	       		}else if(modeOfAcq == 'DONATION'){
+	       			$("#acqDonation").css("display", "block");
+	       		}else if(modeOfAcq == 'CONSTRUCTION'){
+	       			$("#acqConstruction").css("display", "block");
+	       		}else if(modeOfAcq == 'ACQUIRED'){
+	       			$("#acqAcquired").css("display", "block");
+	       		}else{
+	       			console.log("select modeOfAcq");
+	       		}
+	       	}
+           //return res;
+        }
+    });
 }
 </script>

@@ -24,7 +24,7 @@ import org.egov.commons.CChartOfAccounts;
 
 @Entity
 @SequenceGenerator(name = AssetCatagory.SEQ_ASSET_CATAGORY, sequenceName = AssetCatagory.SEQ_ASSET_CATAGORY,initialValue=1, allocationSize = 1)
-@Table(name="asset_category")
+@Table(name="asset_catagory")
 public class AssetCatagory {
 
 	public static final String SEQ_ASSET_CATAGORY = "SEQ_ASSET_CATAGORY";

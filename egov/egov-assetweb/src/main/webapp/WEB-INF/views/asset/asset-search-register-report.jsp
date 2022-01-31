@@ -7,7 +7,7 @@
 
 
 <div class="formmainbox">
-	<form:form name="assetBean" method="post" action="${contextPath}/asset/search" modelAttribute="assetBean" 
+	<form:form name="assetBean" method="post" action="${contextPath}/asset/searchregister" modelAttribute="assetBean" 
 		class="form-horizontal form-groups-bordered" enctype="multipart/form-data">
 
 		<br />
@@ -53,17 +53,26 @@
 				
 				<td>
 					<label class="col-sm-3 control-label text-right">
-						<spring:message code="asset-dept" text="department"/>
+						<spring:message code="asset-location" text="locality"/>
+						<span class="mandatory"></span>
 					</label>
-					<div class="col-sm-6 add-margin">						
-						<form:select path="assetHeader.department" id="department" class="form-control">
-							<form:option value=""><spring:message code="lbl.select" /></form:option>
-							<form:options items="${departmentList}" itemValue="name" itemLabel="name"/>  
+					<div class="col-sm-6 add-margin">
+						<form:select path="assetLocation.location" id="assetLocation.location" required="required" class="form-control">
+								<form:option value=""><spring:message code="lbl.select" /></form:option>
+								<form:options items="${localityList}" itemValue="id" itemLabel="description"/>  
 						</form:select>
 					</div>
 				</td>
 			</tr>
 			<tr>
+				<td>
+					<label class="col-sm-3 control-label text-right">
+						<spring:message code="asset-desc" text="description"/>
+					</label>
+					<div class="col-sm-6 add-margin">
+						<form:input class="form-control" path="assetHeader.description"/>
+					</div>
+				</td>
 				<td>
 					<label class="col-sm-6 control-label text-right">
 						<spring:message code="asset-status" text="status"/>
@@ -80,12 +89,13 @@
 		</div>
 		
 		<div align="center" class="buttonbottom">
-				<div class="row text-center">
-					<input type="submit" class="btn btn-primary" name="search" value="Search"/>
-					<input type="button" name="button2" id="button2" value="Close" class="btn btn-default" 
-					onclick="window.parent.postMessage('close','*');window.close();"/>
-				</div>
+			<div class="row text-center">
+				<input type="submit" class="btn btn-primary" name="search" value="Search"/>
+				<input type="button" name="button2" id="button2" value="Close" class="btn btn-default" 
+				onclick="window.parent.postMessage('close','*');window.close();"/>
 			</div>
+		</div>
+		<input type="hidden" name="viewmode" id="viewmode" value="readonly"/>
 	</form:form>
 	<br />
 	<br />
@@ -96,9 +106,9 @@
 			<tr>
 				<th><spring:message code="lbl-sl-no" text="Sr. No."/></th>
 				<th><spring:message code="code" text="Code"/></th>
-				<th><spring:message code="name" text="Name"/></th>
-				<th><spring:message code="asset-cat" text="Asset Category Type"/></th>
-				<th><spring:message code="asset-dept" text="Department"/></th>
+				<th><spring:message code="name" text="Asset Name"/></th>
+				<th><spring:message code="asset-cat" text="Asset Category"/></th>
+				<th><spring:message code="asset-dept" text="Location"/></th>
 				<th><spring:message code="asset-status" text="Status"/></th>
 				<c:if test="${isReference}">
 					<th><spring:message code="lbl-action" text="Action"/></th>
@@ -111,14 +121,8 @@
 					 <c:forEach items="${assetList}" var="asset" varStatus="item">
 						
 						<tr id="assetView">
-							<%-- <td>
-								<span class="assetView_id_${item.index + 1}">${item.index + 1}</span>
-							</td>
-							 --%>
 							<td>
-                                <a href="assetReference/${asset.id}" target="popup"
-                                  onclick="window.open('${contextPath}/asset/editform/${asset.id}','popup','width=700,height=600'); return false;">
-                                    ${item.index + 1} </a>
+                               ${item.index + 1}
                             </td>
 							<td>
 							<a href="assetReference/${asset.id}" target="popup"
@@ -126,35 +130,17 @@
 								${asset.code } </a>
 							</td>
 							<td>
-							<a href="assetReference/${asset.id}" target="popup"
-                                  onclick="window.open('${contextPath}/asset/editform/${asset.id}','popup','width=700,height=600'); return false;">
-								${asset.assetHeader.assetName }</a>
+								${asset.assetHeader.assetName }
 							</td>
 							<td>
-							<a href="assetReference/${asset.id}" target="popup"
-                                  onclick="window.open('${contextPath}/asset/editform/${asset.id}','popup','width=700,height=600'); return false;">
-								${asset.assetHeader.assetCategory.name }</a>
+								${asset.assetHeader.assetCategory.name }
 							</td>
 							<td>
-							<a href="assetReference/${asset.id}" target="popup"
-                                  onclick="window.open('${contextPath}/asset/editform/${asset.id}','popup','width=700,height=600'); return false;">
-								${asset.assetHeader.department}</a>
+								${asset.assetHeader.assetLocation.description}
 							</td>
 							<td>
-							<a href="assetReference/${asset.id}" target="popup"
-                                  onclick="window.open('${contextPath}/asset/editform/${asset.id}','popup','width=700,height=600'); return false;">
-								${asset.assetStatus.description }</a>
+								${asset.assetStatus.description }
 							</td>
-							<%-- <td>
-								<a href="${contextPath}/asset/editform/${asset.id}"><input type="button" class="btn btn-default" value="Details"/></a>
-							</td> --%>
-							<c:if test="${isReference}">
-								<td>
-								
-								<input type="button" class="btn btn-default" value="Select" 
-									onclick="selectAssetRef('${asset.code}','${asset.assetHeader.assetName }')"/>
-								</td>
-							</c:if>
 						</tr>
 					</c:forEach> 
 				</c:when>

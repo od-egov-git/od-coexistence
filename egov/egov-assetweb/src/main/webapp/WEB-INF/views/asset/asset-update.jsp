@@ -534,10 +534,10 @@
 		
 		<div align="center" class="buttonbottom">
 			<div class="row text-center">
-		<c:if test="${mode == 'update' }">
-				<input type="submit" class="btn btn-primary" name="update" value="Update"/>
-		</c:if>
-				<input type="button" name="button2" id="button2" value="Close" class="btn btn-default" onclick="window.parent.postMessage('close','*');window.close();"/>
+			<c:if test="${mode == 'update' }">
+					<input type="submit" class="btn btn-primary" name="update" value="Update"/>
+			</c:if>
+			<input type="button" name="button2" id="button2" value="Close" class="btn btn-default" onclick="window.parent.postMessage('close','*');window.close();"/>
 			</div>
 		</div>
 		<input type="hidden" id="statusCode" name="statusCode" value="${assetBean.assetStatus.id}"/>
