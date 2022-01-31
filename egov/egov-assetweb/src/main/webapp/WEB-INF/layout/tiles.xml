@@ -55,7 +55,7 @@
         <put-attribute name="body" value="/WEB-INF/views/asset/search-sale-disposal.jsp"/>
     </definition>
     <definition name="asset-create" extends="base_layout">
-        <put-attribute name="page-title" value="lbl-asset-create" cascade="true"/>
+        <put-attribute name="page-title" value="title.asset.catagory.create" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/asset/asset-create.jsp"/>
     </definition>
     

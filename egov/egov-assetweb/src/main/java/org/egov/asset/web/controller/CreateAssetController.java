@@ -171,7 +171,7 @@ public class CreateAssetController {// extends BaseAssetController{
 	List<AssetLocationZone> zoneList = new ArrayList<AssetLocationZone>();
 	List<AssetCustomFieldMapper> mapperList = new ArrayList<AssetCustomFieldMapper>();
 	
-	@GetMapping("/newform")
+	@PostMapping("/newform")
 	public String newform(Model model) {
 		LOGGER.info("Fresh Operation..................");
 
@@ -383,7 +383,7 @@ public class CreateAssetController {// extends BaseAssetController{
 	 * editform(@PathVariable("assetid") String assetId, Model model) {
 	 */
 	
-	@GetMapping("/viewform/{param}")
+	@PostMapping("/viewform/{param}")
 	public String viewform(@PathVariable("param") String param, Model model) {
 		LOGGER.info("View Form..................");
 		assetBean = new AssetMaster();

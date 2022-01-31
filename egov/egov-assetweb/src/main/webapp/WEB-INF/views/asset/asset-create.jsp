@@ -1,8 +1,8 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ taglib uri="/WEB-INF/tags/cdn.tld" prefix="cdn" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://www.springframework.org/tags" prefix="spring" %>
-<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
 
 <%@ page isELIgnored = "false" %>
 <div class="panel-title" align="center">
@@ -503,7 +503,7 @@
 <script src="<cdn:url value='/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}' context='/services/egi'/>"></script>
 <script src="<cdn:url value='/resources/global/js/egov/inbox.js?rnd=${app_release_no}' context='/services/egi'/>"></script>
 <script src="<cdn:url value='/resources/app/js/common/voucherBillHelper.js?rnd=${app_release_no}' context='/services/EGF'/>"></script>  
-<script src="<cdn:url value='/resources/app/js/common/assetHelper.js?rnd=${app_release_no}' context='/services/EGF'/>"></script>
+<script src="<cdn:url value='/resources/app/js/assetHelper.js?rnd=${app_release_no}' context='/services/asset'/>"></script>
 <script src="<cdn:url value='/resources/app/js/expensebill/documents-upload.js?rnd=${app_release_no}' context='/services/EGF'/>"></script>
 
 
@@ -531,7 +531,7 @@ function viewPop(id){
 	console.log(id);
 	/* var url1 = '/services/EGF/report/budgetVarianceReport-loadData.action?asOnDate='+date+'&dept='+dept+'&funds='+fund+'&func='+func+'&accCode='+accCode+'&vtype=pr';
 	window.open(url1,'Source','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700') */
-	var x = window.open('/services/EGF/asset/viewform/ref','popup','width=850,height=600');
+	var x = window.open('/services/asset/assetcreate/viewform/ref','popup','width=850,height=600');
 	console.log("Return Obj..:"+x.value); 
 	console.log("Return Obj..:"+Object.values(x)); 
 	//$('#assetReference').val(x);
@@ -553,7 +553,7 @@ function fetchCustomFieldData(id){
 	console.log("Custom id..."+id);
 	 $.ajax({
 		 type : "POST",
-         url: "/services/EGF/asset/categorydetails/"+id,
+         url: "/services/asset/assetcreate/categorydetails/"+id,
          success: function(res){      
 	           console.log("output............"+res);
 	           var jsonObj = JSON.parse(res);

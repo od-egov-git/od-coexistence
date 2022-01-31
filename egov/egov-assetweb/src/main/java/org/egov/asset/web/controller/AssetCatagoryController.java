@@ -38,17 +38,13 @@ public class AssetCatagoryController {
 	
 	@ModelAttribute
 	public void addDropDownValuesToModel(Model model) {
-		//model.addAttribute("accumulatedDepriciationCode", assetCatagoryService.getAccumulatedDepriciationCode());
-		//model.addAttribute("assetAccountCode", assetCatagoryService.getAssetAccountCode());
-		//model.addAttribute("depriciationExpenseAccount", assetCatagoryService.getDepriciationExpenseAccount());
 		model.addAttribute("depriciationMethod", assetCatagoryService.getDepriciationMethod());
 		model.addAttribute("parentCatagory", assetCatagoryService.getParentCatagory());
-		//model.addAttribute("revolutionReserveAccountCode", assetCatagoryService.getRevolutionReserveAccountCode());
 		model.addAttribute("unitOfMeasurement", assetCatagoryService.getUnitOfMeasurement());
 		model.addAttribute("customFieldDataType", assetCatagoryService.getCustomFieldDataType());
 		model.addAttribute("assetCatagoryTypes", assetCatagoryService.getAssetCatagoryType());
 	}
-	@GetMapping("/createAssetCategory")
+	@PostMapping("/createAssetCategory")
 	public String loadCreateAssetCatagoryForm(Model model) {
 		model.addAttribute("assetCatagory", new AssetCatagory());
 		return "assetcatagory-form";
@@ -115,7 +111,7 @@ public class AssetCatagoryController {
 		return "assetcatagory-form";
 	}
 
-	@GetMapping("/searchAssetCategory")
+	@PostMapping("/searchAssetCategoryPage")
 	public String loadSearchAssetCatagoryForm(Model model) {
 		
 		List<AssetCatagory> assetCategories=new ArrayList<AssetCatagory>();
