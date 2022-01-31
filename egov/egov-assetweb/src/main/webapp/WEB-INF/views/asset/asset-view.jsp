@@ -116,33 +116,33 @@
 							</td>
 							 --%>
 							<td>
-                                <a href="assetReference/${asset.id}" target="popup"
-                                  onclick="window.open('${contextPath}/asset/editform/${asset.id}','popup','width=700,height=600'); return false;">
+                                <a href="#"
+                                  onclick="window.open('${contextPath}/assetcreate/editform/${asset.id}','popup','width=700,height=600'); return false;">
                                     ${item.index + 1} </a>
                             </td>
 							<td>
-							<a href="assetReference/${asset.id}" target="popup"
-                                  onclick="window.open('${contextPath}/asset/editform/${asset.id}','popup','width=700,height=600'); return false;">
+							<a href="#"
+                                  onclick="window.open('${contextPath}/assetcreate/editform/${asset.id}','popup','width=700,height=600'); return false;">
 								${asset.code } </a>
 							</td>
 							<td>
-							<a href="assetReference/${asset.id}" target="popup"
-                                  onclick="window.open('${contextPath}/asset/editform/${asset.id}','popup','width=700,height=600'); return false;">
+							<a href="#"
+                                  onclick="window.open('${contextPath}/assetcreate/editform/${asset.id}','popup','width=700,height=600'); return false;">
 								${asset.assetHeader.assetName }</a>
 							</td>
 							<td>
-							<a href="assetReference/${asset.id}" target="popup"
-                                  onclick="window.open('${contextPath}/asset/editform/${asset.id}','popup','width=700,height=600'); return false;">
+							<a href="#"
+                                  onclick="window.open('${contextPath}/assetcreate/editform/${asset.id}','popup','width=700,height=600'); return false;">
 								${asset.assetHeader.assetCategory.name }</a>
 							</td>
 							<td>
-							<a href="assetReference/${asset.id}" target="popup"
-                                  onclick="window.open('${contextPath}/asset/editform/${asset.id}','popup','width=700,height=600'); return false;">
+							<a href="#"
+                                  onclick="window.open('${contextPath}/assetcreate/editform/${asset.id}','popup','width=700,height=600'); return false;">
 								${asset.assetHeader.department}</a>
 							</td>
 							<td>
-							<a href="assetReference/${asset.id}" target="popup"
-                                  onclick="window.open('${contextPath}/asset/editform/${asset.id}','popup','width=700,height=600'); return false;">
+							<a href="#"
+                                  onclick="window.open('${contextPath}/assetcreate/editform/${asset.id}','popup','width=700,height=600'); return false;">
 								${asset.assetStatus.description }</a>
 							</td>
 							<%-- <td>

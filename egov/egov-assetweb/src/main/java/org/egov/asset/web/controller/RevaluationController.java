@@ -1,5 +1,6 @@
 package org.egov.asset.web.controller;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,20 +9,27 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.egov.asset.model.AssetCatagory;
 import org.egov.asset.model.AssetMaster;
+import org.egov.asset.model.AssetRevaluation;
 import org.egov.asset.model.AssetStatus;
 import org.egov.asset.repository.AssetCatagoryRepository;
 import org.egov.asset.repository.AssetMasterRepository;
 import org.egov.asset.repository.AssetStatusRepository;
+import org.egov.asset.service.RevaluationService;
+import org.egov.commons.CFunction;
+import org.egov.commons.Fund;
+import org.egov.commons.dao.FunctionDAO;
+import org.egov.commons.dao.FundHibernateDAO;
+import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.microservice.models.Department;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
 @RequestMapping(value = "/revaluate")
@@ -34,15 +42,25 @@ public class RevaluationController {
 	private AssetStatusRepository statusRepo;
 	@Autowired
 	private AssetCatagoryRepository categoryRepo;
+	@Autowired
+	private FunctionDAO functionDAO;
+	@Autowired
+	private AssetMasterRepository masterRepo;
+	@Autowired
+	private FundHibernateDAO fundHibernateDAO;
+	@Autowired
+	private RevaluationService revaluationService;
 	
 	private AssetMaster assetBean;
+	private AssetRevaluation assetRevaluation;
 	
 	List<Department> departmentList = new ArrayList<Department>();
 	List<AssetStatus> assetStatusList = new ArrayList<AssetStatus>();
 	List<AssetCatagory> assetCategoryList = new ArrayList<AssetCatagory>();
 	List<AssetMaster> assetList = new ArrayList<AssetMaster>();
-	@Autowired
-	private AssetMasterRepository masterRepo;
+	List<CFunction> functionList = new ArrayList<CFunction>();
+	List<Fund> fundList = new ArrayList<Fund>();
+	
 
 	@PostMapping("/newform")
 	public String viewform(Model model) {
@@ -99,6 +117,45 @@ public class RevaluationController {
 		model.addAttribute("assetCategoryList", assetCategoryList);
 		
 		return "asset-search-revaluate";
+	}
+	
+	@GetMapping("/create/{assetid}")
+	public String editform(@PathVariable("assetid") String assetId, Model model, HttpServletRequest request) {
+		LOGGER.info("Create Operation.................."+assetId);
+		try {
+		assetBean = new AssetMaster();
+		assetBean = masterRepo.findOne(Long.valueOf(assetId));
+		model.addAttribute("assetBean", assetBean);
+		assetRevaluation= new AssetRevaluation();
+		assetRevaluation.setAssetMaster(assetBean);
+		assetRevaluation.setUpdatedCurrentValue(new BigDecimal(assetBean.getGrossValue())); // change to current value
+		assetRevaluation.setCurrent_value(new BigDecimal(assetBean.getGrossValue())); // change to current value
+		functionList = functionDAO.getAllActiveFunctions();
+		fundList = fundHibernateDAO.findAllActiveFunds();
+		model.addAttribute("fundList", fundList);
+		model.addAttribute("functionList", functionList);
+		model.addAttribute("assetRevaluation", assetRevaluation);
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		return "asset-create-revaluate";
+	}
+	
+	@PostMapping(value = "/create", params = "create")
+	public String create(@ModelAttribute("assetRevaluation") AssetRevaluation assetRevaluation,Model model, HttpServletRequest request) {
+
+		LOGGER.info("Creating Asset Object");
+		long userId = ApplicationThreadLocals.getUserId();
+		String voucherNumber=revaluationService.createVoucher(assetRevaluation);
+		assetRevaluation.setVoucher(voucherNumber);
+		AssetRevaluation savedAssetRevaluation=revaluationService.create(assetRevaluation);
+		
+		String message="Asset hasa been revaluated with voucher Number";
+		model.addAttribute("message", message);
+		
+		
+		return "asset-success";
 	}
 
 }

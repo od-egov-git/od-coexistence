@@ -171,7 +171,7 @@ public class CreateAssetController {// extends BaseAssetController{
 	List<AssetLocationZone> zoneList = new ArrayList<AssetLocationZone>();
 	List<AssetCustomFieldMapper> mapperList = new ArrayList<AssetCustomFieldMapper>();
 	
-	@GetMapping("/newform")
+	@PostMapping("/newform")
 	public String newform(Model model) {
 		LOGGER.info("Fresh Operation..................");
 
