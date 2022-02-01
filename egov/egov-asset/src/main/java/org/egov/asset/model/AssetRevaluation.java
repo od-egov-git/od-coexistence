@@ -59,11 +59,8 @@ public class AssetRevaluation extends AbstractAuditable{
 	@Column(name = "current_value")
 	private BigDecimal current_value;
 	
-	@Column(name="department")
-	private String department;
-	
 	@Column(name="function")
-	private int function;
+	private Long function;
 	
 	@Column(name="voucher")
 	private String voucher;
@@ -76,6 +73,24 @@ public class AssetRevaluation extends AbstractAuditable{
 	
 	@Transient
 	private BigDecimal updatedCurrentValue;
+	
+	@Transient
+	private Long masterId;
+	
+	@Transient
+	private String code;
+	
+	@Transient
+	private String assetName;
+	
+	@Transient
+	private AssetCatagory assetCategory;
+	
+	@Transient
+	private AssetStatus assetStatus;
+	
+	@Transient
+	private String department;
 
 	public Long getId() {
 		return id;
@@ -174,11 +189,11 @@ public class AssetRevaluation extends AbstractAuditable{
 		this.voucher = voucher;
 	}
 
-	public int getFunction() {
+	public Long getFunction() {
 		return function;
 	}
 
-	public void setFunction(int function) {
+	public void setFunction(Long function) {
 		this.function = function;
 	}
 
@@ -204,6 +219,46 @@ public class AssetRevaluation extends AbstractAuditable{
 
 	public void setUpdatedCurrentValue(BigDecimal updatedCurrentValue) {
 		this.updatedCurrentValue = updatedCurrentValue;
+	}
+
+	public Long getMasterId() {
+		return masterId;
+	}
+
+	public void setMasterId(Long masterId) {
+		this.masterId = masterId;
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
+
+	public String getAssetName() {
+		return assetName;
+	}
+
+	public void setAssetName(String assetName) {
+		this.assetName = assetName;
+	}
+
+	public AssetCatagory getAssetCategory() {
+		return assetCategory;
+	}
+
+	public void setAssetCategory(AssetCatagory assetCategory) {
+		this.assetCategory = assetCategory;
+	}
+
+	public AssetStatus getAssetStatus() {
+		return assetStatus;
+	}
+
+	public void setAssetStatus(AssetStatus assetStatus) {
+		this.assetStatus = assetStatus;
 	}
 
 	

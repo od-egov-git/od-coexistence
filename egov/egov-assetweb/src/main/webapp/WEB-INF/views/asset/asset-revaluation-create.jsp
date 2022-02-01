@@ -12,13 +12,12 @@
 <br />
 
 <!-- <div class="form-group"> -->
-<form:form name="assetRevaluation" method="post" action="create"
+<form:form name="assetRevaluation" method="post" action="createReval"
 	modelAttribute="assetRevaluation"
 	class="form-horizontal form-groups-bordered"
 	enctype="multipart/form-data">
 	<input type="hidden" name="viewmode" id="viewmode" value="readonly" />
-	<form:hidden id="updatedCurrentValue"
-		path="assetRevaluation.updatedCurrentValue" />
+	<form:hidden id="masterId" path="masterId" />
 	<!-- Header Details -->
 	<br />
 	<br />
@@ -82,7 +81,7 @@
 				</label>
 					<div class="col-sm-6 add-margin">
 						<form:input class="form-control" required="required"
-							path="assetRevaluation.rev_order_no" required="required" />
+							path="rev_order_no" />
 					</div></td>
 				<td><label class="col-sm-6 control-label text-right"> <spring:message
 							code="asset-reval-date" text="Revaluation Order Date" /> <span
@@ -90,7 +89,7 @@
 				</label>
 					<div class="col-sm-6 add-margin">
 						<form:input id="rev_order_date"
-							path="assetRevaluation.rev_order_date"
+							path="rev_order_date"
 							class="form-control datepicker" data-date-end-date="0d"
 							required="required" placeholder="DD/MM/YYYY" />
 					</div></td>
@@ -105,23 +104,21 @@
 						<form:input id="value_after_revaluation"
 							class="form-control text-left" required="required"
 							readonly="true" data-pattern="numeric"
-							path="assetRevaluation.value_after_revaluation" />
+							path="value_after_revaluation" />
 					</div></td>
 				<td><label class="col-sm-6 control-label text-right"> <spring:message
 							code="asset-change" text="Type Of Change" /> <span
 						class="mandatory"></span>
 				</label>
 					<div class="col-sm-6 add-margin">
-						<form:select path="assetRevaluation.type_of_change"
+						<form:select path="type_of_change"
 							onchange="changeValues();" id="type_of_change"
 							required="required" class="form-control">
 							<form:option value="">
 								<spring:message code="lbl.select" />
 							</form:option>
 							<form:option value="Increased">Increased</form:option>
-							<form:option value="Decreased">
-								<spring:message code="Decreased" />
-							</form:option>
+							<form:option value="Decreased">Decreased</form:option>
 						</form:select>
 					</div></td>
 			</tr>
@@ -133,7 +130,7 @@
 					<div class="col-sm-6 add-margin">
 						<form:input id="add_del_amt" class="form-control text-left"
 							required="required" onchange="changeValues();"
-							data-pattern="numeric" path="assetRevaluation.add_del_amt" />
+							data-pattern="numeric" path="add_del_amt" />
 					</div></td>
 				<td><label class="col-sm-6 control-label text-right"> <spring:message
 							code="asset-cuurent-value" text="Current Value of the Asset" />
@@ -142,15 +139,17 @@
 					<div class="col-sm-6 add-margin">
 						<form:input id="current_value" class="form-control text-left"
 							required="required" readonly="true" data-pattern="numeric"
-							path="assetRevaluation.current_value" />
+							path="current_value" />
 					</div></td>
 			</tr>
 			<tr>
 				<td><label class="col-sm-6 control-label text-right"> <spring:message
 							code="asset-reval-reason" text="Reason For Revaluation" />
+							<span
+						class="mandatory"></span>
 				</label>
 					<div class="col-sm-6 add-margin">
-						<form:textarea path="assetHeader.reason" id="reason"
+						<form:textarea path="reason" id="reason"
 							class="form-control" maxlength="1000"></form:textarea>
 					</div></td>
 				<td><label class="col-sm-6 control-label text-right"> <spring:message
@@ -158,7 +157,7 @@
 						class="mandatory"></span>
 				</label>
 					<div class="col-sm-6 add-margin">
-						<form:input id="rev_date" path="assetRevaluation.rev_date"
+						<form:input id="rev_date" path="rev_date"
 							class="form-control datepicker" data-date-end-date="0d"
 							required="required" placeholder="DD/MM/YYYY" />
 					</div></td>
@@ -192,31 +191,19 @@
 							text="Revaluation Reserve Account Code" /> <span
 						class="mandatory"></span>
 				</label>
-					<div class="col-sm-6 add-margin">${ assetRevaluation.assetMaster.assetdocument.getElementById("add_del_amt");Header.assetCategory.revolutionReserveAccountCode.glcode}
+					<div class="col-sm-6 add-margin">${ assetRevaluation.assetMaster.assetHeader.assetCategory.revolutionReserveAccountCode.glcode}
 						- ${ assetRevaluation.assetMaster.assetHeader.assetCategory.revolutionReserveAccountCode.name}
 					</div></td>
 
 			</tr>
 			<tr>
-				<td><label class="col-sm-6 control-label text-right"> <spring:message
-							code="asset-fund" text="fund" /> <span class="mandatory"></span>
-				</label>
-					<div class="col-sm-6 add-margin">
-						<form:select path="assetRevaluation.fund" id="fund"
-							required="required" class="form-control">
-							<form:option value="">
-								<spring:message code="lbl.select" />
-							</form:option>
-							<form:options items="${fundList}" itemValue="id" itemLabel="name" />
-						</form:select>
-					</div></td>
-				<td>> <label class="col-sm-3 control-label text-right">
+				<td> <label class="col-sm-3 control-label text-right">
 						<spring:message code="asset-function" text="function" /> <span
 						class="mandatory"></span>
 				</label>
 					<div class="col-sm-6 add-margin">
-						<form:select path="assetRevaluation.function"
-							id="assetRevaluation.function" class="form-control">
+						<form:select path="function"
+							id="function" class="form-control">
 							<form:option value="">
 								<spring:message code="lbl.select" />
 							</form:option>
@@ -248,7 +235,7 @@
 						class="mandatory"></span>
 				</label>
 					<div class="col-sm-6 add-margin">
-						<form:textarea path="assetHeader.comment" id="comment"
+						<form:textarea path="comment" id="comment"
 							class="form-control" maxlength="1000"></form:textarea>
 					</div></td>
 
@@ -282,7 +269,8 @@
 	function changeValues() {
 		var type = document.getElementById("type_of_change");
 		var add_del = document.getElementById("add_del_amt");
-		var curr = document.getElementById("current_value").value;
+		var amt=0;
+		var curr = parseInt(document.getElementById("current_value").value);
 		var updatedRevaluatedData = 0;
 		if (!(type != null && type != '')) {
 			bootbox.alert("Please select Type of Change");
@@ -291,14 +279,17 @@
 		else
 			{
 				if (!(add_del != null && add_del != '')) {
-					bootbox.alert("Please Fill Addition/Deduction");
-					add_del = 0;
+					amt = parseInt("0");
 				}
+				else
+					{
+					amt=parseInt(add_del.value);
+					}
 	
-				if (type == 'Increased') {
-					updatedRevaluatedData = curr + add_del
+				if (type.value == 'Increased') {
+					updatedRevaluatedData = curr + amt
 				} else {
-					updatedRevaluatedData = curr - add_del
+					updatedRevaluatedData = curr - amt
 				}
 			}
 		if(updatedRevaluatedData < 0)
@@ -310,8 +301,6 @@
 			updatedRevaluatedData ="";
 			}
 		document.getElementById("value_after_revaluation").value=updatedRevaluatedData;
-		
-		
 	}
 </script>
 

@@ -2,6 +2,7 @@ package org.egov.asset.web.controller;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,6 +15,7 @@ import org.egov.asset.model.AssetStatus;
 import org.egov.asset.repository.AssetCatagoryRepository;
 import org.egov.asset.repository.AssetMasterRepository;
 import org.egov.asset.repository.AssetStatusRepository;
+import org.egov.asset.repository.RevaluationRepository;
 import org.egov.asset.service.RevaluationService;
 import org.egov.commons.CFunction;
 import org.egov.commons.Fund;
@@ -22,6 +24,7 @@ import org.egov.commons.dao.FundHibernateDAO;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.microservice.models.Department;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
+import org.egov.infra.persistence.entity.AbstractAuditable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -50,6 +53,8 @@ public class RevaluationController {
 	private FundHibernateDAO fundHibernateDAO;
 	@Autowired
 	private RevaluationService revaluationService;
+	@Autowired
+	private RevaluationRepository revaluationRepository;
 	
 	private AssetMaster assetBean;
 	private AssetRevaluation assetRevaluation;
@@ -58,6 +63,7 @@ public class RevaluationController {
 	List<AssetStatus> assetStatusList = new ArrayList<AssetStatus>();
 	List<AssetCatagory> assetCategoryList = new ArrayList<AssetCatagory>();
 	List<AssetMaster> assetList = new ArrayList<AssetMaster>();
+	List<AssetRevaluation> revAssetList = new ArrayList<AssetRevaluation>();
 	List<CFunction> functionList = new ArrayList<CFunction>();
 	List<Fund> fundList = new ArrayList<Fund>();
 	
@@ -128,6 +134,7 @@ public class RevaluationController {
 		model.addAttribute("assetBean", assetBean);
 		assetRevaluation= new AssetRevaluation();
 		assetRevaluation.setAssetMaster(assetBean);
+		assetRevaluation.setMasterId(assetBean.getId());
 		assetRevaluation.setUpdatedCurrentValue(new BigDecimal(assetBean.getGrossValue())); // change to current value
 		assetRevaluation.setCurrent_value(new BigDecimal(assetBean.getGrossValue())); // change to current value
 		functionList = functionDAO.getAllActiveFunctions();
@@ -142,20 +149,99 @@ public class RevaluationController {
 		return "asset-create-revaluate";
 	}
 	
-	@PostMapping(value = "/create", params = "create")
+	@PostMapping(value = "/create/createReval", params = "create")
 	public String create(@ModelAttribute("assetRevaluation") AssetRevaluation assetRevaluation,Model model, HttpServletRequest request) {
 
 		LOGGER.info("Creating Asset Object");
 		long userId = ApplicationThreadLocals.getUserId();
+		assetBean = new AssetMaster();
+		assetBean = masterRepo.findOne(assetRevaluation.getMasterId());
+		assetRevaluation.setAssetMaster(assetBean);
 		String voucherNumber=revaluationService.createVoucher(assetRevaluation);
 		assetRevaluation.setVoucher(voucherNumber);
+		applyAuditing(assetRevaluation,userId);
 		AssetRevaluation savedAssetRevaluation=revaluationService.create(assetRevaluation);
 		
-		String message="Asset hasa been revaluated with voucher Number";
+		String message="Asset has been revaluated with voucher Number "+voucherNumber;
 		model.addAttribute("message", message);
 		
 		
-		return "asset-success";
+		return "asset-reval-success";
+	}
+
+	public AssetRevaluation getAssetRevaluation() {
+		return assetRevaluation;
+	}
+
+	public void setAssetRevaluation(AssetRevaluation assetRevaluation) {
+		this.assetRevaluation = assetRevaluation;
+	}
+	
+	public void applyAuditing(AbstractAuditable auditable, Long createdBy) {
+		Date currentDate = new Date();
+		if (auditable.isNew()) {
+			auditable.setCreatedBy(createdBy);
+			auditable.setCreatedDate(currentDate);
+		}
+		auditable.setLastModifiedBy(createdBy);
+		auditable.setLastModifiedDate(currentDate);
+	}
+	
+	@PostMapping("/viewform")
+	public String reviewform(Model model) {
+		LOGGER.info("Search revaluate for view");
+		assetRevaluation = new AssetRevaluation();
+		model.addAttribute("assetRevaluation", assetRevaluation);
+		try {
+			departmentList = microserviceUtils.getDepartments();
+			assetStatusList = statusRepo.findByCode("CAPITALIZED");
+			assetCategoryList = categoryRepo.findAll();
+			
+			revAssetList = revaluationRepository.findAll();
+			LOGGER.info("Asset Lists..."+revAssetList.toString());
+		} catch (Exception e) {
+			e.getMessage();
+		}
+		model.addAttribute("revAssetList", revAssetList);
+		model.addAttribute("departmentList", departmentList);
+		model.addAttribute("assetStatusList", assetStatusList);
+		model.addAttribute("assetCategoryList", assetCategoryList);
+		model.addAttribute("mode", "view");
+		model.addAttribute("disabled", "");
+		return "asset-view-revaluate";
+	}
+	
+	@PostMapping(value = "/view", params = "search")
+	public String view(@ModelAttribute("assetBean") AssetRevaluation assetBean, Model model, HttpServletRequest request) {
+		LOGGER.info("Search Operation..................");
+		revAssetList = new ArrayList<>();
+		try {
+			Long statusId = null;
+			if(null != assetBean.getAssetStatus()) {
+				statusId = assetBean.getAssetStatus().getId();
+			}
+			revAssetList = revaluationRepository.getAssetMasterDetails(assetBean.getCode(), 
+					assetBean.getAssetName(),
+					assetBean.getAssetCategory().getId(), 
+					assetBean.getDepartment(), statusId);
+			LOGGER.info("Asset Lists..."+revAssetList.toString());
+		} catch (Exception e) {
+			e.getMessage();
+		}
+		model.addAttribute("revAssetList", revAssetList);
+		try {
+			departmentList = microserviceUtils.getDepartments();
+			assetStatusList = statusRepo.findByCode("CAPITALIZED");
+			assetCategoryList = categoryRepo.findAll();
+		} catch (Exception e) {
+			e.getMessage();
+		}
+		model.addAttribute("assetBean", assetBean);
+		model.addAttribute("departmentList", departmentList);
+		model.addAttribute("assetStatusList", assetStatusList);
+		model.addAttribute("assetCategoryList", assetCategoryList);
+		
+		return "asset-view-revaluate";
 	}
 
 }
