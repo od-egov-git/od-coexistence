@@ -6,78 +6,60 @@
 <c:set var="contextPath" value="${pageContext.request.contextPath}"/>
 
 
-<div class="formmainbox">
+<div class="container">
 	<form:form name="assetBean" method="post" action="${contextPath}/revaluate/search" modelAttribute="assetBean" 
 		class="form-horizontal form-groups-bordered" enctype="multipart/form-data">
 
-		<br />
-		<div class="panel-title" align="center">
-			<spring:message code="search.revaluate" text="Search Asset For Revaluation"/>
-		</div>
-		<br />
-		<div id="search-asset">
-		
-			<table border="0" width="100%">
-			<tr>
-				<td>
-					<label class="col-sm-6 control-label text-right">
+	<div class="panel-heading">
+				<div class="panel-title">
+					<spring:message code="search.revaluate" text="Search Asset For Revaluation"/>
+				</div>
+			</div>
+			<br />
+			<div class="panel panel-primary" data-collapsed="0" id="search-asset">
+				<div class="panel-body">
+					<label class="col-sm-3 control-label text-right">
 						<spring:message code="asset-code" text="assetCode"/>
 					</label>
-					<div class="col-sm-6 add-margin">
+					<div class="col-sm-3 add-margin">
 						<form:input class="form-control" path="code"/>
 					</div>
-				</td>
-				
-				<td>
 					<label class="col-sm-3 control-label text-right">
 						<spring:message code="asset-name" text="assetName"/>
 					</label>
-					<div class="col-sm-6 add-margin">
+					<div class="col-sm-3 add-margin">
 						<form:input class="form-control" path="assetHeader.assetName"/>
 					</div>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<label class="col-sm-6 control-label text-right">
+					<label class="col-sm-3 control-label text-right">
 						<spring:message code="asset-cat" text="assetCategory"/>
 					    <span class="mandatory"></span>
 					</label>
-					<div class="col-sm-6 add-margin">
+					<div class="col-sm-3 add-margin">
 						<form:select path="assetHeader.assetCategory" id="assetHeader.assetCategory" required="required" class="form-control">
 								<form:option value=""><spring:message code="lbl.select" /></form:option>
 								<form:options items="${assetCategoryList}" itemValue="id" itemLabel="name"/>  
 						</form:select>
 					</div>
-				</td>
-				
-				<td>
 					<label class="col-sm-3 control-label text-right">
 						<spring:message code="asset-dept" text="department"/>
 					</label>
-					<div class="col-sm-6 add-margin">						
+					<div class="col-sm-3 add-margin">						
 						<form:select path="assetHeader.department" id="department" class="form-control">
 							<form:option value=""><spring:message code="lbl.select" /></form:option>
 							<form:options items="${departmentList}" itemValue="name" itemLabel="name"/>  
 						</form:select>
 					</div>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<label class="col-sm-6 control-label text-right">
+					<label class="col-sm-3 control-label text-right">
 						<spring:message code="asset-status" text="status"/>
 					</label>
-					<div class="col-sm-6 add-margin">
+					<div class="col-sm-3 add-margin">
 						<form:select path="assetStatus" id="assetStatus" class="form-control">
 								<form:option value=""><spring:message code="lbl.select" /></form:option>
 								<form:options items="${assetStatusList}" itemValue="id" itemLabel="description"/>  
 						</form:select>
 					</div>
-				</td>
-			</tr>		
-		</table>
-		
+				</div>
+			</div>
 			<div align="center" class="buttonbottom">
 				<div class="row text-center">
 					<input type="submit" class="btn btn-primary" name="search" value="Search"/>
@@ -85,12 +67,17 @@
 					onclick="window.parent.postMessage('close','*');window.close();"/>
 				</div>
 			</div>
-		</div>
 	</form:form>
-	<br />
+
 	<br />
 	<!-- Result Table -->
-	<div style="padding:5%">
+	<div class="panel panel-primary" data-collapsed="0">	
+		<div class="panel-heading">
+		<div class="panel-title">
+			<spring:message code="asset-search-result" text="Search Result"/>
+		</div>
+		</div>
+		<div class="panel-body">
 		<table class="table table-bordered" id="resultHeader">
 		<thead>
 			<tr>
@@ -108,41 +95,26 @@
 					 <c:forEach items="${assetList}" var="asset" varStatus="item">
 						
 						<tr id="assetView">
-							<%-- <td>
-								<span class="assetView_id_${item.index + 1}">${item.index + 1}</span>
-							</td>
-							 --%>
 							<td>
-                                <a href="assetReference/${asset.id}" target="popup"
-                                  onclick="window.open('${contextPath}/asset/editform/${asset.id}','popup','width=700,height=600'); return false;">
-                                    ${item.index + 1} </a>
+                                    ${item.index + 1}
                             </td>
 							<td>
-							<a href="assetReference/${asset.id}" target="popup"
-                                  onclick="window.open('${contextPath}/asset/editform/${asset.id}','popup','width=700,height=600'); return false;">
+							<a href="#" target="popup"
+                                  onclick="window.open('${contextPath}/revaluate/create/${asset.id}','popup','width=700,height=600'); return false;">
 								${asset.code } </a>
 							</td>
 							<td>
-							<a href="assetReference/${asset.id}" target="popup"
-                                  onclick="window.open('${contextPath}/asset/editform/${asset.id}','popup','width=700,height=600'); return false;">
-								${asset.assetHeader.assetName }</a>
+								${asset.assetHeader.assetName }
 							</td>
 							<td>
-							<a href="assetReference/${asset.id}" target="popup"
-                                  onclick="window.open('${contextPath}/asset/editform/${asset.id}','popup','width=700,height=600'); return false;">
-								${asset.assetHeader.assetCategory.name }</a>
+								${asset.assetHeader.assetCategory.name }
 							</td>
 							<td>
-							<a href="assetReference/${asset.id}" target="popup"
-                                  onclick="window.open('${contextPath}/asset/editform/${asset.id}','popup','width=700,height=600'); return false;">
-								${asset.assetHeader.department}</a>
+								${asset.assetHeader.department}
 							</td>
 							<td>
-							<a href="assetReference/${asset.id}" target="popup"
-                                  onclick="window.open('${contextPath}/asset/editform/${asset.id}','popup','width=700,height=600'); return false;">
-								${asset.assetStatus.description }</a>
+								${asset.assetStatus.description }
 							</td>
-							
 						</tr>
 					</c:forEach> 
 				</c:when>
@@ -153,6 +125,7 @@
 			</c:choose>
 		</tbody>
 	</table>	
+	</div>
 	</div>
 	<!-- Result Table Ends -->
 </div>
