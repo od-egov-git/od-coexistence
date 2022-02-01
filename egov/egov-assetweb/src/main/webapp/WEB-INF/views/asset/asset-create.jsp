@@ -128,7 +128,7 @@
 							<spring:message code="asset-scheme" text="scheme"/>
 						</label>
 						<div class="col-sm-3 add-margin">
-							<form:select path="assetHeader.scheme" id="scheme" class="form-control">
+							<form:select path="assetHeader.scheme" id="scheme" class="form-control" onChange="getSubSchemelist(this)" >
 									<form:option value=""><spring:message code="lbl.select" /></form:option>
 									<form:options items="${schemeList}" itemValue="id" itemLabel="name"/>  
 							</form:select>
@@ -138,7 +138,7 @@
 						</label>
 						<div class="col-sm-3 add-margin">
 							<form:select path="assetHeader.subScheme" id="subScheme" 
-							onChange="getSubSchemelist(this)" class="form-control">
+							class="form-control">
 									<form:option value=""><spring:message code="lbl.select" /></form:option>
 									<form:options items="${subSchemeList}" itemValue="id" itemLabel="name"/>  
 							</form:select>
@@ -273,7 +273,6 @@
 			</div>
 			<!-- Value Section -->
 			<br />
-			<br />
 			<div class="panel-body" id="valueSection" style="display:none">
 						<div id="capitalized" style="display:none;">
 							<label class="col-sm-3 control-label text-right">
@@ -281,7 +280,7 @@
 								<span class="mandatory"></span>
 							</label>
 							<div class="col-sm-3 add-margin">
-								<form:input data-pattern="alphanumeric" required="required" class="form-control" path="grossValue" />
+								<form:input data-pattern="alphanumeric" id="grossValue" class="form-control" path="grossValue" />
 							</div>
 							<label class="col-sm-3 control-label text-right">
 								<spring:message code="market-value" text="marketValue"/>
@@ -297,7 +296,7 @@
 								<span class="mandatory"></span>
 							</label>
 							<div class="col-sm-3 add-margin">
-								<form:input class="form-control" required="required" data-pattern="alphanumeric" path="accumulatedDepreciation" />
+								<form:input class="form-control" id="accumulatedDepreciation" data-pattern="alphanumeric" path="accumulatedDepreciation" />
 							</div>
 							<label class="col-sm-3 control-label text-right">
 								<spring:message code="survey-number" text="surveyNumber"/>
@@ -381,6 +380,7 @@
 			</div>
 		</div>
 <input type="hidden" id="customFieldsCounts" name="customFieldsCounts"/>
+<input type="hidden" id="isCapitalized" name="isCapitalized"/>
 </form:form> 
 </div>
 <script>
@@ -392,8 +392,9 @@
 }
 function getSubSchemelist(obj)
 {
-	if(document.getElementById('subschemeid'))
-		populatesubschemeid({schemeId:obj.value});
+	loadSubScheme(obj.value);
+	/* if(document.getElementById('subschemeid'))
+		populatesubschemeid({schemeId:obj.value}); */
 } 
 //window.open('popup.jsp?parameter='+param,'mywindow','width=500,height=350,toolbar=no,resizable=no,menubar=no');
 function onPopupClose(returnParameter) {
@@ -504,6 +505,7 @@ function fetchdetails(status,mode){
 	       	if(assetStatusCode == 'CAPITALIZED'){
 	       		$("#capitalized").css("display", "block");
 	       		$("#capitalized2").css("display", "block");
+	       		$('#isCapitalized').val('CAPITALIZED');
 	       	}
 	       	if(flag){
 	       		if(modeOfAcq == 'PURCHASE'){
@@ -592,4 +594,51 @@ function getTotalFileSize() {
     }
 }
 //Till Here
+
+$( "form" ).submit(function(event) {
+	console.log("Submitting...");
+	var grossVal = $('#grossValue').val();
+	var accumulatedDepreciation = $('#accumulatedDepreciation').val();
+	console.log(grossVal+","+accumulatedDepreciation);
+	var isCapitalized = $('#isCapitalized').val();
+	console.log(isCapitalized);
+	if(isCapitalized == 'CAPITALIZED'){
+		if (grossVal == null || grossVal =='' ||accumulatedDepreciation == null || accumulatedDepreciation == '') {
+			console.log('Prevent');
+			  event.preventDefault();
+		    return false;
+		  }
+	}
+});
+
+function loadSubScheme(schemeId){
+	if (!schemeId) {
+		$('#subScheme').empty();
+		$('#subScheme').append($('<option>').text('Select from below').attr('value', ''));
+		return;
+	} else {
+		
+		$.ajax({
+			method : "GET",
+			url : "/services/EGF/common/getsubschemesbyschemeid",
+			data : {
+				schemeId : schemeId
+			},
+			async : true
+		}).done(
+				function(response) {
+					$('#subScheme').empty();
+					$('#subScheme').append($("<option value=''>Select from below</option>"));
+					$.each(response, function(index, value) {
+						var selected="";
+						if($subSchemeId && $subSchemeId==value.id)
+						{
+								selected="selected";
+						}
+						$('#subScheme').append($('<option '+ selected +'>').text(value.name).attr('value', value.id));
+					});
+				});
+		
+	}
+}
 </script>

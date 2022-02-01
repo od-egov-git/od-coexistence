@@ -931,7 +931,7 @@ public class CreateAssetController {// extends BaseAssetController{
 		try {
 			retVal = new StringBuilder("{ \"data\":")
 	                .append(toSearchResultJson(customeFields))
-	                .append("\"depRate\":"+depRate)
+	                .append(",\"depRate\":"+depRate)
 	                .append("}")
 	                .toString();
 		}catch(Exception e) {
@@ -997,10 +997,11 @@ public class CreateAssetController {// extends BaseAssetController{
 				if(null != assetBean.getAssetStatus()) {
 					statusId = assetBean.getAssetStatus().getId();
 				}
-				assetList = masterRepo.getAssetMasterRegisterDetails(assetBean.getCode(), 
+				assetList = masterRepo.findAll();
+				/*assetList = masterRepo.getAssetMasterRegisterDetails(assetBean.getCode(), 
 						assetBean.getAssetHeader().getAssetName(),
 						assetBean.getAssetHeader().getAssetCategory().getId(), 
-						assetBean.getAssetLocation().getId(), assetBean.getAssetHeader().getDescription(), statusId);
+						assetBean.getAssetLocation().getId(), assetBean.getAssetHeader().getDescription(), statusId);*/
 				LOGGER.info("Asset Lists..."+assetList.toString());
 			} catch (Exception e) {
 				e.getMessage();
