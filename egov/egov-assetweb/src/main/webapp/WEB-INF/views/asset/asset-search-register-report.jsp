@@ -6,86 +6,66 @@
 <c:set var="contextPath" value="${pageContext.request.contextPath}"/>
 
 
-<div class="formmainbox">
+<div class="container">
 	<form:form name="assetBean" method="post" action="${contextPath}/asset/searchregister" modelAttribute="assetBean" 
 		class="form-horizontal form-groups-bordered" enctype="multipart/form-data">
 
-		<br />
-		<div class="panel-title" align="center">
-			<spring:message code="view-asset" text="View Asset"/>
+		<div class="panel-heading">
+			<div class="panel-title">
+				<spring:message code="view-asset" text="View Asset"/>
+			</div>
 		</div>
 		<br />
-		<div id="search-asset">
-		
-			<table border="0" width="100%">
-			<tr>
-				<td>
-					<label class="col-sm-6 control-label text-right">
+		<div class="panel panel-primary" data-collapsed="0" id="search-asset">
+			<div class="panel-body">
+					<label class="col-sm-3 control-label text-right">
 						<spring:message code="asset-code" text="assetCode"/>
 					</label>
-					<div class="col-sm-6 add-margin">
+					<div class="col-sm-3 add-margin">
 						<form:input class="form-control" path="code"/>
 					</div>
-				</td>
-				
-				<td>
 					<label class="col-sm-3 control-label text-right">
 						<spring:message code="asset-name" text="assetName"/>
 					</label>
-					<div class="col-sm-6 add-margin">
+					<div class="col-sm-3 add-margin">
 						<form:input class="form-control" path="assetHeader.assetName"/>
 					</div>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<label class="col-sm-6 control-label text-right">
+					<label class="col-sm-3 control-label text-right">
 						<spring:message code="asset-cat" text="assetCategory"/>
 					    <span class="mandatory"></span>
 					</label>
-					<div class="col-sm-6 add-margin">
+					<div class="col-sm-3 add-margin">
 						<form:select path="assetHeader.assetCategory" id="assetHeader.assetCategory" required="required" class="form-control">
 								<form:option value=""><spring:message code="lbl.select" /></form:option>
 								<form:options items="${assetCategoryList}" itemValue="id" itemLabel="name"/>  
 						</form:select>
 					</div>
-				</td>
-				
-				<td>
 					<label class="col-sm-3 control-label text-right">
 						<spring:message code="asset-location" text="locality"/>
 						<span class="mandatory"></span>
 					</label>
-					<div class="col-sm-6 add-margin">
+					<div class="col-sm-3 add-margin">
 						<form:select path="assetLocation.location" id="assetLocation.location" required="required" class="form-control">
 								<form:option value=""><spring:message code="lbl.select" /></form:option>
 								<form:options items="${localityList}" itemValue="id" itemLabel="description"/>  
 						</form:select>
 					</div>
-				</td>
-			</tr>
-			<tr>
-				<td>
 					<label class="col-sm-3 control-label text-right">
 						<spring:message code="asset-desc" text="description"/>
 					</label>
-					<div class="col-sm-6 add-margin">
+					<div class="col-sm-3 add-margin">
 						<form:input class="form-control" path="assetHeader.description"/>
 					</div>
-				</td>
-				<td>
-					<label class="col-sm-6 control-label text-right">
+					<label class="col-sm-3 control-label text-right">
 						<spring:message code="asset-status" text="status"/>
 					</label>
-					<div class="col-sm-6 add-margin">
+					<div class="col-sm-3 add-margin">
 						<form:select path="assetStatus" id="assetStatus" class="form-control">
 								<form:option value=""><spring:message code="lbl.select" /></form:option>
 								<form:options items="${assetStatusList}" itemValue="id" itemLabel="description"/>  
 						</form:select>
 					</div>
-				</td>
-			</tr>		
-		</table>
+				</div>
 		</div>
 		
 		<div align="center" class="buttonbottom">
@@ -98,9 +78,14 @@
 		<input type="hidden" name="viewmode" id="viewmode" value="readonly"/>
 	</form:form>
 	<br />
-	<br />
 	<!-- Result Table -->
-	<div style="padding:5%">
+	<div class="panel panel-primary" data-collapsed="0">	
+		<div class="panel-heading">
+		<div class="panel-title">
+			<spring:message code="asset-search-result" text="Search Result"/>
+		</div>
+		</div>
+		<div class="panel-body">
 		<table class="table table-bordered" id="resultHeader">
 		<thead>
 			<tr>
@@ -125,8 +110,8 @@
                                ${item.index + 1}
                             </td>
 							<td>
-							<a href="assetReference/${asset.id}" target="popup"
-                                  onclick="window.open('${contextPath}/asset/editform/${asset.id}','popup','width=700,height=600'); return false;">
+							<a href="#" target="popup"
+                                  onclick="window.open('${contextPath}/asset/assetcreate/editform/${asset.id}','popup','width=700,height=600'); return false;">
 								${asset.code } </a>
 							</td>
 							<td>
@@ -151,6 +136,7 @@
 			</c:choose>
 		</tbody>
 	</table>	
+	</div>
 	</div>
 	<!-- Result Table Ends -->
 </div>
@@ -197,8 +183,6 @@
 	} );
 
 	function  selectAssetRef(code, name){
-		console.log("My value..."+code);
-		console.log("My value..."+name);
 		var retVal = name + '~'+ code;	
 		window.opener.onPopupClose(retVal);//myValue is the value you want to return to main javascript
 		window.close();

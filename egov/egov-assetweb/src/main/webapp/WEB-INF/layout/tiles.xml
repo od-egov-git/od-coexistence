@@ -55,12 +55,12 @@
         <put-attribute name="body" value="/WEB-INF/views/asset/search-sale-disposal.jsp"/>
     </definition>
     <definition name="asset-create" extends="base_layout">
-        <put-attribute name="page-title" value="title.asset.catagory.create" cascade="true"/>
+        <put-attribute name="page-title" value="lbl-asset-create" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/asset/asset-create.jsp"/>
     </definition>
     
     <definition name="asset-view" extends="base_layout">
-        <put-attribute name="page-title" value="lbl-asset-create" cascade="true"/>
+        <put-attribute name="page-title" value="view-asset" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/asset/asset-view.jsp"/>
     </definition>
     <definition name="asset-success" extends="base_layout">
@@ -93,5 +93,9 @@
     <definition name="depreciation-success" extends="base_layout">
         <put-attribute name="page-title" value="asset.depreciation.title" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/asset/depreciation-success.jsp"/>
+    </definition>
+    <definition name="asset-register-report" extends="base_layout">
+        <put-attribute name="page-title" value="asset-register-report" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/asset/asset-search-register-report.jsp"/>
     </definition>
 </tiles-definitions>
