@@ -6,39 +6,30 @@
 <c:set var="contextPath" value="${pageContext.request.contextPath}"/>
 
 
-<div class="formmainbox">
+<div class="container">
 	<form:form name="assetRevaluation" method="post" action="${contextPath}/revaluate/view" modelAttribute="assetRevaluation" 
 		class="form-horizontal form-groups-bordered" enctype="multipart/form-data">
 
-		<br />
-		<div class="panel-title" align="center">
-			<spring:message code="search.revaluate" text="View Asset For Revaluation"/>
-		</div>
-		<br />
-		<div id="search-asset">
-		
-			<table border="0" width="100%">
-			<tr>
-				<td>
+		<div class="panel-heading">
+				<div class="panel-title">
+					<spring:message code="search.revaluate" text="View Asset For Revaluation"/>
+				</div>
+			</div>
+			<br />
+			<div class="panel panel-primary" data-collapsed="0" id="search-asset">
+				<div class="panel-body">
 					<label class="col-sm-6 control-label text-right">
 						<spring:message code="asset-code" text="assetCode"/>
 					</label>
 					<div class="col-sm-6 add-margin">
 						<form:input class="form-control" path="code"/>
 					</div>
-				</td>
-				
-				<td>
 					<label class="col-sm-3 control-label text-right">
 						<spring:message code="asset-name" text="assetName"/>
 					</label>
 					<div class="col-sm-6 add-margin">
 						<form:input class="form-control" path="assetName"/>
 					</div>
-				</td>
-			</tr>
-			<tr>
-				<td>
 					<label class="col-sm-6 control-label text-right">
 						<spring:message code="asset-cat" text="assetCategory"/>
 					    <span class="mandatory"></span>
@@ -49,9 +40,6 @@
 								<form:options items="${assetCategoryList}" itemValue="id" itemLabel="name"/>  
 						</form:select>
 					</div>
-				</td>
-				
-				<td>
 					<label class="col-sm-3 control-label text-right">
 						<spring:message code="asset-dept" text="department"/>
 					</label>
@@ -61,10 +49,6 @@
 							<form:options items="${departmentList}" itemValue="name" itemLabel="name"/>  
 						</form:select>
 					</div>
-				</td>
-			</tr>
-			<tr>
-				<td>
 					<label class="col-sm-6 control-label text-right">
 						<spring:message code="asset-status" text="status"/>
 					</label>
@@ -74,9 +58,8 @@
 								<form:options items="${assetStatusList}" itemValue="id" itemLabel="description"/>  
 						</form:select>
 					</div>
-				</td>
-			</tr>		
-		</table>
+				</div>
+			</div>
 		
 			<div align="center" class="buttonbottom">
 				<div class="row text-center">
@@ -85,12 +68,16 @@
 					onclick="window.parent.postMessage('close','*');window.close();"/>
 				</div>
 			</div>
-		</div>
 	</form:form>
 	<br />
-	<br />
 	<!-- Result Table -->
-	<div style="padding:5%">
+	<div class="panel panel-primary" data-collapsed="0">	
+		<div class="panel-heading">
+		<div class="panel-title">
+			<spring:message code="asset-search-result" text="Search Result"/>
+		</div>
+		</div>
+		<div class="panel-body">
 		<table class="table table-bordered" id="resultHeader">
 		<thead>
 			<tr>
@@ -108,14 +95,8 @@
 					 <c:forEach items="${revAssetList}" var="asset" varStatus="item">
 						
 						<tr id="assetView">
-							<%-- <td>
-								<span class="assetView_id_${item.index + 1}">${item.index + 1}</span>
-							</td>
-							 --%>
 							<td>
-                                <a href="#" target="popup"
-                                  onclick="window.open('${contextPath}/revaluate/view/${asset.id}','popup','width=700,height=600'); return false;">
-                                    ${item.index + 1} </a>
+                                    ${item.index + 1}
                             </td>
 							<td>
 							<a href="#" target="popup"
@@ -123,26 +104,17 @@
 								${asset.assetMaster.code } </a>
 							</td>
 							<td>
-							<a href="#" target="popup"
-                                  onclick="window.open('${contextPath}/revaluate/view/${asset.id}','popup','width=700,height=600'); return false;">
-								${asset.assetMaster.assetHeader.assetName }</a>
+								${asset.assetMaster.assetHeader.assetName }
 							</td>
 							<td>
-							<a href="#" target="popup"
-                                  onclick="window.open('${contextPath}/revaluate/view/${asset.id}','popup','width=700,height=600'); return false;">
-								${asset.assetMaster.assetHeader.assetCategory.name }</a>
+								${asset.assetMaster.assetHeader.assetCategory.name }
 							</td>
 							<td>
-							<a href="#" target="popup"
-                                  onclick="window.open('${contextPath}/revaluate/view/${asset.id}','popup','width=700,height=600'); return false;">
-								${asset.assetMaster.assetHeader.department}</a>
+								${asset.assetMaster.assetHeader.department}
 							</td>
 							<td>
-							<a href="#" target="popup"
-                                  onclick="window.open('${contextPath}/revaluate/view/${asset.id}','popup','width=700,height=600'); return false;">
-								${asset.assetMaster.assetStatus.description }</a>
+								${asset.assetMaster.assetStatus.description }
 							</td>
-							
 						</tr>
 					</c:forEach> 
 				</c:when>
@@ -153,6 +125,7 @@
 			</c:choose>
 		</tbody>
 	</table>	
+	</div>
 	</div>
 	<!-- Result Table Ends -->
 </div>
