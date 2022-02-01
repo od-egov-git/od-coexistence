@@ -243,5 +243,25 @@ public class RevaluationController {
 		
 		return "asset-view-revaluate";
 	}
+	
+	@GetMapping("/view/{assetid}")
+	public String revViewform(@PathVariable("assetid") String assetId, Model model, HttpServletRequest request) {
+		LOGGER.info("View Operation.................."+assetId);
+		try {
+		assetRevaluation= new AssetRevaluation();
+		assetRevaluation = revaluationRepository.findOne(Long.valueOf(assetId));
+		assetRevaluation.setMasterId(assetRevaluation.getAssetMaster().getId());
+		functionList = functionDAO.getAllActiveFunctions();
+		fundList = fundHibernateDAO.findAllActiveFunds();
+		model.addAttribute("assetRevaluation", assetRevaluation);
+		model.addAttribute("fundList", fundList);
+		model.addAttribute("functionList", functionList);
+		model.addAttribute("assetRevaluation", assetRevaluation);
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		return "asset-view-revaluate-detail";
+	}
 
 }
