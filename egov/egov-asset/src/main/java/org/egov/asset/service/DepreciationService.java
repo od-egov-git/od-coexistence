@@ -49,24 +49,20 @@ package org.egov.asset.service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.script.ScriptContext;
 
-import org.apache.commons.lang.StringUtils;
-import org.egov.commons.CChartOfAccountDetail;
-import org.egov.commons.CChartOfAccounts;
-import org.egov.commons.CFinancialYear;
+import org.egov.asset.model.AssetMaster;
+import org.egov.asset.model.DepreciationInputs;
+import org.egov.asset.model.DepreciationList;
+import org.egov.asset.model.ReasonForFailure;
+import org.egov.asset.repository.AssetMasterRepository;
+import org.egov.asset.repository.DepreciationRepository;
 import org.egov.commons.CFunction;
 import org.egov.commons.CVoucherHeader;
-import org.egov.commons.EgwStatus;
 import org.egov.commons.Fund;
 import org.egov.commons.Vouchermis;
 import org.egov.commons.dao.EgwStatusHibernateDAO;
@@ -74,54 +70,26 @@ import org.egov.commons.dao.FunctionDAO;
 import org.egov.commons.dao.FundHibernateDAO;
 import org.egov.commons.service.CFinancialYearService;
 import org.egov.commons.service.ChartOfAccountDetailService;
-import org.egov.commons.service.CheckListService;
 import org.egov.commons.service.FundService;
-import org.egov.dao.budget.BudgetDetailsHibernateDAO;
-import org.egov.egf.autonumber.ExpenseBillNumberGenerator;
-import org.egov.egf.autonumber.WorksBillNumberGenerator;
-import org.egov.egf.billsubtype.service.EgBillSubTypeService;
-import org.egov.egf.dashboard.event.FinanceEventType;
-import org.egov.egf.dashboard.event.listener.FinanceDashboardService;
-import org.egov.asset.repository.DepreciationRepository;
 import org.egov.egf.expensebill.repository.DocumentUploadRepository;
 import org.egov.egf.utils.FinancialUtils;
-import org.egov.eis.entity.Assignment;
-import org.egov.infra.admin.master.entity.AppConfig;
-import org.egov.infra.admin.master.entity.AppConfigValues;
-import org.egov.infra.admin.master.entity.User;
 import org.egov.infra.admin.master.service.AppConfigService;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
-import org.egov.infra.microservice.models.Department;
-import org.egov.infra.microservice.models.Designation;
-import org.egov.infra.microservice.models.EmployeeInfo;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.script.service.ScriptService;
 import org.egov.infra.security.utils.SecurityUtils;
 import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
-import org.egov.infra.validation.exception.ValidationException;
-import org.egov.infra.workflow.matrix.entity.WorkFlowMatrix;
-import org.egov.infra.workflow.service.SimpleWorkflowService;
-import org.egov.infstr.models.EgChecklists;
 import org.egov.infstr.services.PersistenceService;
-import org.egov.asset.model.Depreciation;
-import org.egov.asset.model.DepreciationInputs;
-import org.egov.asset.model.DepreciationList;
-import org.egov.asset.model.ReasonForFailure;
-import org.egov.model.budget.BudgetGroup;
 import org.egov.model.voucher.VoucherDetails;
 import org.egov.model.voucher.VoucherTypeBean;
 import org.egov.model.voucher.WorkflowBean;
-import org.egov.pims.commons.Position;
 import org.egov.services.masters.SchemeService;
 import org.egov.services.masters.SubSchemeService;
 import org.egov.services.voucher.JournalVoucherActionHelper;
 import org.egov.services.voucher.VoucherService;
-import org.egov.utils.Constants;
-import org.egov.utils.FinancialConstants;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -193,6 +161,9 @@ public class DepreciationService {
 	private FundHibernateDAO fundHibernateDAO;
     
     @Autowired
+	private AssetMasterRepository masterRepo;
+    
+    @Autowired
     public DepreciationService(final DepreciationRepository depreciationRepository, final ScriptService scriptExecutionService) {
         this.depreciationRepository = depreciationRepository;
         this.scriptExecutionService = scriptExecutionService;
@@ -248,6 +219,7 @@ public class DepreciationService {
 
 	public DepreciationInputs saveDepreciationAsset(DepreciationList dl,String depreciationDate,Integer cnt,List<DepreciationList> depreciationList) {
 		System.out.println("inside save Depreciation Asset");
+		AssetMaster assetBean=null;
 		final BigDecimal minValue = BigDecimal.ONE;
         ReasonForFailure reason = null;
         String reason1="N/A";
@@ -361,6 +333,10 @@ public class DepreciationService {
                 dI.setVoucherNumber(voucherHeader.getVoucherNumber());
                 try {    
                 dI=depreciationRepository.save(dI);
+                assetBean = new AssetMaster();
+        		assetBean = masterRepo.findOne(dI.getAssetId());
+        		assetBean.setCurrentValue(new BigDecimal(dI.getAfterDepreciation()).longValue());
+        		masterRepo.save(assetBean);
                 persistenceService.getSession().flush();
                 }
                 catch(Exception e) {

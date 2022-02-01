@@ -1,45 +1,31 @@
 package org.egov.asset.web.controller;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.egov.asset.model.AssetCatagory;
-import org.egov.asset.model.AssetCatagoryType;
 import org.egov.asset.model.Depreciation;
 import org.egov.asset.model.DepreciationInputs;
 import org.egov.asset.model.DepreciationList;
 import org.egov.asset.repository.AssetCatagoryRepository;
+import org.egov.asset.service.AssetCatagoryService;
+import org.egov.asset.service.DepreciationService;
+import org.egov.infra.microservice.utils.MicroserviceUtils;
+import org.egov.infstr.services.PersistenceService;
+import org.egov.infstr.utils.EgovMasterDataCaching;
 import org.hibernate.SQLQuery;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.struts2.convention.annotation.Action;
-import org.apache.struts2.interceptor.validation.SkipValidation;
-import org.egov.asset.service.AssetCatagoryService;
-import org.egov.asset.service.DepreciationService;
-import org.egov.infra.admin.master.service.AppConfigValueService;
-import org.egov.infra.validation.exception.ValidationError;
-import org.egov.infra.validation.exception.ValidationException;
-import org.egov.infra.web.struts.actions.BaseFormAction;
-import org.egov.infra.microservice.models.Department;
-import org.egov.infra.microservice.utils.MicroserviceUtils;
-import org.egov.infstr.services.PersistenceService;
-import org.egov.infstr.utils.EgovMasterDataCaching;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.egov.egf.*;
 @Controller
 @RequestMapping("/asset")
 public class DepreciationController {
@@ -84,9 +70,7 @@ public class DepreciationController {
 		List<Object[]> list= null;
 		SQLQuery queryMain =  null;
 		query1
-		      .append("select ac.name,ah.department,ac.asset_code,ah.asset_name,am.gross_value ,ac.depriciation_rate " + 
-		      			" from asset_category ac,asset_header ah,asset_master am,chartofaccounts c,asset_revaluation ar " + 
-		      			" where ac.asset_code =am.code and ah.id =am.asset_header and c.id =ac.asset_account_code_id and ar.asset_master_id =am.id and am.asset_status ='2'");
+		      .append("select 	ac.name,ah.department,ac.asset_code,ah.asset_name,am.gross_value ,ac.depriciation_rate from	asset_master am,asset_header ah,asset_category ac,asset_revaluation ar where am.id=ar.asset_master_id and am.asset_header=ah.id	and ah.asset_category =ac.id ");
 		System.out.println("categoryName "+depreciation.getCategoryName());
 		if(depreciation.getCategoryName()!=null) {
 			query1.append(" and ac.name='"+depreciation.getCategoryName()+"'");
