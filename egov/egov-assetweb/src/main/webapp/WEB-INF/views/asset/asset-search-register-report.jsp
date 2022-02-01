@@ -7,7 +7,7 @@
 
 
 <div class="container">
-	<form:form name="assetBean" method="post" action="${contextPath}/asset/searchregister" modelAttribute="assetBean" 
+	<form:form name="assetBean" method="post" action="${contextPath}/assetcreate/searchregister" modelAttribute="assetBean" 
 		class="form-horizontal form-groups-bordered" enctype="multipart/form-data">
 
 		<div class="panel-heading">
@@ -111,7 +111,7 @@
                             </td>
 							<td>
 							<a href="#" target="popup"
-                                  onclick="window.open('${contextPath}/asset/assetcreate/editform/${asset.id}','popup','width=700,height=600'); return false;">
+                                  onclick="window.open('${contextPath}/assetcreate/editform/${asset.id}','popup','width=700,height=600'); return false;">
 								${asset.code } </a>
 							</td>
 							<td>

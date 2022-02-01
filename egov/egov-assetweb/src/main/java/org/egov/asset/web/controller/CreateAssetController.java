@@ -906,9 +906,10 @@ public class CreateAssetController {// extends BaseAssetController{
 		LOGGER.info("Category Details.................."+assetCategoryId);
 		AssetCatagory assetCategory = new AssetCatagory();
 		List<CustomeFields> customeFields=new ArrayList<>();
-		
+		double depRate = 0.0;
 		try {
 			assetCategory = categoryRepo.findOne(Long.valueOf(assetCategoryId));
+			depRate = assetCategory.getDepriciationRate();
 			customeFields = assetCategory.getCustomeFields();
 			LOGGER.info("Custom Fields.."+customeFields);
 		}catch(Exception e) {
@@ -929,7 +930,9 @@ public class CreateAssetController {// extends BaseAssetController{
 		String retVal = "";
 		try {
 			retVal = new StringBuilder("{ \"data\":")
-	                .append(toSearchResultJson(customeFields)).append("}")
+	                .append(toSearchResultJson(customeFields))
+	                .append("\"depRate\":"+depRate)
+	                .append("}")
 	                .toString();
 		}catch(Exception e) {
 			e.printStackTrace();
@@ -985,7 +988,7 @@ public class CreateAssetController {// extends BaseAssetController{
 			
 		}
 		
-		@PostMapping(value = "/searchregister", params = "search")
+		@PostMapping(value = "/searchregister")
 		public String searchRegister(@ModelAttribute("assetBean") AssetMaster assetBean, Model model, HttpServletRequest request) {
 			LOGGER.info("Search Register Report Operation..................");
 			assetList = new ArrayList<>();
@@ -1046,5 +1049,31 @@ public class CreateAssetController {// extends BaseAssetController{
 				model.addAttribute("isReference", false);
 			}
 			return "asset-register-report";
+		}
+		
+		@PostMapping("/modifyform")
+		public String modifyform(Model model) {
+			LOGGER.info("View Form..................");
+			assetBean = new AssetMaster();
+			model.addAttribute("assetBean", assetBean);
+			try {
+				departmentList = microserviceUtils.getDepartments();
+				assetStatusList = statusRepo.findAll();
+				assetCategoryList = categoryRepo.findAll();
+				
+				assetList = masterRepo.findAll();
+				LOGGER.info("Asset Lists..."+assetList.toString());
+			} catch (Exception e) {
+				e.getMessage();
+			}
+			model.addAttribute("assetList", assetList);
+			model.addAttribute("departmentList", departmentList);
+			model.addAttribute("assetStatusList", assetStatusList);
+			model.addAttribute("assetCategoryList", assetCategoryList);
+			model.addAttribute("localityList", localityList);
+			model.addAttribute("mode", "add");
+			model.addAttribute("disabled", "");
+			
+			return "asset-modify";
 		}
 }

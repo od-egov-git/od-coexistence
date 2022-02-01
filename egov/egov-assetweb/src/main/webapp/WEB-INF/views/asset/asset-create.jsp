@@ -53,9 +53,10 @@
 						</div>
 						<label class="col-sm-3 control-label text-right">
 							<spring:message code="asset-desc" text="description"/>
+							<span class="mandatory"></span>
 						</label>
 						<div class="col-sm-3 add-margin">
-							<form:textarea path="assetHeader.description" id="description" class="form-control" maxlength="100" ></form:textarea>
+							<form:textarea path="assetHeader.description" id="description" required="required" class="form-control" maxlength="100" ></form:textarea>
 							<form:errors path="assetHeader.description" cssClass="add-margin error-msg" />
 						</div>
 						<label class="col-sm-3 control-label text-right">
@@ -98,7 +99,7 @@
 							<spring:message code="asset-dep-rate" text="depreciationRate"/>
 						</label>
 						<div class="col-sm-3 add-margin">
-							<form:input  class="form-control text-left patternvalidation" 
+							<form:input  class="form-control text-left patternvalidation" id="AssetDep"
 								data-pattern="alphanumeric" path="assetHeader.depreciationRate"/>
 						</div>
 						<label class="col-sm-3 control-label text-right">
@@ -277,10 +278,10 @@
 						<div id="capitalized" style="display:none;">
 							<label class="col-sm-3 control-label text-right">
 								<spring:message code="gross-value" text="grossValue"/>
-								
+								<span class="mandatory"></span>
 							</label>
 							<div class="col-sm-3 add-margin">
-								<form:input data-pattern="alphanumeric" class="form-control" path="grossValue" />
+								<form:input data-pattern="alphanumeric" required="required" class="form-control" path="grossValue" />
 							</div>
 							<label class="col-sm-3 control-label text-right">
 								<spring:message code="market-value" text="marketValue"/>
@@ -293,10 +294,10 @@
 						<div id="capitalized2" style="display:none;">
 							<label class="col-sm-3 control-label text-right">
 								<spring:message code="accumulated-depreciation" text="accumulatedDepreciation"/>
-								
+								<span class="mandatory"></span>
 							</label>
 							<div class="col-sm-3 add-margin">
-								<form:input class="form-control" data-pattern="alphanumeric" path="accumulatedDepreciation" />
+								<form:input class="form-control" required="required" data-pattern="alphanumeric" path="accumulatedDepreciation" />
 							</div>
 							<label class="col-sm-3 control-label text-right">
 								<spring:message code="survey-number" text="surveyNumber"/>
@@ -423,7 +424,7 @@ function showCategoryDetails(obj){
 		$("#categoryDetails").css("display", "block");
 	}
 }
-
+//$("#AssetDep").val();
 function fetchCustomFieldData(id){
 	console.log("Custom id..."+id);
 	 $.ajax({
@@ -433,6 +434,8 @@ function fetchCustomFieldData(id){
 	           console.log("output............"+res);
 	           var jsonObj = JSON.parse(res);
 	           var json = jsonObj.data;
+	           console.log(jsonObj.depRate);
+	           $("#AssetDep").val(jsonObj.depRate);
 	           //var output = evaluateJson(json);
 	           var retHtml = "<tr>";
 	           var len = 0;
