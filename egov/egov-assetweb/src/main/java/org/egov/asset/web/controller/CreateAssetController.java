@@ -302,6 +302,17 @@ public class CreateAssetController {// extends BaseAssetController{
 			e.printStackTrace();
 		}
 		LOGGER.info("Custom Fields Ends...");
+		LOGGER.info("Calculating Current Value..");
+		try {
+			if(null != assetBean.getGrossValue() && null != assetBean.getAccumulatedDepreciation()) {
+				long currentValue =  assetBean.getGrossValue() - assetBean.getAccumulatedDepreciation();//            currentValue.setCurrentAmount(grossValue.subtract(accumulatedDepreciation));
+				LOGGER.info("current Value.."+currentValue);
+				assetBean.setCurrentValue(currentValue);
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		LOGGER.info("Calculating Current Value Ends..");
 		try {
 			final StringBuilder generatedCode = new StringBuilder(String.format("%06d", nextVal));
 			assetCode = generatedCode.toString();
@@ -402,6 +413,7 @@ public class CreateAssetController {// extends BaseAssetController{
 		model.addAttribute("departmentList", departmentList);
 		model.addAttribute("assetStatusList", assetStatusList);
 		model.addAttribute("assetCategoryList", assetCategoryList);
+		model.addAttribute("localityList", localityList);
 		model.addAttribute("mode", "add");
 		model.addAttribute("disabled", "");
 		if(param.equalsIgnoreCase("ref")) {
@@ -442,7 +454,7 @@ public class CreateAssetController {// extends BaseAssetController{
     }
 	
 	@GetMapping("/editform/{assetid}")
-	public String editform(@PathVariable("assetid") String assetId, Model model) {
+	public String editform(@PathVariable("assetid") String assetId, Model model, HttpServletRequest request) {
 		LOGGER.info("Edit Operation.................."+assetId);
 	
 		assetBean = new AssetMaster();
@@ -521,6 +533,13 @@ public class CreateAssetController {// extends BaseAssetController{
 			e.printStackTrace();
 		}
 		
+		String updateParam = "update";
+		try {
+			updateParam = request.getParameter("viewmode");
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		
 		model.addAttribute("departmentList", departmentList);
 		model.addAttribute("fundList", fundList);
 		model.addAttribute("modeOfAcquisitionList", modeOfAcquisitionList);
@@ -536,7 +555,7 @@ public class CreateAssetController {// extends BaseAssetController{
 		model.addAttribute("revenueWardList", revenueWardList);
 		model.addAttribute("streetList", streetList);
 		model.addAttribute("zoneList", zoneList);
-		model.addAttribute("mode", "update");
+		model.addAttribute("mode", updateParam);
 		model.addAttribute("disabled", "disabled");
 		model.addAttribute("mapperList", mapperList);
 		
@@ -957,5 +976,75 @@ public class CreateAssetController {// extends BaseAssetController{
 	        return obj.toString();
 			//return customeFields;
 		}
+		
+		@GetMapping("/test")
+		public String test(Model model) {
+			LOGGER.info("Fresh Operation..................");
+			
+			return "asset-create";
+			
+		}
+		
+		@PostMapping(value = "/searchregister", params = "search")
+		public String searchRegister(@ModelAttribute("assetBean") AssetMaster assetBean, Model model, HttpServletRequest request) {
+			LOGGER.info("Search Register Report Operation..................");
+			assetList = new ArrayList<>();
+			try {
+				Long statusId = null;
+				if(null != assetBean.getAssetStatus()) {
+					statusId = assetBean.getAssetStatus().getId();
+				}
+				assetList = masterRepo.getAssetMasterRegisterDetails(assetBean.getCode(), 
+						assetBean.getAssetHeader().getAssetName(),
+						assetBean.getAssetHeader().getAssetCategory().getId(), 
+						assetBean.getAssetLocation().getId(), assetBean.getAssetHeader().getDescription(), statusId);
+				LOGGER.info("Asset Lists..."+assetList.toString());
+			} catch (Exception e) {
+				e.getMessage();
+			}
+			model.addAttribute("assetList", assetList);
+			try {
+				localityList = localityRepo.findAll();
+				assetStatusList = statusRepo.findAll();
+				assetCategoryList = categoryRepo.findAll();
+			} catch (Exception e) {
+				e.getMessage();
+			}
+			model.addAttribute("assetBean", assetBean);
+			model.addAttribute("localityList", localityList);
+			model.addAttribute("assetStatusList", assetStatusList);
+			model.addAttribute("assetCategoryList", assetCategoryList);
+			
+			return "asset-register-report";
+		}
 	
+		@PostMapping("/searchform/{param}")
+		public String searchform(@PathVariable("param") String param, Model model) {
+			LOGGER.info("Search Form..................");
+			assetBean = new AssetMaster();
+			model.addAttribute("assetBean", assetBean);
+			try {
+				localityList = localityRepo.findAll();
+				assetStatusList = statusRepo.findAll();
+				assetCategoryList = categoryRepo.findAll();
+				
+				assetList = masterRepo.findAll();
+				LOGGER.info("Asset Lists..."+assetList.toString());
+			} catch (Exception e) {
+				e.getMessage();
+			}
+			model.addAttribute("assetList", assetList);
+			model.addAttribute("localityList", localityList);
+			model.addAttribute("assetStatusList", assetStatusList);
+			model.addAttribute("assetCategoryList", assetCategoryList);
+			model.addAttribute("localityList", localityList);
+			model.addAttribute("mode", "add");
+			model.addAttribute("disabled", "");
+			if(param.equalsIgnoreCase("ref")) {
+				model.addAttribute("isReference", true);
+			}else {
+				model.addAttribute("isReference", false);
+			}
+			return "asset-register-report";
+		}
 }

@@ -284,7 +284,7 @@ return returnVal;
 }
 
 
-function loadValues(){//obj
+/*function loadValues(){//obj
 	var assetStatusCode = $('#assetStatus').val();//obj.value;
 	console.log(assetStatusCode);
 	var modeOfAcq = $('#modeOfAcquisition').val();
@@ -299,13 +299,13 @@ function loadValues(){//obj
 	$("#acqAcquired").css("display", "none");
 	
 	if(assetStatusCode != '' && modeOfAcq != ''){
-		fetchdetails(assetStatusCode,modeOfAcq);
+		fetchdetails(assetStatusCode,modeOfAcq);*/
 		//var res =  console.log(res);
 	  /*  var jsonObj = JSON.parse(res);
 	    status = jsonObj.status;
 	    mode = jsonObj.mode;
 	    console.log(status+"..."+mode);*/
-	}
+	//}
 	//default set
 	
 	
@@ -331,7 +331,7 @@ function loadValues(){//obj
 			console.log("select modeOfAcq");
 		}
 	}*/
-}
+//}
 
 function fetchdetails(status,mode){
 	console.log(status);

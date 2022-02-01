@@ -86,5 +86,46 @@
     <definition name="view-asset-history" extends="base_layout">
         <put-attribute name="page-title" value="title.view-asset-history" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/asset/view-asset-history.jsp"/>
+	</definition>
+    <definition name="asset-search-revaluate" extends="base_layout">
+        <put-attribute name="page-title" value="title.asset.catagory.create" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/asset/asset-revaluate-search.jsp"/>
+    </definition>
+    <definition name="asset-create-revaluate" extends="base_layout">
+        <put-attribute name="page-title" value="title.asset.catagory.create" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/asset/asset-revaluation-create.jsp"/>
+        </definition>
+    <definition name="depreciation-create" extends="base_layout">
+        <put-attribute name="page-title" value="asset.depreciation.title" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/asset/depreciation-create.jsp"/>
+    </definition>
+    <definition name="depreciation-search" extends="base_layout">
+        <put-attribute name="page-title" value="asset.depreciation.title" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/asset/depreciation-search.jsp"/>
+    </definition>
+    <definition name="depreciation-view" extends="base_layout">
+        <put-attribute name="page-title" value="asset.depreciation.title" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/asset/depreciation-view.jsp"/>
+    </definition>
+    <definition name="depreciation-success" extends="base_layout">
+        <put-attribute name="page-title" value="asset.depreciation.title" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/asset/depreciation-success.jsp"/>
+    </definition>
+    <definition name="depreciation-report" extends="base_layout">
+        <put-attribute name="page-title" value="asset.depreciation.title" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/asset/depreciation-report.jsp"/>
+    </definition>
+    <definition name="asset-reval-success" extends="base_layout">
+        <put-attribute name="page-title" value="asset-success" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/asset/asset-success.jsp"/>
+    </definition>
+    <definition name="asset-view-revaluate" extends="base_layout">
+        <put-attribute name="page-title" value="title.asset.catagory.create" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/asset/asset-revaluate-view-search.jsp"/>
+    </definition>
+    <definition name="asset-register-report" extends="base_layout">
+        <put-attribute name="page-title" value="asset-register-report" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/asset/asset-search-register-report.jsp"/>
+
     </definition>
 </tiles-definitions>

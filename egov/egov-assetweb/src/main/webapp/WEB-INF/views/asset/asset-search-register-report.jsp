@@ -7,8 +7,9 @@
 
 
 <div class="container">
-	<form:form name="assetBean" method="post" action="${contextPath}/asset/search" modelAttribute="assetBean" 
+	<form:form name="assetBean" method="post" action="${contextPath}/asset/searchregister" modelAttribute="assetBean" 
 		class="form-horizontal form-groups-bordered" enctype="multipart/form-data">
+
 		<div class="panel-heading">
 			<div class="panel-title">
 				<spring:message code="view-asset" text="View Asset"/>
@@ -16,7 +17,6 @@
 		</div>
 		<br />
 		<div class="panel panel-primary" data-collapsed="0" id="search-asset">
-		
 			<div class="panel-body">
 					<label class="col-sm-3 control-label text-right">
 						<spring:message code="asset-code" text="assetCode"/>
@@ -41,13 +41,20 @@
 						</form:select>
 					</div>
 					<label class="col-sm-3 control-label text-right">
-						<spring:message code="asset-dept" text="department"/>
+						<spring:message code="asset-location" text="locality"/>
+						<span class="mandatory"></span>
 					</label>
-					<div class="col-sm-3 add-margin">						
-						<form:select path="assetHeader.department" id="department" class="form-control">
-							<form:option value=""><spring:message code="lbl.select" /></form:option>
-							<form:options items="${departmentList}" itemValue="name" itemLabel="name"/>  
+					<div class="col-sm-3 add-margin">
+						<form:select path="assetLocation.location" id="assetLocation.location" required="required" class="form-control">
+								<form:option value=""><spring:message code="lbl.select" /></form:option>
+								<form:options items="${localityList}" itemValue="id" itemLabel="description"/>  
 						</form:select>
+					</div>
+					<label class="col-sm-3 control-label text-right">
+						<spring:message code="asset-desc" text="description"/>
+					</label>
+					<div class="col-sm-3 add-margin">
+						<form:input class="form-control" path="assetHeader.description"/>
 					</div>
 					<label class="col-sm-3 control-label text-right">
 						<spring:message code="asset-status" text="status"/>
@@ -58,7 +65,7 @@
 								<form:options items="${assetStatusList}" itemValue="id" itemLabel="description"/>  
 						</form:select>
 					</div>
-			</div>
+				</div>
 		</div>
 		
 		<div align="center" class="buttonbottom">
@@ -68,8 +75,8 @@
 				onclick="window.parent.postMessage('close','*');window.close();"/>
 			</div>
 		</div>
+		<input type="hidden" name="viewmode" id="viewmode" value="readonly"/>
 	</form:form>
-	<br />
 	<br />
 	<!-- Result Table -->
 	<div class="panel panel-primary" data-collapsed="0">	
@@ -79,64 +86,57 @@
 		</div>
 		</div>
 		<div class="panel-body">
-			<table class="table table-bordered" id="resultHeader">
-			<thead>
-				<tr>
-					<th><spring:message code="lbl-sl-no" text="Sr. No."/></th>
-					<th><spring:message code="code" text="Code"/></th>
-					<th><spring:message code="name" text="Name"/></th>
-					<th><spring:message code="asset-cat" text="Asset Category Type"/></th>
-					<th><spring:message code="asset-dept" text="Department"/></th>
-					<th><spring:message code="asset-status" text="Status"/></th>
-					<c:if test="${isReference}">
-						<th><spring:message code="lbl-action" text="Action"/></th>
-					</c:if>
-				</tr>
-			</thead>
-			<tbody>
-				<c:choose>
-					<c:when test="${assetList!=null && assetList.size() > 0}">
-						 <c:forEach items="${assetList}" var="asset" varStatus="item">
-							
-							<tr id="assetView">
-								<td>
-										${item.index + 1}
-								</td>
-								<td>
-								<a href="#" target="popup"
-									  onclick="window.open('${contextPath}/asset/assetcreate/editform/${asset.id}','popup','width=700,height=600'); return false;">
-									${asset.code } </a>
-								</td>
-								<td>
-									${asset.assetHeader.assetName }
-								</td>
-								<td>
-									${asset.assetHeader.assetCategory.name }
-								</td>
-								<td>
-									${asset.assetHeader.department}
-								</td>
-								<td>
-									${asset.assetStatus.description }
-								</td>
-								<c:if test="${isReference}">
-									<td>
-									
-									<input type="button" class="btn btn-default" value="Select" 
-										onclick="selectAssetRef('${asset.code}','${asset.assetHeader.assetName }')"/>
-									</td>
-								</c:if>
-							</tr>
-						</c:forEach> 
-					</c:when>
-					<c:otherwise>
-						<td colspan="6">No Records Found..</td>
+		<table class="table table-bordered" id="resultHeader">
+		<thead>
+			<tr>
+				<th><spring:message code="lbl-sl-no" text="Sr. No."/></th>
+				<th><spring:message code="code" text="Code"/></th>
+				<th><spring:message code="name" text="Asset Name"/></th>
+				<th><spring:message code="asset-cat" text="Asset Category"/></th>
+				<th><spring:message code="asset-dept" text="Location"/></th>
+				<th><spring:message code="asset-status" text="Status"/></th>
+				<c:if test="${isReference}">
+					<th><spring:message code="lbl-action" text="Action"/></th>
+				</c:if>
+			</tr>
+		</thead>
+		<tbody>
+			<c:choose>
+				<c:when test="${assetList!=null && assetList.size() > 0}">
+					 <c:forEach items="${assetList}" var="asset" varStatus="item">
 						
-					 </c:otherwise>
-				</c:choose>
-			</tbody>
-		</table>	
-		</div>
+						<tr id="assetView">
+							<td>
+                               ${item.index + 1}
+                            </td>
+							<td>
+							<a href="#" target="popup"
+                                  onclick="window.open('${contextPath}/asset/assetcreate/editform/${asset.id}','popup','width=700,height=600'); return false;">
+								${asset.code } </a>
+							</td>
+							<td>
+								${asset.assetHeader.assetName }
+							</td>
+							<td>
+								${asset.assetHeader.assetCategory.name }
+							</td>
+							<td>
+								${asset.assetHeader.assetLocation.description}
+							</td>
+							<td>
+								${asset.assetStatus.description }
+							</td>
+						</tr>
+					</c:forEach> 
+				</c:when>
+				<c:otherwise>
+		            <td colspan="6">No Records Found..</td>
+		            
+		         </c:otherwise>
+			</c:choose>
+		</tbody>
+	</table>	
+	</div>
 	</div>
 	<!-- Result Table Ends -->
 </div>
