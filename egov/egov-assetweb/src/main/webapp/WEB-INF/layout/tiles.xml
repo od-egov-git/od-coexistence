@@ -98,6 +98,7 @@
     <definition name="depreciation-report" extends="base_layout">
         <put-attribute name="page-title" value="asset.depreciation.title" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/asset/depreciation-report.jsp"/>
+    </definition>
     <definition name="asset-reval-success" extends="base_layout">
         <put-attribute name="page-title" value="asset-success" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/asset/asset-success.jsp"/>

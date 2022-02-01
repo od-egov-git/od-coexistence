@@ -71,7 +71,7 @@ function searchData() {
 }
 function viewDepreciation(id)
 {
-	var url = "/services/asset/asset/viewDepreciation/"+ id;
+	var url = "/services/asset/depreciation/viewDepreciation/"+ id;
 	window.open(url,'','width=900, height=700');
 }
 </script>

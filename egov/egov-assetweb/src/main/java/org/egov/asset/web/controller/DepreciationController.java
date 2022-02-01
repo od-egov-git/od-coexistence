@@ -41,7 +41,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.egov.egf.*;
 @Controller
-@RequestMapping("/asset")
+@RequestMapping("/depreciation")
 public class DepreciationController {
 	private static final String STATE_TYPE = "stateType";
 	@Autowired
@@ -63,7 +63,7 @@ public class DepreciationController {
 	@Autowired
     private DepreciationService depreciationService;
 	
-	 @RequestMapping(value = "/createAssetDeperication", method = RequestMethod.POST)
+	 @RequestMapping(value = "/createAssetDepreciation", method = RequestMethod.POST)
 		public String newDepreciationForm(@ModelAttribute("Depreciation") final Depreciation depreciation,final Model model,HttpServletRequest request) {
 			System.out.println("calling");
 			List<AssetCatagory> assetCategoryList = new ArrayList<AssetCatagory>();	
@@ -89,7 +89,7 @@ public class DepreciationController {
 		      			" where ac.asset_code =am.code and ah.id =am.asset_header and c.id =ac.asset_account_code_id and ar.asset_master_id =am.id and am.asset_status ='2'");
 		System.out.println("categoryName "+depreciation.getCategoryName());
 		if(depreciation.getCategoryName()!=null) {
-			query1.append(" and ac.name='"+depreciation.getCategoryName()+"'");
+			query1.append(" and ac.name = '"+depreciation.getCategoryName()+"'");
 		}
 		System.out.println("categoryType "+depreciation.getCategoryType());
 		if(depreciation.getCategoryType()!=null) {
@@ -101,11 +101,11 @@ public class DepreciationController {
 		}
 		System.out.println("assetCode "+depreciation.getAssetCode());
 		if(depreciation.getAssetCode()!=null) {
-			query1.append(" and ac.asset_code='"+depreciation.getAssetCode()+"'");
+			query1.append(" and ac.asset_code LIKE '%"+depreciation.getAssetCode()+"%'");
 		}
 		System.out.println("assetName "+depreciation.getAssetName());
 		if(depreciation.getAssetName()!=null) {
-			query1.append(" and ah.asset_name='"+depreciation.getAssetName()+"'");
+			query1.append(" and ah.asset_name LIKE '%"+depreciation.getAssetName()+"%'");
 		}
 		
 		queryMain=this.persistenceService.getSession().createSQLQuery(query1.toString());
@@ -162,7 +162,7 @@ public class DepreciationController {
 	    	depreciation.setResultList(depreciationList);
 	    	return "depreciation-success";
 	    }
-	    @RequestMapping(value = "/viewAssetDeperication", method = RequestMethod.POST)
+	    @RequestMapping(value = "/viewAssetDepreciation", method = RequestMethod.POST)
 		public String viewDepreciationForm(@ModelAttribute("Depreciation") final Depreciation depreciation,final Model model,HttpServletRequest request) {
 			System.out.println("view main calling");
 			
@@ -188,15 +188,15 @@ public class DepreciationController {
 		}
 		System.out.println("location "+depreciation.getLocation());
 		if(depreciation.getLocation()!=null) {
-			query1.append(" and ad.location='"+depreciation.getLocation()+"'");
+			query1.append(" and ad.location LIKE '%"+depreciation.getLocation()+"%'");
 		}
 		System.out.println("assetCode "+depreciation.getAssetCode());
 		if(depreciation.getAssetCode()!=null) {
-			query1.append(" and ac.assetcode='"+depreciation.getAssetCode()+"'");
+			query1.append(" and ac.assetcode LIKE '%"+depreciation.getAssetCode()+"%'");
 		}
 		System.out.println("assetName "+depreciation.getAssetName());
 		if(depreciation.getAssetName()!=null) {
-			query1.append(" and ah.assetname='"+depreciation.getAssetName()+"'");
+			query1.append(" and ah.assetname LIKE '%"+depreciation.getAssetName()+"%'");
 		}
 		
 		queryMain=this.persistenceService.getSession().createSQLQuery(query1.toString());
@@ -262,7 +262,7 @@ public class DepreciationController {
 	    	return "depreciation-view";
 	    }
 	   
-	    @RequestMapping(value = "/reportAssetDeperication", method = RequestMethod.POST)
+	    @RequestMapping(value = "/reportAssetDepreciation", method = RequestMethod.POST)
 		public String reportDepreciationForm(@ModelAttribute("Depreciation") final Depreciation depreciation,final Model model,HttpServletRequest request) {
 			System.out.println("view report calling");
 			
@@ -292,11 +292,11 @@ public class DepreciationController {
 		}
 		System.out.println("assetCode "+depreciation.getAssetCode());
 		if(depreciation.getAssetCode()!=null) {
-			query1.append(" and ac.assetcode='"+depreciation.getAssetCode()+"'");
+			query1.append(" and ac.assetcode LIKE '"+depreciation.getAssetCode()+"'");
 		}
 		System.out.println("assetName "+depreciation.getAssetName());
 		if(depreciation.getAssetName()!=null) {
-			query1.append(" and ah.assetname='"+depreciation.getAssetName()+"'");
+			query1.append(" and ah.assetname LIKE '"+depreciation.getAssetName()+"'");
 		}
 		
 		queryMain=this.persistenceService.getSession().createSQLQuery(query1.toString());
