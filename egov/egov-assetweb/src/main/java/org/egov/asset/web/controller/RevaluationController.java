@@ -161,7 +161,10 @@ public class RevaluationController {
 		assetRevaluation.setVoucher(voucherNumber);
 		applyAuditing(assetRevaluation,userId);
 		AssetRevaluation savedAssetRevaluation=revaluationService.create(assetRevaluation);
-		
+		assetBean = new AssetMaster();
+		assetBean = masterRepo.findOne(savedAssetRevaluation.getAssetMaster().getId());
+		assetBean.setCurrentValue(savedAssetRevaluation.getValue_after_revaluation().longValue());
+		masterRepo.save(assetBean);
 		String message="Asset has been revaluated with voucher Number "+voucherNumber;
 		model.addAttribute("message", message);
 		
