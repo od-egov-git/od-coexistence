@@ -85,7 +85,7 @@ public class AssetMaster implements Serializable{
     @Column(name="survey_number")
     private String surveyNumber;
     @Column(name="accumulated_depreciation")
-    private String accumulatedDepreciation;
+    private Long accumulatedDepreciation;
     @Column(name="purchase_value")
     private Long purchaseValue;
     @Column(name="purchase_date")
@@ -100,6 +100,9 @@ public class AssetMaster implements Serializable{
     private Date acquisitionDate;
     @Column(name="donation_date")
     private Date donationDate;
+    @Column(name="current_value")
+    private Long currentValue;
+    
 	public Long getId() {
 		return id;
 	}
@@ -190,12 +193,6 @@ public class AssetMaster implements Serializable{
 	public void setSurveyNumber(String surveyNumber) {
 		this.surveyNumber = surveyNumber;
 	}
-	public String getAccumulatedDepreciation() {
-		return accumulatedDepreciation;
-	}
-	public void setAccumulatedDepreciation(String accumulatedDepreciation) {
-		this.accumulatedDepreciation = accumulatedDepreciation;
-	}
 	public Long getPurchaseValue() {
 		return purchaseValue;
 	}
@@ -238,7 +235,18 @@ public class AssetMaster implements Serializable{
 	public void setDonationDate(Date donationDate) {
 		this.donationDate = donationDate;
 	}
-	
+	public Long getAccumulatedDepreciation() {
+		return accumulatedDepreciation;
+	}
+	public void setAccumulatedDepreciation(Long accumulatedDepreciation) {
+		this.accumulatedDepreciation = accumulatedDepreciation;
+	}
+	public Long getCurrentValue() {
+		return currentValue;
+	}
+	public void setCurrentValue(Long currentValue) {
+		this.currentValue = currentValue;
+	}
 	@Override
 	public String toString() {
 		return "AssetMaster [id=" + id + ", code=" + code + ", assetHeader=" + assetHeader + ", assetLocation="
@@ -249,8 +257,6 @@ public class AssetMaster implements Serializable{
 				+ ", accumulatedDepreciation=" + accumulatedDepreciation + ", purchaseValue=" + purchaseValue
 				+ ", purchaseDate=" + purchaseDate + ", constructionValue=" + constructionValue + ", constructionDate="
 				+ constructionDate + ", acquisitionValue=" + acquisitionValue + ", acquisitionDate=" + acquisitionDate
-				+ ", donationDate=" + donationDate + "]";
+				+ ", donationDate=" + donationDate + ", currentValue=" + currentValue + "]";
 	}
-	
-	
 }

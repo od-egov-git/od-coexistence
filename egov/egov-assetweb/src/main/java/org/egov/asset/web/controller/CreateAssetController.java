@@ -302,6 +302,17 @@ public class CreateAssetController {// extends BaseAssetController{
 			e.printStackTrace();
 		}
 		LOGGER.info("Custom Fields Ends...");
+		LOGGER.info("Calculating Current Value..");
+		try {
+			if(null != assetBean.getGrossValue() && null != assetBean.getAccumulatedDepreciation()) {
+				long currentValue =  assetBean.getGrossValue() - assetBean.getAccumulatedDepreciation();//            currentValue.setCurrentAmount(grossValue.subtract(accumulatedDepreciation));
+				LOGGER.info("current Value.."+currentValue);
+				assetBean.setCurrentValue(currentValue);
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		LOGGER.info("Calculating Current Value Ends..");
 		try {
 			final StringBuilder generatedCode = new StringBuilder(String.format("%06d", nextVal));
 			assetCode = generatedCode.toString();
@@ -1004,7 +1015,36 @@ public class CreateAssetController {// extends BaseAssetController{
 			model.addAttribute("assetStatusList", assetStatusList);
 			model.addAttribute("assetCategoryList", assetCategoryList);
 			
-			return "asset-view";
+			return "asset-register-report";
 		}
 	
+		@PostMapping("/searchform/{param}")
+		public String searchform(@PathVariable("param") String param, Model model) {
+			LOGGER.info("Search Form..................");
+			assetBean = new AssetMaster();
+			model.addAttribute("assetBean", assetBean);
+			try {
+				localityList = localityRepo.findAll();
+				assetStatusList = statusRepo.findAll();
+				assetCategoryList = categoryRepo.findAll();
+				
+				assetList = masterRepo.findAll();
+				LOGGER.info("Asset Lists..."+assetList.toString());
+			} catch (Exception e) {
+				e.getMessage();
+			}
+			model.addAttribute("assetList", assetList);
+			model.addAttribute("localityList", localityList);
+			model.addAttribute("assetStatusList", assetStatusList);
+			model.addAttribute("assetCategoryList", assetCategoryList);
+			model.addAttribute("localityList", localityList);
+			model.addAttribute("mode", "add");
+			model.addAttribute("disabled", "");
+			if(param.equalsIgnoreCase("ref")) {
+				model.addAttribute("isReference", true);
+			}else {
+				model.addAttribute("isReference", false);
+			}
+			return "asset-register-report";
+		}
 }
