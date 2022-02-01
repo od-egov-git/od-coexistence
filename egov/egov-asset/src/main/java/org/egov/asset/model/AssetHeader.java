@@ -16,6 +16,8 @@ import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.egov.infra.admin.master.entity.Department;
+
 @Entity
 @Table(name = "asset_header")
 @SequenceGenerator(name = AssetHeader.SEQ_asset_header, sequenceName = AssetHeader.SEQ_asset_header, allocationSize = 1)
@@ -51,7 +53,7 @@ public class AssetHeader implements Serializable{
 	@JoinColumn(name="mode_of_acquisition")
 	private AssetModeOfAcquisition modeOfAcquisition;
 	@Column(name="department")
-	private String department;
+	private Department department;
 	@Column(name="fund")
 	private String fund;
 	@Column(name="function")
@@ -112,10 +114,10 @@ public class AssetHeader implements Serializable{
 	public void setApplicableForSale(Boolean applicableForSale) {
 		this.applicableForSale = applicableForSale;
 	}
-	public String getDepartment() {
+	public Department getDepartment() {
 		return department;
 	}
-	public void setDepartment(String department) {
+	public void setDepartment(Department department) {
 		this.department = department;
 	}
 	public String getFund() {

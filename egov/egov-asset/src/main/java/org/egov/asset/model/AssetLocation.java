@@ -1,20 +1,21 @@
 package org.egov.asset.model;
 
-import static javax.persistence.GenerationType.IDENTITY;
+import static org.egov.asset.model.AssetLocation.SEQ_asset_location;
 
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-
-
-import static org.egov.asset.model.AssetLocation.SEQ_asset_location;
 
 /**
  * @author Arnab Saha
@@ -33,17 +34,25 @@ public class AssetLocation implements Serializable{
 	@Id
     @GeneratedValue(generator = SEQ_asset_location, strategy = GenerationType.SEQUENCE)
 	private Long id;
-	@Column(name="location")
-	private String location;
-	@Column(name="block")
-	private String block;
-	@Column(name="election_ward")
-	private String ward;
-	@Column(name="zone")
-	private String zone;
-	@Column(name="revenue_ward")
-	private String revenueWard;
-	@Column(name="street")private String street;
+	
+	@OneToOne(fetch=FetchType.LAZY, cascade = CascadeType.ALL)	
+	@JoinColumn(name="location")
+	private AssetLocality location;
+	@OneToOne(fetch=FetchType.LAZY, cascade = CascadeType.ALL)	
+	@JoinColumn(name="block")
+	private AssetLocationBlock block;
+	@OneToOne(fetch=FetchType.LAZY, cascade = CascadeType.ALL)	
+	@JoinColumn(name="election_ward")
+	private AssetLocationElectionWard ward;
+	@OneToOne(fetch=FetchType.LAZY, cascade = CascadeType.ALL)	
+	@JoinColumn(name="zone")
+	private AssetLocationZone zone;
+	@OneToOne(fetch=FetchType.LAZY, cascade = CascadeType.ALL)	
+	@JoinColumn(name="revenue_ward")
+	private AssetLocationRevenueWard revenueWard;
+	@OneToOne(fetch=FetchType.LAZY, cascade = CascadeType.ALL)	
+	@JoinColumn(name="street")
+	private AssetLocationStreet street;
 	@Column(name="door")
 	private String door;
 	@Column(name="pin")
@@ -59,56 +68,46 @@ public class AssetLocation implements Serializable{
     @Column(name="updated_by")
     private String updatedBy;
 	
-	
-	
 	public Long getId() {
 		return id;
 	}
 	public void setId(Long id) {
 		this.id = id;
 	}
-	
-	
-	public String getLocation() {
+	public AssetLocality getLocation() {
 		return location;
 	}
-	public void setLocation(String location) {
+	public void setLocation(AssetLocality location) {
 		this.location = location;
 	}
-	
-	public String getBlock() {
+	public AssetLocationBlock getBlock() {
 		return block;
 	}
-	public void setBlock(String block) {
+	public void setBlock(AssetLocationBlock block) {
 		this.block = block;
 	}
-	
-	public String getWard() {
+	public AssetLocationElectionWard getWard() {
 		return ward;
 	}
-	public void setWard(String ward) {
+	public void setWard(AssetLocationElectionWard ward) {
 		this.ward = ward;
 	}
-	
-	public String getZone() {
+	public AssetLocationZone getZone() {
 		return zone;
 	}
-	public void setZone(String zone) {
+	public void setZone(AssetLocationZone zone) {
 		this.zone = zone;
 	}
-	
-	public String getRevenueWard() {
+	public AssetLocationRevenueWard getRevenueWard() {
 		return revenueWard;
 	}
-	public void setRevenueWard(String revenueWard) {
+	public void setRevenueWard(AssetLocationRevenueWard revenueWard) {
 		this.revenueWard = revenueWard;
 	}
-	
-	
-	public String getStreet() {
+	public AssetLocationStreet getStreet() {
 		return street;
 	}
-	public void setStreet(String street) {
+	public void setStreet(AssetLocationStreet street) {
 		this.street = street;
 	}
 	public String getDoor() {
@@ -122,14 +121,6 @@ public class AssetLocation implements Serializable{
 	}
 	public void setPin(Long pin) {
 		this.pin = pin;
-	}
-	
-	
-	@Override
-	public String toString() {
-		return "AssetLocation [id=" + id + ", location=" + location + ", block=" + block + ", ward=" + ward + ", zone="
-				+ zone + ", revenueWard=" + revenueWard + ", street=" + street + ", door=" + door + ", pin=" + pin
-				+ "]";
 	}
 	public Date getCreatedDate() {
 		return createdDate;
@@ -154,5 +145,13 @@ public class AssetLocation implements Serializable{
 	}
 	public void setUpdatedBy(String updatedBy) {
 		this.updatedBy = updatedBy;
+	}
+	
+	@Override
+	public String toString() {
+		return "AssetLocation [id=" + id + ", location=" + location + ", block=" + block + ", ward=" + ward + ", zone="
+				+ zone + ", revenueWard=" + revenueWard + ", street=" + street + ", door=" + door + ", pin=" + pin
+				+ ", createdDate=" + createdDate + ", updatedDate=" + updatedDate + ", createdBy=" + createdBy
+				+ ", updatedBy=" + updatedBy + "]";
 	}
 }

@@ -434,7 +434,7 @@ public class CreateAssetController {// extends BaseAssetController{
 			assetList = masterRepo.getAssetMasterDetails(assetBean.getCode(), 
 					assetBean.getAssetHeader().getAssetName(),
 					assetBean.getAssetHeader().getAssetCategory().getId(),
-					assetBean.getAssetHeader().getDepartment(),
+					assetBean.getAssetHeader().getDepartment().getId(),
 					assetBean.getAssetStatus().getId());
 			LOGGER.info("Asset Lists..."+assetList.toString());
 		} catch (Exception e) {
@@ -699,7 +699,7 @@ public class CreateAssetController {// extends BaseAssetController{
 			assetList = masterRepo.getAssetMasterDetails(assetBean.getCode(), 
 					assetBean.getAssetHeader().getAssetName(),
 					assetBean.getAssetHeader().getAssetCategory().getId(), 
-					assetBean.getAssetHeader().getDepartment(), statusId);
+					assetBean.getAssetHeader().getDepartment().getId(), statusId);
 			LOGGER.info("Asset Lists..."+assetList.toString());
 		} catch (Exception e) {
 			e.getMessage();
