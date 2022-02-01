@@ -307,6 +307,15 @@ public class AssetCatagoryService {
 	public List<AssetCatagory> findBynameorAssetCataType(String name,Long id){
 		return assetCatagoryRepository.findBynameorAssetCataType(name, id);
 	}
+	public List<AssetCatagory> findBynameContainingOrAssetCataType(String name,Long id){
+		List<AssetCatagory> assetCategoryList=null;
+		if ((""==name || null==name) && null==id) {
+			assetCategoryList=assetCatagoryRepository.findAll();
+		}else {
+			assetCategoryList=assetCatagoryRepository.findBynameContainingOrAssetCataType(name, id);
+		}
+		return assetCategoryList;
+	}
 	public Double getDepreciationRate(final Double depreciationRate) {
 		if (depreciationRate != null) {
 			final Double deprRate = Math.round(depreciationRate * 100.0) / 100.0;

@@ -64,7 +64,7 @@
 <title>Asset Category</title>
 
 <div class="container">
-<form:form action="searchAssetCategory" modelAttribute="assetCatagory" method="POST">
+<form:form action="searchAssetCategoryModifyPage" modelAttribute="assetCatagory" method="POST">
 <div class="panel panel-primary" data-collapsed="0">
 	<div class="panel-heading">
 		<c:if test="${not empty successMsg}">
@@ -81,9 +81,10 @@
 	<div class="panel-body">
 	<div class="form-group">
 		<label class="col-sm-3 control-label text-right"><spring:message code="lbl.name" text="Name" /> 
+			<span class="mandatory"></span>
 		</label>
 		<div class="col-sm-3 add-margin">
-			<form:input class="form-control" path="name"/>
+			<form:input class="form-control" path="name" required="required"/>
 		</div>
 		
 		<label class="col-sm-3 control-label text-right"> <spring:message code="lbl.asset.catagory.type" text="Asset Category Type" />
@@ -128,37 +129,37 @@
 			<tr>
 				<td>${tagStatus.index +1}</td>
 				<td>
-				<a href="viewAssetCategory/${assetCategory.id}" 
+				<a href="viewModifyAssetCategory/${assetCategory.id}" 
   				target="popup" 
-  				onclick="window.open('viewAssetCategory/${assetCategory.id}','popup','width=700,height=600'); return false;">
+  				onclick="window.open('viewModifyAssetCategory/${assetCategory.id}','popup','width=700,height=600'); return false;">
     				${assetCategory.assetCode}
 				</a>
 				</td>
 				<td>
-				<a href="viewAssetCategory/${assetCategory.id}" 
+				<a href="viewModifyAssetCategory/${assetCategory.id}" 
   				target="popup" 
-  				onclick="window.open('viewAssetCategory/${assetCategory.id}','popup','width=700,height=600'); return false;">
+  				onclick="window.open('viewModifyAssetCategory/${assetCategory.id}','popup','width=700,height=600'); return false;">
     				${assetCategory.name}
 				</a>
 				</td>
 				<td>
-				<a href="viewAssetCategory/${assetCategory.id}" 
+				<a href="viewModifyAssetCategory/${assetCategory.id}" 
   				target="popup" 
-  				onclick="window.open('viewAssetCategory/${assetCategory.id}','popup','width=700,height=600'); return false;">
+  				onclick="window.open('viewModifyAssetCategory/${assetCategory.id}','popup','width=700,height=600'); return false;">
     				${assetCategory.assetCatagoryType.description}
 				</a>
 				</td>
 				<td>
-				<a href="viewAssetCategory/${assetCategory.id}" 
+				<a href="viewModifyAssetCategory/${assetCategory.id}" 
   				target="popup" 
-  				onclick="window.open('viewAssetCategory/${assetCategory.id}','popup','width=700,height=600'); return false;">
+  				onclick="window.open('viewModifyAssetCategory/${assetCategory.id}','popup','width=700,height=600'); return false;">
     				${assetCategory.parentCatagory.description}
 				</a>
 				</td>
 				<td>
-				<a href="viewAssetCategory/${assetCategory.id}" 
+				<a href="viewModifyAssetCategory/${assetCategory.id}" 
   				target="popup" 
-  				onclick="window.open('viewAssetCategory/${assetCategory.id}','popup','width=700,height=600'); return false;">
+  				onclick="window.open('viewModifyAssetCategory/${assetCategory.id}','popup','width=700,height=600'); return false;">
     				${assetCategory.unitOfMeasurement.description}
 				</a>
 				</td>

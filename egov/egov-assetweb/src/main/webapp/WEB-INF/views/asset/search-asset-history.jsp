@@ -14,7 +14,7 @@
 
 		<br />
 		<div class="panel-title">
-			<spring:message code="view-asset" text="View Asset" />
+			<spring:message code="lbl-search-asset-history" text="Search Asset History" />
 		</div>
 		<br />
 		<div id="search-asset">
@@ -84,11 +84,13 @@
 			</table>
 
 			<div align="center">
+				
 					<input type="submit" class="btn btn-primary" name="search"
 						value="Search" /> 
 						<input type="button" name="button2" id="button2"
 						value="Close" class="btn btn-primary"
 						onclick="window.parent.postMessage('close','*');window.close();" />
+				
 			</div>
 		</div>
 	</form:form>
@@ -99,12 +101,12 @@
 			<thead>
 				<tr>
 					<th><spring:message code="lbl-sl-no" text="Sr. No." /></th>
-					<th><spring:message code="code" text="Code" /></th>
-					<th><spring:message code="name" text="Name" /></th>
-					<th><spring:message code="asset-cat"
-							text="Asset Category Type" /></th>
-					<th><spring:message code="asset-dept" text="Department" /></th>
-					<th><spring:message code="asset-status" text="Status" /></th>
+					<th><spring:message code="lbl-asset-assetcategoryname" text="Asset Category Name" /></th>
+					<th><spring:message code="lbl-asset-department" text="Department" /></th>
+					<th><spring:message code="lbl-asset-code"
+							text="Asset Code" /></th>
+					<th><spring:message code="lbl-asset-code" text="Asset Name" /></th>
+					<th><spring:message code="lbl-asset-code" text="Current Gross Value(Rs.)" /></th>
 					<%-- <c:if test="${isReference}">
 						<th><spring:message code="lbl-action" text="Action" /></th>
 					</c:if> --%>
@@ -120,24 +122,24 @@
 								<span class="assetView_id_${item.index + 1}">${item.index + 1}</span>
 								</td>
 								--%>
-								<td><a href="createDisposal/${asset.id}" target="popup"
-									onclick="window.open('createDisposal/${asset.id}','popup','width=700,height=600'); return false;">
+								<td><a href="searchAssetHistory/${asset.id}" target="popup"
+									onclick="window.open('searchAssetHistory/${asset.id}','popup','width=700,height=600'); return false;">
 										${item.index + 1} </a></td>
-								<td><a href="createDisposal/${asset.id}" target="popup"
-									onclick="window.open('createDisposal/${asset.id}','popup','width=700,height=600'); return false;">
-										${asset.code } </a></td>
-								<td><a href="createDisposal/${asset.id}" target="popup"
-									onclick="window.open('createDisposal/${asset.id}','popup','width=700,height=600'); return false;">
-										${asset.assetHeader.assetName }</a></td>
-								<td><a href="createDisposal/${asset.id}" target="popup"
-									onclick="window.open('createDisposal/${asset.id}','popup','width=700,height=600'); return false;">
-										${asset.assetHeader.assetCategory.name }</a></td>
-								<td><a href="createDisposal/${asset.id}" target="popup"
-									onclick="window.open('createDisposal/${asset.id}','popup','width=700,height=600'); return false;">
-										${asset.assetHeader.department}</a></td>
-								<td><a href="createDisposal/${asset.id}" target="popup"
-									onclick="window.open('createDisposal/${asset.id}','popup','width=700,height=600'); return false;">
-										${asset.assetStatus.description }</a></td>
+								<td><a href="searchAssetHistory/${asset.id}" target="popup"
+									onclick="window.open('searchAssetHistory/${asset.id}','popup','width=700,height=600'); return false;">
+										${asset.assetHeader.assetCategory.name } </a></td>
+								<td><a href="searchAssetHistory/${asset.id}" target="popup"
+									onclick="window.open('searchAssetHistory/${asset.id}','popup','width=700,height=600'); return false;">
+										${asset.assetHeader.department }</a></td>
+								<td><a href="searchAssetHistory/${asset.id}" target="popup"
+									onclick="window.open('searchAssetHistory/${asset.id}','popup','width=700,height=600'); return false;">
+										${asset.code }</a></td>
+								<td><a href="searchAssetHistory/${asset.id}" target="popup"
+									onclick="window.open('searchAssetHistory/${asset.id}','popup','width=700,height=600'); return false;">
+										${asset.assetHeader.assetName}</a></td>
+								<td><a href="searchAssetHistory/${asset.id}" target="popup"
+									onclick="window.open('searchAssetHistory/${asset.id}','popup','width=700,height=600'); return false;">
+										${asset.grossValue }</a></td>
 								<%-- <td>
 								<a href="${contextPath}/asset/editform/${asset.id}"><input type="button" class="btn btn-default" value="Details"/></a>
 								</td> --%>

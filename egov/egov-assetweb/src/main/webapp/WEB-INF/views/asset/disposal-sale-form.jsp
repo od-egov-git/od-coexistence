@@ -67,7 +67,7 @@
 </style>
 
 <div class="container">
-<form:form action="${contextPath}/sale/createDisposal" modelAttribute="disposal" method="POST" enctype="multipart/form-data">
+<form:form action="${contextPath}/sale/createDisposal" modelAttribute="disposal" method="POST" enctype="multipart/form-data" >
 <div class="panel panel-primary" data-collapsed="0">
 	<div class="panel-heading">
 		<c:if test="${not empty successMsg}">

@@ -82,14 +82,34 @@
 		<div class="col-sm-3 add-margin">
 			<form:input class="form-control" path="name" required="required" readonly="true"/>
 		</div>
+		<label class="col-sm-3 control-label text-right"> <spring:message code="lbl.asset.catagory.type" text="Asset Category Type" />
+			<span class="mandatory"></span>
+		</label>
+		<div class="col-sm-3 add-margin">
+			<form:select path="assetCatagoryType" class="form-control" readonly="true"> 
+				<form:option value="">-select value-</form:option>
+				<form:options items="${assetCatagoryTypes}" itemLabel="description" itemValue="id"/>
+			</form:select>
+			<form:errors path="" cssClass="add-margin error-msg" />
+		</div>
 		<label class="col-sm-3 control-label text-right">
-			<spring:message code="lbl.parent.catagory" text="Parent Catagory" /> 
+			<spring:message code="lbl.parent.catagory" text="Parent Category" /> 
 		</label>
 		<div class="col-sm-3 add-margin">
 			<form:select path="parentCatagory" class="form-control"> 
 			<form:option value="">-select value-</form:option>
 			<form:options items="${parentCatagory}" itemLabel="description" itemValue="id"/>
 			</form:select>
+		</div>
+		<label class="col-sm-3 control-label text-right">
+			<spring:message code="lbl.depriciation.method" text="Depreciation Method" />
+		</label>
+		<div class="col-sm-3 add-margin">
+			<form:select path="depriciationMethod" class="form-control"> 
+				<form:option value="">-select value-</form:option>
+				<form:options items="${depriciationMethod}" itemLabel="description" itemValue="id"/>
+			</form:select>
+			<form:errors path="" cssClass="add-margin error-msg" />
 		</div>
 		<label class="col-sm-3 control-label text-right">
 			<spring:message code="lbl.asset.account.code" text="Asset Account Code" /> 
@@ -102,13 +122,33 @@
 		
 		</div>
 		<label class="col-sm-3 control-label text-right">
-			<spring:message code="lbl.revolution.reserve.account.code" text="Revolution Reserve Account Code" /> 
+			<spring:message code="lbl.accumulated.depriciation.code" text="Accumulated Depreciation Code" />
+		</label>
+		<div class="col-sm-3 add-margin">
+		<input type="text" id="accumulateddepriciationcode" name="code" class="form-control table-input creditDetailGlcode accumulateddepriciationcode"  data-errormsg="Account Code is mandatory!" data-idx="0" data-optional="0"   placeholder="Type any letters of Account code" />
+		<form:hidden path="accumulatedDepriciationCode.id" value="" name=""  class="form-control table-input hidden-input accumulateddepriciationcodeid"/>
+		<form:hidden path="accumulatedDepriciationCode.glcode" id="accumulateddepriciationcodeglcode" value="" name=""  class="form-control table-input hidden-input accumulateddepriciationcodeglcode"/>
+		<form:hidden path="accumulatedDepriciationCode.name" id="accumulateddepriciationcodename" value="" name=""  class="form-control table-input hidden-input accumulateddepriciationcodename"/>
+		
+		</div>
+		<label class="col-sm-3 control-label text-right">
+			<spring:message code="lbl.revolution.reserve.account.code" text="Revaluation Reserve Account Code" /> 
 		</label>
 		<div class="col-sm-3 add-margin">
 		<input type="text" id="revalutionreserveaccountcode" name="code" class="form-control table-input creditDetailGlcode revalutionreserveaccountcode"  data-errormsg="Account Code is mandatory!" data-idx="0" data-optional="0"   placeholder="Type any letters of Account code" />
 		<form:hidden path="revolutionReserveAccountCode.id" value="" name=""  class="form-control table-input hidden-input revalutionreserveaccountcodeid"/>
 		<form:hidden path="revolutionReserveAccountCode.glcode" id="revalutionreserveaccountcodeglcode" value="" name=""  class="form-control table-input hidden-input revalutionreserveaccountcodeglcode"/>
 		<form:hidden path="revolutionReserveAccountCode.name" id="revalutionreserveaccountcodename" value="" name=""  class="form-control table-input hidden-input revalutionreserveaccountcodename"/>
+		
+		</div>
+		<label class="col-sm-3 control-label text-right">
+			<spring:message code="lbl.depriciation.expense.account" text="Depreciation Expense Account" />
+		</label>
+		<div class="col-sm-3 add-margin">
+		<input type="text" id="depriciationexpenseaccount" name="code" class="form-control table-input creditDetailGlcode depriciationexpenseaccount"  data-errormsg="Account Code is mandatory!" data-idx="0" data-optional="0"   placeholder="Type any letters of Account code" />
+		<form:hidden path="depriciationExpenseAccount.id" value="" name=""  class="form-control table-input hidden-input depriciationexpenseaccountid"/>
+		<form:hidden path="depriciationExpenseAccount.glcode" id="depriciationexpenseaccountglcode" value="" name=""  class="form-control table-input hidden-input depriciationexpenseaccountglcode"/>
+		<form:hidden path="depriciationExpenseAccount.name" id="depriciationexpenseaccountname" value="" name=""  class="form-control table-input hidden-input depriciationexpenseaccountname"/>
 		
 		</div>
 		<label class="col-sm-3 control-label text-right">
@@ -121,52 +161,6 @@
 			</form:select>
 		</div>
 		<label class="col-sm-3 control-label text-right">
-			<spring:message code="lbl.depriciation.rate" text="Depriciation Rate" /> 
-		</label>
-		<div class="col-sm-3 add-margin">
-			<form:input class="form-control patternvalidation" data-pattern="alphanumericwithspecialcharacters" path="depriciationRate" />
-		</div>
-		<label class="col-sm-3 control-label text-right"> <spring:message code="lbl.asset.catagory.type" text="Asset Catagory Type" />
-			<span class="mandatory"></span>
-		</label>
-		<div class="col-sm-3 add-margin">
-			<form:select path="assetCatagoryType" class="form-control" readonly="true"> 
-				<form:option value="">-select value-</form:option>
-				<form:options items="${assetCatagoryTypes}" itemLabel="description" itemValue="id"/>
-			</form:select>
-			<form:errors path="" cssClass="add-margin error-msg" />
-		</div>
-		<label class="col-sm-3 control-label text-right">
-			<spring:message code="lbl.depriciation.method" text="Depriciation Method" />
-		</label>
-		<div class="col-sm-3 add-margin">
-			<form:select path="depriciationMethod" class="form-control"> 
-				<form:option value="">-select value-</form:option>
-				<form:options items="${depriciationMethod}" itemLabel="description" itemValue="id"/>
-			</form:select>
-			<form:errors path="" cssClass="add-margin error-msg" />
-		</div>
-		<label class="col-sm-3 control-label text-right">
-			<spring:message code="lbl.accumulated.depriciation.code" text="Accumulated Depriciation Code" />
-		</label>
-		<div class="col-sm-3 add-margin">
-		<input type="text" id="accumulateddepriciationcode" name="code" class="form-control table-input creditDetailGlcode accumulateddepriciationcode"  data-errormsg="Account Code is mandatory!" data-idx="0" data-optional="0"   placeholder="Type any letters of Account code" />
-		<form:hidden path="accumulatedDepriciationCode.id" value="" name=""  class="form-control table-input hidden-input accumulateddepriciationcodeid"/>
-		<form:hidden path="accumulatedDepriciationCode.glcode" id="accumulateddepriciationcodeglcode" value="" name=""  class="form-control table-input hidden-input accumulateddepriciationcodeglcode"/>
-		<form:hidden path="accumulatedDepriciationCode.name" id="accumulateddepriciationcodename" value="" name=""  class="form-control table-input hidden-input accumulateddepriciationcodename"/>
-		
-		</div>
-		<label class="col-sm-3 control-label text-right">
-			<spring:message code="lbl.depriciation.expense.account" text="Depriciation Expense Account" />
-		</label>
-		<div class="col-sm-3 add-margin">
-		<input type="text" id="depriciationexpenseaccount" name="code" class="form-control table-input creditDetailGlcode depriciationexpenseaccount"  data-errormsg="Account Code is mandatory!" data-idx="0" data-optional="0"   placeholder="Type any letters of Account code" />
-		<form:hidden path="depriciationExpenseAccount.id" value="" name=""  class="form-control table-input hidden-input depriciationexpenseaccountid"/>
-		<form:hidden path="depriciationExpenseAccount.glcode" id="depriciationexpenseaccountglcode" value="" name=""  class="form-control table-input hidden-input depriciationexpenseaccountglcode"/>
-		<form:hidden path="depriciationExpenseAccount.name" id="depriciationexpenseaccountname" value="" name=""  class="form-control table-input hidden-input depriciationexpenseaccountname"/>
-		
-		</div>
-		<label class="col-sm-3 control-label text-right">
 			<spring:message code="lbl.version" text="Version" />
 		</label>
 		<div class="col-sm-3 add-margin">
@@ -174,11 +168,23 @@
 			<form:errors path="" cssClass="add-margin error-msg" />
 		</div>
 		<label class="col-sm-3 control-label text-right">
+			<spring:message code="lbl.depriciation.rate" text="Depreciation Rate" /> 
+		</label>
+		<div class="col-sm-3 add-margin">
+			<form:input class="form-control patternvalidation" data-pattern="alphanumericwithspecialcharacters" path="depriciationRate" />
+		</div>
+		<label class="col-sm-3 control-label text-right">
 			<spring:message code="lbl.used.for.lease.and.agreement" text="Used For Lease and Aggrement" />
 		</label>
 		<div class="col-sm-3 add-margin">
 			<form:checkbox class="form-check-input" path="leaseAndAgreement" value="true"/> 
 			<form:errors path="" cssClass="add-margin error-msg" />
+		</div>
+		<label class="col-sm-3 control-label text-right">
+			<spring:message code="lbl.depriciation.rate" text="Life of the Asset" /> 
+		</label>
+		<div class="col-sm-3 add-margin">
+			<form:input class="form-control patternvalidation" data-pattern="alphanumericwithspecialcharacters" path="lifeOfAsset" />
 		</div>
 		</div>
 		</div>

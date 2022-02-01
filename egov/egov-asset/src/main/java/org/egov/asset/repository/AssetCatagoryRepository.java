@@ -13,4 +13,6 @@ public AssetCatagory findByName(String name);
 public Long getNextValMySequence();
 @Query(value="FROM  AssetCatagory ac where ac.name= :name or ac.assetCatagoryType.id= :id")
 public List<AssetCatagory> findBynameorAssetCataType(@Param("name") String name,@Param("id") Long id);
+@Query(value="FROM  AssetCatagory ac where ac.name like %:name% or ac.assetCatagoryType.id= :id")
+public List<AssetCatagory> findBynameContainingOrAssetCataType(@Param("name") String name,@Param("id") Long id);
 }

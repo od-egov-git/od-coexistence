@@ -82,6 +82,8 @@ public class AssetCatagory {
 	private Long createdBy;
 	@Column(name = "updated_by")
 	private Long updatedBy;
+	@Column(name = "life_of_asset")
+	private String lifeOfAsset;
 	
 	@Transient
 	private CustomeFields customeField;
@@ -265,6 +267,14 @@ public class AssetCatagory {
 		this.errorMessage = errorMessage;
 	}
 
+	public String getLifeOfAsset() {
+		return lifeOfAsset;
+	}
+
+	public void setLifeOfAsset(String lifeOfAsset) {
+		this.lifeOfAsset = lifeOfAsset;
+	}
+
 	@Override
 	public String toString() {
 		return "AssetCatagory [id=" + id + ", name=" + name + ", assetCatagoryType=" + assetCatagoryType
@@ -275,9 +285,11 @@ public class AssetCatagory {
 				+ unitOfMeasurement + ", version=" + version + ", depriciationRate=" + depriciationRate
 				+ ", leaseAndAgreement=" + leaseAndAgreement + ", createDate=" + createDate + ", updateDate="
 				+ updateDate + ", assetCode=" + assetCode + ", customeFields=" + customeFields + ", userid=" + userid
-				+ ", createdBy=" + createdBy + ", updatedBy=" + updatedBy + ", customeField=" + customeField
-				+ ", errorMessage=" + errorMessage + "]";
+				+ ", createdBy=" + createdBy + ", updatedBy=" + updatedBy + ", lifeOfAsset=" + lifeOfAsset
+				+ ", customeField=" + customeField + ", errorMessage=" + errorMessage + "]";
 	}
+
+	
 
 	
 	

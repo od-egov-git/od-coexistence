@@ -13,7 +13,7 @@
 		enctype="multipart/form-data">
 
 		<br />
-		<div class="panel-title" align="center">
+		<div class="panel-title">
 			<spring:message code="view-asset" text="View Asset" />
 		</div>
 		<br />
@@ -83,13 +83,12 @@
 				</tr>
 			</table>
 
-			<div align="center" class="buttonbottom">
-				<div class="row text-center">
+			<div align="center">
 					<input type="submit" class="btn btn-primary" name="search"
-						value="Search" /> <input type="button" name="button2" id="button2"
-						value="Close" class="btn btn-default"
+						value="Search" /> 
+						<input type="button" name="button2" id="button2"
+						value="Close" class="btn btn-primary"
 						onclick="window.parent.postMessage('close','*');window.close();" />
-				</div>
 			</div>
 		</div>
 	</form:form>

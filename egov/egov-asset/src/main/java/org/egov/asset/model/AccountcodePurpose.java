@@ -19,7 +19,7 @@ public class AccountcodePurpose {
 	private Long createdBy;
 	@Column(name = "createddate")
 	private Date createdDate;
-	@Column(name = "mofifieddate")
+	@Column(name = "modifieddate")
 	private Date modifiedDate;
 	@Column(name = "modifiedby")
 	private Long modifiedBy;

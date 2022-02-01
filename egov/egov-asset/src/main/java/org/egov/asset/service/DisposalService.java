@@ -1,5 +1,6 @@
 package org.egov.asset.service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -7,11 +8,13 @@ import java.util.Random;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.asset.model.AssetCatagory;
+import org.egov.asset.model.AssetHistory;
 import org.egov.asset.model.AssetMaster;
 import org.egov.asset.model.AssetStatus;
 import org.egov.asset.model.Disposal;
 import org.egov.asset.repository.AccountcodePurposeRepository;
 import org.egov.asset.repository.AssetCatagoryRepository;
+import org.egov.asset.repository.AssetHistoryRepository;
 import org.egov.asset.repository.AssetMasterRepository;
 import org.egov.asset.repository.AssetStatusRepository;
 import org.egov.asset.repository.DisposalRepository;
@@ -49,7 +52,9 @@ public class DisposalService {
 	@Autowired
 	private AssetMasterRepository masterRepo;
 	@Autowired
-	private AssetCatagoryRepository assetCategoryRepo;;
+	private AssetCatagoryRepository assetCategoryRepo;
+	@Autowired
+	private AssetHistoryRepository assetHistoryRepository;
     //public Disposal saveDisposal(final DisposalRequest disposalRequest, final HttpHeaders headers) {
 	public Disposal saveDisposal(final Disposal disposal) {
         //final Disposal disposal = disposalRequest.getDisposal();
@@ -128,6 +133,18 @@ public class DisposalService {
         	saveDisposal.setDocuments(documentDetails);//save obj
             persistDocuments(documentDetails);
         }
+        //to main asset history
+        AssetHistory history=new AssetHistory();
+        history.setAsset(disposal.getAsset());
+        history.setCreatedBy(disposal.getCreatedBy());
+        history.setRecDate(new Date());
+        history.setSaleDisposalId(saveDisposal.getId());
+        history.setTransactionDate(disposal.getDisposalDate());
+        history.setTransactionType(disposal.getTransactionType());
+        history.setValueAfterTrxn(disposal.getAssetCurrentValue().subtract(disposal.getSaleValue()));
+        history.setTrxnValue(disposal.getSaleValue());
+        history.setValueBeforeTrxn(disposal.getAssetCurrentValue());
+        assetHistoryRepository.save(history);
 		
 		return saveDisposal;
 	}

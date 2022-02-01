@@ -127,10 +127,11 @@ public class AssetCatagoryController {
 		if(null!=assetCategory.getName()) {
 			name=assetCategory.getName();
 		}
-		if(null!=assetCategory.getAssetCatagoryType().getId()) {
+		if(null!=assetCategory.getAssetCatagoryType()) {
 			id=assetCategory.getAssetCatagoryType().getId();
 		}
-		List<AssetCatagory> assetCategories=assetCatagoryService.findBynameorAssetCataType(name, id);
+		//List<AssetCatagory> assetCategories=assetCatagoryService.findBynameorAssetCataType(name, id);
+		List<AssetCatagory> assetCategories=assetCatagoryService.findBynameContainingOrAssetCataType(name, id);
 		model.addAttribute("assetCategories", assetCategories);
 		return "search-assetcatagory-form";
 	}
@@ -193,5 +194,40 @@ public class AssetCatagoryController {
 		model.addAttribute("assetCatagory", updateAssetCategory);
 		
 		return "view-assetcatagory-form";
+	}
+	@PostMapping("/modifySearchAssetCategoryPage")
+	public String searchAssetCategoryModifyPage(Model model) {
+		
+		List<AssetCatagory> assetCategories=new ArrayList<AssetCatagory>();
+		model.addAttribute("assetCategories", assetCategories);
+		model.addAttribute("assetCatagory", new AssetCatagory());
+		model.addAttribute("assetCatagoryTypes", assetCatagoryService.getAssetCatagoryType());
+		return "search-assetcategory-modified";
+	}
+	@PostMapping("/searchAssetCategoryModifyPage")
+	public String loadsearchAssetCategoryModifyPage(@ModelAttribute AssetCatagory assetCategory,Model model) {
+		String name="";
+		Long id=null;
+		if(null!=assetCategory.getName()) {
+			name=assetCategory.getName();
+		}
+		if(null!=assetCategory.getAssetCatagoryType()) {
+			id=assetCategory.getAssetCatagoryType().getId();
+		}
+		//List<AssetCatagory> assetCategories=assetCatagoryService.findBynameorAssetCataType(name, id);
+		List<AssetCatagory> assetCategories=assetCatagoryService.findBynameContainingOrAssetCataType(name, id);
+		model.addAttribute("assetCategories", assetCategories);
+		return "search-assetcategory-modified";
+	}
+	@GetMapping("/viewModifyAssetCategory/{id}")
+	public String viewAssetCategoryModify(@PathVariable("id") Long id,Model model) {
+		AssetCatagory assetCategory = assetCatagoryService.getAssetCategory(id);
+		
+		
+
+		
+		model.addAttribute("assetCatagory", assetCategory);
+		System.out.println("viewAssetCategory is calling with id "+id);
+		return "view-assetcategory-modified";
 	}
 }

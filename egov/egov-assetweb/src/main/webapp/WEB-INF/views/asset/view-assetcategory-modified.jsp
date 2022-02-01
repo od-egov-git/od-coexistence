@@ -213,7 +213,7 @@
 				<th><spring:message code="lbl.asset.custome.values" text="Values"/></th>
 				<th><spring:message code="lbl.asset.custome.order" text="Order"/></th>
 				<th><spring:message code="lbl.asset.custome.column" text="Columns"/></th>
-				<%-- <th><spring:message code="lbl.action" text="Action"/></th> --%> 					
+				<th><spring:message code="lbl.action" text="Action"/></th> 					
 			</tr>
 		</thead>
 		<tbody>
@@ -228,16 +228,16 @@
 				<td>${customeField.vlaues}</td>
 				<td>${customeField.orders}</td>
 				<td>${customeField.columns}</td>
-				<%-- <td class="text-center">
+				<td class="text-center">
 					<a class="btn btn-primary" href="${contextPath}/assetcategory/editCustomField/${customeField.id}/${assetCatagory.name}">Update</a>
-					<a class="btn btn-primary" href="${contextPath}/asset/deleteCustomeField/${customeField.id}">Delete</a>
+					<%-- <a class="btn btn-primary" href="${contextPath}/asset/deleteCustomeField/${customeField.id}">Delete</a> --%>
 					
 					<form:hidden path="id" name="id" value="${assetCatagory.id}"/>
 					<form:hidden path="customeField.id" name="cusId" value="${customeField.id}"/>
 				<input type="submit" class="btn btn-primary" name="delete" value="Delete"/>
 			
 			
-				</td> --%>
+				</td>
 			</tr>
 		</c:forEach>
 		</c:if>
@@ -314,11 +314,11 @@
 	
 		</div>
 		</c:if>
-		<%-- <c:if test="${ empty assetCatagory.customeFields}">
+		<c:if test="${ empty assetCatagory.customeFields}">
 		<div align="center">
 		<a class="btn btn-primary" href="${contextPath}/assetcategory/editAssetCategory/${assetCatagory.id}">Edit</a>
 		</div>
-		</c:if> --%>
+		</c:if>
 		
 		</form:form>
 	</div>	
