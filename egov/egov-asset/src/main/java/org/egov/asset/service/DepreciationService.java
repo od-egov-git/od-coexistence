@@ -348,13 +348,11 @@ public class DepreciationService {
                 vd1.setCreditAmountDetail(new BigDecimal(afterDepreciation));
                 vd1.setDebitAmountDetail(new BigDecimal(0));
                 vd1.setGlcodeDetail(dI.getDepreciationExpenseAccount().toString());
-                vd1.setDebitAmountDetail(new BigDecimal(afterDepreciation));
                 billDetailslist.add(vd1);
                 VoucherDetails vd2=new VoucherDetails();
                 vd2.setCreditAmountDetail(new BigDecimal(0));
                 vd2.setDebitAmountDetail(new BigDecimal(afterDepreciation));
                 vd2.setGlcodeDetail(dI.getAccumulatedDepreciationAccount().toString());
-                vd2.setDebitAmountDetail(new BigDecimal(afterDepreciation));
                 billDetailslist.add(vd2);
                 subLedgerlist = new ArrayList<VoucherDetails>();
                 voucherHeader = journalVoucherActionHelper.createVcouher(billDetailslist, subLedgerlist, voucherHeader,

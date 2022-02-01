@@ -85,8 +85,8 @@ public class DepreciationController {
 		SQLQuery queryMain =  null;
 		query1
 		      .append("select ac.name,ah.department,ac.asset_code,ah.asset_name,am.gross_value ,ac.depriciation_rate " + 
-		      			" from asset_category ac,asset_header ah,asset_master am,chartofaccounts c " + 
-		      			" where ac.asset_code =am.code and ah.id =am.asset_header and c.id =ac.asset_account_code_id and am.asset_status ='2'");
+		      			" from asset_category ac,asset_header ah,asset_master am,chartofaccounts c,asset_revaluation ar " + 
+		      			" where ac.asset_code =am.code and ah.id =am.asset_header and c.id =ac.asset_account_code_id and ar.asset_master_id =am.id and am.asset_status ='2'");
 		System.out.println("categoryName "+depreciation.getCategoryName());
 		if(depreciation.getCategoryName()!=null) {
 			query1.append(" and ac.name='"+depreciation.getCategoryName()+"'");
@@ -181,7 +181,7 @@ public class DepreciationController {
 		List<Object[]> list= null;
 		SQLQuery queryMain =  null;
 		query1
-		      .append("select ad.id,ad.assetcode,ad.assetname,ad.categoryname,ad.location,ad.afterdepreciation from asset_depreciation ad ");
+		      .append("select ad.id,ad.assetcode,ad.assetname,ad.categoryname,ad.location,ad.afterdepreciation from asset_depreciation ad where ad.vouchernumber notnull ");
 		System.out.println("categoryName "+depreciation.getCategoryName());
 		if(depreciation.getCategoryName()!=null) {
 			query1.append(" and ad.categoryname='"+depreciation.getCategoryName()+"'");
@@ -262,4 +262,75 @@ public class DepreciationController {
 	    	return "depreciation-view";
 	    }
 	   
+	    @RequestMapping(value = "/reportAssetDeperication", method = RequestMethod.POST)
+		public String reportDepreciationForm(@ModelAttribute("Depreciation") final Depreciation depreciation,final Model model,HttpServletRequest request) {
+			System.out.println("view report calling");
+			
+			List<AssetCatagory> assetCategoryList = new ArrayList<AssetCatagory>();	
+			assetCategoryList = categoryRepo.findAll();
+		  	model.addAttribute("categoryName", assetCategoryList);
+		  	model.addAttribute("categoryType", assetCatagoryService.getAssetCatagoryType());
+		    return "depreciation-report";
+		}
+	    
+	    @RequestMapping(value = "/viewReportDepreciation", method = RequestMethod.POST)
+	    public String viewReportDepreciation(@ModelAttribute("Depreciation") final Depreciation depreciation,final Model model,HttpServletRequest request,
+				final BindingResult resultBinder) {
+		
+	    final StringBuffer query1 = new StringBuffer(500);
+		List<Object[]> list= null;
+		SQLQuery queryMain =  null;
+		query1
+		      .append("select ad.id,ad.assetcode,ad.assetname,ad.categoryname,ad.department,ad.categorytype,ad.depreciationrate,ad.beforedepreciation,ad.currentdepreciation,ad.afterdepreciation from asset_depreciation ad where ad.vouchernumber notnull ");
+		System.out.println("categoryName "+depreciation.getCategoryName());
+		if(depreciation.getCategoryName()!=null) {
+			query1.append(" and ad.categoryname='"+depreciation.getCategoryName()+"'");
+		}
+		System.out.println("categoryType "+depreciation.getCategoryType());
+		if(depreciation.getCategoryType()!=null) {
+			query1.append(" and ad.categorytype='"+depreciation.getCategoryType()+"'");
+		}
+		System.out.println("assetCode "+depreciation.getAssetCode());
+		if(depreciation.getAssetCode()!=null) {
+			query1.append(" and ac.assetcode='"+depreciation.getAssetCode()+"'");
+		}
+		System.out.println("assetName "+depreciation.getAssetName());
+		if(depreciation.getAssetName()!=null) {
+			query1.append(" and ah.assetname='"+depreciation.getAssetName()+"'");
+		}
+		
+		queryMain=this.persistenceService.getSession().createSQLQuery(query1.toString());
+		list = queryMain.list();  
+	    DepreciationList result =null;
+	       if (list.size() != 0) {
+	       	depreciationList = new ArrayList<DepreciationList>();
+	       	System.out.println("Size :: "+list.size() );
+	       	int i=1;
+	           for (final Object[] object : list) {
+	        	   result = new DepreciationList();
+	        	   result.setSlNo(i);
+	        	   result.setId(object[0]!=null?Integer.valueOf(object[0].toString()):0);
+	        	   result.setAssetCode(object[1]!=null?object[1].toString():"");
+	        	   result.setAssetName(object[2]!=null?object[2].toString():"");
+	        	   result.setAssetCategoryName(object[3]!=null?object[3].toString():"");
+	        	   result.setDepartment(object[4]!=null?object[4].toString():"");
+	        	   result.setCategoryType(object[5]!=null?object[5].toString():"");
+	        	   result.setDepreciationRate(object[6]!=null?Double.parseDouble(object[6].toString()):0);
+	        	   result.setCurrentGrossValue(object[7]!=null?new BigDecimal(object[7].toString()):new BigDecimal(0));
+	        	   result.setCurrentDepreciation(object[8]!=null?object[8].toString():"");
+	        	   result.setAfterDepreciation(object[9]!=null?object[9].toString():"");
+	        	   depreciationList.add(result);
+	        	   i++;
+	           }
+	       }
+	       else
+	    	   depreciationList=null;
+	       depreciation.setResultList(depreciationList);
+	    	System.out.println("listData method");
+	    	List<AssetCatagory> assetCategoryList = new ArrayList<AssetCatagory>();	
+			assetCategoryList = categoryRepo.findAll();
+		  	model.addAttribute("categoryName", assetCategoryList);
+		        
+	    	return "depreciation-report";
+	    }
 }

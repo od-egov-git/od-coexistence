@@ -51,16 +51,22 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring" %>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
-
+<link type="text/css" rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
+<link type="text/css" rel="stylesheet" href="https://cdn.datatables.net/buttons/2.1.0/css/buttons.dataTables.min.css">
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.1.0/js/dataTables.buttons.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.1.0/js/buttons.html5.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.1.0/js/buttons.print.min.js"></script>
 <script type="text/javascript">
 function searchData() {
 	if(jQuery("#depreciationDate").val()==""){
 		bootbox.alert("Please select depreciation date");
 		return false;
 	}
-	//document.Depreciation.action = "/services/EGF/expensebill/listData";
-	//document.form.submit();
-	//document.bankRemittanceForm.action = "bankRemittance-listData.action";
 	return true;
 }
 function viewDepreciation(id)
@@ -163,17 +169,22 @@ function viewDepreciation(id)
 						</tr>
 						</c:forEach>
 					<tbody>
-					</c:if>	
-					<c:if test="${Depreciation.resultList == null ||  Depreciation.resultList.isEmpty()}">
-						No records found
 					</c:if>			
 				</table>
 				</div>
-			<br>
-			
 	        </div>
         </div>
         
     </div>
 
 </form:form>
+<script>
+	$(document).ready(function() {
+    $('#searchResult').DataTable( {
+        dom: 'Bfrtip',
+        buttons: [
+            'copy', 'csv', 'excel', 'pdf', 'print'
+        ]
+    } );
+} );
+	</script> 

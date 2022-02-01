@@ -13,7 +13,7 @@
   ~     any later version.
   ~
   ~     This program is distributed in the hope that it will be useful,
-  ~     but WITHresultList ANY WARRANTY; withresultList even the implied warranty of
+  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
   ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   ~     GNU General Public License for more details.
   ~
@@ -63,11 +63,57 @@
 <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.1.0/js/buttons.print.min.js"></script>
 <script type="text/javascript">
 
+function viewDepreciation(id)
+{
+	var url = "/services/asset/asset/viewDepreciation/"+ id;
+	window.open(url,'','width=900, height=700');
+}
 </script>
-    <form:form name="Depreciation" role="form" method="post" action="Depreciation" modelAttribute="Depreciation" id="depreciation" class="form-horizontal form-groups-bordered" enctype="multipart/form-data">
+    <form:form name="Depreciation" role="form" method="post" action="viewReportDepreciation" modelAttribute="Depreciation" id="depreciation" class="form-horizontal form-groups-bordered" enctype="multipart/form-data">
+    <h3>Depreciation Report</h3>
     
+    <div class="tab-content">
+        <div>
+    		<label class="col-sm-2 control-label text-right">Asset Code</label>
+			<div class="col-sm-3 add-margin">
+				<form:input class="form-control" id="assetCode" path="assetCode"/>
+			</div>
+			<label class="col-sm-2 control-label text-right">Asset Name</label>
+			<div class="col-sm-3 add-margin">
+				<form:input class="form-control" id="assetName" path="assetName"/>
+			</div>
+    	</div> 
+    	<div>
+            <label class="col-sm-2 control-label text-right">Asset Category Name</label>
+			<div class="col-sm-3 add-margin">
+				<form:select path="categoryName" data-first-option="false" id="categoryName" class="form-control">
+					<form:option value=""><spring:message code="lbl.select" /></form:option>
+					<form:options items="${categoryName}" itemValue="name" itemLabel="name" />
+				</form:select>
+				<form:errors path="categoryName" cssClass="add-margin error-msg" />
+			</div>
+      		<label class="col-sm-2 control-label text-right">Asset Category Type</label>
+			<div class="col-sm-3 add-margin">
+				<form:select path="categoryType" data-first-option="false" id="categoryType" class="form-control" >
+				<form:option value=""><spring:message code="lbl.select" text="Select"/></form:option>
+					<c:forEach items="${categoryType}" var="categoryType">
+						<form:option value="${categoryType}"> ${categoryType} </form:option>
+					</c:forEach>
+				</form:select>
+				<form:errors path="categoryType" cssClass="add-margin error-msg" />
+			</div>  
+    	</div>
+    	
+    	<div class="buttonbottom" align="center">
+        	<input type="submit" id="search" class="btn btn-primary btn-wf-primary" name="search"  value="Search" onclick="return searchData()"/>
+        </div>
+        
+        <br>
+        <br>
+        <br>
+        <c:if test="${Depreciation.resultList != null &&  !Depreciation.resultList.isEmpty()}">
         <div class="tab-pane fade in active" id="resultheader">
-        <h3> Asset Depreciation</h3>
+        
 	        <div class="panel panel-primary" data-collapsed="0">
 	        <form:hidden path="counter" id="counter" />
 	        	<div style="padding: 0 15px;">
@@ -75,92 +121,83 @@
 					<thead>
 					<tr>
 						<th><spring:message code="lbl.serial" text="SL.No."/></th>
-						<th>Asset Category Name</th>
-						<th>Department</th>
 						<th>Asset Code</th>
 						<th>Asset Name</th>
+						<th>Asset Category Name</th>
+						<th>Department</th>
+						<th>Asset Category Type</th>
 						<th>Depreciation Rate(%)</th>
+						<th>Gross Value(Rs)</th>
 						<th>Current Depreciation(Rs)</th>
-						<th>Value after Depreciation(Rs)</th>
-						<th>Success/Failure</th>
-						<th>Reason For Failure</th>
-						<th>Voucher Number</th>
+						<th>Value After Depreciation(Rs)</th>
 					</tr>
 					</thead>
-`					 <c:if test="${Depreciation.resultList != null &&  !Depreciation.resultList.isEmpty()}">
+`					 
 					<tbody>
 					<c:forEach items="${Depreciation.resultList}" var="result" varStatus="status">
 						<tr>
 							<td>
-						    	<form:hidden path="resultList[${status.index}].slNo" id="resultList[${status.index}].slNo"/>
+						    <form:hidden path="resultList[${status.index}].slNo" id="resultList[${status.index}].slNo"/>
 								${result.slNo }
 						    </td>
 							<td>
-								<form:hidden path="resultList[${status.index}].assetCategoryName" id="resultList[${status.index}].assetCategoryName"/>
-								${result.assetCategoryName }
+							<form:hidden path="resultList[${status.index}].assetCode" id="resultList[${status.index}].assetCode"/>
+								${result.assetCode }
 							</td>
 							<td>
-								<form:hidden path="resultList[${status.index}].department" id="resultList[${status.index}].department"/>
-								${result.department }
-							</td>
-							<td>
-								<form:hidden path="resultList[${status.index}].assetCode" id="resultList[${status.index}].assetCode"/>
-								${result.assetCode }</a>
-							</td>
-							<td>
-								<form:hidden path="resultList[${status.index}].assetName" id="resultList[${status.index}].assetName"/>
+							<form:hidden path="resultList[${status.index}].assetName" id="resultList[${status.index}].assetName"/>
 								${result.assetName }
 							</td>
 							<td>
-								<form:hidden path="resultList[${status.index}].depreciationRate" id="resultList[${status.index}].depreciationRate"/>
+							<form:hidden path="resultList[${status.index}].assetCategoryName" id="resultList[${status.index}].assetCategoryName"/>
+								${result.assetCategoryName }
+							</td>
+							<td>
+							<form:hidden path="resultList[${status.index}].department" id="resultList[${status.index}].department"/>
+								${result.department }
+							</td>
+							<td>
+							<form:hidden path="resultList[${status.index}].categoryType" id="resultList[${status.index}].categoryType"/>
+								${result.categoryType }
+							</td>
+							<td>
+							<form:hidden path="resultList[${status.index}].depreciationRate" id="resultList[${status.index}].depreciationRate"/>
 								${result.depreciationRate }
 							</td>
 							<td>
-								<form:hidden path="resultList[${status.index}].currentDepreciation" id="resultList[${status.index}].currentDepreciation"/>
-								${result.currentDepreciation }
+							<form:hidden path="resultList[${status.index}].currentGrossValue" id="resultList[${status.index}].currentGrossValue"/>
+							${result.currentGrossValue }
 							</td>
 							<td>
-								<form:hidden path="resultList[${status.index}].afterDepreciation" id="resultList[${status.index}].afterDepreciation"/>
-								${result.afterDepreciation }
+							<form:hidden path="resultList[${status.index}].currentDepreciation" id="resultList[${status.index}].currentDepreciation"/>
+							${result.currentDepreciation }
 							</td>
 							<td>
-								<form:hidden path="resultList[${status.index}].successFailure" id="resultList[${status.index}].successFailure"/>
-								${result.successFailure }
+							<form:hidden path="resultList[${status.index}].afterDepreciation" id="resultList[${status.index}].afterDepreciation"/>
+							${result.afterDepreciation }
 							</td>
-							<td>
-								<form:hidden path="resultList[${status.index}].reasonForFailure" id="resultList[${status.index}].reasonForFailure"/>
-								${result.reasonForFailure }
-							</td>
-							<td>
-								<form:hidden path="resultList[${status.index}].voucherNumber" id="resultList[${status.index}].voucherNumber"/>
-								${result.voucherNumber }
-							</td>
-							
 							
 						</tr>
 						</c:forEach>
 					<tbody>
-					</c:if>	
-					<c:if test="${Depreciation.resultList == null ||  Depreciation.resultList.isEmpty()}">
-						No records found
-					</c:if>			
+							
 				</table>
 				</div>
 			<br>
 			
-			<br>
 	        </div>
         </div>
-        
+        </c:if>	
+		
     </div>
 
 </form:form>
-<script>
+ <script>
 	$(document).ready(function() {
     $('#searchResult').DataTable( {
         dom: 'Bfrtip',
         buttons: [
-            'pdf', 'print'
+            'excel', 'pdf', 'print'
         ]
     } );
 } );

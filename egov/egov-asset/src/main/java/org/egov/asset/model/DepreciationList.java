@@ -18,7 +18,14 @@ public class DepreciationList {
 	private String voucherNumber;
 	private String successFailure;
 	private String reasonForFailure;
+	private String categoryType;
 	
+	public String getCategoryType() {
+		return categoryType;
+	}
+	public void setCategoryType(String categoryType) {
+		this.categoryType = categoryType;
+	}
 	public String getCurrentDepreciation() {
 		return currentDepreciation;
 	}
