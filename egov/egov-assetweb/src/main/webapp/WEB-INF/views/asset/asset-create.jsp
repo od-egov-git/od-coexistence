@@ -12,8 +12,6 @@
 				<spring:message code="lbl-asset-create" text="Create Asset"/>
 			</div>
 		</div>
-		<br />
-		<br />
 		<div class="panel panel-primary" data-collapsed="0">	
 				<div class="panel-heading">
 				<div class="panel-title">
@@ -26,9 +24,9 @@
 							<span class="mandatory"></span>
 						</label>
 						<div class="col-sm-3 add-margin">						
-							<form:select path="assetHeader.department" id="department" required="required"  class="form-control">
+							<form:select path="assetHeader.department" id="dept" required="required"  class="form-control">
 								<form:option value=""><spring:message code="lbl.select" /></form:option>
-								<form:options items="${departmentList}" itemValue="name" itemLabel="name"/>  
+								<form:options items="${departmentList}" itemValue="id" itemLabel="name"/>
 							</form:select>
 						</div>
 						<label class="col-sm-3 control-label text-right">
@@ -53,9 +51,10 @@
 						</div>
 						<label class="col-sm-3 control-label text-right">
 							<spring:message code="asset-desc" text="description"/>
+							<span class="mandatory"></span>
 						</label>
 						<div class="col-sm-3 add-margin">
-							<form:textarea path="assetHeader.description" id="description" class="form-control" maxlength="100" ></form:textarea>
+							<form:textarea path="assetHeader.description" id="description" required="required" class="form-control" maxlength="100" ></form:textarea>
 							<form:errors path="assetHeader.description" cssClass="add-margin error-msg" />
 						</div>
 						<label class="col-sm-3 control-label text-right">
@@ -98,7 +97,7 @@
 							<spring:message code="asset-dep-rate" text="depreciationRate"/>
 						</label>
 						<div class="col-sm-3 add-margin">
-							<form:input  class="form-control text-left patternvalidation" 
+							<form:input  class="form-control text-left patternvalidation" id="AssetDep"
 								data-pattern="alphanumeric" path="assetHeader.depreciationRate"/>
 						</div>
 						<label class="col-sm-3 control-label text-right">
@@ -127,7 +126,7 @@
 							<spring:message code="asset-scheme" text="scheme"/>
 						</label>
 						<div class="col-sm-3 add-margin">
-							<form:select path="assetHeader.scheme" id="scheme" class="form-control">
+							<form:select path="assetHeader.scheme" id="scheme" class="form-control" onChange="getSubSchemelist(this)" >
 									<form:option value=""><spring:message code="lbl.select" /></form:option>
 									<form:options items="${schemeList}" itemValue="id" itemLabel="name"/>  
 							</form:select>
@@ -137,7 +136,7 @@
 						</label>
 						<div class="col-sm-3 add-margin">
 							<form:select path="assetHeader.subScheme" id="subScheme" 
-							onChange="getSubSchemelist(this)" class="form-control">
+							class="form-control">
 									<form:option value=""><spring:message code="lbl.select" /></form:option>
 									<form:options items="${subSchemeList}" itemValue="id" itemLabel="name"/>  
 							</form:select>
@@ -145,9 +144,6 @@
 			</div>
 		</div>
 		<!-- Location Details -->
-		<br />
-		<br />
-		
 		<div class="panel panel-primary" data-collapsed="0">	
 			<div class="panel-heading">
 			<div class="panel-title">
@@ -228,9 +224,6 @@
 			</div>
 		</div>
 		<!-- Category Details -->
-		<br />
-		<br />
-		
 		<div class="panel panel-primary" data-collapsed="0" id="categoryDetails" style="display:none">	
 			<div class="panel-heading">
 			<div class="panel-title">
@@ -248,8 +241,6 @@
 		</div>
 		
 		<!-- Asset Status -->
-		<br />
-		<br />
 		<div class="panel panel-primary" data-collapsed="0">	
 			<div class="panel-heading">
 			<div class="panel-title">
@@ -272,15 +263,14 @@
 			</div>
 			<!-- Value Section -->
 			<br />
-			<br />
 			<div class="panel-body" id="valueSection" style="display:none">
 						<div id="capitalized" style="display:none;">
 							<label class="col-sm-3 control-label text-right">
 								<spring:message code="gross-value" text="grossValue"/>
-								
+								<span class="mandatory"></span>
 							</label>
 							<div class="col-sm-3 add-margin">
-								<form:input data-pattern="alphanumeric" class="form-control" path="grossValue" />
+								<form:input data-pattern="alphanumeric" id="grossValue" class="form-control" path="grossValue" />
 							</div>
 							<label class="col-sm-3 control-label text-right">
 								<spring:message code="market-value" text="marketValue"/>
@@ -293,10 +283,10 @@
 						<div id="capitalized2" style="display:none;">
 							<label class="col-sm-3 control-label text-right">
 								<spring:message code="accumulated-depreciation" text="accumulatedDepreciation"/>
-								
+								<span class="mandatory"></span>
 							</label>
 							<div class="col-sm-3 add-margin">
-								<form:input class="form-control" data-pattern="alphanumeric" path="accumulatedDepreciation" />
+								<form:input class="form-control" id="accumulatedDepreciation" data-pattern="alphanumeric" path="accumulatedDepreciation" />
 							</div>
 							<label class="col-sm-3 control-label text-right">
 								<spring:message code="survey-number" text="surveyNumber"/>
@@ -369,17 +359,17 @@
 									<form:errors data-pattern="alphanumeric" path="acquisitionDate" cssClass="add-margin error-msg" />
 								</div>
 						</div> 
-			
 			</div>
 		</div>
 	
 		<div align="center" class="buttonbottom">
 			<div class="row text-center">
-				<input type="submit" class="btn btn-primary" name="create" value="create"/>
+				<input type="submit" class="btn btn-primary" name="create" id="createBtn" value="create"/>
 				<input type="button" name="button2" id="button2" value="Close" class="btn btn-default" onclick="window.parent.postMessage('close','*');window.close();"/>
 			</div>
 		</div>
 <input type="hidden" id="customFieldsCounts" name="customFieldsCounts"/>
+<input type="hidden" id="isCapitalized" name="isCapitalized"/>
 </form:form> 
 </div>
 <script>
@@ -391,8 +381,9 @@
 }
 function getSubSchemelist(obj)
 {
-	if(document.getElementById('subschemeid'))
-		populatesubschemeid({schemeId:obj.value});
+	loadSubScheme(obj.value);
+	/* if(document.getElementById('subschemeid'))
+		populatesubschemeid({schemeId:obj.value}); */
 } 
 //window.open('popup.jsp?parameter='+param,'mywindow','width=500,height=350,toolbar=no,resizable=no,menubar=no');
 function onPopupClose(returnParameter) {
@@ -406,7 +397,7 @@ function viewPop(id){
 	console.log(id);
 	/* var url1 = '/services/EGF/report/budgetVarianceReport-loadData.action?asOnDate='+date+'&dept='+dept+'&funds='+fund+'&func='+func+'&accCode='+accCode+'&vtype=pr';
 	window.open(url1,'Source','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700') */
-	var x = window.open('/services/asset/assetcreate/viewform/ref','popup','width=850,height=600');
+	var x = window.open('/services/asset/assetcreate/assetRef/ref','popup','width=850,height=600');
 	console.log("Return Obj..:"+x.value); 
 	console.log("Return Obj..:"+Object.values(x)); 
 	//$('#assetReference').val(x);
@@ -423,7 +414,7 @@ function showCategoryDetails(obj){
 		$("#categoryDetails").css("display", "block");
 	}
 }
-
+//$("#AssetDep").val();
 function fetchCustomFieldData(id){
 	console.log("Custom id..."+id);
 	 $.ajax({
@@ -433,6 +424,8 @@ function fetchCustomFieldData(id){
 	           console.log("output............"+res);
 	           var jsonObj = JSON.parse(res);
 	           var json = jsonObj.data;
+	           console.log(jsonObj.depRate);
+	           $("#AssetDep").val(jsonObj.depRate);
 	           //var output = evaluateJson(json);
 	           var retHtml = "<tr>";
 	           var len = 0;
@@ -501,6 +494,7 @@ function fetchdetails(status,mode){
 	       	if(assetStatusCode == 'CAPITALIZED'){
 	       		$("#capitalized").css("display", "block");
 	       		$("#capitalized2").css("display", "block");
+	       		$('#isCapitalized').val('CAPITALIZED');
 	       	}
 	       	if(flag){
 	       		if(modeOfAcq == 'PURCHASE'){
@@ -589,4 +583,81 @@ function getTotalFileSize() {
     }
 }
 //Till Here
+//$( "form" ).submit(function(event) {
+$( "#createBtn" ).click(function(e) {	
+	console.log("Submitting...");
+	var grossVal = $('#grossValue').val();
+	var accumulatedDepreciation = $('#accumulatedDepreciation').val();
+	console.log(grossVal+","+accumulatedDepreciation);
+	var isCapitalized = $('#isCapitalized').val();
+	console.log(isCapitalized);
+	if(isCapitalized == 'CAPITALIZED'){
+		if (grossVal == null || grossVal =='') {
+			console.log('Prevent');
+			e.preventDefault();
+			$( "#grossValue" ).focus();
+		  }
+		if (accumulatedDepreciation == null || accumulatedDepreciation == '') {
+			console.log('Prevent');
+			e.preventDefault();
+			$( "#accumulatedDepreciation" ).focus();
+		  }
+	}
+});
+
+function loadSubScheme(schemeId){
+	console.log('schemeid...'+schemeId);
+	if (!schemeId) {
+		$('#subScheme').empty();
+		$('#subScheme').append($('<option>').text('Select from below').attr('value', ''));
+		return;
+	} else {
+		
+		$.ajax({
+			method : "GET",
+			url : "/services/EGF/common/getsubschemesbyschemeid",
+			data : {
+				schemeId : schemeId
+			},
+			async : true
+		}).done(
+				function(response) {
+					console.log('Response...'+response);
+					$('#subScheme').empty();
+					$('#subScheme').append($("<option value=''>Select from below</option>"));
+					$.each(response, function(index, value) {
+						var selected="";
+						/*if($subSchemeId && $subSchemeId==value.id)
+						{
+								selected="selected";
+						}*/
+						$('#subScheme').append($('<option '+ selected +'>').text(value.name).attr('value', value.id));
+					});
+				});
+		
+	}
+}
+
+/*$( "#create" ).click(function(e) {
+	var flag = true;
+	console.log("Submitting...");
+	var grossVal = $('#grossValue').val();
+	var accumulatedDepreciation = $('#accumulatedDepreciation').val();
+	console.log(grossVal+","+accumulatedDepreciation);
+	var isCapitalized = $('#isCapitalized').val();
+	console.log(isCapitalized);
+	if(isCapitalized == 'CAPITALIZED'){
+		if (grossVal == null || grossVal =='') {
+			console.log('Prevent');
+		    flag false;
+		  }
+		  if(accumulatedDepreciation == null || accumulatedDepreciation == '') {
+			flag = false;
+			console.log('Prevent');
+		}
+	}
+	if(!flag){
+		e.preventDefault();
+	}
+});*/
 </script>

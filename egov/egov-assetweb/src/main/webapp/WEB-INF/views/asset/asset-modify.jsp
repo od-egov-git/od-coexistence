@@ -68,6 +68,7 @@
 				onclick="window.parent.postMessage('close','*');window.close();"/>
 			</div>
 		</div>
+		<input type="hidden" name="viewmode" id="viewmode" value="update"/>
 	</form:form>
 	<br />
 	<br />
@@ -88,9 +89,6 @@
 					<th><spring:message code="asset-cat" text="Asset Category Type"/></th>
 					<th><spring:message code="asset-dept" text="Department"/></th>
 					<th><spring:message code="asset-status" text="Status"/></th>
-					<c:if test="${isReference}">
-						<th><spring:message code="lbl-action" text="Action"/></th>
-					</c:if>
 				</tr>
 			</thead>
 			<tbody>

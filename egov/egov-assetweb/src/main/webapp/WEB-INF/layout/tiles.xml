@@ -59,6 +59,10 @@
         <put-attribute name="body" value="/WEB-INF/views/asset/asset-create.jsp"/>
     </definition>
     
+    <definition name="asset-modify" extends="base_layout">
+        <put-attribute name="page-title" value="asset-modify" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/asset/asset-modify.jsp"/>
+    </definition>
     <definition name="asset-view" extends="base_layout">
         <put-attribute name="page-title" value="view-asset" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/asset/asset-view.jsp"/>

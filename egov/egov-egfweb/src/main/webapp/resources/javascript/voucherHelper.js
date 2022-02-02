@@ -205,6 +205,7 @@ function createAmountFieldFormatterJV(prefix,suffix,onblurfunction){
 		el.innerHTML = "<input type='text' id='"+prefix+"["+billDetailTableIndex+"]"+suffix+"' name='"+prefix+"["+billDetailTableIndex+"]"+suffix+"' style='text-align:right;width:100%;' maxlength='18' onblur='validateDigitsAndDecimal(this);"+onblurfunction+"'/>";
 	}
 }
+
 function createSLTextFieldFormatterJV(prefix,suffix,onblurfunction){
     return function(el, oRecord, oColumn, oData) {
 		el.innerHTML = "<input type='text' id='"+prefix+"["+slDetailTableIndex+"]"+suffix+"' name='"+prefix+"["+slDetailTableIndex+"]"+suffix+"' style='width:90px;' onblur='"+onblurfunction+"'/>";
@@ -232,11 +233,16 @@ function createSLLongTextFieldFormatterJV(prefix,suffix){
 		el.innerHTML = "<input type='text' id='"+prefix+"["+slDetailTableIndex+"]"+suffix+"' name='"+prefix+"["+slDetailTableIndex+"]"+suffix+"' readOnly style='width:120px;'/>";
 	}
 }
-
 function createSLAmountFieldFormatterJV(prefix,suffix){
     return function(el, oRecord, oColumn, oData) {
 		var value = (YAHOO.lang.isValue(oData))?oData:"";
 		el.innerHTML = "<input type='text' id='"+prefix+"["+slDetailTableIndex+"]"+suffix+"' name='"+prefix+"["+slDetailTableIndex+"]"+suffix+"' onblur='validateDigitsAndDecimal(this);' maxlength='18' style='text-align:right;width:90px;'/>";
+	}
+}
+function createSLAmountFieldFormatterJVNew(prefix,suffix,onChangeFunction){
+    return function(el, oRecord, oColumn, oData) {
+		var value = (YAHOO.lang.isValue(oData))?oData:"";
+		el.innerHTML = "<input type='text' id='"+prefix+"["+slDetailTableIndex+"]"+suffix+"' name='"+prefix+"["+slDetailTableIndex+"]"+suffix+"' onblur='validateDigitsAndDecimal(this);"+onChangeFunction+"' maxlength='18' style='text-align:right;width:90px;'/>";
 	}
 }
 function createLongTextFieldFormatterPayin(prefix,suffix){
@@ -442,7 +448,6 @@ function loadCoa(id){
 
 function loadDropDownCodes()
 {
-	//alert("::loadDropDownCodes::");
 	var	url = "/services/EGF/voucher/common-ajaxGetAllCoaCodes.action";
 	var req2 = initiateRequest();
 	req2.onreadystatechange = function()
@@ -793,7 +798,6 @@ function autocompletecode(obj,myEvent)
 				oAutoComp.useShadow = true;
 				oAutoComp.maxResultsDisplayed = 15;
 				oAutoComp.useIFrame = true;
-				
 				codeObj.applyLocalFilter = true;
 				codeObj.queryMatchContains = true;
 				oAutoComp.minQueryLength = 0;
@@ -856,7 +860,6 @@ var funcObj;
 var funcArray;
 function loadDropDownCodesFunction()
 {
-	//alert("::loadDropDownCodesFunction:::");
 	var url = "/services/EGF/voucher/common-ajaxGetAllFunctionName.action";
 	var req2 = initiateRequest();
 	req2.onreadystatechange = function()
@@ -2403,6 +2406,23 @@ function updateRateDetailJV()
 	
 	
 	
+}
+function updateSubLedgerAmount(){
+var amt=0;
+	
+	for(var i=0;i<slDetailTableIndex+1;i++)
+	{
+		
+		if(null != document.getElementById('subLedgerlist['+i+'].amount')){
+			var val = document.getElementById('subLedgerlist['+i+'].amount').value;
+			if(val!="" && !isNaN(val))
+			{
+				amt = amt + parseFloat(val);
+			}
+		}
+		
+	}
+	document.getElementById('totalVoucherAmt').value = amountConverter(amt);
 }
 
 function updateDebitAmountJV()

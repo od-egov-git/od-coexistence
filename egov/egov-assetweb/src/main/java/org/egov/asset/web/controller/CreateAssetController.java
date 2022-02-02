@@ -54,12 +54,14 @@ import org.egov.commons.SubScheme;
 import org.egov.commons.dao.FunctionDAO;
 import org.egov.commons.dao.FundHibernateDAO;
 import org.egov.egf.expensebill.repository.DocumentUploadRepository;
+import org.egov.infra.admin.master.entity.Department;
+import org.egov.infra.admin.master.repository.DepartmentRepository;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.exception.ApplicationException;
 import org.egov.infra.filestore.service.FileStoreService;
-import org.egov.infra.microservice.models.Department;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infstr.services.PersistenceService;
+import org.egov.infstr.utils.EgovMasterDataCaching;
 import org.egov.model.bills.DocumentUpload;
 import org.egov.services.masters.SchemeService;
 import org.egov.services.masters.SubSchemeService;
@@ -104,6 +106,8 @@ public class CreateAssetController {// extends BaseAssetController{
 	@Autowired
 	private DocumentUploadRepository documentUploadRepository;
 	@Autowired
+	private EgovMasterDataCaching masterDataCache;
+	@Autowired
 	private FundHibernateDAO fundHibernateDAO;
 	@Autowired
 	private FunctionDAO functionDAO;
@@ -131,6 +135,9 @@ public class CreateAssetController {// extends BaseAssetController{
 	private AssetCustomFieldMapperRepository customFieldRepo;
 	
 	@Autowired
+	private DepartmentRepository deptRepo;
+	
+	@Autowired
 	private AssetService assetService;
 	@Autowired
     @Qualifier("messageSource")
@@ -154,7 +161,7 @@ public class CreateAssetController {// extends BaseAssetController{
     private FileStoreService fileStoreService;
 
     List<AssetMaster> assetList = new ArrayList<AssetMaster>();
-	List<Department> departmentList = new ArrayList<Department>();
+	List<Department> departmentList = new ArrayList<>();
 	List<Fund> fundList = new ArrayList<Fund>();
 	List<CFunction> functionList = new ArrayList<CFunction>();
 	List<AssetCatagory> assetCategoryList = new ArrayList<AssetCatagory>();
@@ -181,10 +188,9 @@ public class CreateAssetController {// extends BaseAssetController{
 		model.addAttribute("assetBean", assetBean);
 		//model.addAttribute("assetHeaderBean", assetHeaderBean);
 		//model.addAttribute("assetLocationBean", assetLocationBean);
-		
 		try {
 			fundList = fundHibernateDAO.findAllActiveFunds();
-			departmentList = microserviceUtils.getDepartments();
+			departmentList = deptRepo.findAll(); //masterDataCache.get("egi-department");		//microserviceUtils.getDepartments();
 			modeOfAcquisitionList = acqRepo.findAll();
 			assetStatusList = statusRepo.findAll();
 			assetCategoryList = categoryRepo.findAll();
@@ -209,6 +215,7 @@ public class CreateAssetController {// extends BaseAssetController{
 			e.printStackTrace();
 		}
 		model.addAttribute("departmentList", departmentList);
+		//model.addAttribute("departmentList", masterDataCache.get("egi-department"));
 		model.addAttribute("fundList", fundList);
 		model.addAttribute("modeOfAcquisitionList", modeOfAcquisitionList);
 		model.addAttribute("assetStatusList", assetStatusList);
@@ -233,8 +240,6 @@ public class CreateAssetController {// extends BaseAssetController{
 		LOGGER.info("Creating Asset Object");
 		long userId = ApplicationThreadLocals.getUserId();
 		LOGGER.info("userId..." + userId);
-		LOGGER.info("Asset Header..." + assetBean.toString());
-		LOGGER.info("Asset Header..." + assetBean.getAssetHeader().toString());
 		//File
 		List<DocumentUpload> list = new ArrayList<>();
 		try {
@@ -400,7 +405,37 @@ public class CreateAssetController {// extends BaseAssetController{
 		assetBean = new AssetMaster();
 		model.addAttribute("assetBean", assetBean);
 		try {
-			departmentList = microserviceUtils.getDepartments();
+			departmentList = deptRepo.findAll(); //microserviceUtils.getDepartments();
+			assetStatusList = statusRepo.findAll();
+			assetCategoryList = categoryRepo.findAll();
+			
+			assetList = masterRepo.findAll();
+			LOGGER.info("Asset Lists..."+assetList.toString());
+		} catch (Exception e) {
+			e.getMessage();
+		}
+		model.addAttribute("assetList", assetList);
+		model.addAttribute("departmentList", departmentList);
+		model.addAttribute("assetStatusList", assetStatusList);
+		model.addAttribute("assetCategoryList", assetCategoryList);
+		model.addAttribute("localityList", localityList);
+		model.addAttribute("mode", "add");
+		model.addAttribute("disabled", "");
+		if(param.equalsIgnoreCase("ref")) {
+			model.addAttribute("isReference", true);
+		}else {
+			model.addAttribute("isReference", false);
+		}
+		return "asset-view";
+	}
+	
+	@GetMapping("/assetRef/{param}")
+	public String assetRef(@PathVariable("param") String param, Model model) {
+		LOGGER.info("assetRef Form..................");
+		assetBean = new AssetMaster();
+		model.addAttribute("assetBean", assetBean);
+		try {
+			departmentList = deptRepo.findAll(); //microserviceUtils.getDepartments();
 			assetStatusList = statusRepo.findAll();
 			assetCategoryList = categoryRepo.findAll();
 			
@@ -434,7 +469,7 @@ public class CreateAssetController {// extends BaseAssetController{
 			assetList = masterRepo.getAssetMasterDetails(assetBean.getCode(), 
 					assetBean.getAssetHeader().getAssetName(),
 					assetBean.getAssetHeader().getAssetCategory().getId(),
-					assetBean.getAssetHeader().getDepartment(),
+					assetBean.getAssetHeader().getDepartment().getId(),
 					assetBean.getAssetStatus().getId());
 			LOGGER.info("Asset Lists..."+assetList.toString());
 		} catch (Exception e) {
@@ -502,7 +537,7 @@ public class CreateAssetController {// extends BaseAssetController{
 			//modeOfAcquisitionList = acqRepo.findAll();
 			
 			fundList = fundHibernateDAO.findAllActiveFunds();
-			departmentList = microserviceUtils.getDepartments();
+			departmentList = deptRepo.findAll(); //microserviceUtils.getDepartments();
 			modeOfAcquisitionList = acqRepo.findAll();
 			assetStatusList = statusRepo.findAll();
 			assetCategoryList = categoryRepo.findAll();
@@ -699,14 +734,14 @@ public class CreateAssetController {// extends BaseAssetController{
 			assetList = masterRepo.getAssetMasterDetails(assetBean.getCode(), 
 					assetBean.getAssetHeader().getAssetName(),
 					assetBean.getAssetHeader().getAssetCategory().getId(), 
-					assetBean.getAssetHeader().getDepartment(), statusId);
+					assetBean.getAssetHeader().getDepartment().getId(), statusId);
 			LOGGER.info("Asset Lists..."+assetList.toString());
 		} catch (Exception e) {
 			e.getMessage();
 		}
 		model.addAttribute("assetList", assetList);
 		try {
-			departmentList = microserviceUtils.getDepartments();
+			departmentList = deptRepo.findAll(); //microserviceUtils.getDepartments();
 			assetStatusList = statusRepo.findAll();
 			assetCategoryList = categoryRepo.findAll();
 		} catch (Exception e) {
@@ -832,7 +867,7 @@ public class CreateAssetController {// extends BaseAssetController{
 			model.addAttribute("assetBean", assetBean);
 			try {
 				fundList = fundHibernateDAO.findAllActiveFunds();
-				departmentList = microserviceUtils.getDepartments();
+				departmentList = deptRepo.findAll(); //microserviceUtils.getDepartments();
 				modeOfAcquisitionList = acqRepo.findAll();
 				assetStatusList = statusRepo.findAll();
 				assetCategoryList = categoryRepo.findAll();
@@ -906,9 +941,10 @@ public class CreateAssetController {// extends BaseAssetController{
 		LOGGER.info("Category Details.................."+assetCategoryId);
 		AssetCatagory assetCategory = new AssetCatagory();
 		List<CustomeFields> customeFields=new ArrayList<>();
-		
+		double depRate = 0.0;
 		try {
 			assetCategory = categoryRepo.findOne(Long.valueOf(assetCategoryId));
+			depRate = assetCategory.getDepriciationRate();
 			customeFields = assetCategory.getCustomeFields();
 			LOGGER.info("Custom Fields.."+customeFields);
 		}catch(Exception e) {
@@ -929,7 +965,9 @@ public class CreateAssetController {// extends BaseAssetController{
 		String retVal = "";
 		try {
 			retVal = new StringBuilder("{ \"data\":")
-	                .append(toSearchResultJson(customeFields)).append("}")
+	                .append(toSearchResultJson(customeFields))
+	                .append(",\"depRate\":"+depRate)
+	                .append("}")
 	                .toString();
 		}catch(Exception e) {
 			e.printStackTrace();
@@ -985,7 +1023,7 @@ public class CreateAssetController {// extends BaseAssetController{
 			
 		}
 		
-		@PostMapping(value = "/searchregister", params = "search")
+		@PostMapping(value = "/searchregister")
 		public String searchRegister(@ModelAttribute("assetBean") AssetMaster assetBean, Model model, HttpServletRequest request) {
 			LOGGER.info("Search Register Report Operation..................");
 			assetList = new ArrayList<>();
@@ -994,10 +1032,11 @@ public class CreateAssetController {// extends BaseAssetController{
 				if(null != assetBean.getAssetStatus()) {
 					statusId = assetBean.getAssetStatus().getId();
 				}
-				assetList = masterRepo.getAssetMasterRegisterDetails(assetBean.getCode(), 
+				assetList = masterRepo.findAll();
+				/*assetList = masterRepo.getAssetMasterRegisterDetails(assetBean.getCode(), 
 						assetBean.getAssetHeader().getAssetName(),
 						assetBean.getAssetHeader().getAssetCategory().getId(), 
-						assetBean.getAssetLocation().getId(), assetBean.getAssetHeader().getDescription(), statusId);
+						assetBean.getAssetLocation().getId(), assetBean.getAssetHeader().getDescription(), statusId);*/
 				LOGGER.info("Asset Lists..."+assetList.toString());
 			} catch (Exception e) {
 				e.getMessage();
@@ -1046,5 +1085,31 @@ public class CreateAssetController {// extends BaseAssetController{
 				model.addAttribute("isReference", false);
 			}
 			return "asset-register-report";
+		}
+		
+		@PostMapping("/modifyform")
+		public String modifyform(Model model) {
+			LOGGER.info("View Form..................");
+			assetBean = new AssetMaster();
+			model.addAttribute("assetBean", assetBean);
+			try {
+				departmentList = deptRepo.findAll(); //microserviceUtils.getDepartments();
+				assetStatusList = statusRepo.findAll();
+				assetCategoryList = categoryRepo.findAll();
+				
+				assetList = masterRepo.findAll();
+				LOGGER.info("Asset Lists..."+assetList.toString());
+			} catch (Exception e) {
+				e.getMessage();
+			}
+			model.addAttribute("assetList", assetList);
+			model.addAttribute("departmentList", departmentList);
+			model.addAttribute("assetStatusList", assetStatusList);
+			model.addAttribute("assetCategoryList", assetCategoryList);
+			model.addAttribute("localityList", localityList);
+			model.addAttribute("mode", "add");
+			model.addAttribute("disabled", "");
+			
+			return "asset-modify";
 		}
 }

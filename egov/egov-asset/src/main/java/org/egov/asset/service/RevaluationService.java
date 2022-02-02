@@ -75,7 +75,7 @@ public class RevaluationService {
 		voucherHeader.setVoucherDate(new Date());
 		voucherHeader.setVouchermis(new Vouchermis());
 		voucherHeader.getVouchermis().setFunction(fun);
-		voucherHeader.getVouchermis().setDepartmentcode(savedAssetRevaluation.getAssetMaster().getAssetHeader().getDepartment());
+		voucherHeader.getVouchermis().setDepartmentcode(savedAssetRevaluation.getAssetMaster().getAssetHeader().getDepartment().getCode());
 		workflowBean.setWorkFlowAction("CreateAndApprove");
 		billDetailslist = new ArrayList<VoucherDetails>();
 		VoucherDetails vd1 = new VoucherDetails();

@@ -104,7 +104,7 @@ public class RevaluationController {
 			assetList = masterRepo.getAssetMasterDetails(assetBean.getCode(), 
 					assetBean.getAssetHeader().getAssetName(),
 					assetBean.getAssetHeader().getAssetCategory().getId(), 
-					assetBean.getAssetHeader().getDepartment(), statusId);
+					assetBean.getAssetHeader().getDepartment().getId(), statusId);
 			LOGGER.info("Asset Lists..."+assetList.toString());
 		} catch (Exception e) {
 			e.getMessage();

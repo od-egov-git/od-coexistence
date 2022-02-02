@@ -102,10 +102,10 @@
 					<div class="col-sm-3 add-margin">
 						<c:choose>
 	  						<c:when test="${assetBean.documentDetail !=null}">
-					       		<a href="/services/asset/assetcreate/downloadBillDoc?assetId=${assetBean.id}&fileStoreId=${document.fileStore.fileStoreId }">${document.fileStore.fileName }</a>
+					       		<a href="/services/asset/assetcreate/downloadBillDoc?assetId=${assetBean.id}&fileStoreId=${assetBean.documentDetail.fileStore.fileStoreId }">${assetBean.documentDetail.fileStore.fileName }</a>
 	        					<br/>
 	        					<span><input type="button" id="remove" style="background: #265988" value="Remove"
-									onclick="deletedoc(${assetBean.id},${document.id});"></span>
+									onclick="deletedoc(${assetBean.id},${assetBean.documentDetail.id});"></span>
 							</c:when>
 							<c:otherwise>
 								<input type="file" name="file" id="file1" class="padding-10">
@@ -435,7 +435,52 @@ $(document).ready(function(){
 	var mode = $('#mode').val();
 	console.log($('#statusCode').val());
 	console.log($('#mode').val());
-	fetchdetails(statusCode,mode);
+	fetchdetails1(statusCode,mode);
 });
 
+function fetchdetails1(status,mode){
+	console.log(status);
+	console.log(mode);
+	$.ajax({
+		type : "GET",
+        url: "/services/asset/assetcreate/fetchdetails",
+        data: {status: status, mode: mode},
+        async : false,
+        success: function(res){      
+           console.log("output............"+res);
+           var jsonObj = JSON.parse(res);
+           var assetStatusCode = jsonObj.status;
+           var modeOfAcq = jsonObj.mode;
+           console.log(assetStatusCode+"..."+modeOfAcq);
+           
+	        var flag = false;   
+	        if(assetStatusCode == 'CREATED' || assetStatusCode == 'CAPITALIZED'){
+	       		$("#valueSection").css("display", "block");
+	       		flag = true;
+	       	}else{
+	       		console.log("else Part");
+	       		$("#valueSection").css("display", "none");
+	       		flag = false;
+	       	}
+	       	if(assetStatusCode == 'CAPITALIZED'){
+	       		$("#capitalized").css("display", "block");
+	       		$("#capitalized2").css("display", "block");
+	       	}
+	       	if(flag){
+	       		if(modeOfAcq == 'PURCHASE'){
+	       			$("#acqPurchase").css("display", "block");
+	       		}else if(modeOfAcq == 'DONATION'){
+	       			$("#acqDonation").css("display", "block");
+	       		}else if(modeOfAcq == 'CONSTRUCTION'){
+	       			$("#acqConstruction").css("display", "block");
+	       		}else if(modeOfAcq == 'ACQUIRED'){
+	       			$("#acqAcquired").css("display", "block");
+	       		}else{
+	       			console.log("select modeOfAcq");
+	       		}
+	       	}
+           //return res;
+        }
+    });
+}
 </script>

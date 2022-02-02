@@ -70,7 +70,7 @@ public class DepreciationController {
 		List<Object[]> list= null;
 		SQLQuery queryMain =  null;
 		query1
-		      .append("select 	ac.name,ah.department,ac.asset_code,ah.asset_name,am.gross_value ,ac.depriciation_rate from	asset_master am,asset_header ah,asset_category ac,asset_revaluation ar where am.id=ar.asset_master_id and am.asset_header=ah.id	and ah.asset_category =ac.id ");
+		      .append("select ac.name,ah.department,ac.asset_code,ah.asset_name,am.current_value ,ac.depriciation_rate from	asset_master am,asset_header ah,asset_category ac,asset_revaluation ar where am.id=ar.asset_master_id and am.asset_header=ah.id	and ah.asset_category =ac.id and TO_CHAR(ar.rev_date,'dd-mm-yyyy') = '"+depreciation.getDepreciationDate()+"' ");
 		System.out.println("categoryName "+depreciation.getCategoryName());
 		if(depreciation.getCategoryName()!=null) {
 			query1.append(" and ac.name = '"+depreciation.getCategoryName()+"'");
@@ -265,7 +265,7 @@ public class DepreciationController {
 		List<Object[]> list= null;
 		SQLQuery queryMain =  null;
 		query1
-		      .append("select ad.id,ad.assetcode,ad.assetname,ad.categoryname,ad.department,ad.categorytype,ad.depreciationrate,ad.beforedepreciation,ad.currentdepreciation,ad.afterdepreciation from asset_depreciation ad where ad.vouchernumber notnull ");
+		      .append("select ad.id,ad.assetcode,ad.assetname,ad.categoryname,ad.department,ad.categorytype,ad.depreciationrate,ad.beforedepreciation,ad.currentdepreciation,ad.afterdepreciation,ad.voucherNumber from asset_depreciation ad where ad.vouchernumber notnull ");
 		System.out.println("categoryName "+depreciation.getCategoryName());
 		if(depreciation.getCategoryName()!=null) {
 			query1.append(" and ad.categoryname='"+depreciation.getCategoryName()+"'");
@@ -303,6 +303,7 @@ public class DepreciationController {
 	        	   result.setCurrentGrossValue(object[7]!=null?new BigDecimal(object[7].toString()):new BigDecimal(0));
 	        	   result.setCurrentDepreciation(object[8]!=null?object[8].toString():"");
 	        	   result.setAfterDepreciation(object[9]!=null?object[9].toString():"");
+	        	   result.setVoucherNumber(object[10]!=null?object[10].toString():"");
 	        	   depreciationList.add(result);
 	        	   i++;
 	           }

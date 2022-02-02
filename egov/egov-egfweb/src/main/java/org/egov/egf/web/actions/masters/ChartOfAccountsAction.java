@@ -385,10 +385,10 @@ public class ChartOfAccountsAction extends BaseFormAction {
         final List<Accountdetailtype> rowsToBeAdded = getAccountDetailTypeToBeAdded(accountDetailType, accounts);
         String accountDetailTypeName = "";
         if (accounts.getChartOfAccountDetails().isEmpty() && !accountDetailType.isEmpty() && updateOnly) {
-            if (!validAddtition(model.getGlcode())) {
+            /*if (!validAddtition(model.getGlcode())) {
                 final String message = getText("chartOfAccount.accDetail.uncancelled.bills");
                 throw new ValidationException(Arrays.asList(new ValidationError(message, message)));
-            }
+            }*/
         }
 
         else if (accounts.getChartOfAccountDetails().size() == rowsToBeDeleted.size() && rowsToBeAdded.isEmpty())

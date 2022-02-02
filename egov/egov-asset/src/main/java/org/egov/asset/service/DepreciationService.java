@@ -259,12 +259,14 @@ public class DepreciationService {
         		List<Object[]> list= null;
         		SQLQuery queryMain =  null;
         		query1
-        		      .append("select ac.name,act.code,ah.department,ac.asset_code,ah.asset_name,am.gross_value,ac.depriciation_rate, "+
-        		    		  " (select c.glcode from chartofaccounts c,asset_category ac where c.id = ac.asset_account_code_id and ac.asset_code ='"+dl.getAssetCode()+"') as accumulated, "+
-        		    		  " am.accumulated_depreciation,(select c.glcode from chartofaccounts c,asset_category ac where c.id = ac.depriciation_expense_account_id  and ac.asset_code ='"+dl.getAssetCode()+"') as expense, " +
-        		    		  " (select c.glcode from chartofaccounts c,asset_category ac where c.id = ac.revolution_reserve_account_code_id and ac.asset_code ='"+dl.getAssetCode()+"') as revolution_reverse, "+
-        		    		  " ah.function,ah.fund,ah.description,al.location from asset_category ac,asset_catagory_type act,asset_header ah,asset_master am,asset_location al,chartofaccounts c " + 
-        		      		" where ac.asset_code =am.code and al.id = am.asset_location and act.id =ac.asset_catagory_type_id and ah.id =am.asset_header and c.id =ac.asset_account_code_id and am.asset_status ='2' and ac.asset_code ='"+dl.getAssetCode()+"'");
+        		.append("select ac.name,act.code,ah.department,ac.asset_code,ah.asset_name,am.gross_value,ac.depriciation_rate," + 
+        				" (select c.glcode from chartofaccounts c,asset_category ac where c.id = ac.asset_account_code_id and ac.asset_code = '"+dl.getAssetCode()+"') as accumulated,am.accumulated_depreciation, " + 
+        				" (select c.glcode from chartofaccounts c,asset_category ac where c.id = ac.depriciation_expense_account_id and ac.asset_code = '"+dl.getAssetCode()+"') as expense, " + 
+        				" (select c.glcode from chartofaccounts c, asset_category ac where c.id = ac.revolution_reserve_account_code_id and ac.asset_code = '"+dl.getAssetCode()+"') as revolution_reverse, " + 
+        				" ah.function,ah.fund,ah.description,al.location,am.id from asset_category ac, asset_catagory_type act, asset_header ah, asset_master am,asset_revaluation ar, asset_location al, " + 
+        				" asset_location_locality all2 where am.id = ar.asset_master_id and am.asset_header =ah.id and ah.asset_category =ac.id and ac.asset_catagory_type_id =act.id and am.asset_location =al.id " + 
+        				/*"--and al.location =all2.id" +*/ 
+        				" and ac.asset_code = '"+dl.getAssetCode()+"'");
         		System.out.println("query1 "+query1.toString());
         		queryMain=this.persistenceService.getSession().createSQLQuery(query1.toString());
         		list = queryMain.list();  
@@ -287,6 +289,7 @@ public class DepreciationService {
         	       		dI.setFund(object[12]!=null?object[12].toString():"");
         	       		dI.setDescription(object[13]!=null?object[13].toString():"");
         	       		dI.setLocation(object[14]!=null?object[14].toString():"");
+        	       		dI.setAssetId(object[15]!=null?Long.valueOf(object[15].toString()):0);
         	       		dI.setCurrentDepreciation(currentDepreciation);
         	       		dI.setBeforeDepreciation(dl.getCurrentGrossValue().toString());
         	       		dI.setAfterDepreciation(afterDepreciation);
@@ -335,7 +338,7 @@ public class DepreciationService {
                 dI=depreciationRepository.save(dI);
                 assetBean = new AssetMaster();
         		assetBean = masterRepo.findOne(dI.getAssetId());
-        		assetBean.setCurrentValue(new BigDecimal(dI.getAfterDepreciation()).longValue());
+        		assetBean.setCurrentValue(valueAfterDep.longValue());
         		masterRepo.save(assetBean);
                 persistenceService.getSession().flush();
                 }
@@ -358,12 +361,6 @@ public class DepreciationService {
          return dI;//depreciation;
 	}
 
-    
-	/*
-	 * private BigDecimal getAmountToBeDepreciated(final DepreciationInputs
-	 * depInputs, final Long indvidualFromDate, final Long toDate, final String
-	 * financialYear)
-	 */
         private BigDecimal getAmountToBeDepreciated(final DepreciationList dl) 
         {
         	BigDecimal Amount= new BigDecimal(0);
