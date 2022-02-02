@@ -176,6 +176,10 @@ function viewDepreciation(id)
 							<form:hidden path="resultList[${status.index}].afterDepreciation" id="resultList[${status.index}].afterDepreciation"/>
 							${result.afterDepreciation }
 							</td>
+							<td>
+							<form:hidden path="resultList[${status.index}].voucherNumber" id="resultList[${status.index}].voucherNumber"/>
+							${result.voucherNumber }
+							</td>
 							
 						</tr>
 						</c:forEach>

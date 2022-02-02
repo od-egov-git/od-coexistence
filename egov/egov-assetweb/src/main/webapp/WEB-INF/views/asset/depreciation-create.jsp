@@ -121,11 +121,11 @@ function save(){
 			</div>	  
     	</div>
     	<div>
-            <label class="col-sm-2 control-label text-right">From Date</label>
+            <label class="col-sm-2 control-label text-right">Asset Created From Date</label>
 			<div class="col-sm-3 add-margin">
 			  <form:input id="fromDate" path="fromDate" class="form-control datepicker" data-date-end-date="0d" placeholder="DD/MM/YYYY"/>
 	        </div>
-      		<label class="col-sm-2 control-label text-right">To Date</label>
+      		<label class="col-sm-2 control-label text-right">Asset Created To Date</label>
 			<div class="col-sm-3 add-margin">
 			  <form:input id="toDate" path="toDate" class="form-control datepicker" data-date-end-date="0d" placeholder="DD/MM/YYYY"/>
 	        </div>	  
@@ -231,4 +231,7 @@ function save(){
     } );
 } );
 	</script> 
+<script
+        src="<cdn:url value='/resources/app/js/i18n/jquery.i18n.properties.js?rnd=${app_release_no}' context='/services/EGF'/>"></script>
+	
 
