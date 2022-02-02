@@ -210,7 +210,7 @@ public class DisposalService {
 				 return disposalRepository.getAssetMasterDetails(assetBean.getCode(), 
 					assetBean.getAssetHeader().getAssetName(),
 					assetBean.getAssetHeader().getAssetCategory().getId(), 
-					assetBean.getAssetHeader().getDepartment(), statusId);
+					assetBean.getAssetHeader().getDepartment().getCode(), statusId);
 	 }
 	 public List<AssetMaster> getSaleDisposalDetails(AssetMaster assetBean){
 		 /*String statusId = null;
@@ -225,7 +225,7 @@ public class DisposalService {
 			List<AssetMaster> saleOrDisposalDetails = disposalRepository.getSaleOrDisposalDetails(assetBean.getCode(), 
 					assetBean.getAssetHeader().getAssetName(),
 					assetBean.getAssetHeader().getAssetCategory().getId(), 
-					assetBean.getAssetHeader().getDepartment(), statusId);
+					assetBean.getAssetHeader().getDepartment().getCode(), statusId);
 				 return saleOrDisposalDetails;
 	 }
 	 public List<Disposal> getFromDisposal(AssetMaster assetBean){
@@ -241,7 +241,7 @@ public class DisposalService {
 			List<Disposal> disposalList = disposalRepository.getSaleAndDisposalList(assetBean.getCode(), 
 					assetBean.getAssetHeader().getAssetName(),
 					assetBean.getAssetHeader().getAssetCategory().getId(), 
-					assetBean.getAssetHeader().getDepartment(), statusId);
+					assetBean.getAssetHeader().getDepartment().getCode(), statusId);
 			return disposalList;
 	 }
 	 public AssetMaster getAssetById(Long aasetId) {

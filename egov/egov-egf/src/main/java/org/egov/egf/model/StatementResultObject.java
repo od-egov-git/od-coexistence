@@ -48,6 +48,7 @@
 package org.egov.egf.model;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 public class StatementResultObject {
     private static final BigDecimal NEGATIVE = new BigDecimal(-1);
@@ -60,6 +61,12 @@ public class StatementResultObject {
     String scheduleName = "";
     String majorCode;
     BigDecimal budgetAmount;
+    
+    String departmentcode;
+    BigDecimal createdby ;
+    Date createddate ;
+    BigDecimal lastmodifiedby ;
+	Date lastmodifieddate;
 
     public BigDecimal getBudgetAmount() {
         return budgetAmount;
@@ -144,4 +151,44 @@ public class StatementResultObject {
     public void setFundCode(final String fundCode) {
         this.fundCode = fundCode;
     }
+
+	public String getDepartmentcode() {
+		return departmentcode;
+	}
+
+	public void setDepartmentcode(String departmentcode) {
+		this.departmentcode = departmentcode;
+	}
+
+	public BigDecimal getCreatedby() {
+		return createdby;
+	}
+
+	public void setCreatedby(BigDecimal createdby) {
+		this.createdby = createdby;
+	}
+
+	public Date getCreateddate() {
+		return createddate;
+	}
+
+	public void setCreateddate(Date createddate) {
+		this.createddate = createddate;
+	}
+
+	public BigDecimal getLastmodifiedby() {
+		return lastmodifiedby;
+	}
+
+	public void setLastmodifiedby(BigDecimal lastmodifiedby) {
+		this.lastmodifiedby = lastmodifiedby;
+	}
+
+	public Date getLastmodifieddate() {
+		return lastmodifieddate;
+	}
+
+	public void setLastmodifieddate(Date lastmodifieddate) {
+		this.lastmodifieddate = lastmodifieddate;
+	}
 }

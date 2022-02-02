@@ -56,7 +56,7 @@
 <script>
 
 		path="${pageContext.request.contextPath}";
-		var totaldbamt=0,totalcramt=0;
+		var totaldbamt=0,totalcramt=0,totalVoucherAmt=0;
 		
 		   
 		
@@ -246,7 +246,7 @@
 		{key:"detailCode",label:'Code <span class="mandatory1">*</span>', formatter:createSLDetailCodeTextFieldFormatterJV(SUBLEDGERLIST,".detailCode","splitEntitiesDetailCode(this)", ".search", "openSearchWindowFromJV(this)")},
 		{key:"detailKeyId",hidden:true, formatter:createSLHiddenFieldFormatterJV(SUBLEDGERLIST,".detailKeyId")},
 		{key:"detailKey",label:'Name', formatter:createSLLongTextFieldFormatterJV(SUBLEDGERLIST,".detailKey","")},
-		{key:"amount",label:'Amount', formatter:createSLAmountFieldFormatterJV(SUBLEDGERLIST,".amount")},
+		{key:"amount",label:'Amount', formatter:createSLAmountFieldFormatterJVNew(SUBLEDGERLIST,".amount","updateSubLedgerAmount()")},
 		{key:'Add',label:'Add',formatter:createAddImageFormatter("${pageContext.request.contextPath}")},
 		{key:'Delete',label:'Delete',formatter:createDeleteImageFormatter("${pageContext.request.contextPath}")}
 		];              
@@ -271,6 +271,7 @@
 					for(var i=0;i<allRecords.getLength();i++){
 						this.updateCell(this.getRecord(i),this.getColumn('SlNo'),""+(i+1));
 					}
+					updateSubLedgerAmount();
 				}
 				else{
 					bootbox.alert("This row can not be deleted");
@@ -296,6 +297,7 @@
 					for(var i=0;i<allRecords.getLength();i++){
 						subLedgersTable.updateCell(subLedgersTable.getRecord(i),subLedgersTable.getColumn('SlNo'),""+(i+1));
 					}
+					updateSubLedgerAmount();
 				}
 				else{
 					bootbox.alert("This row can not be deleted");
@@ -341,8 +343,36 @@
 				updateSLGridPJV('detailKeyId',index,'<s:property value="detailKeyId"/>');
 				updateSLGridPJV('detailKey',index,'<s:property value="detailKeyEscSpecChar" />');
 				updateSLGridPJV('amount',index,'<s:property value="amount"/>');
+				totalVoucherAmt = totalVoucherAmt+parseFloat('<s:property value="amount"/>');
+				
 				updateSLTableIndex();
 			</s:iterator>
+			
+			var tfoot = subLedgersTable.getTbodyEl().parentNode.createTFoot();
+			var tr = tfoot.insertRow(-1);
+			var th = tr.appendChild(document.createElement('th'));
+			<s:if test='%{isRestrictedtoOneFunctionCenter == true}'>
+			th.colSpan = 4;
+			</s:if>
+			<s:else>
+			th.colSpan = 4;
+			</s:else>
+			th.innerHTML = 'Total&nbsp;&nbsp;&nbsp;';
+			th.align='right';
+			th.style.borderTop = "1px solid #84B1AD";
+			var td = tr.insertCell(-1);
+			/* td.innerHTML="<input type='text' style='text-align:right;width:100px;'  id='totaldbamount' name='totaldbamount' readonly='true' tabindex='-1'/>";
+			td.style.borderTop = "1px solid #84B1AD";
+			var td = tr.insertCell(-1);
+			td.align="right";
+			td.style.borderTop = "1px solid #84B1AD" ;*/
+			
+ 			td.innerHTML="<input type='text' style='text-align:right;width:100px;'  id='totalVoucherAmt' name='totalVoucherAmt' readonly='true' tabindex='-1'/>";
+			document.getElementById('totalVoucherAmt').value=totalVoucherAmt;
+			var td = tr.insertCell(-1);
+			td.style.borderTop = "1px solid #84B1AD";
+			var td = tr.insertCell(-1);
+			td.style.borderTop = "1px solid #84B1AD"; 
 		
 	}
 	

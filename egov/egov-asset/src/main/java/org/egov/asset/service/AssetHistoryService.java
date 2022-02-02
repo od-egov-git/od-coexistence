@@ -28,7 +28,7 @@ public class AssetHistoryService {
 				 List<AssetMaster> assetMasetrHisory = assetHistoryRepository.getAssetMasetrHisory(assetBean.getCode(), 
 					assetBean.getAssetHeader().getAssetName(),
 					assetBean.getAssetHeader().getAssetCategory().getId(), 
-					assetBean.getAssetHeader().getDepartment(), statusId);
+					assetBean.getAssetHeader().getDepartment().getCode(), statusId);
 				 
 				return assetMasetrHisory;
 	 }

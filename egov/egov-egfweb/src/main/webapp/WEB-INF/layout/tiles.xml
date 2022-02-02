@@ -920,4 +920,13 @@
 		<put-attribute name="page-title" value="title.pr.request" cascade="true" />
 		<put-attribute name="body" value="/WEB-INF/views/paymentrefund/ol-payment-refund-request-update.jsp" />
 	</definition>
+	<definition name="cashBookReport" extends="base_layout">
+        <put-attribute name="page-title" value="title.estimate.preparation.create" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/cashBook/cashBookReport.jsp"/>
+    </definition> 
+   <definition name="cashFlowReport" extends="base_layout">
+        <put-attribute name="page-title" value="title.estimate.preparation.create" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/cashBook/cashFlowReport.jsp"/>
+    </definition>
+	
 </tiles-definitions>
