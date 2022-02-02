@@ -51,6 +51,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring" %>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
+
 <link type="text/css" rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
 <link type="text/css" rel="stylesheet" href="https://cdn.datatables.net/buttons/2.1.0/css/buttons.dataTables.min.css">
 <script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.js"></script>
@@ -61,18 +62,16 @@
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
 <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.1.0/js/buttons.html5.min.js"></script>
 <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.1.0/js/buttons.print.min.js"></script>
-<script type="text/javascript">
-function searchData() {
-	if(jQuery("#depreciationDate").val()==""){
-		bootbox.alert("Please select depreciation date");
-		return false;
-	}
-	return true;
-}
-function save(){
-	
-}
-</script>
+<script>
+				$(document).ready(function() {
+		$('input[id$=fromDate]').datepicker({
+			dateFormat: 'dd/mm/yy'
+		});
+        
+	});
+				</script>
+
+<div class="container">
     <form:form name="Depreciation" role="form" method="post" action="searchDepreciation" modelAttribute="Depreciation" id="depreciation" class="form-horizontal form-groups-bordered" enctype="multipart/form-data">
     <div class="panel-heading">
 		<div class="panel-title">
@@ -91,6 +90,9 @@ function save(){
 			<div class="col-sm-3 add-margin">
 			  <form:input id="depreciationDate" path="depreciationDate" class="form-control datepicker" data-date-end-date="0d" required="required" placeholder="DD/MM/YYYY"/>
 	        </div>
+	        <%-- <div class="col-sm-3 add-margin">
+			  <form:input id="rev_order_date" path="rev_order_date" class="form-control datepicker" data-date-end-date="0d" required="required" placeholder="DD/MM/YYYY" />
+				</div> --%>
       		<label class="col-sm-2 control-label text-right">Asset Category Type</label>
 			<div class="col-sm-3 add-margin">
 				<form:select path="categoryType" data-first-option="false" id="categoryType" class="form-control" >
@@ -221,6 +223,9 @@ function save(){
     </div>
 
 </form:form>
+</div>
+<script
+	src="<cdn:url value='/resources/app/js/i18n/jquery.i18n.properties.js?rnd=${app_release_no}' context='/services/EGF'/>"></script>
 <script>
 	$(document).ready(function() {
     $('#searchResult').DataTable( {
@@ -231,7 +236,5 @@ function save(){
     } );
 } );
 	</script> 
-<script
-        src="<cdn:url value='/resources/app/js/i18n/jquery.i18n.properties.js?rnd=${app_release_no}' context='/services/EGF'/>"></script>
-	
+
 

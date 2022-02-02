@@ -102,7 +102,7 @@
 					<form:input class="form-control" id="categoryName" path="categoryName" value="${depreciation.categoryName }" readonly="true" />
 				</td>
 	        </tr>
-	        <tr><td></td></tr>
+	        <tr><td style="width: 5%"></td><td></td><td></td></tr>
         <tr><th> Asset Depreciation Details</th></tr>
             <tr>
 				<td style="width: 5%"></td>

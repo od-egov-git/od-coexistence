@@ -130,6 +130,7 @@ function viewDepreciation(id)
 						<th>Gross Value(Rs)</th>
 						<th>Current Depreciation(Rs)</th>
 						<th>Value After Depreciation(Rs)</th>
+						<th>Voucher Number</th>
 					</tr>
 					</thead>
 `					 

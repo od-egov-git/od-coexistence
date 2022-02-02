@@ -57,7 +57,6 @@ public class DepreciationController {
 		  	model.addAttribute("categoryName", assetCategoryList);
 		    model.addAttribute("categoryType", assetCatagoryService.getAssetCatagoryType());
 			model.addAttribute("departments",microserviceUtils.getDepartments());
-			model.addAttribute(STATE_TYPE, depreciation.getClass().getSimpleName());
 			return "depreciation-create";
 		}
 	 	
@@ -70,7 +69,7 @@ public class DepreciationController {
 		List<Object[]> list= null;
 		SQLQuery queryMain =  null;
 		query1
-		      .append("select ac.name,ah.department,ac.asset_code,ah.asset_name,am.current_value ,ac.depriciation_rate from	asset_master am,asset_header ah,asset_category ac,asset_revaluation ar where am.id=ar.asset_master_id and am.asset_header=ah.id	and ah.asset_category =ac.id and TO_CHAR(ar.rev_date,'dd-mm-yyyy') = '"+depreciation.getDepreciationDate()+"' ");
+		      .append("select ac.name,d.code,ac.asset_code,ah.asset_name,am.current_value ,ac.depriciation_rate from	asset_master am,asset_header ah,eg_department d,asset_category ac,asset_revaluation ar where am.id=ar.asset_master_id and am.asset_header=ah.id	and ah.asset_category =ac.id and d.id = ah.department and TO_CHAR(ar.rev_date,'dd-mm-yyyy') = '"+depreciation.getDepreciationDate()+"' ");
 		System.out.println("categoryName "+depreciation.getCategoryName());
 		if(depreciation.getCategoryName()!=null) {
 			query1.append(" and ac.name = '"+depreciation.getCategoryName()+"'");
@@ -90,6 +89,14 @@ public class DepreciationController {
 		System.out.println("assetName "+depreciation.getAssetName());
 		if(depreciation.getAssetName()!=null) {
 			query1.append(" and ah.asset_name LIKE '%"+depreciation.getAssetName()+"%'");
+		}
+		System.out.println("assetCreatedFromDate "+depreciation.getFromDate());
+		if(depreciation.getFromDate()!=null) {
+			query1.append(" and TO_CHAR(ah.created_date,'dd-mm-yyyy') >= '"+depreciation.getFromDate()+"'");
+		}
+		System.out.println("assetCreatedToDate "+depreciation.getToDate());
+		if(depreciation.getToDate()!=null) {
+			query1.append(" and TO_CHAR(ah.created_date,'dd-mm-yyyy') <= '"+depreciation.getToDate()+"'");
 		}
 		
 		queryMain=this.persistenceService.getSession().createSQLQuery(query1.toString());
@@ -276,11 +283,11 @@ public class DepreciationController {
 		}
 		System.out.println("assetCode "+depreciation.getAssetCode());
 		if(depreciation.getAssetCode()!=null) {
-			query1.append(" and ac.assetcode LIKE '"+depreciation.getAssetCode()+"'");
+			query1.append(" and ac.assetcode LIKE '%"+depreciation.getAssetCode()+"%'");
 		}
 		System.out.println("assetName "+depreciation.getAssetName());
 		if(depreciation.getAssetName()!=null) {
-			query1.append(" and ah.assetname LIKE '"+depreciation.getAssetName()+"'");
+			query1.append(" and ah.assetname LIKE '%"+depreciation.getAssetName()+"%'");
 		}
 		
 		queryMain=this.persistenceService.getSession().createSQLQuery(query1.toString());

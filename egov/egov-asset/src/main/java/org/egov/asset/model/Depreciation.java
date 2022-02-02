@@ -1,6 +1,7 @@
 package org.egov.asset.model;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class Depreciation {
@@ -8,8 +9,8 @@ public class Depreciation {
 	private String department;
 	private String categoryType;
 	private String categoryName;
-	private String fromDate;
-	private String toDate;
+	private Date fromDate;
+	private Date toDate;
 	private String assetCode;
 	private String assetName;
 	private String location;
@@ -85,18 +86,25 @@ public class Depreciation {
 	public void setDepartment(String department) {
 		this.department = department;
 	}
-	public String getFromDate() {
+
+	public Date getFromDate() {
 		return fromDate;
 	}
-	public void setFromDate(String fromDate) {
+	public void setFromDate(Date fromDate) {
 		this.fromDate = fromDate;
 	}
-	public String getToDate() {
+	public Date getToDate() {
 		return toDate;
 	}
-	public void setToDate(String toDate) {
+	public void setToDate(Date toDate) {
 		this.toDate = toDate;
 	}
+	/*
+	 * public String getFromDate() { return fromDate; } public void
+	 * setFromDate(String fromDate) { this.fromDate = fromDate; } public String
+	 * getToDate() { return toDate; } public void setToDate(String toDate) {
+	 * this.toDate = toDate; }
+	 */
 	public String getAssetCode() {
 		return assetCode;
 	}

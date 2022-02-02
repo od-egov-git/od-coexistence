@@ -73,8 +73,10 @@ import org.egov.commons.service.ChartOfAccountDetailService;
 import org.egov.commons.service.FundService;
 import org.egov.egf.expensebill.repository.DocumentUploadRepository;
 import org.egov.egf.utils.FinancialUtils;
+import org.egov.infra.admin.master.entity.Department;
 import org.egov.infra.admin.master.service.AppConfigService;
 import org.egov.infra.admin.master.service.AppConfigValueService;
+import org.egov.infra.admin.master.service.DepartmentService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.script.service.ScriptService;
@@ -153,7 +155,8 @@ public class DepreciationService {
     
     @Autowired
 	protected MicroserviceUtils microserviceUtils;
-    
+    @Autowired
+	private DepartmentService departmentService;
     @Autowired
 	private FunctionDAO functionDAO;
     
@@ -301,6 +304,9 @@ public class DepreciationService {
         	       		dI.setDepreciationDate(depreciationDate);
         	       	   }
         	       }
+        	    Department department = new Department(); 
+        	    department=departmentService.getDepartmentById(Long.valueOf(dI.getDepartment()));
+        	    dI.setDepartment(department.getCode());
         	    CFunction function = new CFunction();
        			Fund fund = new Fund();
        			fund = fundHibernateDAO.fundByCode(dI.getFund());
