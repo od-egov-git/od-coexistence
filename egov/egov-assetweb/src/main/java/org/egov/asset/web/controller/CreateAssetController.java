@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,6 +17,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper;
 import org.apache.struts2.dispatcher.multipart.UploadedFile;
@@ -82,6 +84,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -235,15 +238,16 @@ public class CreateAssetController {// extends BaseAssetController{
 	}
 
 	@PostMapping(value = "/create", params = "create", consumes = {"multipart/form-data"})
-	public String create(@ModelAttribute("assetBean") AssetMaster assetBean,Model model, HttpServletRequest request) {
+	public String create(@RequestParam("file") MultipartFile file, @ModelAttribute("assetBean") AssetMaster assetBean,Model model, HttpServletRequest request) {
 
 		LOGGER.info("Creating Asset Object");
 		long userId = ApplicationThreadLocals.getUserId();
 		LOGGER.info("userId..." + userId);
 		//File
 		List<DocumentUpload> list = new ArrayList<>();
-		try {
-			String[] contentType = ((MultiPartRequestWrapper) request).getContentTypes("file");
+		//@RequestParam("file") MultipartFile file
+		/*try {
+			//String[] contentType = ((MultiPartRequestWrapper) request).getContentTypes("file");
 	        UploadedFile[] uploadedFiles = ((MultiPartRequestWrapper) request).getFiles("file");
 	        String[] fileName = ((MultiPartRequestWrapper) request).getFileNames("file");
 	        if(uploadedFiles!=null)
@@ -260,11 +264,27 @@ public class CreateAssetController {// extends BaseAssetController{
 	        }
 		}catch(Exception e) {
 			e.printStackTrace();
-		}
-		assetBean.setDocumentDetail(list);
-		//assetBean.setFileno();
-        
+		}*/
 		
+		//assetBean.setFileno();
+        try {
+        	DocumentUpload upload = new DocumentUpload();
+        	ByteArrayInputStream bios = (ByteArrayInputStream) file.getInputStream();//new ByteArrayInputStream(FileUtils.readFileToByteArray(file.getInputStream()));
+        	upload.setInputStream(bios);
+        	upload.setFileName(file.getOriginalFilename());
+            upload.setContentType(file.getContentType());
+            list.add(upload);
+        	//@RequestMapping(value = "/uploadFile", method = RequestMethod.POST)
+        	//public String submit(@RequestParam("file") MultipartFile file, ModelMap modelMap) {
+        	  //  modelMap.addAttribute("file", file);
+//        	    return "fileUploadView";
+        	//}
+        	
+        }catch(Exception e) {
+        	e.printStackTrace();
+        }
+        assetBean.setDocumentDetail(list);
+        
 		assetBean.setCreatedBy(String.valueOf(userId));
 		assetBean.getAssetHeader().setCreatedBy(String.valueOf(userId));
 		assetBean.getAssetLocation().setCreatedBy(String.valueOf(userId));
