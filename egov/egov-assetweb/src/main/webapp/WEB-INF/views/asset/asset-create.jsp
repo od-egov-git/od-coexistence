@@ -491,11 +491,14 @@ function fetchdetails(status,mode){
 	       		$("#valueSection").css("display", "none");
 	       		flag = false;
 	       	}
+	        $('#isCapitalized').val(assetStatusCode);
 	       	if(assetStatusCode == 'CAPITALIZED'){
 	       		$("#capitalized").css("display", "block");
 	       		$("#capitalized2").css("display", "block");
-	       		$('#isCapitalized').val('CAPITALIZED');
-	       	}
+	       		//$('#isCapitalized').val('CAPITALIZED');
+	       	//}else{
+	       		//$('#isCapitalized').val('CREATED');
+		    }
 	       	if(flag){
 	       		if(modeOfAcq == 'PURCHASE'){
 	       			$("#acqPurchase").css("display", "block");

@@ -234,7 +234,7 @@ public class CreateAssetController {// extends BaseAssetController{
 		return "asset-create";
 	}
 
-	@PostMapping(value = "/create", params = "create")
+	@PostMapping(value = "/create", params = "create", consumes = {"multipart/form-data"})
 	public String create(@ModelAttribute("assetBean") AssetMaster assetBean,Model model, HttpServletRequest request) {
 
 		LOGGER.info("Creating Asset Object");

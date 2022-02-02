@@ -30,7 +30,7 @@
 						<form:select path="assetHeader.department" id="department" required="required" readonly="true" 
 							class="form-control">
 							<form:option value=""><spring:message code="lbl.select" /></form:option>
-							<form:options items="${departmentList}" itemValue="name" itemLabel="name"/>  
+							<form:options items="${departmentList}" itemValue="id" itemLabel="name"/>  
 						</form:select>
 					</div>
 					<label class="col-sm-3 control-label text-right">
@@ -102,10 +102,9 @@
 					<div class="col-sm-3 add-margin">
 						<c:choose>
 	  						<c:when test="${assetBean.documentDetail !=null}">
-					       		<a href="/services/asset/assetcreate/downloadBillDoc?assetId=${assetBean.id}&fileStoreId=${assetBean.documentDetail.fileStore.fileStoreId }">${assetBean.documentDetail.fileStore.fileName }</a>
+					       		<a href="/services/asset/assetcreate/downloadBillDoc?assetId=${assetBean.id}&fileStoreId=${assetBean.documentDetail[0].fileStore.fileStoreId }">${assetBean.documentDetail[0].fileStore.fileName }</a>
 	        					<br/>
-	        					<span><input type="button" id="remove" style="background: #265988" value="Remove"
-									onclick="deletedoc(${assetBean.id},${assetBean.documentDetail.id});"></span>
+	        					<span><input type="button" id="remove" style="background: #265988" value="Remove" onclick="deletedoc(${assetBean.id},${assetBean.documentDetail[0].id});"></span>
 							</c:when>
 							<c:otherwise>
 								<input type="file" name="file" id="file1" class="padding-10">
