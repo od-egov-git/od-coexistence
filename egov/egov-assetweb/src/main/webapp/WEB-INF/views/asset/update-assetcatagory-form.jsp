@@ -115,7 +115,8 @@
 			<spring:message code="lbl.asset.account.code" text="Asset Account Code" /> 
 		</label>
 		<div class="col-sm-3 add-margin">
-		<input type="text" id="assetaccountcode" name="code" class="form-control table-input creditDetailGlcode assetaccountcode"  data-errormsg="Account Code is mandatory!" data-idx="0" data-optional="0"   placeholder="Type any letters of Account code" />
+		<input type="text" id="assetaccountcode" name="code" class="form-control table-input creditDetailGlcode assetaccountcode"  data-errormsg="Account Code is mandatory!" data-idx="0" data-optional="0"   placeholder="Type any letters of Account code" readonly/>
+		<span class="mandatory"></span>
 		<form:hidden path="assetAccountCode.id" value="" name=""  class="form-control table-input hidden-input assetaccountcodeid"/>
 		<form:hidden path="assetAccountCode.glcode" id="assetaccountcodeglcode" value="" name=""  class="form-control table-input hidden-input assetaccountcodeglcode"/>
 		<form:hidden path="assetAccountCode.name" id="assetaccountcodename" value="" name=""  class="form-control table-input hidden-input assetaccountcodename"/>
@@ -125,7 +126,8 @@
 			<spring:message code="lbl.accumulated.depriciation.code" text="Accumulated Depreciation Code" />
 		</label>
 		<div class="col-sm-3 add-margin">
-		<input type="text" id="accumulateddepriciationcode" name="code" class="form-control table-input creditDetailGlcode accumulateddepriciationcode"  data-errormsg="Account Code is mandatory!" data-idx="0" data-optional="0"   placeholder="Type any letters of Account code" />
+		<input type="text" id="accumulateddepriciationcode" name="code" class="form-control table-input creditDetailGlcode accumulateddepriciationcode"  data-errormsg="Account Code is mandatory!" data-idx="0" data-optional="0"   placeholder="Type any letters of Account code" readonly/>
+		<span class="mandatory"></span>
 		<form:hidden path="accumulatedDepriciationCode.id" value="" name=""  class="form-control table-input hidden-input accumulateddepriciationcodeid"/>
 		<form:hidden path="accumulatedDepriciationCode.glcode" id="accumulateddepriciationcodeglcode" value="" name=""  class="form-control table-input hidden-input accumulateddepriciationcodeglcode"/>
 		<form:hidden path="accumulatedDepriciationCode.name" id="accumulateddepriciationcodename" value="" name=""  class="form-control table-input hidden-input accumulateddepriciationcodename"/>
@@ -135,7 +137,8 @@
 			<spring:message code="lbl.revolution.reserve.account.code" text="Revaluation Reserve Account Code" /> 
 		</label>
 		<div class="col-sm-3 add-margin">
-		<input type="text" id="revalutionreserveaccountcode" name="code" class="form-control table-input creditDetailGlcode revalutionreserveaccountcode"  data-errormsg="Account Code is mandatory!" data-idx="0" data-optional="0"   placeholder="Type any letters of Account code" />
+		<input type="text" id="revalutionreserveaccountcode" name="code" class="form-control table-input creditDetailGlcode revalutionreserveaccountcode"  data-errormsg="Account Code is mandatory!" data-idx="0" data-optional="0"   placeholder="Type any letters of Account code" readonly/>
+		<span class="mandatory"></span>
 		<form:hidden path="revolutionReserveAccountCode.id" value="" name=""  class="form-control table-input hidden-input revalutionreserveaccountcodeid"/>
 		<form:hidden path="revolutionReserveAccountCode.glcode" id="revalutionreserveaccountcodeglcode" value="" name=""  class="form-control table-input hidden-input revalutionreserveaccountcodeglcode"/>
 		<form:hidden path="revolutionReserveAccountCode.name" id="revalutionreserveaccountcodename" value="" name=""  class="form-control table-input hidden-input revalutionreserveaccountcodename"/>
@@ -145,7 +148,8 @@
 			<spring:message code="lbl.depriciation.expense.account" text="Depreciation Expense Account" />
 		</label>
 		<div class="col-sm-3 add-margin">
-		<input type="text" id="depriciationexpenseaccount" name="code" class="form-control table-input creditDetailGlcode depriciationexpenseaccount"  data-errormsg="Account Code is mandatory!" data-idx="0" data-optional="0"   placeholder="Type any letters of Account code" />
+		<input type="text" id="depriciationexpenseaccount" name="code" class="form-control table-input creditDetailGlcode depriciationexpenseaccount"  data-errormsg="Account Code is mandatory!" data-idx="0" data-optional="0"   placeholder="Type any letters of Account code" readonly/>
+		<span class="mandatory"></span>
 		<form:hidden path="depriciationExpenseAccount.id" value="" name=""  class="form-control table-input hidden-input depriciationexpenseaccountid"/>
 		<form:hidden path="depriciationExpenseAccount.glcode" id="depriciationexpenseaccountglcode" value="" name=""  class="form-control table-input hidden-input depriciationexpenseaccountglcode"/>
 		<form:hidden path="depriciationExpenseAccount.name" id="depriciationexpenseaccountname" value="" name=""  class="form-control table-input hidden-input depriciationexpenseaccountname"/>
@@ -248,7 +252,7 @@
 			<span class="mandatory"></span>
 		</label>
 		<div class="col-sm-3 add-margin">
-			<form:input class="form-control"  path="customeField.name" readonly="true" />
+			<form:input class="form-control"  path="customeField.name" />
 		</div>
 		<label class="col-sm-3 control-label text-right">
 			<spring:message code="lbl.parent.data.type" text="Data Type" /> 
@@ -257,7 +261,7 @@
 		<div class="col-sm-3 add-margin">
 			<form:select path="customeField.customFieldDataType" class="form-control" readonly="true"> 
 			<form:option value="" readonly="true">-select value-</form:option>
-			<form:options items="${customFieldDataType}" itemLabel="DataTypes" itemValue="id" readonly="true"/>
+			<form:options items="${customFieldDataType}" itemLabel="DataTypes" itemValue="id"/>
 			</form:select>
 		</div>
 		<label class="col-sm-3 control-label text-right">

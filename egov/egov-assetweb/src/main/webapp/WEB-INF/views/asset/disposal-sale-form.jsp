@@ -71,7 +71,7 @@
 <div class="panel panel-primary" data-collapsed="0">
 	<div class="panel-heading">
 		<c:if test="${not empty successMsg}">
-			<div class="alert alert-success" role="alert">${successMsg}</div>
+			<div class="alert alert-info" role="alert">${successMsg}</div>
 		</c:if>
 		<c:if test="${not empty errorMessage}">
 			<div class="alert alert-danger" role="alert">${errorMessage}</div>
@@ -153,7 +153,7 @@
 		<label class="col-sm-3 control-label text-right"><spring:message code="lbl.disposal.assetcurrentvalue" text="Current Value Of The Asset" /> 
 		</label>
 		<div class="col-sm-3 add-margin">
-			<form:input class="form-control" path="assetCurrentValue"/>
+			<form:input class="form-control" value="${disposal.asset.currentValue}" readonly="true" path="assetCurrentValue"/>
 		</div>
 		
 		<label class="col-sm-3 control-label text-right"><spring:message code="lbl.disposal.accountcode" text="Asset Disposal Account Code" /> 
@@ -201,7 +201,7 @@
 		<label class="col-sm-3 control-label text-right"><spring:message code="lbl.disposal.assetcurrentvalue" text="Current Value Of The Asset" /> 
 		</label>
 		<div class="col-sm-3 add-margin">
-			<form:input class="form-control patternvalidation" data-pattern="alphanumericwithspecialcharacters" id="assetcurrentvalue" path="assetCurrentValueSale"/>
+			<form:input class="form-control" value="${disposal.asset.currentValue}" readonly="true" id="assetcurrentvalue" path="assetCurrentValueSale"/>
 		</div>
 		<label class="col-sm-3 control-label text-right"><spring:message code="lbl.disposal.accountcode" text="Asset Disposal Account Code" /> 
 		</label>
@@ -223,18 +223,13 @@
 			<form:input class="form-control" id="profitloss" path="" readonly="true"/>
 	
 		</div>
-		<label class="col-sm-3 control-label text-right"><spring:message code="lbl.disposal.attachment" text="Attach Documents" /> 
-		</label>
-		<div class="col-sm-3 add-margin">
-			
-		</div>
 		</div>
 		
 		
 		
 		</div>
 		</div>
-		<jsp:include page="sale-disposal-upload.jsp"/>
+		<%-- <jsp:include page="sale-disposal-upload.jsp"/> --%>
 		<div align="center">
 			<input type="submit" class="btn btn-primary" name="create" value="Create" />
 		</div>
@@ -283,7 +278,7 @@
 		console.log("before")
 		const  assetValue= document.getElementById("assetcurrentvalue").value;
 		const  saleValue= document.getElementById("salevalue").value;
-		const profitloss=assetValue-saleValue;
+		const profitloss=saleValue-assetValue;
 		document.getElementById("profitloss").value=profitloss;
 		console.log("after")
 	}

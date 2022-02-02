@@ -212,7 +212,7 @@ public class AssetCatagoryService {
 		if(null!=assetCategory.getName()) {
 			findOne.setName(assetCategory.getName());
 //		}if(null!=assetCategory.getAccumulatedDepriciationCode().getDescription()) {
-		}if(null!=assetCategory.getAccumulatedDepriciationCode().getId()) {
+		}if(null!=assetCategory.getAccumulatedDepriciationCode()) {
 			CChartOfAccounts accDepCode = cChartOfAccountsRepository.findOne(assetCategory.getAccumulatedDepriciationCode().getId());
 			findOne.setAccumulatedDepriciationCode(accDepCode);
 			//findOne.setAccumulatedDepriciationCode(assetCategory.getAccumulatedDepriciationCode());
@@ -231,7 +231,7 @@ public class AssetCatagoryService {
 			CChartOfAccounts assetAccountCode = cChartOfAccountsRepository.findOne(assetCategory.getAssetAccountCode().getId());
 			findOne.setAssetAccountCode(assetAccountCode);
 			//findOne.setAssetAccountCode(assetCategory.getAssetAccountCode());
-		}if(null!=assetCategory.getAssetCatagoryType().getDescription()) {
+		}if(null!=assetCategory.getAssetCatagoryType()) {
 			findOne.setAssetCatagoryType(assetCategory.getAssetCatagoryType());
 		}if(null!=assetCategory.getAssetCode()) {
 			findOne.setAssetCode(assetCategory.getAssetCode());
@@ -240,20 +240,20 @@ public class AssetCatagoryService {
 		}if(null!=assetCategory.getVersion()) {
 			findOne.setVersion(assetCategory.getVersion());
 		//}if(null!=assetCategory.getDepriciationExpenseAccount().getDescription()) {
-		}if(null!=assetCategory.getDepriciationExpenseAccount().getId()) {
+		}if(null!=assetCategory.getDepriciationExpenseAccount()) {
 			CChartOfAccounts depExpAcc = cChartOfAccountsRepository.findOne(assetCategory.getDepriciationExpenseAccount().getId());
 			findOne.setDepriciationExpenseAccount(depExpAcc);
 			//findOne.setDepriciationExpenseAccount(assetCategory.getDepriciationExpenseAccount());
-		}if(null!=assetCategory.getDepriciationMethod().getDescription()) {
+		}if(null!=assetCategory.getDepriciationMethod()) {
 			findOne.setDepriciationMethod(assetCategory.getDepriciationMethod());
-		}if(null!=assetCategory.getParentCatagory().getDescription()) {
+		}if(null!=assetCategory.getParentCatagory()) {
 			findOne.setParentCatagory(assetCategory.getParentCatagory());
 		//}if(null!=assetCategory.getRevolutionReserveAccountCode().getDescription()) {
-		}if(null!=assetCategory.getRevolutionReserveAccountCode().getId()) {
+		}if(null!=assetCategory.getRevolutionReserveAccountCode()) {
 			CChartOfAccounts revResAcc = cChartOfAccountsRepository.findOne(assetCategory.getRevolutionReserveAccountCode().getId());
 			findOne.setRevolutionReserveAccountCode(revResAcc);
 			//findOne.setRevolutionReserveAccountCode(assetCategory.getRevolutionReserveAccountCode());
-		}if(null!=assetCategory.getUnitOfMeasurement().getDescription()) {
+		}if(null!=assetCategory.getUnitOfMeasurement()) {
 			findOne.setUnitOfMeasurement(assetCategory.getUnitOfMeasurement());
 		}
 		findOne.setLeaseAndAgreement(assetCategory.isLeaseAndAgreement());

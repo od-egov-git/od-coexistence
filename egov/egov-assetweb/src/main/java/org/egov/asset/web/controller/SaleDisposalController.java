@@ -72,7 +72,7 @@ public class SaleDisposalController {
 	public String createDisposal(@ModelAttribute("disposal") Disposal disposal,Model model,final HttpServletRequest request )throws IOException {
 		//disposalValidator.validateDisposal(disposal);
 		
-		String[] contentType = ((MultiPartRequestWrapper) request).getContentTypes("file");
+		/*String[] contentType = ((MultiPartRequestWrapper) request).getContentTypes("file");
         List<DocumentUpload> list = new ArrayList<>();
         UploadedFile[] uploadedFiles = ((MultiPartRequestWrapper) request).getFiles("file");
         String[] fileName = ((MultiPartRequestWrapper) request).getFileNames("file");
@@ -88,11 +88,13 @@ public class SaleDisposalController {
             upload.setContentType(contentType[i]);
             list.add(upload);
         }
-        System.out.println(list);
+        System.out.println(list);*/
         Long createdBy=ApplicationThreadLocals.getUserId();
         disposal.setCreatedBy(createdBy);
-        disposal.setDocuments(list);
-			disposalService.createDisposal(disposal);
+       // disposal.setDocuments(list);
+			Disposal createDisposal = disposalService.createDisposal(disposal);
+			String successMsg=createDisposal.getTransactionType()+" "+"created successuflly"+" with reference "+createDisposal.getProfitLossVoucherReference();
+			model.addAttribute("successMsg", successMsg);
 		//Disposal disposalResponse = disposalService.saveDisposal(disposal);
 		return "disposal-sale-form";
 	}

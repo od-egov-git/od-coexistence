@@ -81,10 +81,9 @@
 	<div class="panel-body">
 	<div class="form-group">
 		<label class="col-sm-3 control-label text-right"><spring:message code="lbl.name" text="Name" /> 
-			<span class="mandatory"></span>
 		</label>
 		<div class="col-sm-3 add-margin">
-			<form:input class="form-control" path="name" required="required"/>
+			<form:input class="form-control" path="name"/>
 		</div>
 		
 		<label class="col-sm-3 control-label text-right"> <spring:message code="lbl.asset.catagory.type" text="Asset Category Type" />

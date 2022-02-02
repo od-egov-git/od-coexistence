@@ -141,9 +141,13 @@ public class DisposalService {
         history.setSaleDisposalId(saveDisposal.getId());
         history.setTransactionDate(disposal.getDisposalDate());
         history.setTransactionType(disposal.getTransactionType());
+        if(disposal.getTransactionType().equalsIgnoreCase("Sale")) {
         history.setValueAfterTrxn(disposal.getAssetCurrentValue().subtract(disposal.getSaleValue()));
         history.setTrxnValue(disposal.getSaleValue());
         history.setValueBeforeTrxn(disposal.getAssetCurrentValue());
+        }else {
+        	
+        }
         assetHistoryRepository.save(history);
 		
 		return saveDisposal;
