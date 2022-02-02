@@ -15,7 +15,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-
 import org.egov.infra.admin.master.entity.Department;
 
 @Entity
@@ -33,7 +32,7 @@ public class AssetHeader implements Serializable{
 	@GeneratedValue(generator = SEQ_asset_header, strategy = GenerationType.SEQUENCE)
 	private Long id;	
 	@OneToOne(fetch=FetchType.LAZY, cascade = CascadeType.ALL)
-	@JoinColumn(name="asset_category")
+	@JoinColumn(name="asset_catagory")
 //	private AssetCatagory assetCategory;
 	private AssetCatagory assetCategory;
 	@Column(name="date_of_creation")

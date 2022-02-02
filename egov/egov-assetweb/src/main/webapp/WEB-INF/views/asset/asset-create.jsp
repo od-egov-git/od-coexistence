@@ -12,8 +12,6 @@
 				<spring:message code="lbl-asset-create" text="Create Asset"/>
 			</div>
 		</div>
-		<br />
-		<br />
 		<div class="panel panel-primary" data-collapsed="0">	
 				<div class="panel-heading">
 				<div class="panel-title">
@@ -26,9 +24,9 @@
 							<span class="mandatory"></span>
 						</label>
 						<div class="col-sm-3 add-margin">						
-							<form:select path="assetHeader.department" id="department" required="required"  class="form-control">
+							<form:select path="assetHeader.department" id="dept" required="required"  class="form-control">
 								<form:option value=""><spring:message code="lbl.select" /></form:option>
-								<form:options items="${departmentList}" itemValue="name" itemLabel="name"/>  
+								<form:options items="${departmentList}" itemValue="id" itemLabel="name"/>
 							</form:select>
 						</div>
 						<label class="col-sm-3 control-label text-right">
@@ -146,9 +144,6 @@
 			</div>
 		</div>
 		<!-- Location Details -->
-		<br />
-		<br />
-		
 		<div class="panel panel-primary" data-collapsed="0">	
 			<div class="panel-heading">
 			<div class="panel-title">
@@ -229,9 +224,6 @@
 			</div>
 		</div>
 		<!-- Category Details -->
-		<br />
-		<br />
-		
 		<div class="panel panel-primary" data-collapsed="0" id="categoryDetails" style="display:none">	
 			<div class="panel-heading">
 			<div class="panel-title">
@@ -249,8 +241,6 @@
 		</div>
 		
 		<!-- Asset Status -->
-		<br />
-		<br />
 		<div class="panel panel-primary" data-collapsed="0">	
 			<div class="panel-heading">
 			<div class="panel-title">
@@ -369,13 +359,12 @@
 									<form:errors data-pattern="alphanumeric" path="acquisitionDate" cssClass="add-margin error-msg" />
 								</div>
 						</div> 
-			
 			</div>
 		</div>
 	
 		<div align="center" class="buttonbottom">
 			<div class="row text-center">
-				<input type="submit" class="btn btn-primary" name="create" value="create"/>
+				<input type="submit" class="btn btn-primary" name="create" id="createBtn" value="create"/>
 				<input type="button" name="button2" id="button2" value="Close" class="btn btn-default" onclick="window.parent.postMessage('close','*');window.close();"/>
 			</div>
 		</div>
@@ -408,7 +397,7 @@ function viewPop(id){
 	console.log(id);
 	/* var url1 = '/services/EGF/report/budgetVarianceReport-loadData.action?asOnDate='+date+'&dept='+dept+'&funds='+fund+'&func='+func+'&accCode='+accCode+'&vtype=pr';
 	window.open(url1,'Source','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700') */
-	var x = window.open('/services/asset/assetcreate/viewform/ref','popup','width=850,height=600');
+	var x = window.open('/services/asset/assetcreate/assetRef/ref','popup','width=850,height=600');
 	console.log("Return Obj..:"+x.value); 
 	console.log("Return Obj..:"+Object.values(x)); 
 	//$('#assetReference').val(x);
@@ -594,8 +583,8 @@ function getTotalFileSize() {
     }
 }
 //Till Here
-
-$( "form" ).submit(function(event) {
+//$( "form" ).submit(function(event) {
+$( "#createBtn" ).click(function(e) {	
 	console.log("Submitting...");
 	var grossVal = $('#grossValue').val();
 	var accumulatedDepreciation = $('#accumulatedDepreciation').val();
@@ -603,15 +592,21 @@ $( "form" ).submit(function(event) {
 	var isCapitalized = $('#isCapitalized').val();
 	console.log(isCapitalized);
 	if(isCapitalized == 'CAPITALIZED'){
-		if (grossVal == null || grossVal =='' ||accumulatedDepreciation == null || accumulatedDepreciation == '') {
+		if (grossVal == null || grossVal =='') {
 			console.log('Prevent');
-			  event.preventDefault();
-		    return false;
+			e.preventDefault();
+			$( "#grossValue" ).focus();
+		  }
+		if (accumulatedDepreciation == null || accumulatedDepreciation == '') {
+			console.log('Prevent');
+			e.preventDefault();
+			$( "#accumulatedDepreciation" ).focus();
 		  }
 	}
 });
 
 function loadSubScheme(schemeId){
+	console.log('schemeid...'+schemeId);
 	if (!schemeId) {
 		$('#subScheme').empty();
 		$('#subScheme').append($('<option>').text('Select from below').attr('value', ''));
@@ -627,18 +622,42 @@ function loadSubScheme(schemeId){
 			async : true
 		}).done(
 				function(response) {
+					console.log('Response...'+response);
 					$('#subScheme').empty();
 					$('#subScheme').append($("<option value=''>Select from below</option>"));
 					$.each(response, function(index, value) {
 						var selected="";
-						if($subSchemeId && $subSchemeId==value.id)
+						/*if($subSchemeId && $subSchemeId==value.id)
 						{
 								selected="selected";
-						}
+						}*/
 						$('#subScheme').append($('<option '+ selected +'>').text(value.name).attr('value', value.id));
 					});
 				});
 		
 	}
 }
+
+/*$( "#create" ).click(function(e) {
+	var flag = true;
+	console.log("Submitting...");
+	var grossVal = $('#grossValue').val();
+	var accumulatedDepreciation = $('#accumulatedDepreciation').val();
+	console.log(grossVal+","+accumulatedDepreciation);
+	var isCapitalized = $('#isCapitalized').val();
+	console.log(isCapitalized);
+	if(isCapitalized == 'CAPITALIZED'){
+		if (grossVal == null || grossVal =='') {
+			console.log('Prevent');
+		    flag false;
+		  }
+		  if(accumulatedDepreciation == null || accumulatedDepreciation == '') {
+			flag = false;
+			console.log('Prevent');
+		}
+	}
+	if(!flag){
+		e.preventDefault();
+	}
+});*/
 </script>

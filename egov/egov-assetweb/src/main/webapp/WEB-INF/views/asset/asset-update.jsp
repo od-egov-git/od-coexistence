@@ -102,10 +102,10 @@
 					<div class="col-sm-3 add-margin">
 						<c:choose>
 	  						<c:when test="${assetBean.documentDetail !=null}">
-					       		<a href="/services/asset/assetcreate/downloadBillDoc?assetId=${assetBean.id}&fileStoreId=${document.fileStore.fileStoreId }">${document.fileStore.fileName }</a>
+					       		<a href="/services/asset/assetcreate/downloadBillDoc?assetId=${assetBean.id}&fileStoreId=${assetBean.documentDetail.fileStore.fileStoreId }">${assetBean.documentDetail.fileStore.fileName }</a>
 	        					<br/>
 	        					<span><input type="button" id="remove" style="background: #265988" value="Remove"
-									onclick="deletedoc(${assetBean.id},${document.id});"></span>
+									onclick="deletedoc(${assetBean.id},${assetBean.documentDetail.id});"></span>
 							</c:when>
 							<c:otherwise>
 								<input type="file" name="file" id="file1" class="padding-10">
