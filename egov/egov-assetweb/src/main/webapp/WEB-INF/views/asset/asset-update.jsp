@@ -240,40 +240,17 @@
 				</tr>
 			</thead>
 			<tbody>
-				<%-- <c:choose> --%>
-					<%-- <c:when test="${mapperList!=null && mapperList.size() > 0}"> --%>
-					<%-- <c:when test="${customeFields !=null && customeFields.size() > 0}"> assetCustomFieldMappers--%>
-					<form:input type="hidden" path="assetCustomFieldMappers"/>
-						 <c:forEach items="${assetBean.assetCustomFieldMappers}" var="x" varStatus="item">
-							<tr id="assetView_${item.index}">
-								<td>
-                                    ${item.index + 1} 
-	                            </td>
-								<td>
-									${x.name }
-									<%-- ${assetCustomFieldMappers.name} --%>
-									<%-- ${assetCustomFieldMappers.name}  --%>
-									<%-- ${asset.name} --%>
-								</td>
-								<td>
-								 	<input type="text" id="customField_${item.index}" 
-										name="customField_${item.index}" value="${x.val}"/>
-									<input type="hidden" id="customField_id_${item.index}" 
-										name="customField_id_${item.index}" value="${x.id}"/>
-									<%-- <input type="text" id="customField_${item.index}_${assetCustomFieldMappers.name}" 
-										name="customField_${item.index}_${assetCustomFieldMappers.name}" value="${assetCustomFieldMappers.val}"/>
-									<input type="hidden" id="customField_${item.index}_id_${assetCustomFieldMappers.name}" 
-										name="customField_${item.index}_id_${assetCustomFieldMappers.name}" value="${assetCustomFieldMappers.id}"/> --%>
-										
-									<%-- <form:input path="val" class="form-control text-left"/> --%>
-								</td>
-							</tr>
-						</c:forEach> 
-					<%-- </c:when>
-					<c:otherwise>
-			            <td colspan="6">No Records Found..</td>
-			         </c:otherwise> --%>
-				<%-- </c:choose> --%>
+				 <form:input type="hidden" path="assetCustomFieldMappers"/>
+				 <c:forEach items="${assetBean.assetCustomFieldMappers}" var="x" varStatus="item">
+					<tr id="assetView_${item.index}">
+						<td> ${item.index + 1} </td>
+						<td>${x.name}</td>
+						<td>
+						 	<input type="text" id="customField_${x.id}" name="customField_${x.id}" value="${x.val}"/>
+							<input type="hidden" id="customField_id_${item.index}" name="customField_id_${item.index}" value="${x.id}"/>
+						</td>
+					</tr>
+				</c:forEach>
 			</tbody>
 		</table>	
 		</div>
@@ -413,7 +390,7 @@
 		<form:hidden path="assetHeader.id" id="assetHeaderId" value="${assetBean.assetHeader.id}" />
 		<form:hidden path="assetLocation.id" id="assetLocationId" value="${assetBean.assetLocation.id}" />
 	</form:form>
-
+</div>
 <!-- Read Only view section -->
  <c:if test="${mode != 'readOnly' }">
  

@@ -5,6 +5,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -14,6 +17,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper;
+import org.apache.struts2.dispatcher.multipart.UploadedFile;
 import org.egov.asset.model.AssetCatagory;
 import org.egov.asset.model.AssetCustomFieldMapper;
 import org.egov.asset.model.AssetHeader;
@@ -708,13 +713,22 @@ public class CreateAssetController {// extends BaseAssetController{
 		try {
 			List<CustomeFields> customeFields = assetBean.getAssetHeader().getAssetCategory().getCustomeFields();
 			LOGGER.info("Custom Fields.."+customeFields);
-			if(!customeFields.isEmpty()) {
+			if(!mapperList.isEmpty()) {
+				//for(AssetCustomFieldMapper obj : mapperList) {
 				for(int i=0; i<customeFields.size(); i++) {
+					item = assetBean.getAssetCustomFieldMappers().get(i);
+					String name = item.getName();
+					String id = String.valueOf(item.getId());
+					String values = request.getParameter("customField_"+id);
+					LOGGER.info(id+"..."+name+"...Value..."+values);
+					item.setVal(values);
+				}
+				/*for(int i=0; i<customeFields.size(); i++) {
 					item = assetBean.getAssetCustomFieldMappers().get(i);
 					String name = item.getName();
 					String values = request.getParameter("customField_"+i);
 					LOGGER.info(name+"...Value..."+values);
-					item.setVal(values);
+					item.setVal(values);*/
 					/*String name = customeFields.get(i).getName();
 					String values = request.getParameter("customField_"+i);
 					LOGGER.info(name+"...Value..."+values);
@@ -739,7 +753,7 @@ public class CreateAssetController {// extends BaseAssetController{
 					//item.set
 					mapperList.add(item);*/
 					//mapperList.add(item);
-				}
+				//}
 				//assetBean.getAssetCustomFieldMappers().clear();
 				//assetBean.setAssetCustomFieldMappers(mapperList);
 			}
