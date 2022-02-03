@@ -117,6 +117,7 @@
 		</div>
 		<label class="col-sm-3 control-label text-right">
 			<spring:message code="lbl.asset.account.code" text="Asset Account Code" /> 
+			<span class="mandatory"></span>
 		</label>
 		<div class="col-sm-3 add-margin">
 		<input type="text" id="assetaccountcode" name="code" class="form-control table-input creditDetailGlcode assetaccountcode" readonly="true" data-errormsg="Account Code is mandatory!" data-idx="0" data-optional="0"   placeholder="Type any letters of Account code" />
@@ -126,6 +127,7 @@
 		</div>
 		<label class="col-sm-3 control-label text-right">
 			<spring:message code="lbl.accumulated.depriciation.code" text="Accumulated Depreciation Code" />
+			<span class="mandatory"></span>
 		</label>
 		<div class="col-sm-3 add-margin">
 		<input type="text" id="accumulateddepriciationcode" name="code" class="form-control table-input creditDetailGlcode accumulateddepriciationcode" readonly="true" data-errormsg="Account Code is mandatory!" data-idx="0" data-optional="0"   placeholder="Type any letters of Account code" />
@@ -136,6 +138,7 @@
 		</div>
 		<label class="col-sm-3 control-label text-right">
 			<spring:message code="lbl.revolution.reserve.account.code" text="Revaluation Reserve Account Code" /> 
+			<span class="mandatory"></span>
 		</label>
 		<div class="col-sm-3 add-margin">
 		<input type="text" id="revalutionreserveaccountcode" name="code" class="form-control table-input creditDetailGlcode revalutionreserveaccountcode" readonly="true" data-errormsg="Account Code is mandatory!" data-idx="0" data-optional="0"   placeholder="Type any letters of Account code" />
@@ -145,6 +148,7 @@
 		</div>
 		<label class="col-sm-3 control-label text-right">
 			<spring:message code="lbl.depriciation.expense.account" text="Depreciation Expense Account" />
+			<span class="mandatory"></span>
 		</label>
 		<div class="col-sm-3 add-margin">
 		<input type="text" id="depriciationexpenseaccount" name="code" class="form-control table-input creditDetailGlcode depriciationexpenseaccount" readonly="true" data-errormsg="Account Code is mandatory!" data-idx="0" data-optional="0"   placeholder="Type any letters of Account code" />
@@ -170,6 +174,7 @@
 		</div>
 		<label class="col-sm-3 control-label text-right">
 			<spring:message code="lbl.depriciation.rate" text="Depreciation Rate" /> 
+			<span class="mandatory"></span>
 		</label>
 		<div class="col-sm-3 add-margin">
 			<form:input class="form-control patternvalidation" data-pattern="alphanumericwithspecialcharacters" path="depriciationRate" disabled="true"/>

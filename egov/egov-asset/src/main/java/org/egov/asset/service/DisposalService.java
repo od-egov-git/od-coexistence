@@ -211,10 +211,11 @@ public class DisposalService {
 			}
 			
 			
-				 return disposalRepository.getAssetMasterDetails(assetBean.getCode(), 
+				 List<AssetMaster> assetMasterDetails = disposalRepository.getAssetMasterDetails(assetBean.getCode(), 
 					assetBean.getAssetHeader().getAssetName(),
 					assetBean.getAssetHeader().getAssetCategory().getId(), 
 					assetBean.getAssetHeader().getDepartment().getCode(), statusId);
+				 return assetMasterDetails;
 	 }
 	 public List<AssetMaster> getSaleDisposalDetails(AssetMaster assetBean){
 		 /*String statusId = null;
