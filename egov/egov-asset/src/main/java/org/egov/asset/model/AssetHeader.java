@@ -51,7 +51,8 @@ public class AssetHeader implements Serializable{
 	@OneToOne(fetch=FetchType.LAZY, cascade = CascadeType.ALL)	
 	@JoinColumn(name="mode_of_acquisition")
 	private AssetModeOfAcquisition modeOfAcquisition;
-	@Column(name="department")
+	@OneToOne(fetch=FetchType.LAZY, cascade = CascadeType.ALL)	
+	@JoinColumn(name="department")
 	private Department department;
 	@Column(name="fund")
 	private String fund;
