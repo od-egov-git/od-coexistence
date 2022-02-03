@@ -243,6 +243,7 @@
 				<%-- <c:choose> --%>
 					<%-- <c:when test="${mapperList!=null && mapperList.size() > 0}"> --%>
 					<%-- <c:when test="${customeFields !=null && customeFields.size() > 0}"> assetCustomFieldMappers--%>
+					<form:input type="hidden" path="assetCustomFieldMappers"/>
 						 <c:forEach items="${assetBean.assetCustomFieldMappers}" var="x" varStatus="item">
 							<tr id="assetView_${item.index}">
 								<td>
