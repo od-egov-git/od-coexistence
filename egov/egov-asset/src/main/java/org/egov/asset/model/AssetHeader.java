@@ -15,6 +15,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+
 import org.egov.infra.admin.master.entity.Department;
 
 @Entity
@@ -51,7 +52,8 @@ public class AssetHeader implements Serializable{
 	@OneToOne(fetch=FetchType.LAZY, cascade = CascadeType.ALL)	
 	@JoinColumn(name="mode_of_acquisition")
 	private AssetModeOfAcquisition modeOfAcquisition;
-	@Column(name="department")
+	@OneToOne(fetch=FetchType.LAZY, cascade = CascadeType.ALL)	
+	@JoinColumn(name="department")
 	private Department department;
 	@Column(name="fund")
 	private String fund;

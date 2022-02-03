@@ -7,16 +7,15 @@
 
 
 <div class="container">
-	<form:form name="assetBean" method="post" action="${contextPath}/assetcreate/search" modelAttribute="assetBean" 
+	<form:form name="assetBean" method="post" action="${contextPath}/assetcreate/searchedit" modelAttribute="assetBean" 
 		class="form-horizontal form-groups-bordered" enctype="multipart/form-data">
-		<div class="panel-heading">
-			<div class="panel-title">
-				<spring:message code="view-asset" text="View Asset"/>
-			</div>
-		</div>
-		<br />
-		<div class="panel panel-primary" data-collapsed="0" id="search-asset">
 		
+		<div class="panel panel-primary" data-collapsed="0" id="search-asset">
+			<div class="panel-heading">
+				<div class="panel-title">
+					<spring:message code="view-asset" text="View Asset"/>
+				</div>
+			</div>
 			<div class="panel-body">
 					<label class="col-sm-3 control-label text-right">
 						<spring:message code="asset-code" text="assetCode"/>
@@ -68,11 +67,11 @@
 				onclick="window.parent.postMessage('close','*');window.close();"/>
 			</div>
 		</div>
-		<input type="hidden" name="viewmode" id="viewmode" value="update"/>
 	</form:form>
-	<br />
-	<br />
+	<input type="hidden" name="viewmode" id="viewmode" value="${viewmode}"/>
+	
 	<!-- Result Table -->
+	<c:if test="${!isViewPage}">
 	<div class="panel panel-primary" data-collapsed="0">	
 		<div class="panel-heading">
 		<div class="panel-title">
@@ -101,8 +100,10 @@
 										${item.index + 1}
 								</td>
 								<td>
-								<a href="#" target="popup"
-									  onclick="window.open('${contextPath}/assetcreate/editform/${asset.id}','popup','width=700,height=600'); return false;">
+								<%-- <a href="#" target="popup"
+									  onclick="window.open('${contextPath}/assetcreate/viewupdateform/${asset.id}','popup','width=700,height=600'); return false;">
+									${asset.code } </a> --%>
+									<a href="${contextPath}/assetcreate/viewupdateform/${asset.id}" target="_self">
 									${asset.code } </a>
 								</td>
 								<td>
@@ -136,6 +137,7 @@
 		</table>	
 		</div>
 	</div>
+	</c:if>
 	<!-- Result Table Ends -->
 </div>
 
