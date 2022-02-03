@@ -91,6 +91,10 @@
         <put-attribute name="page-title" value="title.view-asset-history" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/asset/view-asset-history.jsp"/>
 	</definition>
+	<definition name="create-asset-category" extends="base_layout">
+        <put-attribute name="page-title" value="title.create-asset-category" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/asset/create-asset-category.jsp"/>
+	</definition>
     <definition name="asset-search-revaluate" extends="base_layout">
         <put-attribute name="page-title" value="title.asset.catagory.create" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/asset/asset-revaluate-search.jsp"/>

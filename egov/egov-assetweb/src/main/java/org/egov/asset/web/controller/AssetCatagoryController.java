@@ -48,6 +48,13 @@ public class AssetCatagoryController {
 	public String loadCreateAssetCatagoryForm(Model model) {
 		model.addAttribute("assetCatagory", new AssetCatagory());
 		return "assetcatagory-form";
+		//return "create-asset-category";
+	}
+	@PostMapping("/createAssetCategoryNew")
+	public String loadCreateAssetCatagoryFormNew(Model model) {
+		model.addAttribute("assetCatagory", new AssetCatagory());
+		//return "assetcatagory-form";
+		return "create-asset-category";
 	}
 
 	@PostMapping(value = "/createAssetCategory", params = "add")
@@ -193,7 +200,7 @@ public class AssetCatagoryController {
 		model.addAttribute("successMsg", updateAssetCategory.getErrorMessage());
 		model.addAttribute("assetCatagory", updateAssetCategory);
 		
-		return "view-assetcatagory-form";
+		return "view-assetcategory-modified";
 	}
 	@PostMapping("/modifySearchAssetCategoryPage")
 	public String searchAssetCategoryModifyPage(Model model) {
