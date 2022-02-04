@@ -310,8 +310,14 @@
 	var i=0;
 	$("#addRow").click(function () {
 		var html = '';
-
-							html += '<div class="form-popup"  id="customForm">';
+							html += '<div class="panel panel-primary" id="customForm" data-collapsed="0">';
+							html += '<div class="panel-heading">';
+							html += '<div class="panel-title">';
+							html += '<spring:message code="lbl.asset.catagory.custome.feilds" text="Custom Feilds"/>';
+							html += '</div>';
+							html += '</div>';
+							html += '<div class="panel-body">';
+							html += '<div class="form-popup">';
 							html += '<label class="col-sm-3 control-label text-right"><spring:message code="lbl.custom.name" text="Name" />';
 							html += '<span class="mandatory"></span>';
 							html += '</label>';
@@ -361,8 +367,10 @@
 							html += '<div class="col-sm-3 add-margin">';
 							html += '<input type="textarea" class="form-control" name = "customeFields['+i+'].vlaues" rows = "5" cols = "30" />';
 							html += '</div>';
-							html += '<div class="col-sm-3 add-margin">';
-							html += '<button id="removeRow" type="button" class="btn btn-danger">Remove</button>';
+							html += '<div class="col-sm-3 add-margin text-center">';
+							html += '<button id="removeRow" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span>Remove</button>';
+							html += '</div>';
+							html += '</div>';
 							html += '</div>';
 							html += '</div>';
 							i++;

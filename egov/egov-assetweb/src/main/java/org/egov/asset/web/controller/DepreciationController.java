@@ -69,7 +69,7 @@ public class DepreciationController {
 		List<Object[]> list= null;
 		SQLQuery queryMain =  null;
 		query1
-		      .append("select ac.name,d.code,ac.asset_code,ah.asset_name,am.current_value ,ac.depriciation_rate from	asset_master am,asset_header ah,eg_department d,asset_category ac,asset_revaluation ar where am.id=ar.asset_master_id and am.asset_header=ah.id	and ah.asset_category =ac.id and d.id = ah.department and TO_CHAR(ar.rev_date,'dd-mm-yyyy') = '"+depreciation.getDepreciationDate()+"' ");
+		      .append("select ac.name,d.code,ac.asset_code,ah.asset_name,am.current_value ,ac.depriciation_rate from	asset_master am,asset_header ah,eg_department d,asset_category ac,asset_revaluation ar where am.id=ar.asset_master_id and am.asset_header=ah.id	and ah.asset_catagory =ac.id and d.id = ah.department and TO_CHAR(ar.rev_date,'dd-mm-yyyy') = '"+depreciation.getDepreciationDate()+"' ");
 		System.out.println("categoryName "+depreciation.getCategoryName());
 		if(depreciation.getCategoryName()!=null) {
 			query1.append(" and ac.name = '"+depreciation.getCategoryName()+"'");

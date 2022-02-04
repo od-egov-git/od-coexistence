@@ -55,10 +55,12 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+import org.egov.asset.model.AssetHistory;
 import org.egov.asset.model.AssetMaster;
 import org.egov.asset.model.DepreciationInputs;
 import org.egov.asset.model.DepreciationList;
 import org.egov.asset.model.ReasonForFailure;
+import org.egov.asset.repository.AssetHistoryRepository;
 import org.egov.asset.repository.AssetMasterRepository;
 import org.egov.asset.repository.DepreciationRepository;
 import org.egov.commons.CFunction;
@@ -167,6 +169,9 @@ public class DepreciationService {
 	private AssetMasterRepository masterRepo;
     
     @Autowired
+	private AssetHistoryRepository assetHistoryRepository;
+    
+    @Autowired
     public DepreciationService(final DepreciationRepository depreciationRepository, final ScriptService scriptExecutionService) {
         this.depreciationRepository = depreciationRepository;
         this.scriptExecutionService = scriptExecutionService;
@@ -267,7 +272,7 @@ public class DepreciationService {
         				" (select c.glcode from chartofaccounts c,asset_category ac where c.id = ac.depriciation_expense_account_id and ac.asset_code = '"+dl.getAssetCode()+"') as expense, " + 
         				" (select c.glcode from chartofaccounts c, asset_category ac where c.id = ac.revolution_reserve_account_code_id and ac.asset_code = '"+dl.getAssetCode()+"') as revolution_reverse, " + 
         				" ah.function,ah.fund,ah.description,al.location,am.id from asset_category ac, asset_catagory_type act, asset_header ah, asset_master am,asset_revaluation ar, asset_location al, " + 
-        				" asset_location_locality all2 where am.id = ar.asset_master_id and am.asset_header =ah.id and ah.asset_category =ac.id and ac.asset_catagory_type_id =act.id and am.asset_location =al.id " + 
+        				" asset_location_locality all2 where am.id = ar.asset_master_id and am.asset_header =ah.id and ah.asset_catagory =ac.id and ac.asset_catagory_type_id =act.id and am.asset_location =al.id " + 
         				/*"--and al.location =all2.id" +*/ 
         				" and ac.asset_code = '"+dl.getAssetCode()+"'");
         		System.out.println("query1 "+query1.toString());
@@ -309,7 +314,7 @@ public class DepreciationService {
         	    dI.setDepartment(department.getCode());
         	    CFunction function = new CFunction();
        			Fund fund = new Fund();
-       			fund = fundHibernateDAO.fundByCode(dI.getFund());
+       			fund = fundHibernateDAO.fundById(Integer.parseInt(dI.getFund()),true);
         	    CFunction fun=functionDAO.getFunctionById(Long.valueOf(dI.getFunction()));  
                 voucherTypeBean.setVoucherName("JVGeneral");
                 voucherTypeBean.setVoucherType("Journal Voucher");
@@ -326,13 +331,13 @@ public class DepreciationService {
                 workflowBean.setWorkFlowAction("CreateAndApprove");
                 billDetailslist = new ArrayList<VoucherDetails>();
                 VoucherDetails vd1=new VoucherDetails();
-                vd1.setCreditAmountDetail(new BigDecimal(afterDepreciation));
+                vd1.setCreditAmountDetail(new BigDecimal(currentDepreciation));
                 vd1.setDebitAmountDetail(new BigDecimal(0));
                 vd1.setGlcodeDetail(dI.getDepreciationExpenseAccount().toString());
                 billDetailslist.add(vd1);
                 VoucherDetails vd2=new VoucherDetails();
                 vd2.setCreditAmountDetail(new BigDecimal(0));
-                vd2.setDebitAmountDetail(new BigDecimal(afterDepreciation));
+                vd2.setDebitAmountDetail(new BigDecimal(currentDepreciation));
                 vd2.setGlcodeDetail(dI.getAccumulatedDepreciationAccount().toString());
                 billDetailslist.add(vd2);
                 subLedgerlist = new ArrayList<VoucherDetails>();
@@ -346,6 +351,17 @@ public class DepreciationService {
         		assetBean = masterRepo.findOne(dI.getAssetId());
         		assetBean.setCurrentValue(valueAfterDep.longValue());
         		masterRepo.save(assetBean);
+        		AssetHistory history=new AssetHistory();
+                history.setAsset(assetBean);
+                history.setCreatedBy(dI.getCreatedby());
+                history.setRecDate(new Date());
+                history.setDepId(Long.valueOf(dI.getId()));
+                history.setTransactionDate(new Date());
+                history.setTransactionType("DEPRECIATION");
+                history.setValueAfterTrxn(new BigDecimal(dI.getAfterDepreciation()));
+                history.setTrxnValue(new BigDecimal(dI.getCurrentDepreciation()));
+                history.setValueBeforeTrxn(new BigDecimal(dI.getBeforeDepreciation()));
+                assetHistoryRepository.save(history);
                 persistenceService.getSession().flush();
                 }
                 catch(Exception e) {

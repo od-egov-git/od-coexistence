@@ -35,7 +35,7 @@
 					    <span class="mandatory"></span>
 					</label>
 					<div class="col-sm-6 add-margin">
-						<form:select path="assetCategory" id=assetCategory" required="required" class="form-control">
+						<form:select path="assetCategory" id="assetCategory" required="required" class="form-control">
 								<form:option value=""><spring:message code="lbl.select" /></form:option>
 								<form:options items="${assetCategoryList}" itemValue="id" itemLabel="name"/>  
 						</form:select>

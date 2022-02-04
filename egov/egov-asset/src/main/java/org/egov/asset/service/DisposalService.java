@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.egov.asset.model.AssetCatagory;
 import org.egov.asset.model.AssetHistory;
 import org.egov.asset.model.AssetMaster;
+import org.egov.asset.model.AssetRevaluation;
 import org.egov.asset.model.AssetStatus;
 import org.egov.asset.model.Disposal;
 import org.egov.asset.repository.AccountcodePurposeRepository;
@@ -19,13 +20,24 @@ import org.egov.asset.repository.AssetMasterRepository;
 import org.egov.asset.repository.AssetStatusRepository;
 import org.egov.asset.repository.DisposalRepository;
 import org.egov.commons.CChartOfAccounts;
+import org.egov.commons.CFunction;
+import org.egov.commons.CVoucherHeader;
+import org.egov.commons.Fund;
+import org.egov.commons.Vouchermis;
+import org.egov.commons.dao.FunctionDAO;
+import org.egov.commons.dao.FundHibernateDAO;
 import org.egov.commons.repository.CChartOfAccountsRepository;
 import org.egov.egf.expensebill.repository.DocumentUploadRepository;
 import org.egov.egf.utils.FinancialUtils;
 import org.egov.infra.microservice.models.Department;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.model.bills.DocumentUpload;
+import org.egov.model.voucher.VoucherDetails;
+import org.egov.model.voucher.VoucherTypeBean;
+import org.egov.model.voucher.WorkflowBean;
+import org.egov.services.voucher.JournalVoucherActionHelper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 @Service
 public class DisposalService {
@@ -41,6 +53,7 @@ public class DisposalService {
 	final private static String FILESTORE_MODULEOBJECT="disposal";
 	final private static String ASSET_PROFIT="ASSET_PROFIT";
 	final private static String ASSET_LOSS="ASSET_LOSS";
+	final private static String DISPOSED="DISPOSED";
 	@Autowired
 	private CChartOfAccountsRepository cChartOfAccountsRepository;
 	@Autowired
@@ -55,6 +68,48 @@ public class DisposalService {
 	private AssetCatagoryRepository assetCategoryRepo;
 	@Autowired
 	private AssetHistoryRepository assetHistoryRepository;
+	@Autowired
+	private FunctionDAO functionDAO;
+
+	@Autowired
+	private FundHibernateDAO fundHibernateDAO;
+	
+	@Autowired
+	private VoucherTypeBean voucherTypeBean;
+	
+	public transient CVoucherHeader voucherHeader = new CVoucherHeader();
+	
+	public transient WorkflowBean workflowBean = new WorkflowBean();
+	private List<VoucherDetails> billDetailslist;
+    private List<VoucherDetails> subLedgerlist;
+	public VoucherTypeBean getVoucherTypeBean() {
+		return voucherTypeBean;
+	}
+	public void setVoucherTypeBean(VoucherTypeBean voucherTypeBean) {
+		this.voucherTypeBean = voucherTypeBean;
+	}
+	public CVoucherHeader getVoucherHeader() {
+		return voucherHeader;
+	}
+	public void setVoucherHeader(CVoucherHeader voucherHeader) {
+		this.voucherHeader = voucherHeader;
+	}
+	public WorkflowBean getWorkflowBean() {
+		return workflowBean;
+	}
+	public void setWorkflowBean(WorkflowBean workflowBean) {
+		this.workflowBean = workflowBean;
+	}
+	public List<VoucherDetails> getSubLedgerlist() {
+		return subLedgerlist;
+	}
+	public void setSubLedgerlist(List<VoucherDetails> subLedgerlist) {
+		this.subLedgerlist = subLedgerlist;
+	}
+
+	@Autowired
+    @Qualifier("journalVoucherActionHelper")
+    private JournalVoucherActionHelper journalVoucherActionHelper;
     //public Disposal saveDisposal(final DisposalRequest disposalRequest, final HttpHeaders headers) {
 	public Disposal saveDisposal(final Disposal disposal) {
         //final Disposal disposal = disposalRequest.getDisposal();
@@ -106,10 +161,7 @@ public class DisposalService {
 			return disposal;
 }
 	public Disposal createDisposal(Disposal disposal) {
-		disposal.setCreateDate(new Date());
-		Random random = new Random(); 
-		int y = random.nextInt(1000);
-		disposal.setProfitLossVoucherReference("R/123/2022/18/"+y);
+		disposal.setCreateDate(new Date());	
 		if(disposal.getTransactionType().equalsIgnoreCase("Sale")) {
 		if(null!=disposal.getSaleReason()) {
 			disposal.setDisposalReason(disposal.getSaleReason());
@@ -123,6 +175,7 @@ public class DisposalService {
 		}
 		AssetMaster assetMaster = assetRepository.findOne(disposal.getAsset().getId());
 		disposal.setAsset(assetMaster);
+		disposal.setProfitLossVoucherReference(createVoucher(disposal));
 		Disposal saveDisposal = disposalRepository.save(disposal);
 		
 		List<DocumentUpload> files = disposal.getDocuments() == null ? null : disposal.getDocuments();
@@ -140,13 +193,19 @@ public class DisposalService {
         history.setRecDate(new Date());
         history.setSaleDisposalId(saveDisposal.getId());
         history.setTransactionDate(disposal.getDisposalDate());
-        history.setTransactionType(disposal.getTransactionType());
+        history.setTransactionType(disposal.getTransactionType().toUpperCase());
         if(disposal.getTransactionType().equalsIgnoreCase("Sale")) {
-        history.setValueAfterTrxn(disposal.getAssetCurrentValue().subtract(disposal.getSaleValue()));
+        history.setValueAfterTrxn(disposal.getSaleValue().subtract(disposal.getAssetCurrentValue()));
         history.setTrxnValue(disposal.getSaleValue());
         history.setValueBeforeTrxn(disposal.getAssetCurrentValue());
+        //after sale updating asset current value in master
+        assetMaster.setCurrentValue(disposal.getSaleValue().longValue());
+        masterRepo.save(assetMaster);
         }else {
-        	
+        	//after Disposal changing status in asset master
+        	AssetStatus assetStatus = statusRepo.findByCode(DisposalService.DISPOSED).get(0);
+        	assetMaster.setAssetStatus(assetStatus);
+        	masterRepo.save(assetMaster);
         }
         assetHistoryRepository.save(history);
 		
@@ -213,9 +272,10 @@ public class DisposalService {
 			
 				 List<AssetMaster> assetMasterDetails = disposalRepository.getAssetMasterDetails(assetBean.getCode(), 
 					assetBean.getAssetHeader().getAssetName(),
-					assetBean.getAssetHeader().getAssetCategory().getId(), 
-					assetBean.getAssetHeader().getDepartment().getCode(), statusId);
+					assetBean.getAssetHeader().getAssetCategory().getId(),statusId);
 				 return assetMasterDetails;
+
+
 	 }
 	 public List<AssetMaster> getSaleDisposalDetails(AssetMaster assetBean){
 		 /*String statusId = null;
@@ -253,4 +313,57 @@ public class DisposalService {
 		 
 		 return masterRepo.findOne(aasetId);
 	 }
+	 
+	 public String createVoucher(Disposal disposal) {
+			String voucherNumber = "";
+			CFunction function = new CFunction();
+			Fund fund = new Fund();
+			fund = fundHibernateDAO.fundByCode("01");
+			CFunction fun = functionDAO.getFunctionById(Long.valueOf(disposal.getAsset().getAssetHeader().getFunction()));
+			voucherTypeBean.setVoucherName("JVGeneral");
+			voucherTypeBean.setVoucherType("Journal Voucher");
+			voucherTypeBean.setVoucherSubType("JVGeneral");
+			voucherHeader = new CVoucherHeader();
+			voucherHeader.setBackdateentry("N");
+			voucherHeader.setFileno("");
+			voucherHeader.setDescription(disposal.getSaleReason());
+			voucherHeader.setFundId(fund);
+			voucherHeader.setVoucherDate(new Date());
+			voucherHeader.setVouchermis(new Vouchermis());
+			voucherHeader.getVouchermis().setFunction(fun);
+			voucherHeader.getVouchermis().setDepartmentcode(disposal.getAsset().getAssetHeader().getDepartment().getCode());
+			workflowBean.setWorkFlowAction("CreateAndApprove");
+			billDetailslist = new ArrayList<VoucherDetails>();
+			VoucherDetails vd1 = new VoucherDetails();
+			if(disposal.getTransactionType().equalsIgnoreCase("sale"))
+			{
+				vd1.setCreditAmountDetail(disposal.getSaleValue());
+			}
+			else
+			{
+				vd1.setCreditAmountDetail(new BigDecimal(disposal.getAsset().getCurrentValue()));
+			}
+			
+			vd1.setDebitAmountDetail(new BigDecimal(0));
+			vd1.setGlcodeDetail(disposal.getAsset().getAssetHeader().getAssetCategory().getAssetAccountCode().getGlcode());
+			billDetailslist.add(vd1);
+			VoucherDetails vd2 = new VoucherDetails();
+			vd2.setCreditAmountDetail(new BigDecimal(0));
+			if(disposal.getTransactionType().equalsIgnoreCase("sale"))
+			{
+				vd2.setDebitAmountDetail(disposal.getSaleValue());
+			}
+			else
+			{
+				vd2.setDebitAmountDetail(new BigDecimal(disposal.getAsset().getCurrentValue()));
+			}
+			
+			vd2.setGlcodeDetail(disposal.getAssetSaleAccount().getGlcode());
+			billDetailslist.add(vd2);
+			subLedgerlist = new ArrayList<VoucherDetails>();
+			voucherHeader = journalVoucherActionHelper.createVcouher(billDetailslist, subLedgerlist, voucherHeader,
+					voucherTypeBean, workflowBean);
+			voucherNumber=voucherHeader.getVoucherNumber();
+			return voucherNumber;
+		}
 }

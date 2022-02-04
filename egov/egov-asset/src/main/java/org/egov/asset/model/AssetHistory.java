@@ -45,11 +45,11 @@ public class AssetHistory {
 	@Column(name = "trxn_value")
 	private BigDecimal trxnValue;
 	@Column(name = "rev_id")
-	private Double revId;
+	private Long revId;
 	@Column(name = "sale_disposal_id")
 	private Long saleDisposalId;
 	@Column(name = "dep_id")
-	private Double depId;
+	private Long depId;
 	@Column(name = "created_by")
 	private Long createdBy;
 	@Column(name = "rec_date")
@@ -98,10 +98,10 @@ public class AssetHistory {
 	public void setTrxnValue(BigDecimal trxnValue) {
 		this.trxnValue = trxnValue;
 	}
-	public Double getRevId() {
+	public Long getRevId() {
 		return revId;
 	}
-	public void setRevId(Double revId) {
+	public void setRevId(Long revId) {
 		this.revId = revId;
 	}
 	public Long getSaleDisposalId() {
@@ -110,10 +110,10 @@ public class AssetHistory {
 	public void setSaleDisposalId(Long saleDisposalId) {
 		this.saleDisposalId = saleDisposalId;
 	}
-	public Double getDepId() {
+	public Long getDepId() {
 		return depId;
 	}
-	public void setDepId(Double depId) {
+	public void setDepId(Long depId) {
 		this.depId = depId;
 	}
 	public Long getCreatedBy() {

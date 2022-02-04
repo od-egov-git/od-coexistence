@@ -110,7 +110,7 @@
 								${asset.assetHeader.assetCategory.name }
 							</td>
 							<td>
-								${asset.assetHeader.department}
+								${asset.assetHeader.department.name}
 							</td>
 							<td>
 								${asset.assetStatus.description }
