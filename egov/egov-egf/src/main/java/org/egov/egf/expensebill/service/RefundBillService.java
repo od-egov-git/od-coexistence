@@ -543,6 +543,12 @@ public class RefundBillService {
             egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.REFUNDBILL_FIN,
                     FinancialConstants.CONTINGENCYBILL_CREATED_STATUS));
 			}
+			else if (FinancialConstants.CONTINGENCYBILL_CREATED_STATUS.equals(egBillregister.getStatus().getCode())
+                    && egBillregister.getState() != null && workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONAPPROVE))
+            {
+				egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.REFUNDBILL_FIN,
+                FinancialConstants.CONTINGENCYBILL_APPROVED_STATUS));
+            }
             else if (workFlowAction.equals(FinancialConstants.BUTTONREJECT)) {
                 egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.REFUNDBILL_FIN,
                         FinancialConstants.CONTINGENCYBILL_REJECTED_STATUS));
@@ -677,8 +683,8 @@ public class RefundBillService {
                 	else
                 	{
                 		stateValue = wfmatrix.getNextState();
-                		egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.REFUNDBILL_FIN,
-                                FinancialConstants.CONTINGENCYBILL_PENDING_FINANCE));
+                		//egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.REFUNDBILL_FIN,
+                           //     FinancialConstants.CONTINGENCYBILL_PENDING_FINANCE));
                 		
                 	}
                     
@@ -735,7 +741,21 @@ public class RefundBillService {
                         .withStateValue(stateValue).withDateInfo(new Date())
                         .withNextAction(wfmatrix.getNextAction())
                         .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_REFUND_BILL_DISPLAYNAME);
-            } else {
+            }
+            else if (FinancialConstants.BUTTONAPPROVE.equalsIgnoreCase(workFlowAction)) {
+                wfmatrix = egBillregisterRegisterWorkflowService.getWfMatrix(egBillregister.getStateType(), null,
+                        null, additionalRule, egBillregister.getCurrentState().getValue(), null);
+
+                if (stateValue.isEmpty())
+                    stateValue = wfmatrix.getNextState();
+
+                egBillregister.transition().end().withSenderName(user.getUsername() + "::" + user.getName())
+                        .withComments(approvalComent)
+                        .withStateValue(stateValue).withDateInfo(new Date())
+                        .withNextAction(wfmatrix.getNextAction())
+                        .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_REFUND_BILL_DISPLAYNAME);
+            } 
+            else {
                 if (designation != null
                         && finalDesignationNames.get(designation.getName().toUpperCase()) != null)
                     stateValue = FinancialConstants.WF_STATE_FINAL_APPROVAL_PENDING;

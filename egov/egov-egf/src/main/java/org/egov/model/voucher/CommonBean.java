@@ -80,6 +80,7 @@ public class CommonBean {
     private String modeOfPayment;
     private String documentNumber;
     private Date documentDate;
+    private String documentdate;
     private Long documentId;
     private String linkReferenceNumber;
     private String paidTo;
@@ -101,8 +102,61 @@ public class CommonBean {
     private String fundnew;
     private String departmentnew;
     private String functionnew;
-
+    private String refundable;
+    private String narrtion;
+    private String backdateentry;
+    private String secondsignatory;
+    private String firstsignatory;
     
+    
+	public String getDocumentdate() {
+		return documentdate;
+	}
+
+	public void setDocumentdate(String documentdate) {
+		this.documentdate = documentdate;
+	}
+
+	public String getRefundable() {
+		return refundable;
+	}
+
+	public void setRefundable(String refundable) {
+		this.refundable = refundable;
+	}
+
+	public String getNarrtion() {
+		return narrtion;
+	}
+
+	public void setNarrtion(String narrtion) {
+		this.narrtion = narrtion;
+	}
+
+	public String getBackdateentry() {
+		return backdateentry;
+	}
+
+	public void setBackdateentry(String backdateentry) {
+		this.backdateentry = backdateentry;
+	}
+
+	public String getSecondsignatory() {
+		return secondsignatory;
+	}
+
+	public void setSecondsignatory(String secondsignatory) {
+		this.secondsignatory = secondsignatory;
+	}
+
+	public String getFirstsignatory() {
+		return firstsignatory;
+	}
+
+	public void setFirstsignatory(String firstsignatory) {
+		this.firstsignatory = firstsignatory;
+	}
+
 	public String getFundnew() {
 		return fundnew;
 	}

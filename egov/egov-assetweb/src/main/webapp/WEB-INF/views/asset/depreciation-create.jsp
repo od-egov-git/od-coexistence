@@ -54,7 +54,6 @@
 
 <link type="text/css" rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
 <link type="text/css" rel="stylesheet" href="https://cdn.datatables.net/buttons/2.1.0/css/buttons.dataTables.min.css">
-<script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.js"></script>
 <script type="text/javascript" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
 <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.1.0/js/dataTables.buttons.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
@@ -62,15 +61,19 @@
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
 <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.1.0/js/buttons.html5.min.js"></script>
 <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.1.0/js/buttons.print.min.js"></script>
-<script>
-				$(document).ready(function() {
-		$('input[id$=fromDate]').datepicker({
-			dateFormat: 'dd/mm/yy'
-		});
-        
-	});
-				</script>
-
+ <link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.1/themes/base/jquery-ui.css" rel="stylesheet" />
+       <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.1/jquery-ui.min.js"></script>
+<script type="text/javascript">
+			$(function () {
+		            $('#depreciationDate').datepicker({
+		                format: "dd/mm/yyyy"
+		            });
+		            $('#fromDate').datepicker({
+		                format: "dd/mm/yyyy"
+		            });
+		        });			
+</script>
 <div class="container">
     <form:form name="Depreciation" role="form" method="post" action="searchDepreciation" modelAttribute="Depreciation" id="depreciation" class="form-horizontal form-groups-bordered" enctype="multipart/form-data">
     <div class="panel-heading">
@@ -88,18 +91,13 @@
         <div>
             <label class="col-sm-2 control-label text-right">Date Of Depreciation<span class="mandatory"></span></label>
 			<div class="col-sm-3 add-margin">
-			  <form:input id="depreciationDate" path="depreciationDate" class="form-control datepicker" data-date-end-date="0d" required="required" placeholder="DD/MM/YYYY"/>
+			  <form:input type="text" id="depreciationDate" path="depreciationDate" class="form-control datepicker" data-date-end-date="0d" required="required" placeholder="DD/MM/YYYY"/>
 	        </div>
-	        <%-- <div class="col-sm-3 add-margin">
-			  <form:input id="rev_order_date" path="rev_order_date" class="form-control datepicker" data-date-end-date="0d" required="required" placeholder="DD/MM/YYYY" />
-				</div> --%>
       		<label class="col-sm-2 control-label text-right">Asset Category Type</label>
 			<div class="col-sm-3 add-margin">
 				<form:select path="categoryType" data-first-option="false" id="categoryType" class="form-control" >
-				<form:option value=""><spring:message code="lbl.select" text="Select"/></form:option>
-					<c:forEach items="${categoryType}" var="categoryType">
-						<form:option value="${categoryType}"> ${categoryType} </form:option>
-					</c:forEach>
+					<form:option value="">-select value-</form:option>
+					<form:options items="${categoryType}" itemLabel="description" itemValue="id"/>
 				</form:select>
 				<form:errors path="categoryType" cssClass="add-margin error-msg" />
 			</div>   
@@ -234,6 +232,9 @@
             'excel', 'pdf', 'print'
         ]
     } );
+    $('.datepicker').datepicker({
+    	format: 'dd/mm/yy'
+    })
 } );
 	</script> 
 

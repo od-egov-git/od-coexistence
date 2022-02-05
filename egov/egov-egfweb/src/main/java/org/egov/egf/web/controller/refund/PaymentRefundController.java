@@ -1226,7 +1226,11 @@ public class PaymentRefundController extends BaseBillController {
             message = messageSource.getMessage("msg.expense.refund.bill.approved.success",
                     new String[]{expenseBill.getBillnumber()}, null);
         }
-            
+        else if (FinancialConstants.CONTINGENCYBILL_APPROVED_STATUS.equals(expenseBill.getStatus().getCode()))
+        {    
+        	message = messageSource.getMessage("msg.expense.refund.bill.approved.success",
+                    new String[]{expenseBill.getBillnumber()}, null);
+        }
         else if (FinancialConstants.WORKFLOW_STATE_REJECTED.equals(expenseBill.getState().getValue())) {
             message = messageSource.getMessage("msg.expense.refund.bill.reject",
                     new String[]{expenseBill.getBillnumber(), approverName, nextDesign}, null);

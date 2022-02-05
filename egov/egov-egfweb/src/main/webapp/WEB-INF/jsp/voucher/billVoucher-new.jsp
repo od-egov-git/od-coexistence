@@ -170,7 +170,13 @@
 						<tr class="setborder">
 							<td class="bluebox setborder"><s:property value="#s.index+1" />
 							</td>
+							<%-- <td class="bluebox setborder" style="text-align: center"><a href="preApprovedVoucher-voucher.action?billid=<s:property value='%{id}'/>"><s:property value="%{billnumber}" /> </a></td> --%>
+							<s:if test="%{expendituretype == 'Refund'}">
+							<td class="bluebox setborder" style="text-align: center"><a href="${pageContext.request.contextPath}/payment/refunddirectBankPayment-newform.action?billid=<s:property value='%{id}'/>"><s:property value="%{billnumber}" /> </a></td>
+							</s:if>
+							<s:else>
 							<td class="bluebox setborder" style="text-align: center"><a href="preApprovedVoucher-voucher.action?billid=<s:property value='%{id}'/>"><s:property value="%{billnumber}" /> </a></td>
+							</s:else>
 							<td class="bluebox setborder" style="text-align: center"><s:date name="%{billdate}" format="dd/MM/yyyy" /></td>
 							<td class="bluebox setborder" style="text-align: right"><s:text name="format.number"> <s:param value="%{billamount}" /> </s:text></td>
 							<td class="bluebox setborder" style="text-align: right"><s:text name="format.number"> <s:param value="%{passedamount}" /> </s:text></td>

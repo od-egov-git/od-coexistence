@@ -9,8 +9,8 @@ public class Depreciation {
 	private String department;
 	private String categoryType;
 	private String categoryName;
-	private Date fromDate;
-	private Date toDate;
+	private String fromDate;
+	private String toDate;
 	private String assetCode;
 	private String assetName;
 	private String location;
@@ -87,24 +87,18 @@ public class Depreciation {
 		this.department = department;
 	}
 
-	public Date getFromDate() {
+	public String getFromDate() {
 		return fromDate;
 	}
-	public void setFromDate(Date fromDate) {
+	public void setFromDate(String fromDate) {
 		this.fromDate = fromDate;
 	}
-	public Date getToDate() {
+	public String getToDate() {
 		return toDate;
 	}
-	public void setToDate(Date toDate) {
+	public void setToDate(String toDate) {
 		this.toDate = toDate;
 	}
-	/*
-	 * public String getFromDate() { return fromDate; } public void
-	 * setFromDate(String fromDate) { this.fromDate = fromDate; } public String
-	 * getToDate() { return toDate; } public void setToDate(String toDate) {
-	 * this.toDate = toDate; }
-	 */
 	public String getAssetCode() {
 		return assetCode;
 	}

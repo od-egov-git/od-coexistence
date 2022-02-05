@@ -57,9 +57,11 @@
 				<div class="col-sm-3 add-margin">
 					<form:select path="egBillregistermis.fund" data-first-option="false" id="egBillregistermis.fund" class="form-control" required="required"  >
 						<form:option value=""><spring:message code="lbl.select" /></form:option>
-						<form:options items="${fundList}" itemValue="id" itemLabel="name" />
+						<form:options items="${funds}" itemValue="id" itemLabel="name" />
 					</form:select>
 					<form:errors path="egBillregistermis.fund" cssClass="add-margin error-msg" />
+					
+					
 				</div>
 				<label class="col-sm-3 control-label text-right">Fund Source: </label>
 				<div class="col-sm-3 add-margin">
@@ -560,7 +562,8 @@
    
    
   <input type="hidden" name="stateType" id="stateType" value="${stateType}"/>	
-  <input type="hidden" id="workFlowAction" name="workFlowAction"/>    
+  <input type="hidden" id="workFlowAction" name="workFlowAction"/>
+    
   
  <div class="panel panel-primary" data-collapsed="0" >	
    <c:if test="${nextAction !='END'}" > 
