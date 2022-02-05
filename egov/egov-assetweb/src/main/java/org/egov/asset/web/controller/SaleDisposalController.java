@@ -1,22 +1,15 @@
 package org.egov.asset.web.controller;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper;
-import org.apache.struts2.dispatcher.multipart.UploadedFile;
 import org.egov.asset.model.AssetMaster;
 import org.egov.asset.model.Disposal;
 import org.egov.asset.service.DisposalService;
@@ -160,7 +153,7 @@ public class SaleDisposalController {
 	 		model.addAttribute("assetBean", new AssetMaster());
 	 		return "search-asset-for-sale-disposal";
 	 	}*/
-	 	@GetMapping("/search")
+	 	@PostMapping("/search")
 		public String viewform(Model model) {
 			
 	 		AssetMaster assetBean = new AssetMaster();
@@ -182,7 +175,7 @@ public class SaleDisposalController {
 			model.addAttribute("assetBean", assetBean);
 			return "search-sale-disposal";
 		}
-	 	@GetMapping("/searchsaledisposal")
+	 	@PostMapping("/searchsaledisposal")
 		public String searchSaleDisposalform(Model model) {
 			
 	 		AssetMaster assetBean = new AssetMaster();

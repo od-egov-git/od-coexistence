@@ -9,10 +9,12 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.egov.asset.model.AssetCatagory;
+import org.egov.asset.model.AssetHistory;
 import org.egov.asset.model.AssetMaster;
 import org.egov.asset.model.AssetRevaluation;
 import org.egov.asset.model.AssetStatus;
 import org.egov.asset.repository.AssetCatagoryRepository;
+import org.egov.asset.repository.AssetHistoryRepository;
 import org.egov.asset.repository.AssetMasterRepository;
 import org.egov.asset.repository.AssetStatusRepository;
 import org.egov.asset.repository.RevaluationRepository;
@@ -55,6 +57,8 @@ public class RevaluationController {
 	private RevaluationService revaluationService;
 	@Autowired
 	private RevaluationRepository revaluationRepository;
+	@Autowired
+	private AssetHistoryRepository assetHistoryRepository;
 	
 	private AssetMaster assetBean;
 	private AssetRevaluation assetRevaluation;
@@ -165,6 +169,17 @@ public class RevaluationController {
 		assetBean = masterRepo.findOne(savedAssetRevaluation.getAssetMaster().getId());
 		assetBean.setCurrentValue(savedAssetRevaluation.getValue_after_revaluation().longValue());
 		masterRepo.save(assetBean);
+		AssetHistory history=new AssetHistory();
+        history.setAsset(assetBean);
+        history.setCreatedBy(savedAssetRevaluation.getCreatedBy());
+        history.setRecDate(new Date());
+        history.setRevId(savedAssetRevaluation.getId());
+        history.setTransactionDate(savedAssetRevaluation.getRev_date());
+        history.setTransactionType("REVALUATION");
+        history.setValueAfterTrxn(savedAssetRevaluation.getValue_after_revaluation());
+        history.setTrxnValue(savedAssetRevaluation.getAdd_del_amt());
+        history.setValueBeforeTrxn(savedAssetRevaluation.getCurrent_value());
+        assetHistoryRepository.save(history);
 		String message="Asset has been revaluated with voucher Number "+voucherNumber;
 		model.addAttribute("message", message);
 		

@@ -7,15 +7,15 @@
 <c:set var="contextPath" value="${pageContext.request.contextPath}"/>
 
 <div class="container">
-<form:form name="assetBean" method="post" action="${contextPath}/asset/update" modelAttribute="assetBean" 
+<form:form name="assetBean" method="post" action="${contextPath}/assetcreate/update" modelAttribute="assetBean" 
 	class="form-horizontal form-groups-bordered" enctype="multipart/form-data">
 	<!-- Header Details -->
-		<div class="panel-heading">
-			<div class="panel-title">
-				<spring:message code="asset-update" text="Update Asset"/>
-			</div>
-		</div>
 		<div class="panel panel-primary" data-collapsed="0">	
+				<div class="panel-heading">
+					<div class="panel-title">
+						<spring:message code="asset-update" text="Update Asset"/>
+					</div>
+				</div>
 				<div class="panel-heading">
 					<div class="panel-title">
 						<spring:message code="lbl-asset-header" text="Header Asset"/>
@@ -103,8 +103,8 @@
 						<c:choose>
 	  						<c:when test="${assetBean.documentDetail !=null}">
 					       		<a href="/services/asset/assetcreate/downloadBillDoc?assetId=${assetBean.id}&fileStoreId=${assetBean.documentDetail[0].fileStore.fileStoreId }">${assetBean.documentDetail[0].fileStore.fileName }</a>
-	        					<br/>
-	        					<span><input type="button" id="remove" style="background: #265988" value="Remove" onclick="deletedoc(${assetBean.id},${assetBean.documentDetail[0].id});"></span>
+	        					<!-- <input type="hidden" name="file" class="padding-10"> -->
+	        					<%-- <span><input type="button" id="remove" style="background: #265988" value="Remove" onclick="deletedoc(${assetBean.id},${assetBean.documentDetail[0].id});"></span> --%>
 							</c:when>
 							<c:otherwise>
 								<input type="file" name="file" id="file1" class="padding-10">
@@ -240,38 +240,17 @@
 				</tr>
 			</thead>
 			<tbody>
-				<%-- <c:choose> --%>
-					<%-- <c:when test="${mapperList!=null && mapperList.size() > 0}"> --%>
-					<%-- <c:when test="${customeFields !=null && customeFields.size() > 0}"> --%>
-						 <c:forEach items="${assetBean.assetCustomFieldMappers}" var="assetCustomFieldMappers" varStatus="item">
-							<tr id="assetView_${item.index}">
-								<td>
-                                    ${item.index + 1} 
-	                            </td>
-								<td>
-									${assetCustomFieldMappers.name}
-									<%-- ${assetCustomFieldMappers.name}  --%>
-									<%-- ${asset.name} --%>
-								</td>
-								<td>
-								 	<input type="text" id="customField_${item.index}" 
-										name="customField_${item.index}" value="${assetCustomFieldMappers.val}"/>
-									<input type="hidden" id="customField_id_${item.index}" 
-										name="customField_id_${item.index}" value="${assetCustomFieldMappers.id}"/>
-									<%-- <input type="text" id="customField_${item.index}_${assetCustomFieldMappers.name}" 
-										name="customField_${item.index}_${assetCustomFieldMappers.name}" value="${assetCustomFieldMappers.val}"/>
-									<input type="hidden" id="customField_${item.index}_id_${assetCustomFieldMappers.name}" 
-										name="customField_${item.index}_id_${assetCustomFieldMappers.name}" value="${assetCustomFieldMappers.id}"/> --%>
-										
-									<%-- <form:input path="val" class="form-control text-left"/> --%>
-								</td>
-							</tr>
-						</c:forEach> 
-					<%-- </c:when>
-					<c:otherwise>
-			            <td colspan="6">No Records Found..</td>
-			         </c:otherwise> --%>
-				<%-- </c:choose> --%>
+				 <form:input type="hidden" path="assetCustomFieldMappers"/>
+				 <c:forEach items="${assetBean.assetCustomFieldMappers}" var="x" varStatus="item">
+					<tr id="assetView_${item.index}">
+						<td> ${item.index + 1} </td>
+						<td>${x.name}</td>
+						<td>
+						 	<input type="text" id="customField_${x.id}" name="customField_${x.id}" value="${x.val}"/>
+							<input type="hidden" id="customField_id_${item.index}" name="customField_id_${item.index}" value="${x.id}"/>
+						</td>
+					</tr>
+				</c:forEach>
 			</tbody>
 		</table>	
 		</div>
@@ -396,7 +375,6 @@
 					</div>
 			</div> 
 		</div>
-		
 		<div align="center" class="buttonbottom">
 			<div class="row text-center">
 			<c:if test="${mode == 'update' }">
@@ -412,7 +390,7 @@
 		<form:hidden path="assetHeader.id" id="assetHeaderId" value="${assetBean.assetHeader.id}" />
 		<form:hidden path="assetLocation.id" id="assetLocationId" value="${assetBean.assetLocation.id}" />
 	</form:form>
-
+</div>
 <!-- Read Only view section -->
  <c:if test="${mode != 'readOnly' }">
  
