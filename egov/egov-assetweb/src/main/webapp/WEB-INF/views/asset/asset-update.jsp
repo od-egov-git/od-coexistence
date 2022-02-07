@@ -12,7 +12,7 @@
 	<!-- Header Details -->
 		<div class="panel panel-primary" data-collapsed="0">	
 				<div class="panel-heading">
-					<div class="panel-title">
+					<div class="panel-title" style="text-align: center;">
 						<spring:message code="asset-update" text="Update Asset"/>
 					</div>
 				</div>
@@ -77,8 +77,14 @@
 					<label class="col-sm-3 control-label text-right">
 						<spring:message code="asset-ref" text="assetReference"/>
 					</label>
-					<div class="col-sm-3 add-margin">
+					<%-- <div class="col-sm-3 add-margin">
 						<form:input class="form-control" path="assetHeader.assetReference"/>
+					</div> --%>
+					<div class="col-sm-3 add-margin" style="display: inline-flex">
+						<form:input class="form-control" id="assetReference" path="assetHeader.assetReference" />
+						<input class="form-control search" type="button" id="assetRef"
+							style="width: 25px; margin-left: 10px;" onclick="viewPop('${id}')">
+							<i class="bi bi-search"></i></input>
 					</div>
 					<label class="col-sm-3 control-label text-right">
 						<spring:message code="asset-fund" text="fund"/>
@@ -95,21 +101,6 @@
 					</label>
 					<div class="col-sm-3 add-margin">
 						<form:input class="form-control" path="assetHeader.depreciationRate"/>
-					</div>
-					<label class="col-sm-3 control-label text-right">
-						<spring:message code="asset-attach-doc" text="file"/>
-					</label>
-					<div class="col-sm-3 add-margin">
-						<c:choose>
-	  						<c:when test="${assetBean.documentDetail !=null}">
-					       		<a href="/services/asset/assetcreate/downloadBillDoc?assetId=${assetBean.id}&fileStoreId=${assetBean.documentDetail[0].fileStore.fileStoreId }">${assetBean.documentDetail[0].fileStore.fileName }</a>
-	        					<!-- <input type="hidden" name="file" class="padding-10"> -->
-	        					<%-- <span><input type="button" id="remove" style="background: #265988" value="Remove" onclick="deletedoc(${assetBean.id},${assetBean.documentDetail[0].id});"></span> --%>
-							</c:when>
-							<c:otherwise>
-								<input type="file" name="file" id="file1" class="padding-10">
-							</c:otherwise>
-						</c:choose>
 					</div>
 					<label class="col-sm-3 control-label text-right">
 						<spring:message code="asset-function" text="function"/>
@@ -145,6 +136,22 @@
 							<form:option value=""><spring:message code="lbl.select" /></form:option>
 							<form:options items="${subSchemeList}" itemValue="id" itemLabel="name"/>  
 						</form:select>
+					</div>
+					
+					<label class="col-sm-3 control-label text-right">
+						<spring:message code="asset-attach-doc" text="file"/>
+					</label>
+					<div class="col-sm-3 add-margin" style="width: -webkit-fill-available;">
+						<c:choose>
+	  						<c:when test="${assetBean.documentDetail !=null}">
+					       		<a href="/services/asset/assetcreate/downloadBillDoc?assetId=${assetBean.id}&fileStoreId=${assetBean.documentDetail[0].fileStore.fileStoreId }">${assetBean.documentDetail[0].fileStore.fileName }</a>
+	        					<!-- <input type="hidden" name="file" class="padding-10"> -->
+	        					<%-- <span><input type="button" id="remove" style="background: #265988" value="Remove" onclick="deletedoc(${assetBean.id},${assetBean.documentDetail[0].id});"></span> --%>
+							</c:when>
+							<c:otherwise>
+								<input type="file" name="file" id="file1" class="padding-10">
+							</c:otherwise>
+						</c:choose>
 					</div>
 			</div>
 	</div>
@@ -390,7 +397,7 @@
 		<form:hidden path="assetHeader.id" id="assetHeaderId" value="${assetBean.assetHeader.id}" />
 		<form:hidden path="assetLocation.id" id="assetLocationId" value="${assetBean.assetLocation.id}" />
 	</form:form>
-</div>
+
 <!-- Read Only view section -->
  <c:if test="${mode != 'readOnly' }">
  

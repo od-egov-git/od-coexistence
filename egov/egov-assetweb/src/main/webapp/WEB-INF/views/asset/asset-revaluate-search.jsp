@@ -11,12 +11,11 @@
 		class="form-horizontal form-groups-bordered" enctype="multipart/form-data">
 
 	<div class="panel-heading">
-				<div class="panel-title">
-					<spring:message code="search.revaluate" text="Search Asset For Revaluation"/>
-				</div>
-			</div>
-			<br />
 			<div class="panel panel-primary" data-collapsed="0" id="search-asset">
+				<div class="panel-title">
+						<spring:message code="search.revaluate" text="Search Asset For Revaluation"/>
+					</div>
+				</div>
 				<div class="panel-body">
 					<label class="col-sm-3 control-label text-right">
 						<spring:message code="asset-code" text="assetCode"/>
@@ -69,7 +68,7 @@
 			</div>
 	</form:form>
 
-	<br />
+	
 	<!-- Result Table -->
 	<div class="panel panel-primary" data-collapsed="0">	
 		<div class="panel-heading">

@@ -5,11 +5,6 @@
 <%@ taglib uri="/WEB-INF/tags/cdn.tld" prefix="cdn"%>
 
 <%@ page isELIgnored="false"%>
-<div class="panel-title" align="center">
-	<spring:message code="lbl.asset.revaluate"
-		text="View Asset Revaluation" />
-</div>
-<br />
 
 <div class="container">
 	<form:form name="assetRevaluation" method="post" action="createReval"
@@ -19,8 +14,14 @@
 		<input type="hidden" name="viewmode" id="viewmode" value="readonly" />
 		<form:hidden id="masterId" path="masterId" />
 		<!-- Header Details -->
-		<br />
+		
 		<div class="panel panel-primary" data-collapsed="0">
+			<div class="panel-heading">
+				<div class="panel-title" align="center">
+					<spring:message code="lbl.asset.revaluate" text="View Asset Revaluation" />
+				</div>
+			</div>
+			
 			<div class="panel-heading">
 				<div class="panel-title">
 					<spring:message code="lbl-asset-details" text="Asset Details" />
@@ -52,7 +53,7 @@
 			</div>
 		</div>
 		<!-- Revaluation Details -->
-		<br />
+		
 		<div class="panel panel-primary" data-collapsed="0">
 			<div class="panel-heading">
 				<div class="panel-title">text="Asset Revaluation Details" /></div>
@@ -138,7 +139,7 @@
 			</div>
 		</div>
 		<!-- Accounting Details -->
-		<br />
+		
 		<div class="panel panel-primary" data-collapsed="0">
 			<div class="panel-heading">
 				<div class="panel-title">
@@ -176,7 +177,7 @@
 			</div>
 		</div>
 		<!-- Asset Status -->
-		<br />
+		
 		<div class="panel panel-primary" data-collapsed="0">
 			<div class="panel-heading">
 				<div class="panel-title">

@@ -84,6 +84,7 @@
 			</div>
 		</div>
 		<input type="hidden" name="viewmode" id="viewmode" value="${viewmode}"/>
+		<input type="hidden" name="isReference" id="isReference" value="${isReference}"/>
 	</form:form>
 
 	<!-- Result Table -->
@@ -94,6 +95,7 @@
 				<spring:message code="asset-search-result" text="Search Result" />
 			</div>
 		</div>
+		
 		<div class="panel-body">
 			<table class="table table-bordered" id="resultHeader">
 				<thead>
@@ -124,8 +126,7 @@
 									<td>${asset.assetHeader.department.name}</td>
 									<td>${asset.assetStatus.description }</td>
 									<c:if test="${isReference}">
-										<td><input type="button" class="btn btn-default"
-											value="Select"
+										<td><input type="button" class="btn btn-default" value="Select"
 											onclick="selectAssetRef('${asset.code}','${asset.assetHeader.assetName }')" />
 										</td>
 									</c:if>

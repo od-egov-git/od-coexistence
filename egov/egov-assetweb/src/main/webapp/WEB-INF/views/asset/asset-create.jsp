@@ -10,7 +10,7 @@
 		<!-- Header Details -->
 		<div class="panel panel-primary" data-collapsed="0">
 			<div class="panel-heading">
-				<div class="panel-title">
+				<div class="panel-title" style="text-align: center;">
 					<spring:message code="lbl-asset-create" text="Create Asset" />
 				</div>
 			</div>	
@@ -137,12 +137,6 @@
 					</form:select>
 				</div>
 				<label class="col-sm-3 control-label text-right"> <spring:message
-						code="asset-na-sale" text="applicableForSale" />
-				</label>
-				<div class="col-sm-3 add-margin">
-					<form:checkbox path="assetHeader.applicableForSale" />
-				</div>
-				<label class="col-sm-3 control-label text-right"> <spring:message
 						code="asset-scheme" text="scheme" />
 				</label>
 				<div class="col-sm-3 add-margin">
@@ -167,6 +161,12 @@
 						<form:options items="${subSchemeList}" itemValue="id"
 							itemLabel="name" />
 					</form:select>
+				</div>
+				<label class="col-sm-3 control-label text-right"> <spring:message
+						code="asset-na-sale" text="applicableForSale" />
+				</label>
+				<div class="col-sm-3 add-margin">
+					<form:checkbox path="assetHeader.applicableForSale" />
 				</div>
 			</div>
 		</div>
