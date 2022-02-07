@@ -4,17 +4,18 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ taglib uri="/WEB-INF/tags/cdn.tld" prefix="cdn"%>
 
-<div class="panel-title" align="center">
-	<spring:message code="lbl.asset.revaluate"
-		text="Create Asset Revaluation" />
-</div>
-<br />
 
 <div class="container">
 	<form:form name="assetRevaluation" method="post" action="createReval"
 		modelAttribute="assetRevaluation"
 		class="form-horizontal form-groups-bordered"
 		enctype="multipart/form-data">
+		
+		<div class="panel-heading">
+			<div class="panel-title" align="center">
+				<spring:message code="lbl.asset.revaluate" text="Create Asset Revaluation" />
+			</div>
+		</div>
 		<div class="panel-heading">
 			<div class="panel-title">
 				<spring:message code="lbl-asset-details" text="Asset Details" />
@@ -55,7 +56,7 @@
 			</div>
 		</div>
 		<!-- Revaluation Details -->
-		<br />
+		
 		<div class="panel panel-primary" data-collapsed="0">
 			<div class="panel-heading">
 				<div class="panel-title">
@@ -142,7 +143,7 @@
 			</div>
 		</div>
 		<!-- Accounting Details -->
-		<br />
+		
 		<div class="panel panel-primary" data-collapsed="0">
 			<div class="panel-heading">
 				<div class="panel-title">
@@ -180,7 +181,7 @@
 			</div>
 		</div>
 		<!-- Asset Status -->
-		<br />
+		
 		<div class="panel panel-primary" data-collapsed="0">
 			<div class="panel-heading">
 				<div class="panel-title">
