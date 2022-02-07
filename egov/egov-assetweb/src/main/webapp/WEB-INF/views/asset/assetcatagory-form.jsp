@@ -179,19 +179,19 @@
 		<div class="col-sm-3 add-margin">
 			<form:input class="form-control patternvalidation" required="true" onkeypress="javascript:return isNumber(event)" path="depriciationRate" />
 		</div>
-		
-		<label class="col-sm-3 control-label text-right">
-			<spring:message code="lbl.used.for.lease.and.agreement" text="Used For Lease and Aggrement" />
-		</label>
-		<div class="col-sm-3 add-margin">
-			<form:checkbox class="form-check-input" path="leaseAndAgreement" value="true"/> 
-		</div>
 		<label class="col-sm-3 control-label text-right">
 			<spring:message code="lbl.depriciation.rate" text="Life of the Asset" /> 
 		</label>
 		<div class="col-sm-3 add-margin">
 			<form:input class="form-control" path="lifeOfAsset" />
 		</div>
+		<label class="col-sm-3 control-label text-right">
+			<spring:message code="lbl.used.for.lease.and.agreement" text="Used For Lease and Aggrement" />
+		</label>
+		<div class="col-sm-3 add-margin">
+			<form:checkbox class="form-check-input" path="leaseAndAgreement" value="true"/> 
+		</div>
+		
 		</div>
 		</div>
 		</div>

@@ -23,12 +23,15 @@ public class AssetHistoryService {
 			if(null != assetBean.getAssetStatus()) {
 				statusId = assetBean.getAssetStatus().getId();
 			}
-			
+			Long deptId=null;
+			if(null!=assetBean.getAssetHeader().getDepartment()) {
+				deptId=assetBean.getAssetHeader().getDepartment().getId();
+			}
 			
 				 List<AssetMaster> assetMasetrHisory = assetHistoryRepository.getAssetMasetrHisory(assetBean.getCode(), 
 					assetBean.getAssetHeader().getAssetName(),
 					assetBean.getAssetHeader().getAssetCategory().getId(), 
-					assetBean.getAssetHeader().getDepartment().getCode(), statusId);
+					deptId, statusId);
 				 
 				return assetMasetrHisory;
 	 }
