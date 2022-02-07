@@ -459,12 +459,12 @@ public class CreateAssetController {// extends BaseAssetController{
 			assetStatusList = statusRepo.findAll();
 			assetCategoryList = categoryRepo.findAll();
 			
-			/*assetList = masterRepo.findAll();
-			LOGGER.info("Asset Lists..."+assetList.toString());*/
+			assetList = masterRepo.findAll();
+			LOGGER.info("Asset Lists..."+assetList.toString());
 		} catch (Exception e) {
 			e.getMessage();
 		}
-		//model.addAttribute("assetList", assetList);
+		model.addAttribute("assetList", assetList);
 		model.addAttribute("departmentList", departmentList);
 		model.addAttribute("assetStatusList", assetStatusList);
 		model.addAttribute("assetCategoryList", assetCategoryList);

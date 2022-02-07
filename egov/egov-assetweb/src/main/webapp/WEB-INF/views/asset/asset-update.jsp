@@ -78,13 +78,16 @@
 						<spring:message code="asset-ref" text="assetReference"/>
 					</label>
 					<%-- <div class="col-sm-3 add-margin">
-						<form:input class="form-control" path="assetHeader.assetReference"/>
+						<form:input class="form-control" path="assetHeader.assetReference"/>  style="flex"   style="width: 88%;"
 					</div> --%>
-					<div class="col-sm-3 add-margin" style="display: inline-flex">
-						<form:input class="form-control" id="assetReference" path="assetHeader.assetReference" />
-						<input class="form-control search" type="button" id="assetRef"
-							style="width: 25px; margin-left: 10px;" onclick="viewPop('${id}')">
-							<i class="bi bi-search"></i></input>
+					<div class="col-sm-3 add-margin">
+						<form:input class="form-control" id="assetReference" path="assetHeader.assetReference"/>
+						<%-- <input class="form-control search" type="button" id="assetRef"
+							style="width: 25px; margin-left: 10px;" onclick="viewPop('${id}')"/> --%>
+							<c:if test="${mode == 'update' }">
+								<input class="form-control search" type="button" id="assetRef"
+									style="width: 25px; margin-left: 10px;" onclick="viewPop('${id}')"/>
+							</c:if>
 					</div>
 					<label class="col-sm-3 control-label text-right">
 						<spring:message code="asset-fund" text="fund"/>
@@ -127,7 +130,7 @@
 							<form:options items="${schemeList}" itemValue="id" itemLabel="name"/>  
 						</form:select>
 					</div>
-					<label class="col-sm-3 control-label text-right">
+					<label class="col-sm-6 control-label text-right">
 						<spring:message code="asset-sub-scheme" text="subScheme"/>
 					</label>
 					<div class="col-sm-3 add-margin">
@@ -141,7 +144,7 @@
 					<label class="col-sm-3 control-label text-right">
 						<spring:message code="asset-attach-doc" text="file"/>
 					</label>
-					<div class="col-sm-3 add-margin" style="width: -webkit-fill-available;">
+					<div class="col-sm-3 add-margin">
 						<c:choose>
 	  						<c:when test="${assetBean.documentDetail !=null}">
 					       		<a href="/services/asset/assetcreate/downloadBillDoc?assetId=${assetBean.id}&fileStoreId=${assetBean.documentDetail[0].fileStore.fileStoreId }">${assetBean.documentDetail[0].fileStore.fileName }</a>
@@ -397,12 +400,7 @@
 		<form:hidden path="assetHeader.id" id="assetHeaderId" value="${assetBean.assetHeader.id}" />
 		<form:hidden path="assetLocation.id" id="assetLocationId" value="${assetBean.assetLocation.id}" />
 	</form:form>
-
-<!-- Read Only view section -->
- <c:if test="${mode != 'readOnly' }">
- 
- 
- </c:if>
+</div>
 
 
 <script src="<cdn:url value='/resources/app/js/i18n/jquery.i18n.properties.js?rnd=${app_release_no}' context='/services/EGF'/>"></script>
