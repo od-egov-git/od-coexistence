@@ -37,7 +37,7 @@ public class AssetHistoryController {
 	}
 	
 	
-	@GetMapping("/search")
+	@PostMapping("/search")
 	public String viewform(Model model) {
 		
  		AssetMaster assetBean = new AssetMaster();
