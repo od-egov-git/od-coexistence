@@ -234,7 +234,7 @@
 					
 					<form:hidden path="id" name="id" value="${assetCatagory.id}"/>
 					<form:hidden path="customeField.id" name="cusId" value="${customeField.id}"/>
-				<input type="submit" class="btn btn-primary" name="delete" value="Delete"/>
+				<input type="submit" class="btn btn-primary" name="delete" value="Deactivate"/>
 			
 			
 				</td>
@@ -317,9 +317,12 @@
 		<c:if test="${ empty assetCatagory.customeFields}">
 		<div align="center">
 		<a class="btn btn-primary" href="${contextPath}/assetcategory/editAssetCategory/${assetCatagory.id}">Edit</a>
+		<input type="button" name="button2" id="button2" value="Close" class="btn btn-primary" onclick="window.parent.postMessage('close','*');window.close();"/>
 		</div>
 		</c:if>
-		
+		<c:if test="${ not empty assetCatagory.customeFields}">
+		<div align="center"><input type="button" name="button2" id="button2" value="Close" class="btn btn-primary" onclick="window.parent.postMessage('close','*');window.close();"/></div>
+		</c:if>
 		</form:form>
 	</div>	
 		

@@ -324,7 +324,7 @@
 		<a class="btn btn-primary" href="${contextPath}/assetcategory/editAssetCategory/${assetCatagory.id}">Edit</a>
 		</div>
 		</c:if> --%>
-		
+		<div align="center"><input type="button" name="button2" id="button2" value="Close" class="btn btn-primary" onclick="window.parent.postMessage('close','*');window.close();"/></div>
 		</form:form>
 	</div>	
 		

@@ -177,7 +177,7 @@
 			<span class="mandatory"></span>
 		</label>
 		<div class="col-sm-3 add-margin">
-			<form:input class="form-control patternvalidation" required="true" data-pattern="alphanumericwithspecialcharacters" path="depriciationRate" />
+			<form:input class="form-control patternvalidation" required="true" onkeypress="javascript:return isNumber(event)" path="depriciationRate" />
 		</div>
 		
 		<label class="col-sm-3 control-label text-right">
@@ -260,17 +260,19 @@
 			<span class="mandatory"></span>
 		</label>
 		<div class="col-sm-3 add-margin">
-			<form:input class="form-control"  path="customeField.name" />
+			<form:input class="form-control" onchange="removeErrorMsg()" id="customeFieldName" path="customeField.name" />
+			<p cssClass="add-margin error-msg" id="customeFieldNameError" style="color:red"/>
 		</div>
 		<label class="col-sm-3 control-label text-right">
 			<spring:message code="lbl.parent.data.type" text="Data Type" /> 
 			<span class="mandatory"></span>
 		</label>
 		<div class="col-sm-3 add-margin">
-			<form:select path="customeField.customFieldDataType" class="form-control" id="columnSelect" onchange="displayColumn()"> 
+			<form:select path="customeField.customFieldDataType" class="form-control" id="columnSelect" onchange="removeErrorMsg()"> 
 			<form:option value="">-select value-</form:option>
 			<form:options items="${customFieldDataType}" itemLabel="DataTypes" itemValue="id"/>
 			</form:select>
+			<p cssClass="add-margin error-msg" id="dataTypeError" style="color:red"/>
 		</div>
 		<label class="col-sm-3 control-label text-right">
 			<spring:message code="lbl.used.for.lease.and.mandatory" text="Mandatory" />
@@ -290,8 +292,8 @@
 			<spring:message code="lbl.bill.custom.order" text="Order"/>
 		</label>
 		<div class="col-sm-3 add-margin">
-			<form:input class="form-control patternvalidation" data-pattern="alphanumerichyphenbackslash"  path="customeField.orders" maxlength="50" />
-			<form:errors path="" cssClass="add-margin error-msg" />
+			<form:input class="form-control patternvalidation" id="customefieldorder" onchange="removeErrorMsg()" data-pattern="alphanumerichyphenbackslash"  path="customeField.orders" maxlength="50" />
+			<p cssClass="add-margin error-msg" id="customefieldorderError" style="color:red"/>
 		</div>
 		<div class="column-form-popup" style="display: none;">
 		<label class="col-sm-3 control-label text-right">
@@ -309,7 +311,7 @@
 			<form:errors path="" cssClass="add-margin error-msg" />
 		</div>
 		<div align="center">
-			<input type="submit" class="btn btn-primary" onclick="show()" name="add" value="Add" />
+			<input type="submit" class="btn btn-primary" onclick="return validateForm()" name="add" value="Add" />
 			<button type="button" class="btn btn-primary" onclick="closeForm(); show();"><spring:message code="lbl.bill.custom.close" text="Close"/></button>
 		</div>
 	</div>
@@ -365,7 +367,48 @@
 			  }
 		  console.log("executed");
 		}
-	
+
+	function validateForm() {
+		  let customeFieldName = document.getElementById("customeFieldName").value;
+		  let customeFieldDataType = document.getElementById("columnSelect").value;
+		  let customefieldorder = document.getElementById("customefieldorder").value;
+		  
+		  let errorMessage;
+		  if (customeFieldName == "") {
+			  errorMessage="please enter custom field name";
+			    document.getElementById("customeFieldNameError").innerHTML = errorMessage;
+			    return false;
+			  }
+		  else if (customeFieldDataType == "") {
+			  errorMessage="please select custom field data type";
+			    document.getElementById("dataTypeError").innerHTML = errorMessage;
+			    return false;
+			  }
+		  else if (isNaN(customefieldorder)){ 
+			  errorMessage="order must be a number";
+			  document.getElementById("customefieldorderError").innerHTML = errorMessage;
+			  return false;
+		  }else{
+			  document.getElementById("customeFieldNameError").innerHTML ="";
+			  document.getElementById("dataTypeError").innerHTML ="";
+			  document.getElementById("customefieldorderError").innerHTML ="";
+			  show();
+			  return true;
+			}
+		}
+	function removeErrorMsg(){
+		document.getElementById("customeFieldNameError").innerHTML ="";
+		  document.getElementById("dataTypeError").innerHTML ="";
+		  document.getElementById("customefieldorderError").innerHTML ="";
+		}
+	function isNumber(evt)
+    {
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode != 46 && charCode > 31 && (charCode < 48 || charCode > 57))
+           return false;
+
+        return true;
+     }
 	</script>
 		<script src="<cdn:url value='/resources/app/js/assetcategory.js?rnd=${app_release_no}' context='/services/asset'/>"></script>
 	

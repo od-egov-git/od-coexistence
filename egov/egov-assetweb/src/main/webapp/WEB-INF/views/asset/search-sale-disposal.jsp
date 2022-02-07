@@ -6,95 +6,93 @@
 <c:set var="contextPath" value="${pageContext.request.contextPath}"/>
 
 
-<div class="formmainbox">
+<div class="container">
 	<form:form name="assetBean" method="post" action="${contextPath}/sale/searchsaledisposal"
 		modelAttribute="assetBean"
 		class="form-horizontal form-groups-bordered"
 		enctype="multipart/form-data">
 
-		<br />
-		<div class="panel-title">
-			<spring:message code="view-asset" text="View Asset" />
-		</div>
-		<br />
-		<div id="search-asset">
-
-			<table border="0" width="100%">
-				<tr>
-					<td><label class="col-sm-6 control-label text-right">
-							<spring:message code="asset-code" text="assetCode" />
-					</label>
-						<div class="col-sm-6 add-margin">
-							<form:input class="form-control" path="code" />
-						</div></td>
-
-					<td><label class="col-sm-3 control-label text-right">
-							<spring:message code="asset-name" text="assetName" />
-					</label>
-						<div class="col-sm-6 add-margin">
-							<form:input class="form-control" path="assetHeader.assetName" />
-						</div></td>
-				</tr>
-				<tr>
-					<td><label class="col-sm-6 control-label text-right">
-							<spring:message code="asset-cat" text="assetCategory" /> <span
-							class="mandatory"></span>
-					</label>
-						<div class="col-sm-6 add-margin">
-							<form:select path="assetHeader.assetCategory"
-								id="assetHeader.assetCategory" required="required"
-								class="form-control">
-								<form:option value="">
-									<spring:message code="lbl.select" />
-								</form:option>
-								<form:options items="${assetCategoryList}" itemValue="id"
-									itemLabel="name" />
-							</form:select>
-						</div></td>
-
-					<td><label class="col-sm-3 control-label text-right">
-							<spring:message code="asset-dept" text="department" />
-					</label>
-						<div class="col-sm-6 add-margin">
-							<form:select path="assetHeader.department" id="department"
-								class="form-control">
-								<form:option value="">
-									<spring:message code="lbl.select" />
-								</form:option>
-								<form:options items="${departmentList}" itemValue="name"
-									itemLabel="name" />
-							</form:select>
-						</div></td>
-				</tr>
-				<tr>
-					<td><label class="col-sm-6 control-label text-right">
-							<spring:message code="asset-status" text="status" />
-					</label>
-						<div class="col-sm-6 add-margin">
-							<form:select path="assetStatus" id="assetStatus"
-								class="form-control">
-								<form:option value="">
-									<spring:message code="lbl.select" />
-								</form:option>
-								<form:options items="${assetStatusList}" itemValue="id"
-									itemLabel="description" />
-							</form:select>
-						</div></td>
-				</tr>
-			</table>
-
-			<div align="center">
-					<input type="submit" class="btn btn-primary" name="search"
-						value="Search" /> 
-						<input type="button" name="button2" id="button2"
-						value="Close" class="btn btn-primary"
-						onclick="window.parent.postMessage('close','*');window.close();" />
+		<div class="panel panel-primary" data-collapsed="0" id="search-asset">
+			<div class="panel-heading">
+				<div class="panel-title">
+					<spring:message code="view-asset" text="View Asset" />
+				</div>
+			</div>
+			
+			<div class="panel-body">
+				<label class="col-sm-3 control-label text-right">
+				 	<spring:message code="asset-code" text="assetCode" />
+				</label>
+				<div class="col-sm-3 add-margin">
+					<form:input class="form-control" path="code" />
+				</div>
+				<label class="col-sm-3 control-label text-right"> <spring:message
+						code="asset-name" text="assetName" />
+				</label>
+				<div class="col-sm-3 add-margin">
+					<form:input class="form-control" path="assetHeader.assetName" />
+				</div>
+				<label class="col-sm-3 control-label text-right"> <spring:message
+						code="asset-cat" text="assetCategory" /> <span class="mandatory"></span>
+				</label>
+				<div class="col-sm-3 add-margin">
+					<form:select path="assetHeader.assetCategory"
+						id="assetHeader.assetCategory" required="required"
+						class="form-control">
+						<form:option value="">
+							<spring:message code="lbl.select" />
+						</form:option>
+						<form:options items="${assetCategoryList}" itemValue="id"
+							itemLabel="name" />
+					</form:select>
+				</div>
+				<label class="col-sm-3 control-label text-right"> <spring:message
+						code="asset-dept" text="department" />
+				</label>
+				<div class="col-sm-3 add-margin">
+					<form:select path="assetHeader.department" id="department"
+						class="form-control">
+						<form:option value="">
+							<spring:message code="lbl.select" />
+						</form:option>
+						<form:options items="${departmentList}" itemValue="id"
+							itemLabel="name" />
+					</form:select>
+				</div>
+				<label class="col-sm-3 control-label text-right"> <spring:message
+						code="asset-status" text="status" />
+				</label>
+				<div class="col-sm-3 add-margin">
+					<form:select path="assetStatus" id="assetStatus"
+						class="form-control">
+						<form:option value="">
+							<spring:message code="lbl.select" />
+						</form:option>
+						<form:options items="${assetStatusList}" itemValue="id"
+							itemLabel="description" />
+					</form:select>
+				</div>
 			</div>
 		</div>
+
+		<div align="center" class="buttonbottom">
+			<div class="row text-center">
+				<input type="submit" class="btn btn-primary" name="search"
+					value="Search" /> <input type="button" name="button2" id="button2"
+					value="Close" class="btn btn-default"
+					onclick="window.parent.postMessage('close','*');window.close();" />
+			</div>
+		</div>
+		<input type="hidden" name="viewmode" id="viewmode" value="${viewmode}"/>
 	</form:form>
-	<br /> <br />
 	<!-- Result Table -->
-	<div style="padding: 5%">
+	<div class="panel panel-primary" data-collapsed="0">
+		<div class="panel-heading">
+			<div class="panel-title">
+				<spring:message code="asset-search-result" text="Search Result" />
+			</div>
+		</div>
+		<div class="panel-body">
 		<table class="table table-bordered" id="resultHeader">
 			<thead>
 				<tr>
@@ -134,7 +132,7 @@
 										${disposal.asset.assetHeader.assetCategory.name }</a></td>
 								<td><a href="view/${disposal.id}" target="popup"
 									onclick="window.open('view/${disposal.id}','popup','width=700,height=600'); return false;">
-										${disposal.asset.assetHeader.department}</a></td>
+										${disposal.asset.assetHeader.department.name}</a></td>
 								<td><a href="view/${disposal.id}" target="popup"
 									onclick="window.open('view/${disposal.id}','popup','width=700,height=600'); return false;">
 										${disposal.asset.assetStatus.description }</a></td>
@@ -159,6 +157,7 @@
 		</table>
 	</div>
 	<!-- Result Table Ends -->
+	</div>
 </div>
 
 <script src="<cdn:url value='/resources/app/js/i18n/jquery.i18n.properties.js?rnd=${app_release_no}' context='/services/EGF'/>"></script>
@@ -195,6 +194,7 @@
     $(document).ready(function() {
    $('#resultHeader').DataTable( {
        dom: 'Bfrtip',
+       aaSorting : [],
        buttons: [
            'copy', 'csv', 'excel', 'pdf', 'print'
        ]

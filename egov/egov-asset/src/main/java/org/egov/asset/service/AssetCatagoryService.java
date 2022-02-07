@@ -212,7 +212,9 @@ public class AssetCatagoryService {
 		if(null!=assetCategory.getName()) {
 			findOne.setName(assetCategory.getName());
 //		}if(null!=assetCategory.getAccumulatedDepriciationCode().getDescription()) {
-		}if(null!=assetCategory.getAccumulatedDepriciationCode()) {
+		}if(null!=assetCategory.getLifeOfAsset()) {
+			findOne.setLifeOfAsset(assetCategory.getLifeOfAsset());
+			}if(null!=assetCategory.getAccumulatedDepriciationCode()) {
 			CChartOfAccounts accDepCode = cChartOfAccountsRepository.findOne(assetCategory.getAccumulatedDepriciationCode().getId());
 			findOne.setAccumulatedDepriciationCode(accDepCode);
 			//findOne.setAccumulatedDepriciationCode(assetCategory.getAccumulatedDepriciationCode());

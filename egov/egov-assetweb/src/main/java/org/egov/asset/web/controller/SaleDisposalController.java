@@ -88,8 +88,15 @@ public class SaleDisposalController {
 			Disposal createDisposal = disposalService.createDisposal(disposal);
 			String successMsg=createDisposal.getTransactionType()+" "+"created successuflly"+" with reference "+createDisposal.getProfitLossVoucherReference();
 			model.addAttribute("successMsg", successMsg);
+			Disposal disposalResponse = getBillDocuments(createDisposal);
+			if(null!=disposalResponse.getAssetSaleAccount()) {
+				String codeAndName=disposalResponse.getAssetSaleAccount().getGlcode()+"~"+disposalResponse.getAssetSaleAccount().getName();
+				disposalResponse.getAssetSaleAccount().setName(codeAndName);
+			}
+	 		model.addAttribute("disposal", disposalResponse);
+	 		model.addAttribute("assetAccounts", disposalService.getAssetAccount());
 		//Disposal disposalResponse = disposalService.saveDisposal(disposal);
-		return "disposal-sale-form";
+		return "view-sale-disposal";
 	}
 	 @RequestMapping(value = "/downloadSaleDisposalDoc", method = RequestMethod.GET)
 	    public void getSaleDisposalDoc(final HttpServletRequest request, final HttpServletResponse response)
@@ -144,6 +151,10 @@ public class SaleDisposalController {
 	 	public String viewSalaDisposal(@PathVariable("id") Long disposalId,Model model) {
 	 		Disposal disposal = disposalService.getById(disposalId);
 	 		Disposal disposalResponse = getBillDocuments(disposal);
+	 		if(null!=disposalResponse.getAssetSaleAccount()) {
+				String codeAndName=disposalResponse.getAssetSaleAccount().getGlcode()+"~"+disposalResponse.getAssetSaleAccount().getName();
+				disposalResponse.getAssetSaleAccount().setName(codeAndName);
+			}
 	 		model.addAttribute("disposal", disposalResponse);
 	 		model.addAttribute("assetAccounts", disposalService.getAssetAccount());
 	 		return "view-sale-disposal";

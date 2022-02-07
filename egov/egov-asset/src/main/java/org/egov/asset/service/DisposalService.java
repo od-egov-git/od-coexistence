@@ -29,7 +29,8 @@ import org.egov.commons.dao.FundHibernateDAO;
 import org.egov.commons.repository.CChartOfAccountsRepository;
 import org.egov.egf.expensebill.repository.DocumentUploadRepository;
 import org.egov.egf.utils.FinancialUtils;
-import org.egov.infra.microservice.models.Department;
+import org.egov.infra.admin.master.repository.DepartmentRepository;
+import org.egov.infra.admin.master.entity.Department;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.model.bills.DocumentUpload;
 import org.egov.model.voucher.VoucherDetails;
@@ -76,6 +77,8 @@ public class DisposalService {
 	
 	@Autowired
 	private VoucherTypeBean voucherTypeBean;
+	@Autowired
+	private DepartmentRepository deptRepo;
 	
 	public transient CVoucherHeader voucherHeader = new CVoucherHeader();
 	
@@ -247,7 +250,8 @@ public class DisposalService {
 		return assetAccount;
 	 }
 	 public List<Department> getDepartments() {
-		 return microserviceUtils.getDepartments();
+	
+		 return deptRepo.findAll();
 		 
 	 }
 	 public List<AssetMaster> getAssets(){
@@ -268,11 +272,14 @@ public class DisposalService {
 			if(null != assetBean.getAssetStatus()) {
 				statusId = assetBean.getAssetStatus().getId();
 			}
-			
+			Long deptId=null;
+			if(null!=assetBean.getAssetHeader().getDepartment()) {
+				deptId=assetBean.getAssetHeader().getDepartment().getId();
+			}
 			
 				 List<AssetMaster> assetMasterDetails = disposalRepository.getAssetMasterDetails(assetBean.getCode(), 
 					assetBean.getAssetHeader().getAssetName(),
-					assetBean.getAssetHeader().getAssetCategory().getId(),statusId);
+					assetBean.getAssetHeader().getAssetCategory().getId(),deptId,statusId);
 				 return assetMasterDetails;
 
 
@@ -302,11 +309,14 @@ public class DisposalService {
 			if(null != assetBean.getAssetStatus()) {
 				statusId = assetBean.getAssetStatus().getId();
 			}
-			
+			Long deptId=null;
+			if(null!=assetBean.getAssetHeader().getDepartment()) {
+				deptId=assetBean.getAssetHeader().getDepartment().getId();
+			}
 			List<Disposal> disposalList = disposalRepository.getSaleAndDisposalList(assetBean.getCode(), 
 					assetBean.getAssetHeader().getAssetName(),
 					assetBean.getAssetHeader().getAssetCategory().getId(), 
-					assetBean.getAssetHeader().getDepartment().getCode(), statusId);
+					deptId, statusId);
 			return disposalList;
 	 }
 	 public AssetMaster getAssetById(Long aasetId) {

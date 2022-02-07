@@ -178,6 +178,7 @@
 	$(document).ready(function() {
     $('#viewassetcategory').DataTable( {
         dom: 'Bfrtip',
+        aaSorting : [],
         buttons: [
             'copy', 'csv', 'excel', 'pdf', 'print'
         ]
