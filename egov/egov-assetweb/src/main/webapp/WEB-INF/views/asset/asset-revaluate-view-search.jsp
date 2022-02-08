@@ -46,7 +46,7 @@
 					<div class="col-sm-6 add-margin">						
 						<form:select path="department" id="department" class="form-control">
 							<form:option value=""><spring:message code="lbl.select" /></form:option>
-							<form:options items="${departmentList}" itemValue="name" itemLabel="name"/>  
+							<form:options items="${departmentList}" itemValue="id" itemLabel="name"/>  
 						</form:select>
 					</div>
 					<label class="col-sm-6 control-label text-right">
@@ -110,7 +110,7 @@
 								${asset.assetMaster.assetHeader.assetCategory.name }
 							</td>
 							<td>
-								${asset.assetMaster.assetHeader.department}
+								${asset.assetMaster.assetHeader.department.name}
 							</td>
 							<td>
 								${asset.assetMaster.assetStatus.description }

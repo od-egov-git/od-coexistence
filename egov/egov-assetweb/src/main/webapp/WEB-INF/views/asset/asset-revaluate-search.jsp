@@ -10,9 +10,9 @@
 	<form:form name="assetBean" method="post" action="${contextPath}/revaluate/search" modelAttribute="assetBean" 
 		class="form-horizontal form-groups-bordered" enctype="multipart/form-data">
 
-	<div class="panel-heading">
 			<div class="panel panel-primary" data-collapsed="0" id="search-asset">
-				<div class="panel-title">
+				<div class="panel-heading">
+					<div class="panel-title">
 						<spring:message code="search.revaluate" text="Search Asset For Revaluation"/>
 					</div>
 				</div>
@@ -45,7 +45,7 @@
 					<div class="col-sm-3 add-margin">						
 						<form:select path="assetHeader.department" id="department" class="form-control">
 							<form:option value=""><spring:message code="lbl.select" /></form:option>
-							<form:options items="${departmentList}" itemValue="name" itemLabel="name"/>  
+							<form:options items="${departmentList}" itemValue="id" itemLabel="name"/>  
 						</form:select>
 					</div>
 					<label class="col-sm-3 control-label text-right">
