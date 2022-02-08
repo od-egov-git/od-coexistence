@@ -74,7 +74,7 @@
 			<div class="alert alert-danger" role="alert">${errorMessage}</div>
 		</c:if>
 			<div class="panel-title">
-				<spring:message code="lbl.asset.catagory" text="Seach Asset Catagory" />
+				<spring:message code="lbl.asset.catagory" text="Seach Asset Category" />
 			</div>
 	</div>
 
