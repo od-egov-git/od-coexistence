@@ -475,8 +475,8 @@ var curdate = new Date();
 																		class="bluebox"><span class="mandatory1">*</span></span></td>
 																	<td class="bluebox"><s:select name="bank"
 																			id="bank" list="dropdownData.bankList"
-																			listKey="bank.id+'-'+id"
-																			listValue="bank.name+' '+branchname" headerKey="-1"
+																			listKey="id"
+																			listValue="name" headerKey="-1"
 																			headerValue="%{getText('lbl.choose.options')}" onclick="validateFund()"
 																			onChange="populateAccNumbers(this);" /></td>
 																	<egov:ajaxdropdown id="accountNumber"
