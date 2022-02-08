@@ -528,8 +528,11 @@ public class RefundBillService {
     }
 
     public void expenseBillRegisterStatusChange(final EgBillregister egBillregister, final String workFlowAction) {
+    	System.out.println("in expenseBillRegisterStatusChange ");
+    	
         if (null != egBillregister && null != egBillregister.getStatus()
                 && null != egBillregister.getStatus().getCode()) {
+        	System.out.println("status code before==== "+egBillregister.getStatus().getCode());
             if (FinancialConstants.CONTINGENCYBILL_PENDING_FINANCE.equals(egBillregister.getStatus().getCode())
                     && egBillregister.getState() != null && workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONVERIFY))
             {
@@ -578,6 +581,7 @@ public class RefundBillService {
                         "Cancelled"));
             }
         }
+        System.out.println("status code after==== "+egBillregister.getStatus().getCode());
     }
 
     @Transactional(readOnly = true)
@@ -632,20 +636,9 @@ public class RefundBillService {
         final String currState = "";
         String stateValue = "";
         System.out.println("desig********:"+approvalDesignation);
+        System.out.println("workFlowAction========= "+workFlowAction);
         if (null != egBillregister.getId())
-//            wfInitiator = assignmentService.getPrimaryAssignmentForUser(egBillregister.getCreatedBy());
         	wfInitiator = this.getCurrentUserAssignmet(egBillregister.getCreatedBy());
-      /*  if (FinancialConstants.BUTTONREJECT.equalsIgnoreCase(workFlowAction)) {
-            stateValue = FinancialConstants.WORKFLOW_STATE_REJECTED;
-            egBillregister.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
-                    .withComments(approvalComent)
-                    .withStateValue(stateValue).withDateInfo(currentDate.toDate())
-                    .withOwner(wfInitiator.getPosition())
-                    .withNextAction("")
-                    .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_REFUND_BILL_DISPLAYNAME);
-        } else {*/
-//            if (null != approvalPosition && approvalPosition != -1 && !approvalPosition.equals(Long.valueOf(0)))
-//                wfInitiator = assignmentService.getAssignmentsForPosition(approvalPosition).get(0);
             WorkFlowMatrix wfmatrix;
            Designation designation = this.getDesignationDetails(approvalDesignation);
            if(designation != null)
@@ -702,6 +695,7 @@ public class RefundBillService {
                         .withCreatedBy(user.getId())
                         .withtLastModifiedBy(user.getId());
             } else if (FinancialConstants.BUTTONCANCEL.equalsIgnoreCase(workFlowAction)) {
+            	System.out.println("wf cancel called");
                 stateValue = FinancialConstants.WORKFLOW_STATE_CANCELLED;
                 egBillregister.transition().end().withSenderName(user.getUsername() + "::" + user.getName())
                         .withComments(approvalComent)
@@ -730,6 +724,7 @@ public class RefundBillService {
         		 egBillregister.setState(null);
                 
             } else if (FinancialConstants.BUTTONVERIFY.equalsIgnoreCase(workFlowAction)) {
+            	System.out.println("wf verify called");
                 wfmatrix = egBillregisterRegisterWorkflowService.getWfMatrix(egBillregister.getStateType(), null,
                         null, additionalRule, egBillregister.getCurrentState().getValue(), null);
 
@@ -743,6 +738,7 @@ public class RefundBillService {
                         .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_REFUND_BILL_DISPLAYNAME);
             }
             else if (FinancialConstants.BUTTONAPPROVE.equalsIgnoreCase(workFlowAction)) {
+            	System.out.println("wf approve called");
                 wfmatrix = egBillregisterRegisterWorkflowService.getWfMatrix(egBillregister.getStateType(), null,
                         null, additionalRule, egBillregister.getCurrentState().getValue(), null);
 
@@ -756,6 +752,7 @@ public class RefundBillService {
                         .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_REFUND_BILL_DISPLAYNAME);
             } 
             else {
+            	System.out.println("wf else called");
                 if (designation != null
                         && finalDesignationNames.get(designation.getName().toUpperCase()) != null)
                     stateValue = FinancialConstants.WF_STATE_FINAL_APPROVAL_PENDING;
@@ -838,6 +835,7 @@ public class RefundBillService {
 		        }
 				else if (FinancialConstants.BUTTONAPPROVE.equalsIgnoreCase(workFlowAction))
 				{
+					System.out.println("approve called state empty");
 					egBillregister.transition().end().withSenderName(user.getUsername() + "::" + user.getName())
                     .withComments(approvalComent)
                     .withStateValue(stateValue).withDateInfo(new Date())

@@ -1192,14 +1192,14 @@ public class PaymentRefundController extends BaseBillController {
         final String message = getMessageByStatus(expenseBill, approverName, nextDesign);
 
         model.addAttribute("message", message);
-        System.out.println(message);
+        System.out.println("message========="+ message);
         return "expensebill-success";
     }
     
     
     private String getMessageByStatus(final EgBillregister expenseBill, final String approverName, final String nextDesign) {
         String message = "";
-          System.out.println(expenseBill.getStatus().getCode());
+          System.out.println("expenseBill.getStatus().getCode()================== "+expenseBill.getStatus().getCode());
           
         if (FinancialConstants.CONTINGENCYBILL_CREATED_STATUS.equals(expenseBill.getStatus().getCode())
                                      || FinancialConstants.CONTINGENCYBILL_PENDING_FINANCE.equals(expenseBill.getStatus().getCode())) {
@@ -1228,6 +1228,7 @@ public class PaymentRefundController extends BaseBillController {
         }
         else if (FinancialConstants.CONTINGENCYBILL_APPROVED_STATUS.equals(expenseBill.getStatus().getCode()))
         {    
+        	System.out.println("approved message going to set");
         	message = messageSource.getMessage("msg.expense.refund.bill.approved.success",
                     new String[]{expenseBill.getBillnumber()}, null);
         }
