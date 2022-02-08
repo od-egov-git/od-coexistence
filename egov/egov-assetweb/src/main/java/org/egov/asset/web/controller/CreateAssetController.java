@@ -472,6 +472,7 @@ public class CreateAssetController {// extends BaseAssetController{
 		model.addAttribute("mode", "add");
 		model.addAttribute("disabled", "");
 		model.addAttribute("isViewPage", true);
+		LOGGER.info("Asset Reference..."+param.equalsIgnoreCase("ref"));
 		if(param.equalsIgnoreCase("ref")) {
 			model.addAttribute("isReference", true);
 		}else {
@@ -816,6 +817,15 @@ public class CreateAssetController {// extends BaseAssetController{
 		model.addAttribute("assetStatusList", assetStatusList);
 		model.addAttribute("assetCategoryList", assetCategoryList);
 		model.addAttribute("viewmode", "view");
+		
+		String isRef = request.getParameter("isReference");
+		LOGGER.info("Asset Reference..."+isRef);
+		if("true".equalsIgnoreCase(isRef)) {
+			model.addAttribute("isReference", true);
+		}else {
+			model.addAttribute("isReference", false);
+		}
+
 		return "asset-view";
 	}
 	

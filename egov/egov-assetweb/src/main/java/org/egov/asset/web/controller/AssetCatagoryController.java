@@ -163,7 +163,7 @@ public class AssetCatagoryController {
 		model.addAttribute("successMsg", deleteCustomField.getErrorMessage());
 		model.addAttribute("assetCatagory", deleteCustomField);
 		
-		return "view-assetcatagory-form";
+		return "view-assetcategory-modified";
 	}
 	@GetMapping(value = "/editAssetCategory/{id}")
 	public String editAssetCategory(@PathVariable Long id, Model model) {

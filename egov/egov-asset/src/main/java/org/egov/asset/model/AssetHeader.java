@@ -33,7 +33,7 @@ public class AssetHeader implements Serializable{
 	@GeneratedValue(generator = SEQ_asset_header, strategy = GenerationType.SEQUENCE)
 	private Long id;	
 	@OneToOne(fetch=FetchType.LAZY, cascade = CascadeType.ALL)
-	@JoinColumn(name="asset_catagory")
+	@JoinColumn(name="asset_category")
 //	private AssetCatagory assetCategory;
 	private AssetCatagory assetCategory;
 	@Column(name="date_of_creation")

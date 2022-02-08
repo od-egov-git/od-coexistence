@@ -160,10 +160,14 @@
 		<label class="col-sm-3 control-label text-right"><spring:message code="lbl.disposal.accountcode" text="Asset Disposal Account Code" /> 
 		</label>
 		<div class="col-sm-3 add-margin">
-			<form:select path="assetSaleAccount" class="form-control" readonly="true" > 
+			<%-- <form:select path="assetSaleAccount" class="form-control" readonly="true" > 
 			<form:option value="">-select value-</form:option>
 			<form:options items="${assetAccounts}" itemLabel="name" itemValue="id"/>
-			</form:select>
+			<c:forEach var="acc" items="${assetAccounts}">
+        <form:option value="${acc.id}"><c:out value="${acc.glcode}-${acc.name} "/></form:option>
+   	 	</c:forEach>
+			</form:select> --%>
+			<form:input path="assetSaleAccount.name" class="form-control" readonly="true" />
 		</div>
 		<label class="col-sm-3 control-label text-right"><spring:message code="lbl.sale.voucherreferencenumber" text="Voucher Reference number" /> 
 		</label>
@@ -214,10 +218,14 @@
 		<label class="col-sm-3 control-label text-right"><spring:message code="lbl.disposal.accountcode" text="Asset Disposal Account Code" /> 
 		</label>
 		<div class="col-sm-3 add-margin">
-			<form:select path="assetSaleAccountSale" readonly="true" class="form-control"> 
+			<%-- <form:select path="assetSaleAccountSale" readonly="true" class="form-control"> 
 			<form:option value="">-select value-</form:option>
 			<form:options items="${assetAccounts}" itemLabel="name" itemValue="id"/>
-			</form:select>
+			<c:forEach var="acc" items="${assetAccounts}">
+        <form:option value="${acc.id}"><c:out value="${acc.glcode}-${acc.name} "/></form:option>
+   	 	</c:forEach>
+			</form:select> --%>
+			<form:input path="assetSaleAccount.name" class="form-control" readonly="true" />
 		</div>
 		<label class="col-sm-3 control-label text-right"><spring:message code="lbl.sale.salevalue" text="Sale Value" /> 
 		</label>
@@ -284,9 +292,10 @@
 		
 	</div>
 </div>
-		<div align="center">
+		<!-- <div align="center">
 			<input type="submit" class="btn btn-primary" disabled="true" name="create" value="Create" />
-		</div>
+		</div> -->
+		<div align="center"><input type="button" name="button2" id="button2" value="Close" class="btn btn-primary" onclick="window.parent.postMessage('close','*');window.close();"/></div>
 		</form:form>
 		
 		</div>

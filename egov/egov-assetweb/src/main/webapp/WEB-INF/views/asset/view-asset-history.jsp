@@ -6,15 +6,15 @@
 <c:set var="contextPath" value="${pageContext.request.contextPath}"/>
 
 
-<div class="formmainbox">
-		<br />
-		<div class="panel-title">
-			<spring:message code="lbl-search-asset-history" text="View Asset History" />
-		</div>
-		<br />
-	<br /> <br />
-	<!-- Result Table -->
-	<div style="padding: 5%">
+<div class="container">
+		<div class="panel panel-primary" data-collapsed="0" id="search-asset">
+			<div class="panel-heading">
+				<div class="panel-title">
+					<spring:message code="view-asset" text="View Asset History" />
+				</div>
+			</div>
+			
+			<div class="panel-body">
 		<table class="table table-bordered" id="resultHeader">
 			<thead>
 				<tr>
@@ -64,6 +64,7 @@
 				</c:choose>
 			</tbody>
 		</table>
+	</div>
 	</div>
 	<!-- Result Table Ends -->
 	<div align="center"><input type="button" name="button2" id="button2" value="Close" class="btn btn-primary" onclick="window.parent.postMessage('close','*');window.close();"/></div>
