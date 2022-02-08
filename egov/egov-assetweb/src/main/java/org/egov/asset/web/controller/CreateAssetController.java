@@ -851,6 +851,47 @@ public class CreateAssetController {// extends BaseAssetController{
 		return "asset-modify";
 	}
 	
+	@PostMapping(value = "/searchreport", params = "search")
+	public String searchreport( @ModelAttribute("assetBean") AssetMaster assetBean, Model model, HttpServletRequest request) {
+		LOGGER.info("Search Operation..................");
+		List<AssetMaster> assetList = new ArrayList<AssetMaster>();
+		
+		try {
+			Long statusId = null;
+			Long locationId = null;
+			if(null != assetBean.getAssetStatus()) {
+				statusId = assetBean.getAssetStatus().getId();
+			}
+			if(null != assetBean.getAssetLocation()) {
+				locationId = assetBean.getAssetLocation().getId();
+			}
+			//assetList = masterRepo.findAll();
+			assetList = masterRepo.getAssetMasterRegisterDetails(assetBean.getCode(), 
+					assetBean.getAssetHeader().getAssetName(),
+					assetBean.getAssetHeader().getAssetCategory().getId(), 
+					locationId, assetBean.getAssetHeader().getDescription(), statusId);
+			model.addAttribute("assetList", assetList);
+			//LOGGER.info("Asset Lists..."+assetList.toString());
+		} catch (Exception e) {
+			e.getMessage();
+		}
+		try {
+			localityList = localityRepo.findAll();
+			assetStatusList = statusRepo.findAll();
+			assetCategoryList = categoryRepo.findAll();
+		} catch (Exception e) {
+			e.getMessage();
+		}
+		model.addAttribute("assetBean", assetBean);
+		model.addAttribute("localityList", localityList);
+		model.addAttribute("assetStatusList", assetStatusList);
+		model.addAttribute("assetCategoryList", assetCategoryList);
+		model.addAttribute("viewmode", "view");
+		
+		return "asset-register-report";
+	}
+
+	
 	public List<AssetMaster> searchResult(AssetMaster assetBean){
 		List<AssetMaster> assetList = new ArrayList<AssetMaster>();
 		try {
@@ -1142,9 +1183,11 @@ public class CreateAssetController {// extends BaseAssetController{
 		}
 		
 		@PostMapping(value = "/searchregister")
-		public String searchRegister(@ModelAttribute("assetBean") AssetMaster assetBean, Model model, HttpServletRequest request) {
+		public String searchRegister(Model model) {
 			LOGGER.info("Search Register Report Operation..................");
-			assetList = new ArrayList<>();
+			assetBean = new AssetMaster();
+			model.addAttribute("assetBean", assetBean);
+			/*assetList = new ArrayList<>();
 			try {
 				Long statusId = null;
 				if(null != assetBean.getAssetStatus()) {
@@ -1155,11 +1198,11 @@ public class CreateAssetController {// extends BaseAssetController{
 						assetBean.getAssetHeader().getAssetName(),
 						assetBean.getAssetHeader().getAssetCategory().getId(), 
 						assetBean.getAssetLocation().getId(), assetBean.getAssetHeader().getDescription(), statusId);*/
-				LOGGER.info("Asset Lists..."+assetList.toString());
+				/*LOGGER.info("Asset Lists..."+assetList.toString());
 			} catch (Exception e) {
 				e.getMessage();
 			}
-			model.addAttribute("assetList", assetList);
+			model.addAttribute("assetList", assetList);*/
 			try {
 				localityList = localityRepo.findAll();
 				assetStatusList = statusRepo.findAll();
@@ -1167,10 +1210,10 @@ public class CreateAssetController {// extends BaseAssetController{
 			} catch (Exception e) {
 				e.getMessage();
 			}
-			model.addAttribute("assetBean", assetBean);
 			model.addAttribute("localityList", localityList);
 			model.addAttribute("assetStatusList", assetStatusList);
 			model.addAttribute("assetCategoryList", assetCategoryList);
+			model.addAttribute("isViewPage", true);
 			
 			return "asset-register-report";
 		}
