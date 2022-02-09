@@ -75,6 +75,7 @@ public class RevaluationController {
 	List<AssetStatus> assetStatusList = new ArrayList<AssetStatus>();
 	List<AssetCatagory> assetCategoryList = new ArrayList<AssetCatagory>();
 	List<AssetMaster> assetList = new ArrayList<AssetMaster>();
+	List<AssetMaster> assetTempList = new ArrayList<AssetMaster>();
 	List<AssetRevaluation> revAssetList = new ArrayList<AssetRevaluation>();
 	List<CFunction> functionList = new ArrayList<CFunction>();
 	List<Fund> fundList = new ArrayList<Fund>();
@@ -91,7 +92,15 @@ public class RevaluationController {
 			assetStatusList = statusRepo.findByCode("CAPITALIZED");
 			assetCategoryList = categoryRepo.findAll();
 			
-			assetList = masterRepo.findAll();
+			assetTempList = masterRepo.findAll();
+			assetList.clear();
+			for(AssetMaster master:assetTempList)
+			{
+				if(master.getAssetStatus().getCode().equalsIgnoreCase("CAPITALIZED"))
+				{
+					assetList.add(master);
+				}
+			}
 			LOGGER.info("Asset Lists..."+assetList.toString());
 		} catch (Exception e) {
 			e.getMessage();
