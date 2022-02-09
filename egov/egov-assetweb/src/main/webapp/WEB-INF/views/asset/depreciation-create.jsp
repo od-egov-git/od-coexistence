@@ -65,14 +65,7 @@
        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.1/jquery-ui.min.js"></script>
 <script type="text/javascript">
-			$(function () {
-		            $('#depreciationDate').datepicker({
-		                format: "dd/mm/yyyy"
-		            });
-		            $('#fromDate').datepicker({
-		                format: "dd/mm/yyyy"
-		            });
-		        });			
+					
 </script>
 <div class="container">
     <form:form name="Depreciation" role="form" method="post" action="searchDepreciation" modelAttribute="Depreciation" id="depreciation" class="form-horizontal form-groups-bordered" enctype="multipart/form-data">
@@ -232,9 +225,6 @@
             'excel', 'pdf', 'print'
         ]
     } );
-    $('.datepicker').datepicker({
-    	format: 'dd/mm/yy'
-    })
 } );
 	</script> 
 

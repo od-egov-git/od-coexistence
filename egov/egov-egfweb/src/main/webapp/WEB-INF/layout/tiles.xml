@@ -921,12 +921,12 @@
 		<put-attribute name="body" value="/WEB-INF/views/paymentrefund/ol-payment-refund-request-update.jsp" />
 	</definition>
 	<definition name="cashBookReport" extends="base_layout">
-        <put-attribute name="page-title" value="title.estimate.preparation.create" cascade="true"/>
-        <put-attribute name="body" value="/WEB-INF/views/cashBook/cashBookReport.jsp"/>
+        <put-attribute name="page-title" value="title.CashBook.report" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/cashbook/cashBookReport.jsp"/>
     </definition> 
    <definition name="cashFlowReport" extends="base_layout">
-        <put-attribute name="page-title" value="title.estimate.preparation.create" cascade="true"/>
-        <put-attribute name="body" value="/WEB-INF/views/cashBook/cashFlowReport.jsp"/>
+        <put-attribute name="page-title" value="title.CashFlow.report" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/cashbook/cashFlowReport.jsp"/>
     </definition>
 	
 </tiles-definitions>

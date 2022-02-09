@@ -478,7 +478,7 @@ function onLoadTask_new()
 }
 
 function populateAccNum(branch){
-	alert("populate Acc Num");
+	//alert("populate Acc Num");
 	var fundObj = "1";//document.getElementById('fundId');
 	var bankbranchId = branch.options[branch.selectedIndex].value;
 	var index=bankbranchId.indexOf("-");
