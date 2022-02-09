@@ -13,7 +13,7 @@
 		<div class="panel panel-primary" data-collapsed="0" id="search-asset">
 			<div class="panel-heading">
 				<div class="panel-title">
-					<spring:message code="view-asset" text="View Asset"/>
+					<spring:message code="asset-search-regis-report-lbl" text="Search Asset Register Report"/>
 				</div>
 			</div>
 			<div class="panel-body">

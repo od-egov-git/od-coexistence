@@ -13,7 +13,12 @@
 		<div class="panel panel-primary" data-collapsed="0">	
 				<div class="panel-heading">
 					<div class="panel-title" style="text-align: center;">
-						<spring:message code="asset-update" text="Update Asset"/>
+						<c:when test="${mode == 'update' }">
+							<spring:message code="asset-update" text="Update Asset"/>
+						</c:when>
+						<c:otherwise>
+							<spring:message code="asset-details" text="Asset Details"/>
+						</c:otherwise>
 					</div>
 				</div>
 				<div class="panel-heading">
@@ -77,16 +82,15 @@
 					<label class="col-sm-3 control-label text-right">
 						<spring:message code="asset-ref" text="assetReference"/>
 					</label>
-					<%-- <div class="col-sm-3 add-margin">
-						<form:input class="form-control" path="assetHeader.assetReference"/>  style="flex"   style="width: 88%;"
-					</div> --%>
-					<div class="col-sm-3 add-margin">
+					<div class="col-sm-3 add-margin"style="display: inline-flex">
 						<form:input class="form-control" id="assetReference" path="assetHeader.assetReference"/>
-						<%-- <input class="form-control search" type="button" id="assetRef"
-							style="width: 25px; margin-left: 10px;" onclick="viewPop('${id}')"/> --%>
 							<c:if test="${mode == 'update' }">
-								<input class="form-control search" type="button" id="assetRef"
-									style="width: 25px; margin-left: 10px;" onclick="viewPop('${id}')"/>
+								<%-- <input class="form-control search" type="button" id="assetRef"
+									style="width: 25px; margin-left: 10px;" onclick="viewPop('${id}')"/> --%>
+								<button class="form-control search" type="button" id="assetRef" 
+										style="width: 35px; margin-left: 10px;text-align: center;" onclick="viewPop('${id}')">
+									<span class="glyphicon glyphicon-search"></span>
+								</button>
 							</c:if>
 					</div>
 					<label class="col-sm-3 control-label text-right">

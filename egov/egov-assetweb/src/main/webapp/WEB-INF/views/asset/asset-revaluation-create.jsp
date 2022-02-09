@@ -10,28 +10,58 @@
 		modelAttribute="assetRevaluation"
 		class="form-horizontal form-groups-bordered"
 		enctype="multipart/form-data">
-		
-		<div class="panel-heading">
-			<div class="panel-title" align="center">
-				<spring:message code="lbl.asset.revaluate" text="Create Asset Revaluation" />
-			</div>
-		</div>
-		<div class="panel-heading">
-			<div class="panel-title">
-				<spring:message code="lbl-asset-details" text="Asset Details" />
-			</div>
-		</div>
 		<input type="hidden" name="viewmode" id="viewmode" value="readonly" />
 		<form:hidden id="masterId" path="masterId" />
 		<!-- Header Details -->
 		<div class="panel panel-primary" data-collapsed="0">
+			<div class="panel-heading">
+				<div class="panel-title" align="center">
+					<spring:message code="lbl.asset.revaluate"
+						text="Create Asset Revaluation" />
+				</div>
+			</div>
+			<div class="panel-heading">
+				<div class="panel-title">
+					<spring:message code="lbl-asset-details" text="Asset Details" />
+				</div>
+			</div>
 			<div class="panel-heading">
 				<div class="panel-title">
 					<spring:message code="lbl-asset-header" text="Header Asset" />
 				</div>
 			</div>
 			<div class="panel-body">
-				<label class="col-sm-3 control-label text-right"> <spring:message
+
+				<table width="100%">
+					<tr>
+						<td><label class="col-sm-3 control-label text-right">
+								<spring:message code="asset-code" text="Asset Code" />
+						</label>
+							<div class="col-sm-3 add-margin">
+								<a href="#" id="assetLink"
+									onclick="return openAsset('${assetRevaluation.assetMaster.id}');">${assetRevaluation.assetMaster.code}</a>
+							</div></td>
+						<td><label class="col-sm-3 control-label text-right">
+								<spring:message code="asset-name" text="Asset Name" />
+						</label>
+							<div class="col-sm-3 add-margin">
+								${assetRevaluation.assetMaster.assetHeader.assetName }</div></td>
+					</tr>
+					<tr>
+						<td><label class="col-sm-3 control-label text-right">
+								<spring:message code="asset-desc" text="Description" />
+						</label>
+							<div class="col-sm-3 add-margin">
+								${assetRevaluation.assetMaster.assetHeader.description }</div></td>
+						<td><label class="col-sm-3 control-label text-right">
+								<spring:message code="asset-cat" text="Asset Category Name" />
+						</label>
+							<div class="col-sm-3 add-margin">
+								${assetRevaluation.assetMaster.assetHeader.assetCategory.name }</div>
+						</td>
+					</tr>
+				</table>
+				<%-- <label class="col-sm-3 control-label text-right"> <spring:message
 						code="asset-code" text="Asset Code" />
 				</label>
 				<div class="col-sm-3 add-margin">
@@ -52,7 +82,7 @@
 						code="asset-cat" text="Asset Category Name" />
 				</label>
 				<div class="col-sm-3 add-margin">
-					${assetRevaluation.assetMaster.assetHeader.assetCategory.name }</div>
+					${assetRevaluation.assetMaster.assetHeader.assetCategory.name }</div> --%>
 			</div>
 		</div>
 		<!-- Revaluation Details -->
