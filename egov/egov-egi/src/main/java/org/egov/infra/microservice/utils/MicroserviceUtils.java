@@ -856,8 +856,12 @@ public class MicroserviceUtils {
             for (Assignment a : ei.getAssignments()) {
                 a.setEmployeeName(ei.getUser().getName());
                 a.setEmpId(ei.getUser().getId());
+                if(a.getDepartment().equalsIgnoreCase(department) && a.getDesignation().equalsIgnoreCase(designation) && a.getToDate() ==  0.0f)
+                {
+                	assignmentList.add(a);
+                }
             }
-            assignmentList.addAll(ei.getAssignments());
+            //assignmentList.addAll(ei.getAssignments());
         }
         return assignmentList;
     }
