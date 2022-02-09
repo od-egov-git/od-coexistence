@@ -46,7 +46,7 @@ public class RevaluationController {
 	
 	private static final Logger LOGGER = Logger.getLogger(RevaluationController.class);
 	@Autowired
-	private MicroserviceUtils microserviceUtilss;
+	private MicroserviceUtils microserviceUtils;
 	@Autowired
 	private AssetStatusRepository statusRepo;
 	@Autowired

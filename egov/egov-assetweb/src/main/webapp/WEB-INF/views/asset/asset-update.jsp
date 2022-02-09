@@ -13,12 +13,7 @@
 		<div class="panel panel-primary" data-collapsed="0">	
 				<div class="panel-heading">
 					<div class="panel-title" style="text-align: center;">
-						<c:when test="${mode == 'update' }">
-							<spring:message code="asset-update" text="Update Asset"/>
-						</c:when>
-						<c:otherwise>
 							<spring:message code="asset-details" text="Asset Details"/>
-						</c:otherwise>
 					</div>
 				</div>
 				<div class="panel-heading">
