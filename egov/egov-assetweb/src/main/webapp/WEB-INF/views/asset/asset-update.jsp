@@ -77,7 +77,7 @@
 					<label class="col-sm-3 control-label text-right">
 						<spring:message code="asset-ref" text="assetReference"/>
 					</label>
-					<div class="col-sm-3 add-margin"style="display: inline-flex">
+					<div class="col-sm-3 add-margin"style="display: flex">
 						<form:input class="form-control" id="assetReference" path="assetHeader.assetReference"/>
 							<c:if test="${mode == 'update' }">
 								<%-- <input class="form-control search" type="button" id="assetRef"
@@ -288,13 +288,13 @@
 			<br />
 			<div class="panel-body" id="valueSection" style="display:none;">
 					<div id="capitalized" style="display:none;">
-							<label class="col-sm-3 control-label text-right">
-								<spring:message code="gross-value" text="grossValue"/>
-								
-							</label>
-							<div class="col-sm-3 add-margin">
-								<form:input class="form-control" path="grossValue" />
-							</div>
+							<label class="col-sm-3 control-label text-right"> <spring:message
+							code="gross-value" text="grossValue" /> <span class="mandatory"></span>
+					</label>
+					<div class="col-sm-3 add-margin">
+						<form:input data-pattern="alphanumeric" id="grossValue"
+							class="form-control" path="grossValue" />
+					</div>
 							<label class="col-sm-3 control-label text-right">
 								<spring:message code="market-value" text="marketValue"/>
 								
@@ -304,12 +304,13 @@
 							</div>
 					</div>
 					<div id="capitalized2" style="display:none;">
-							<label class="col-sm-3 control-label text-right">
-								<spring:message code="accumulated-depreciation" text="accumulatedDepreciation"/>
-								
+							<label class="col-sm-3 control-label text-right"> <spring:message
+							code="accumulated-depreciation" text="accumulatedDepreciation" />
+								<span class="mandatory"></span>
 							</label>
 							<div class="col-sm-3 add-margin">
-								<form:input class="form-control" path="accumulatedDepreciation" />
+								<form:input class="form-control" id="accumulatedDepreciation"
+									data-pattern="alphanumeric" path="accumulatedDepreciation" />
 							</div>
 							<label class="col-sm-3 control-label text-right">
 								<spring:message code="survey-number" text="surveyNumber"/>
@@ -387,7 +388,9 @@
 		<div align="center" class="buttonbottom">
 			<div class="row text-center">
 			<c:if test="${mode == 'update' }">
-					<input type="submit" class="btn btn-primary" name="update" value="Update"/>
+					<!-- <input type="submit" class="btn btn-primary" name="update" value="Update"/> -->
+					<input type="submit" class="btn btn-primary" name="update"
+						id="createBtn" value="Update" />
 			</c:if>
 			<input type="button" name="button2" id="button2" value="Close" class="btn btn-default" onclick="window.parent.postMessage('close','*');window.close();"/>
 			</div>
@@ -398,6 +401,8 @@
 		<form:hidden path="id" id="assetId" value="${assetBean.id}" />
 		<form:hidden path="assetHeader.id" id="assetHeaderId" value="${assetBean.assetHeader.id}" />
 		<form:hidden path="assetLocation.id" id="assetLocationId" value="${assetBean.assetLocation.id}" />
+		<input type="hidden" id="customFieldsCounts" name="customFieldsCounts" />
+		<input type="hidden" id="isCapitalized" name="isCapitalized" />
 	</form:form>
 </div>
 
@@ -419,6 +424,10 @@ $(document).ready(function(){
 	fetchdetails1(statusCode,mode);
 });
 
+function onPopupClose(returnParameter) {
+	   $('#assetReference').val(returnParameter);
+	}
+	
 function fetchdetails1(status,mode){
 	console.log(status);
 	console.log(mode);
@@ -464,4 +473,87 @@ function fetchdetails1(status,mode){
         }
     });
 }
+
+function viewPop(id){
+	/* var url1 = '/services/EGF/report/budgetVarianceReport-loadData.action?asOnDate='+date+'&dept='+dept+'&funds='+fund+'&func='+func+'&accCode='+accCode+'&vtype=pr';
+	window.open(url1,'Source','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700') */
+	var x = window.open('/services/asset/assetcreate/assetRef/ref','popup','width=850,height=600');
+}
+
+
+function loadValues(){
+	var assetStatusCode = $('#statusCode').val();
+	var modeOfAcq = $('#mode').val();
+
+	$("#valueSection").css("display", "none");
+	$("#capitalized").css("display", "none");
+	$("#capitalized2").css("display", "none");
+	$("#acqPurchase").css("display", "none");
+	$("#acqDonation").css("display", "none");
+	$("#acqConstruction").css("display", "none");
+	$("#acqAcquired").css("display", "none");
+	
+	if(assetStatusCode != '' && modeOfAcq != ''){
+		fetchdetails(assetStatusCode,modeOfAcq);
+	}
+}
+
+function fetchdetails(status,mode){
+	$.ajax({
+		type : "GET",
+        url: "/services/asset/assetcreate/fetchdetails",
+        data: {status: status, mode: mode},
+        async : false,
+        success: function(res){      
+           var jsonObj = JSON.parse(res);
+           var assetStatusCode = jsonObj.status;
+           var modeOfAcq = jsonObj.mode;
+           var flag = false;   
+	        if(assetStatusCode == 'CREATED' || assetStatusCode == 'CAPITALIZED'){
+	       		$("#valueSection").css("display", "block");
+	       		flag = true;
+	       	}else{
+	       		$("#valueSection").css("display", "none");
+	       		flag = false;
+	       	}
+	        $('#isCapitalized').val(assetStatusCode);
+	       	if(assetStatusCode == 'CAPITALIZED'){
+	       		$("#capitalized").css("display", "block");
+	       		$("#capitalized2").css("display", "block");
+		    }
+	       	if(flag){
+	       		if(modeOfAcq == 'PURCHASE'){
+	       			$("#acqPurchase").css("display", "block");
+	       		}else if(modeOfAcq == 'DONATION'){
+	       			$("#acqDonation").css("display", "block");
+	       		}else if(modeOfAcq == 'CONSTRUCTION'){
+	       			$("#acqConstruction").css("display", "block");
+	       		}else if(modeOfAcq == 'ACQUIRED'){
+	       			$("#acqAcquired").css("display", "block");
+	       		}else{
+	       			bootbox.alert('Please select Mode of Acquisition');
+	       		}
+	       	}
+        }
+    });
+}
+
+$( "#createBtn" ).click(function(e) {	
+	var grossVal = $('#grossValue').val();
+	var accumulatedDepreciation = $('#accumulatedDepreciation').val();
+	var isCapitalized = $('#isCapitalized').val();
+	if(isCapitalized == 'CAPITALIZED'){
+		if (grossVal == null || grossVal =='') {
+			e.preventDefault();
+			bootbox.alert('Gross Value shouldnot be empty!');
+			$( "#grossValue" ).focus();
+		  }
+		if (accumulatedDepreciation == null || accumulatedDepreciation == '') {
+			e.preventDefault();
+			bootbox.alert('Accumulated Depreciation shouldnot be empty!');
+			$( "#accumulatedDepreciation" ).focus();
+		  }
+	}
+});
+
 </script>
