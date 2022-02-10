@@ -48,7 +48,10 @@
 package org.egov.asset.repository;
 
 import org.egov.asset.model.DepreciationInputs;
+
+import org.springframework.data.elasticsearch.annotations.Query;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
