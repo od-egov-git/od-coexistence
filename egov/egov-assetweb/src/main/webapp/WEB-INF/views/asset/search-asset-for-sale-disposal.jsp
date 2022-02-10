@@ -33,11 +33,11 @@
 					<form:input class="form-control" path="assetHeader.assetName" />
 				</div>
 				<label class="col-sm-3 control-label text-right"> <spring:message
-						code="asset-cat" text="assetCategory" /> <span class="mandatory"></span>
+						code="asset-cat" text="assetCategory" />
 				</label>
 				<div class="col-sm-3 add-margin">
 					<form:select path="assetHeader.assetCategory"
-						id="assetHeader.assetCategory" required="required"
+						id="assetHeader.assetCategory" 
 						class="form-control">
 						<form:option value="">
 							<spring:message code="lbl.select" />

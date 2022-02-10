@@ -105,6 +105,7 @@
     $(document).ready(function() {
    $('#resultHeader').DataTable( {
        dom: 'Bfrtip',
+       aaSorting : [],
        buttons: [
            'copy', 'csv', 'excel', 'pdf', 'print'
        ]
