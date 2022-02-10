@@ -237,6 +237,7 @@ public class RevaluationController {
 			assetCategoryList = categoryRepo.findAll();
 			
 			revAssetList = revaluationRepository.findAll();
+			//revAssetList = assetService.searchAssets(assetBean);
 			LOGGER.info("Asset Lists..."+revAssetList.toString());
 		} catch (Exception e) {
 			e.getMessage();
@@ -255,14 +256,15 @@ public class RevaluationController {
 		LOGGER.info("Search Operation..................");
 		revAssetList = new ArrayList<>();
 		try {
-			Long statusId = null;
+			/*Long statusId = null;
 			if(null != assetBean.getAssetStatus()) {
 				statusId = assetBean.getAssetStatus().getId();
 			}
 			revAssetList = revaluationRepository.getAssetMasterDetails(assetBean.getCode(), 
 					assetBean.getAssetName(),
 					assetBean.getAssetCategory().getId(), 
-					assetBean.getDepartment(), statusId);
+					assetBean.getDepartment(), statusId);*/
+			revAssetList = revaluationService.searchAssets(assetBean);//searchAssets
 			LOGGER.info("Asset Lists..."+revAssetList.toString());
 		} catch (Exception e) {
 			e.getMessage();
