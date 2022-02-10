@@ -18,13 +18,17 @@ import org.egov.asset.repository.AssetHistoryRepository;
 import org.egov.asset.repository.AssetMasterRepository;
 import org.egov.asset.repository.AssetStatusRepository;
 import org.egov.asset.repository.RevaluationRepository;
+import org.egov.asset.service.AssetService;
 import org.egov.asset.service.RevaluationService;
 import org.egov.commons.CFunction;
 import org.egov.commons.Fund;
 import org.egov.commons.dao.FunctionDAO;
 import org.egov.commons.dao.FundHibernateDAO;
+//import org.egov.infra.admin.master.repository.DepartmentRepository;
+import org.egov.infra.admin.master.entity.Department;
+import org.egov.infra.admin.master.repository.DepartmentRepository;
 import org.egov.infra.config.core.ApplicationThreadLocals;
-import org.egov.infra.microservice.models.Department;
+//import org.egov.infra.microservice.models.Department;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.persistence.entity.AbstractAuditable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +63,10 @@ public class RevaluationController {
 	private RevaluationRepository revaluationRepository;
 	@Autowired
 	private AssetHistoryRepository assetHistoryRepository;
+	@Autowired
+	private DepartmentRepository deptRepo;
+	@Autowired
+	private AssetService assetService;
 	
 	private AssetMaster assetBean;
 	private AssetRevaluation assetRevaluation;
@@ -67,6 +75,7 @@ public class RevaluationController {
 	List<AssetStatus> assetStatusList = new ArrayList<AssetStatus>();
 	List<AssetCatagory> assetCategoryList = new ArrayList<AssetCatagory>();
 	List<AssetMaster> assetList = new ArrayList<AssetMaster>();
+	List<AssetMaster> assetTempList = new ArrayList<AssetMaster>();
 	List<AssetRevaluation> revAssetList = new ArrayList<AssetRevaluation>();
 	List<CFunction> functionList = new ArrayList<CFunction>();
 	List<Fund> fundList = new ArrayList<Fund>();
@@ -78,11 +87,20 @@ public class RevaluationController {
 		assetBean = new AssetMaster();
 		model.addAttribute("assetBean", assetBean);
 		try {
-			departmentList = microserviceUtils.getDepartments();
+			departmentList = deptRepo.findAll();
+			//departmentList = microserviceUtils.getDepartments();
 			assetStatusList = statusRepo.findByCode("CAPITALIZED");
 			assetCategoryList = categoryRepo.findAll();
 			
-			assetList = masterRepo.findAll();
+			assetTempList = masterRepo.findAll();
+			assetList.clear();
+			for(AssetMaster master:assetTempList)
+			{
+				if(master.getAssetStatus().getCode().equalsIgnoreCase("CAPITALIZED"))
+				{
+					assetList.add(master);
+				}
+			}
 			LOGGER.info("Asset Lists..."+assetList.toString());
 		} catch (Exception e) {
 			e.getMessage();
@@ -101,7 +119,7 @@ public class RevaluationController {
 		LOGGER.info("Search Operation..................");
 		assetList = new ArrayList<>();
 		try {
-			Long statusId = null;
+			/*Long statusId = null;
 			if(null != assetBean.getAssetStatus()) {
 				statusId = assetBean.getAssetStatus().getId();
 			}
@@ -109,13 +127,15 @@ public class RevaluationController {
 					assetBean.getAssetHeader().getAssetName(),
 					assetBean.getAssetHeader().getAssetCategory().getId(), 
 					assetBean.getAssetHeader().getDepartment().getId(), statusId);
-			LOGGER.info("Asset Lists..."+assetList.toString());
+			LOGGER.info("Asset Lists..."+assetList.toString());*/
+			assetList = assetService.searchAssets(assetBean);
 		} catch (Exception e) {
 			e.getMessage();
 		}
 		model.addAttribute("assetList", assetList);
 		try {
-			departmentList = microserviceUtils.getDepartments();
+			departmentList = deptRepo.findAll();
+			//departmentList = microserviceUtils.getDepartments();
 			assetStatusList = statusRepo.findByCode("CAPITALIZED");
 			assetCategoryList = categoryRepo.findAll();
 		} catch (Exception e) {
@@ -211,7 +231,8 @@ public class RevaluationController {
 		assetRevaluation = new AssetRevaluation();
 		model.addAttribute("assetRevaluation", assetRevaluation);
 		try {
-			departmentList = microserviceUtils.getDepartments();
+			departmentList = deptRepo.findAll();
+			//departmentList = microserviceUtils.getDepartments();
 			assetStatusList = statusRepo.findByCode("CAPITALIZED");
 			assetCategoryList = categoryRepo.findAll();
 			
@@ -248,7 +269,8 @@ public class RevaluationController {
 		}
 		model.addAttribute("revAssetList", revAssetList);
 		try {
-			departmentList = microserviceUtils.getDepartments();
+			departmentList = deptRepo.findAll();
+			//departmentList = microserviceUtils.getDepartments();
 			assetStatusList = statusRepo.findByCode("CAPITALIZED");
 			assetCategoryList = categoryRepo.findAll();
 		} catch (Exception e) {

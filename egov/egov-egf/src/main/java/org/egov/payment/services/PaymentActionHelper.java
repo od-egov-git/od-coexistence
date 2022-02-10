@@ -410,6 +410,7 @@ public class PaymentActionHelper {
         			 {
         				 if(expenseBill.getRefundable() != null && expenseBill.getRefundable().equalsIgnoreCase("Y"))
         				 {
+        					 voucherHeader = paymentheader.getVoucherheader();
         					 expenseBill.setStatus(egwStatusDAO.getStatusByModuleAndCode("REFUNDBILL", "Bill Payment Approved"));
         					 ///set voucherheader id in billregistermis table for redund bill
             				 System.out.println("vouhcerHearderId "+voucherHeader.getId());

@@ -7,16 +7,15 @@
 
 
 <div class="container">
-	<form:form name="assetBean" method="post" action="${contextPath}/assetcreate/searchregister" modelAttribute="assetBean" 
+	<form:form name="assetBean" method="post" action="${contextPath}/assetcreate/searchreport" modelAttribute="assetBean" 
 		class="form-horizontal form-groups-bordered" enctype="multipart/form-data">
 
-		<div class="panel-heading">
-			<div class="panel-title">
-				<spring:message code="view-asset" text="View Asset"/>
-			</div>
-		</div>
-		<br />
 		<div class="panel panel-primary" data-collapsed="0" id="search-asset">
+			<div class="panel-heading">
+				<div class="panel-title">
+					<spring:message code="asset-search-regis-report-lbl" text="Search Asset Register Report"/>
+				</div>
+			</div>
 			<div class="panel-body">
 					<label class="col-sm-3 control-label text-right">
 						<spring:message code="asset-code" text="assetCode"/>
@@ -77,8 +76,9 @@
 		</div>
 		<input type="hidden" name="viewmode" id="viewmode" value="readonly"/>
 	</form:form>
-	<br />
+	
 	<!-- Result Table -->
+	<c:if test="${!isViewPage}">
 	<div class="panel panel-primary" data-collapsed="0">	
 		<div class="panel-heading">
 		<div class="panel-title">
@@ -93,11 +93,8 @@
 				<th><spring:message code="code" text="Code"/></th>
 				<th><spring:message code="name" text="Asset Name"/></th>
 				<th><spring:message code="asset-cat" text="Asset Category"/></th>
-				<th><spring:message code="asset-dept" text="Location"/></th>
+				<th><spring:message code="asset-location" text="Location"/></th>
 				<th><spring:message code="asset-status" text="Status"/></th>
-				<c:if test="${isReference}">
-					<th><spring:message code="lbl-action" text="Action"/></th>
-				</c:if>
 			</tr>
 		</thead>
 		<tbody>
@@ -121,7 +118,7 @@
 								${asset.assetHeader.assetCategory.name }
 							</td>
 							<td>
-								${asset.assetHeader.assetLocation.description}
+								${asset.assetLocation.location.description}
 							</td>
 							<td>
 								${asset.assetStatus.description }
@@ -138,6 +135,7 @@
 	</table>	
 	</div>
 	</div>
+</c:if>
 	<!-- Result Table Ends -->
 </div>
 

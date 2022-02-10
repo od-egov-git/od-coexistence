@@ -12,8 +12,7 @@
 <div class="tab-pane fade in active">
 <div class="panel panel-primary" data-collapsed="0">
 		<div class="form-group" style="padding: 50px 20px 250px;">
-			<label class="col-sm-3 control-label text-left-audit1"><spring:message
-					code="lbl.estimate.preparation.estimate.aadate" /><span
+			<label class="col-sm-3 control-label text-left-audit1">From Date <span
 				class="mandatory"></span></label>
 			<div class="col-sm-3 add-margin">
 				<form:input id="fromDate" path="fromDate" 
@@ -21,8 +20,7 @@
 									placeholder="DD/MM/YYYY" />
 								
 					</div>
-				<label class="col-sm-3 control-label text-left-audit1"><spring:message
-					code="lbl.estimate.preparation.estimate.aadate" /><span
+				<label class="col-sm-3 control-label text-left-audit1">To Date<span
 				class="mandatory"></span></label>
 			<div class="col-sm-3 add-margin">
 				<form:input id="toDate" path="toDate" 

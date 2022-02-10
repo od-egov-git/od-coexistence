@@ -595,6 +595,8 @@ function printVoucher(){
 					</s:else>
 					<s:hidden id="paymentid" name="paymentid"
 						value="%{paymentheader.id}" />
+					<s:hidden id="firstsignatory" name="firstsignatory"
+						value="%{firstsignatory}" />	
 					<s:hidden name="actionname" id="actionName" value="%{action}" />
 					<script>
 if(document.getElementById('actionName').value!='')

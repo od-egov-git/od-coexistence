@@ -5,9 +5,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -17,8 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper;
-import org.apache.struts2.dispatcher.multipart.UploadedFile;
 import org.egov.asset.model.AssetCatagory;
 import org.egov.asset.model.AssetCustomFieldMapper;
 import org.egov.asset.model.AssetHeader;
@@ -61,7 +56,6 @@ import org.egov.infra.exception.ApplicationException;
 import org.egov.infra.filestore.service.FileStoreService;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infstr.services.PersistenceService;
-import org.egov.infstr.utils.EgovMasterDataCaching;
 import org.egov.model.bills.DocumentUpload;
 import org.egov.services.masters.SchemeService;
 import org.egov.services.masters.SubSchemeService;
@@ -87,26 +81,21 @@ import org.springframework.web.multipart.MultipartFile;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+/**
+ * @author Arnab Saha
+ */
+
 @Controller
 @RequestMapping(value = "/assetcreate")
 public class CreateAssetController {// extends BaseAssetController{
 
-	/*
-	 * public CreateAssetController(AppConfigValueService appConfigValuesService) {
-	 * super(appConfigValuesService); }
-	 */
 	private static final Logger LOGGER = Logger.getLogger(CreateAssetController.class);
 	private static final int BUFFER_SIZE = 4096;
-	//private static final long serialVersionUID = 1L;
 	protected String showMode;
 
 	private AssetMaster assetBean;
-	//private AssetHeader assetHeaderBean;
-	//private AssetLocation assetLocationBean;
 	@Autowired
 	private DocumentUploadRepository documentUploadRepository;
-	@Autowired
-	private EgovMasterDataCaching masterDataCache;
 	@Autowired
 	private FundHibernateDAO fundHibernateDAO;
 	@Autowired
@@ -180,14 +169,12 @@ public class CreateAssetController {// extends BaseAssetController{
 	
 	@PostMapping("/newform")
 	public String newform(Model model) {
-		LOGGER.info("Fresh Operation..................");
+		LOGGER.info("New Form.Fresh Operation Starts.");
 
 		assetBean = new AssetMaster();
 		assetBean.setAssetHeader(new AssetHeader());
 		assetBean.setAssetLocation(new AssetLocation());
 		model.addAttribute("assetBean", assetBean);
-		//model.addAttribute("assetHeaderBean", assetHeaderBean);
-		//model.addAttribute("assetLocationBean", assetLocationBean);
 		try {
 			fundList = fundHibernateDAO.findAllActiveFunds();
 			departmentList = deptRepo.findAll(); //masterDataCache.get("egi-department");		//microserviceUtils.getDepartments();
@@ -208,8 +195,6 @@ public class CreateAssetController {// extends BaseAssetController{
 		
 		try {
 			int fundId = fundList.get(0).getId();
-			LOGGER.info("Fund Id...:"+fundId);
-			
 			schemeList = schemeService.getByFundId(fundId);
 		}catch(Exception e) {
 			e.printStackTrace();
@@ -239,31 +224,8 @@ public class CreateAssetController {// extends BaseAssetController{
 
 		LOGGER.info("Creating Asset Object");
 		long userId = ApplicationThreadLocals.getUserId();
-		LOGGER.info("userId..." + userId);
 		//File
 		List<DocumentUpload> list = new ArrayList<>();
-		//@RequestParam("file") MultipartFile file
-		/*try {
-			//String[] contentType = ((MultiPartRequestWrapper) request).getContentTypes("file");
-	        UploadedFile[] uploadedFiles = ((MultiPartRequestWrapper) request).getFiles("file");
-	        String[] fileName = ((MultiPartRequestWrapper) request).getFileNames("file");
-	        if(uploadedFiles!=null)
-	        for (int i = 0; i < uploadedFiles.length; i++) {
-
-	            Path path = Paths.get(uploadedFiles[i].getAbsolutePath());
-	            byte[] fileBytes = Files.readAllBytes(path);
-	            ByteArrayInputStream bios = new ByteArrayInputStream(fileBytes);
-	            DocumentUpload upload = new DocumentUpload();
-	            upload.setInputStream(bios);
-	            upload.setFileName(fileName[i]);
-	            upload.setContentType(contentType[i]);
-	            list.add(upload);
-	        }
-		}catch(Exception e) {
-			e.printStackTrace();
-		}*/
-		
-		//assetBean.setFileno();
         try {
         	if(!file.isEmpty()) {
 	        	DocumentUpload upload = new DocumentUpload();
@@ -273,12 +235,6 @@ public class CreateAssetController {// extends BaseAssetController{
 	            upload.setContentType(file.getContentType());
 	            list.add(upload);
         	}
-        	//@RequestMapping(value = "/uploadFile", method = RequestMethod.POST)
-        	//public String submit(@RequestParam("file") MultipartFile file, ModelMap modelMap) {
-        	  //  modelMap.addAttribute("file", file);
-//        	    return "fileUploadView";
-        	//}
-        	
         }catch(Exception e) {
         	e.printStackTrace();
         }
@@ -301,23 +257,18 @@ public class CreateAssetController {// extends BaseAssetController{
 		AssetCustomFieldMapper item = new AssetCustomFieldMapper();
 		try {
 			List<CustomeFields> customeFields = assetBean.getAssetHeader().getAssetCategory().getCustomeFields();
-			LOGGER.info("Custom Fields.."+customeFields);
 			if(!customeFields.isEmpty()) {
 				for(int i=0; i<customeFields.size(); i++) {
 					item = new AssetCustomFieldMapper();
 					String name = customeFields.get(i).getName();
 					item.setName(name);
 					String values = request.getParameter("customField_"+i);
-					LOGGER.info(name+"...Value..."+values);
 					item.setVal(values);
 					item.setCreatedDate(new Date());
 					item.setCreatedBy(String.valueOf(userId));
 					item.setAssetCatagory(assetBean.getAssetHeader().getAssetCategory());
 					item.setCustomeFields(customeFields.get(i));
 					
-					//assetBean = masterRepo.findOne(Long.valueOf(nextVal));
-					//item.setAssetMaster(assetBean);
-					//customFieldRepo.save(item);
 					mapperList.add(item);
 				}
 				assetBean.setAssetCustomFieldMappers(mapperList);
@@ -325,24 +276,23 @@ public class CreateAssetController {// extends BaseAssetController{
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
-		LOGGER.info("Custom Fields Ends...");
-		LOGGER.info("Calculating Current Value..");
+		//Custom Fields Ends
+		//Calculating Current Value
 		try {
 			if(null != assetBean.getGrossValue() && null != assetBean.getAccumulatedDepreciation()) {
 				long currentValue =  assetBean.getGrossValue() - assetBean.getAccumulatedDepreciation();//            currentValue.setCurrentAmount(grossValue.subtract(accumulatedDepreciation));
-				LOGGER.info("current Value.."+currentValue);
 				assetBean.setCurrentValue(currentValue);
 			}
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
-		LOGGER.info("Calculating Current Value Ends..");
+		//Calculating Current Value Ends
 		try {
 			final StringBuilder generatedCode = new StringBuilder(String.format("%06d", nextVal));
 			assetCode = generatedCode.toString();
 			assetBean.setCode(assetCode);
 			assetBean = assetService.create(assetBean);
-			LOGGER.info("Created Successfully");
+			LOGGER.info("Asset Created Successfully");
 		    message = getMessageByStatus(assetBean,"create", true);
 		}catch(Exception e) {
 			LOGGER.error("Error Occured : Asset Creation Failed");
@@ -351,35 +301,18 @@ public class CreateAssetController {// extends BaseAssetController{
 		}
 		model.addAttribute("message", message);
 		
-		/*try {
-			LOGGER.info("Custom Fields Starts...");
-			String customFieldsCounts = request.getParameter("customFieldsCounts");
-			LOGGER.info("CustomFields Counts ..:"+customFieldsCounts);
-			String customName1 = request.getParameter("customField_0_name");//customField_0_name
-			LOGGER.info("CustomFields Name ..:"+customName1);*/
-			
-			
-		/*}catch(Exception e) {
-			e.printStackTrace();
-		}*/
-		
 		return "asset-success";
 	}
 	
 	public Long generateNextVal() {
-		//String code = "";
 		long id = 0;
 		try {
 			id = masterRepo.getNextValMySequence();
-			//final StringBuilder generatedCode = new StringBuilder(String.format("%06d", id));
-			//code = generatedCode.toString();
-			//code = String.valueOf(id);
 		}catch(Exception e) {
 			LOGGER.error("Error Occured while generating Asset Code");
 		}
 		return id;
 	}
-
 	
 	@RequestMapping(value = "/success", method = RequestMethod.GET)
 	public String showSuccessPage(@RequestParam("id") final String od, final Model model,
@@ -413,10 +346,6 @@ public class CreateAssetController {// extends BaseAssetController{
         }
         return message;
     }
-	/*
-	 * @GetMapping("/editform/{assetid}") public String
-	 * editform(@PathVariable("assetid") String assetId, Model model) {
-	 */
 	
 	@PostMapping("/viewform/{param}")
 	public String viewform(@PathVariable("param") String param, Model model) {
@@ -428,12 +357,11 @@ public class CreateAssetController {// extends BaseAssetController{
 			assetStatusList = statusRepo.findAll();
 			assetCategoryList = categoryRepo.findAll();
 			
-			assetList = masterRepo.findAll();
-			LOGGER.info("Asset Lists..."+assetList.toString());
+			//assetList = masterRepo.findAll();
 		} catch (Exception e) {
 			e.getMessage();
 		}
-		model.addAttribute("assetList", assetList);
+		//model.addAttribute("assetList", assetList);
 		model.addAttribute("departmentList", departmentList);
 		model.addAttribute("assetStatusList", assetStatusList);
 		model.addAttribute("assetCategoryList", assetCategoryList);
@@ -451,7 +379,6 @@ public class CreateAssetController {// extends BaseAssetController{
 	
 	@GetMapping("/assetRef/{param}")
 	public String assetRef(@PathVariable("param") String param, Model model) {
-		LOGGER.info("assetRef Form..................");
 		assetBean = new AssetMaster();
 		model.addAttribute("assetBean", assetBean);
 		try {
@@ -459,12 +386,11 @@ public class CreateAssetController {// extends BaseAssetController{
 			assetStatusList = statusRepo.findAll();
 			assetCategoryList = categoryRepo.findAll();
 			
-			assetList = masterRepo.findAll();
-			LOGGER.info("Asset Lists..."+assetList.toString());
+			//assetList = masterRepo.findAll();
 		} catch (Exception e) {
 			e.getMessage();
 		}
-		model.addAttribute("assetList", assetList);
+		//model.addAttribute("assetList", assetList);
 		model.addAttribute("departmentList", departmentList);
 		model.addAttribute("assetStatusList", assetStatusList);
 		model.addAttribute("assetCategoryList", assetCategoryList);
@@ -472,7 +398,6 @@ public class CreateAssetController {// extends BaseAssetController{
 		model.addAttribute("mode", "add");
 		model.addAttribute("disabled", "");
 		model.addAttribute("isViewPage", true);
-		LOGGER.info("Asset Reference..."+param.equalsIgnoreCase("ref"));
 		if(param.equalsIgnoreCase("ref")) {
 			model.addAttribute("isReference", true);
 		}else {
@@ -488,7 +413,7 @@ public class CreateAssetController {// extends BaseAssetController{
     		@RequestParam("status") final String status){
 		
 		try {
-			Long statusId = null;
+			/*Long statusId = null;
 			Long departmentId = null;
 			if(null != assetBean.getAssetStatus()) {
 				statusId = assetBean.getAssetStatus().getId();
@@ -499,8 +424,8 @@ public class CreateAssetController {// extends BaseAssetController{
 			assetList = masterRepo.getAssetMasterDetails(assetBean.getCode(), 
 					assetBean.getAssetHeader().getAssetName(),
 					assetBean.getAssetHeader().getAssetCategory().getId(),
-					departmentId, statusId);
-			LOGGER.info("Asset Lists..."+assetList.toString());
+					departmentId, statusId);*/
+			assetList = assetService.searchAssets(assetBean);
 		} catch (Exception e) {
 			e.getMessage();
 			assetList = new ArrayList<>();
@@ -519,7 +444,7 @@ public class CreateAssetController {// extends BaseAssetController{
 	
 	@GetMapping("/editform/{assetid}")
 	public String editform(@PathVariable("assetid") String assetId, Model model, HttpServletRequest request) {
-		LOGGER.info("Edit Operation.................."+assetId);
+		LOGGER.info("Edit Operation Starts..................");
 		model.addAttribute("isViewPage", false);
 		assetBean = new AssetMaster();
 		assetBean = masterRepo.findOne(Long.valueOf(assetId));
@@ -528,43 +453,12 @@ public class CreateAssetController {// extends BaseAssetController{
 			List<DocumentUpload> documents = assetService.findByObjectIdAndObjectType(assetBean.getId(),
 	                AssetConstant.FILESTORE_MODULEOBJECT_ASSET);
 	        assetBean.setDocumentDetail(documents);
-	        LOGGER.info(assetBean.getDocumentDetail().get(0).getFileName());
-	        LOGGER.info(assetBean.getDocumentDetail().get(0).getFileStore().getFileName());
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
 		model.addAttribute("assetBean", assetBean);
-		
 		mapperList = assetBean.getAssetCustomFieldMappers();
 		try {
-			/*Fund fund = fundHibernateDAO.fundById(Integer.parseInt(assetBean.getAssetHeader().getFund()), true);
-			fundList.add(fund);
-			
-			Department department = microserviceUtils.getDepartmentByCode(assetBean.getAssetHeader().getDepartment());
-			departmentList.add(department);
-			
-			CFunction function = functionDAO.getFunctionById(Long.parseLong(assetBean.getAssetHeader().getFunction()));
-			functionList.add(function);
-			
-			AssetStatus assetStatus = statusRepo.getOne(assetBean.getAssetStatus().getId());
-			assetStatusList.add(assetStatus);
-			
-			AssetCategory assetCategory = categoryRepo.getOne(Long.parseLong(assetBean.getAssetHeader().getAssetCategory()));
-			assetCategoryList.add(assetCategory);
-			
-			AssetLocality locality = localityRepo.getOne(Long.parseLong(assetBean.getAssetLocation().getLocation()));
-			localityList.add(locality);
-			
-			blockList = blockRepo.findAll();
-			electionWardList = electionWardRepo.findAll();
-			revenueWardList = revenueWardRepo.findAll();
-			streetList = streetRepo.findAll();
-			zoneList = zoneRepo.findAll();*/
-			
-			//AssetModeOfAcquisition modeOfAcquisition = acqRepo.getOne(Long.parseLong(assetBean.getAssetHeader().getModeOfAcquisition()));
-			//modeOfAcquisitionList.add(modeOfAcquisition);
-			//modeOfAcquisitionList = acqRepo.findAll();
-			
 			fundList = fundHibernateDAO.findAllActiveFunds();
 			departmentList = deptRepo.findAll(); //microserviceUtils.getDepartments();
 			modeOfAcquisitionList = acqRepo.findAll();
@@ -578,12 +472,6 @@ public class CreateAssetController {// extends BaseAssetController{
 			revenueWardList = revenueWardRepo.findAll();
 			streetList = streetRepo.findAll();
 			zoneList = zoneRepo.findAll();
-			
-		} catch (Exception e) {
-			e.getMessage();
-		}
-		
-		try {
 			int fundId = fundList.get(0).getId();
 			int schemeId = 0;
 			if(!assetBean.getAssetHeader().getScheme().equalsIgnoreCase(null) || assetBean.getAssetHeader().getScheme() != null){
@@ -591,8 +479,8 @@ public class CreateAssetController {// extends BaseAssetController{
 			}
 			schemeList = schemeService.getByFundId(fundId);
 			subSchemeList = subSchemeService.getBySchemeId(schemeId);
-		}catch(Exception e) {
-			e.printStackTrace();
+		} catch (Exception e) {
+			LOGGER.error("Error Occured : While fetching default dropdown values for editform. Error -> "+e.getMessage());
 		}
 		
 		model.addAttribute("departmentList", departmentList);
@@ -629,7 +517,7 @@ public class CreateAssetController {// extends BaseAssetController{
 	                AssetConstant.FILESTORE_MODULEOBJECT_ASSET);
 	        assetBean.setDocumentDetail(documents);
 		}catch(Exception e) {
-			e.printStackTrace();
+			LOGGER.error("Error Occured : While fetching File details for viewupdateform. Error -> "+e.getMessage());
 		}
 		model.addAttribute("assetBean", assetBean);
 		mapperList = assetBean.getAssetCustomFieldMappers();
@@ -656,7 +544,7 @@ public class CreateAssetController {// extends BaseAssetController{
 			schemeList = schemeService.getByFundId(fundId);
 			subSchemeList = subSchemeService.getBySchemeId(schemeId);
 		} catch (Exception e) {
-			e.getMessage();
+			LOGGER.error("Error Occured : While fetching default dropdown values for viewupdateform. Error -> "+e.getMessage());
 		}
 		
 		model.addAttribute("departmentList", departmentList);
@@ -683,14 +571,10 @@ public class CreateAssetController {// extends BaseAssetController{
 	
 	@PostMapping(value = "/update", params = "update", consumes = {"multipart/form-data"})
 	public String update(@ModelAttribute("assetBean") AssetMaster assetBean, Model model, HttpServletRequest request) {
-//@RequestParam("file") MultipartFile file,
-		LOGGER.info("Creating Asset Object");
-		LOGGER.info("Asset Header..." + assetBean.toString());
-		LOGGER.info("Asset Header..." + assetBean.getId());
+		LOGGER.info("Updating Asset Object Starts");
 		String message = "";
 		
 		long userId = ApplicationThreadLocals.getUserId();
-		LOGGER.info("userId..." + userId);
 		assetBean.setUpdatedBy(String.valueOf(userId));
 		assetBean.getAssetHeader().setUpdatedBy(String.valueOf(userId));
 		assetBean.getAssetLocation().setUpdatedBy(String.valueOf(userId));
@@ -700,11 +584,8 @@ public class CreateAssetController {// extends BaseAssetController{
 		assetBean.getAssetLocation().setUpdatedDate(new Date());
 		
 		String assetid = request.getParameter("id");
-		LOGGER.info("ID ..:"+assetid);
 		String assetHeaderId = request.getParameter("assetHeaderId");
-		LOGGER.info("assetHeaderId ..:"+assetHeaderId);
 		String assetLocationId = request.getParameter("assetLocationId");
-		LOGGER.info("assetLocationId ..:"+assetLocationId);
 		
 		assetBean.setId(Long.parseLong(assetid));
 		//Custom Fields
@@ -713,57 +594,20 @@ public class CreateAssetController {// extends BaseAssetController{
 		AssetCustomFieldMapper item = new AssetCustomFieldMapper();
 		try {
 			List<CustomeFields> customeFields = assetBean.getAssetHeader().getAssetCategory().getCustomeFields();
-			LOGGER.info("Custom Fields.."+customeFields);
 			if(!mapperList.isEmpty()) {
-				//for(AssetCustomFieldMapper obj : mapperList) {
 				for(int i=0; i<customeFields.size(); i++) {
 					item = assetBean.getAssetCustomFieldMappers().get(i);
 					String name = item.getName();
 					String id = String.valueOf(item.getId());
 					String values = request.getParameter("customField_"+id);
-					LOGGER.info(id+"..."+name+"...Value..."+values);
 					item.setVal(values);
 				}
-				/*for(int i=0; i<customeFields.size(); i++) {
-					item = assetBean.getAssetCustomFieldMappers().get(i);
-					String name = item.getName();
-					String values = request.getParameter("customField_"+i);
-					LOGGER.info(name+"...Value..."+values);
-					item.setVal(values);*/
-					/*String name = customeFields.get(i).getName();
-					String values = request.getParameter("customField_"+i);
-					LOGGER.info(name+"...Value..."+values);
-					LOGGER.info(request.getParameter("customField_0"));
-					String customFieldId = request.getParameter("customField_id_"+i);
-					LOGGER.info("CustomFieldId..."+customFieldId);
-					Long id = Long.valueOf(customFieldId);
-					item = customFieldRepo.findOne(id);
-					item.setVal(values);
-					item.setUpdatedDate(new Date());
-					item.setUpdatedBy(String.valueOf(userId));*/
-					//assetBean.getAssetCustomFieldMappers()
-					//customFieldRepo.save(item);
-					/*item = new AssetCustomFieldMapper();
-					for(AssetCustomFieldMapper obj : mapperList) {
-						if(obj.getId() == id) {
-							item = obj;
-						}
-					}
-					item.setVal(values);
-					
-					//item.set
-					mapperList.add(item);*/
-					//mapperList.add(item);
-				//}
-				//assetBean.getAssetCustomFieldMappers().clear();
-				//assetBean.setAssetCustomFieldMappers(mapperList);
 			}
 		}catch(Exception e) {
-			e.printStackTrace();
+			LOGGER.error("Error Occured : While updating custom fields values for update. Error -> "+e.getMessage());
 		}
-		LOGGER.info("Custom Fields Ends...");
-		//File
-		//LOGGER.info("File Starts...");
+		//Custom Fields Ends
+		//File Starts
 		List<DocumentUpload> list = new ArrayList<>();
 		/*try {
 			if(!file.isEmpty()) {
@@ -784,9 +628,8 @@ public class CreateAssetController {// extends BaseAssetController{
 			LOGGER.info("Updated Successfully");
 		    message = getMessageByStatus(assetBean,"update", true);
 		}catch(Exception e) {
-			LOGGER.error("Error Occured : Asset Creation Failed");
 			message = getMessageByStatus(assetBean,"update", false);
-			e.printStackTrace();
+			LOGGER.error("Error Occured : Updating asset. Error -> "+e.getMessage());
 		}
 		model.addAttribute("message", message);
 		return "asset-success";
@@ -794,23 +637,18 @@ public class CreateAssetController {// extends BaseAssetController{
 	
 	
 	//Search
-	/*
-	 * @GetMapping("/search/{assetid}") public String
-	 * search(@PathVariable("assetid") String assetId, Model model) {
-	 */
-	//@PostMapping(value = "/search", params = "search")
 	@PostMapping(value = "/searchview", params = "search")
 	public String searchview( @ModelAttribute("assetBean") AssetMaster assetBean, Model model, HttpServletRequest request) {
-		LOGGER.info("Search Operation..................");
 		List<AssetMaster> assetList = new ArrayList<AssetMaster>();
 		try {
-			assetList = searchResult(assetBean);
+			//assetList = searchResult(assetBean);
+			assetList = assetService.searchAssets(assetBean);
 			model.addAttribute("assetList", assetList);
 			departmentList = deptRepo.findAll();
 			assetStatusList = statusRepo.findAll();
 			assetCategoryList = categoryRepo.findAll();
 		} catch (Exception e) {
-			e.getMessage();
+			LOGGER.error("Error Occured : While fetching default dropdown values for searchview. Error -> "+e.getMessage());
 		}
 		model.addAttribute("assetBean", assetBean);
 		model.addAttribute("departmentList", departmentList);
@@ -819,7 +657,6 @@ public class CreateAssetController {// extends BaseAssetController{
 		model.addAttribute("viewmode", "view");
 		
 		String isRef = request.getParameter("isReference");
-		LOGGER.info("Asset Reference..."+isRef);
 		if("true".equalsIgnoreCase(isRef)) {
 			model.addAttribute("isReference", true);
 		}else {
@@ -831,16 +668,15 @@ public class CreateAssetController {// extends BaseAssetController{
 	
 	@PostMapping(value = "/searchedit")
 	public String searchedit( @ModelAttribute("assetBean") AssetMaster assetBean, Model model, HttpServletRequest request) {
-		LOGGER.info("Search Operation..................");
 		List<AssetMaster> assetList = new ArrayList<AssetMaster>();
 		try {
-			assetList = searchResult(assetBean);
+			assetList = assetService.searchAssets(assetBean);
 			model.addAttribute("assetList", assetList);
 			departmentList = deptRepo.findAll();
 			assetStatusList = statusRepo.findAll();
 			assetCategoryList = categoryRepo.findAll();
 		} catch (Exception e) {
-			e.getMessage();
+			LOGGER.error("Error Occured : While fetching default dropdown values for searchedit. Error -> "+e.getMessage());
 		}
 		model.addAttribute("assetBean", assetBean);
 		model.addAttribute("departmentList", departmentList);
@@ -851,10 +687,50 @@ public class CreateAssetController {// extends BaseAssetController{
 		return "asset-modify";
 	}
 	
+	@PostMapping(value = "/searchreport", params = "search")
+	public String searchreport( @ModelAttribute("assetBean") AssetMaster assetBean, Model model, HttpServletRequest request) {
+		List<AssetMaster> assetList = new ArrayList<AssetMaster>();
+		
+		try {
+			/*Long statusId = null;
+			Long locationId = null;
+			if(null != assetBean.getAssetStatus()) {
+				statusId = assetBean.getAssetStatus().getId();
+			}
+			if(null != assetBean.getAssetLocation()) {
+				locationId = assetBean.getAssetLocation().getId();
+			}
+			assetList = masterRepo.getAssetMasterRegisterDetails(assetBean.getCode(), 
+					assetBean.getAssetHeader().getAssetName(),
+					assetBean.getAssetHeader().getAssetCategory().getId(), 
+					locationId, assetBean.getAssetHeader().getDescription(), statusId);
+					*/
+			assetList = assetService.searchAssets(assetBean);
+			model.addAttribute("assetList", assetList);
+		} catch (Exception e) {
+			LOGGER.error("Error Occured : While fetching SearchResult for report. Error -> "+e.getMessage());
+		}
+		try {
+			localityList = localityRepo.findAll();
+			assetStatusList = statusRepo.findAll();
+			assetCategoryList = categoryRepo.findAll();
+		} catch (Exception e) {
+			LOGGER.error("Error Occured : While fetching default dropdown values for searchResult. Error -> "+e.getMessage());
+		}
+		model.addAttribute("assetBean", assetBean);
+		model.addAttribute("localityList", localityList);
+		model.addAttribute("assetStatusList", assetStatusList);
+		model.addAttribute("assetCategoryList", assetCategoryList);
+		model.addAttribute("viewmode", "view");
+		
+		return "asset-register-report";
+	}
+
+	@Deprecated
 	public List<AssetMaster> searchResult(AssetMaster assetBean){
 		List<AssetMaster> assetList = new ArrayList<AssetMaster>();
 		try {
-			Long statusId = null;
+			/*Long statusId = null;
 			Long departmentId = null;
 			if(null != assetBean.getAssetStatus()) {
 				statusId = assetBean.getAssetStatus().getId();
@@ -865,8 +741,8 @@ public class CreateAssetController {// extends BaseAssetController{
 			assetList = masterRepo.getAssetMasterDetails(assetBean.getCode(), 
 					assetBean.getAssetHeader().getAssetName(),
 					assetBean.getAssetHeader().getAssetCategory().getId(), 
-					departmentId, statusId);
-			LOGGER.info("Asset Lists..."+assetList.toString());
+					departmentId, statusId);*/
+			assetList = assetService.searchAssets(assetBean);
 		} catch (Exception e) {
 			e.getMessage();
 		}
@@ -877,8 +753,6 @@ public class CreateAssetController {// extends BaseAssetController{
 		
 		String code = assetBean.getCode();
 		String name = assetBean.getAssetHeader().getAssetName();
-		//String category = assetBean.getAssetHeader().getAssetCategory();
-		//from AssetMaster am where am.code=:code or am.assetHeader.assetCategory=:cat
 		String queryString = "from AssetMaster am where am.code=:code or am.assetHeader.assetName=:name";
 				
 		/*
@@ -888,18 +762,12 @@ public class CreateAssetController {// extends BaseAssetController{
 		 * ;
 		 */
 		
-		LOGGER.info("Query String..:"+queryString);
         SQLQuery sqlQuery = persistenceService.getSession().createSQLQuery(queryString);
         sqlQuery.setString("code", code);
         sqlQuery.setString("name", name);
         return sqlQuery.list();
     }
 	
-	/*
-	 * 
-		@GetMapping("/editform/{assetid}")
-		public String editform(@PathVariable("assetid") String assetId, Model model) {
-	 */
 	 @RequestMapping(value = "/downloadBillDoc", method = RequestMethod.GET)
 	    public void getBillDoc(final HttpServletRequest request, final HttpServletResponse response)
 	            throws IOException {
@@ -910,10 +778,6 @@ public class CreateAssetController {// extends BaseAssetController{
 	        final FileInputStream inputStream = new FileInputStream(downloadFile);
 	        AssetMaster assetBean = assetService.getById(Long.parseLong(request.getParameter("assetId")));
 	        assetBean = getBillDocuments(assetBean);
-	        
-	        // final List<DocumentUpload> documents = documentUploadRepository.findByObjectId(Long.valueOf(billId));
-	        // assetBean.setDocumentDetail(documents);
-	        
 	        
 	        for (final DocumentUpload doc : assetBean.getDocumentDetail())
 	            if (doc.getFileStore().getFileStoreId().equalsIgnoreCase(fileStoreId))
@@ -958,13 +822,10 @@ public class CreateAssetController {// extends BaseAssetController{
 	@RequestMapping(value = "/deleteAssetDoc/{docid}", method = RequestMethod.GET)
 	public @ResponseBody String deleteAssetDoc(@PathVariable("docid") String docid)
 			throws ApplicationException, IOException {
-		LOGGER.info("::::::::  :::::: " + docid);
 		String deletefile = "delete from egf_documents where id=" + Long.valueOf(docid);
 		final SQLQuery totalSQLQuery = persistenceService.getSession().createSQLQuery(deletefile.toString());
 
-		LOGGER.info(":::query: " + deletefile);
 		int de = totalSQLQuery.executeUpdate();
-		LOGGER.info(":::::::::Delete files:::" + de);
 		if (de == 1) {
 			return "success";
 		}
@@ -974,85 +835,45 @@ public class CreateAssetController {// extends BaseAssetController{
 	//View Only
 	 @GetMapping("/assetReference/{assetBean}")
 	 public String assetReference(@PathVariable("assetBean") AssetMaster assetBean, Model model) {
-	/* @PostMapping(value = "/assetReference", params = "search")
-     public String assetReference(@ModelAttribute("assetBean") AssetMaster assetBean, Model model, HttpServletRequest request) {*/
-			LOGGER.info("assetReference Operation.................."+assetBean);
-		
-		/*
-		  assetBean = new AssetMaster(); assetBean =
-		  masterRepo.findOne(Long.valueOf(assetId));
-		 */
-			model.addAttribute("assetBean", assetBean);
-			try {
-				fundList = fundHibernateDAO.findAllActiveFunds();
-				departmentList = deptRepo.findAll(); //microserviceUtils.getDepartments();
-				modeOfAcquisitionList = acqRepo.findAll();
-				assetStatusList = statusRepo.findAll();
-				assetCategoryList = categoryRepo.findAll();
-				functionList = functionDAO.getAllActiveFunctions();
-				
-				localityList = localityRepo.findAll();
-				blockList = blockRepo.findAll();
-				electionWardList = electionWardRepo.findAll();
-				revenueWardList = revenueWardRepo.findAll();
-				streetList = streetRepo.findAll();
-				zoneList = zoneRepo.findAll();
-			} catch (Exception e) {
-				e.getMessage();
-			}
-		/*
-		 * try { int fundId = fundList.get(0).getId();
-		 * LOGGER.info("Fund Id...:"+fundId); int schemeId = 0;
-		 * if(!assetBean.getAssetHeader().getScheme().equalsIgnoreCase(null) ||
-		 * assetBean.getAssetHeader().getScheme() != null){ schemeId =
-		 * Integer.parseInt(assetBean.getAssetHeader().getScheme()); }
-		 * LOGGER.info("Scheme Id...:"+schemeId); schemeList =
-		 * schemeService.getByFundId(fundId); subSchemeList =
-		 * subSchemeService.getBySchemeId(schemeId); }catch(Exception e) {
-		 * e.printStackTrace(); }
-		 */
-			model.addAttribute("departmentList", departmentList);
-			model.addAttribute("fundList", fundList);
-			model.addAttribute("modeOfAcquisitionList", modeOfAcquisitionList);
-			model.addAttribute("assetStatusList", assetStatusList);
-			model.addAttribute("assetCategoryList", assetCategoryList);
-			model.addAttribute("functionList", functionList);
-			model.addAttribute("schemeList", schemeList);
-			model.addAttribute("subSchemeList", subSchemeList);
-			 
-			model.addAttribute("localityList", localityList);
-			model.addAttribute("blockList", blockList);
-			model.addAttribute("electionWardList", electionWardList);
-			model.addAttribute("revenueWardList", revenueWardList);
-			model.addAttribute("streetList", streetList);
-			model.addAttribute("zoneList", zoneList);
-			model.addAttribute("mode", "view-only");
-			model.addAttribute("disabled", "disabled");
-			return "asset-view";
+		LOGGER.info("assetReference Operation.................."+assetBean);
+		model.addAttribute("assetBean", assetBean);
+		try {
+			fundList = fundHibernateDAO.findAllActiveFunds();
+			departmentList = deptRepo.findAll(); //microserviceUtils.getDepartments();
+			modeOfAcquisitionList = acqRepo.findAll();
+			assetStatusList = statusRepo.findAll();
+			assetCategoryList = categoryRepo.findAll();
+			functionList = functionDAO.getAllActiveFunctions();
+			
+			localityList = localityRepo.findAll();
+			blockList = blockRepo.findAll();
+			electionWardList = electionWardRepo.findAll();
+			revenueWardList = revenueWardRepo.findAll();
+			streetList = streetRepo.findAll();
+			zoneList = zoneRepo.findAll();
+		} catch (Exception e) {
+			LOGGER.error("Error Occured : While fetching details for asset Reference. Error -> "+e.getMessage());
 		}
-	 
-	 public AssetMaster bindValueObject(AssetMaster assetBean){
-		 // Generate Current Value
-		 /*final AssetCurrentValue currentValue = AssetCurrentValue.builder().assetId(assetBean.getId()).assetTranType(TransactionType.CREATE).build();
-
-        final Long grossValue = asset.getGrossValue();
-        final Long accumulatedDepreciation = asset.getAccumulatedDepreciation();
-
-        if (grossValue != null && accumulatedDepreciation != null)
-            currentValue.setCurrentAmount(grossValue.subtract(accumulatedDepreciation));
-        else if (grossValue != null)
-            currentValue.setCurrentAmount(grossValue);
-
-        if (grossValue != null || accumulatedDepreciation != null) {
-            final List<AssetCurrentValue> assetCurrentValueList = new ArrayList<>();
-            assetCurrentValueList.add(currentValue);
-            currentValueService.createCurrentValue(AssetCurrentValueRequest.builder()
-                    .assetCurrentValues(assetCurrentValueList).requestInfo(assetRequest.getRequestInfo()).build());
-        }*/
-	   return assetBean;	
+		model.addAttribute("departmentList", departmentList);
+		model.addAttribute("fundList", fundList);
+		model.addAttribute("modeOfAcquisitionList", modeOfAcquisitionList);
+		model.addAttribute("assetStatusList", assetStatusList);
+		model.addAttribute("assetCategoryList", assetCategoryList);
+		model.addAttribute("functionList", functionList);
+		model.addAttribute("schemeList", schemeList);
+		model.addAttribute("subSchemeList", subSchemeList);
+		 
+		model.addAttribute("localityList", localityList);
+		model.addAttribute("blockList", blockList);
+		model.addAttribute("electionWardList", electionWardList);
+		model.addAttribute("revenueWardList", revenueWardList);
+		model.addAttribute("streetList", streetList);
+		model.addAttribute("zoneList", zoneList);
+		model.addAttribute("mode", "view-only");
+		model.addAttribute("disabled", "disabled");
+		return "asset-view";
 	}
 	 
-	//@GetMapping("/categorydetails/{categoryid}")
 	@RequestMapping(value = "/categorydetails/{categoryid}", method = RequestMethod.POST, produces = MediaType.TEXT_PLAIN_VALUE)
 	@ResponseBody
 	public String categoryDetails(@PathVariable("categoryid") String assetCategoryId, Model model) {
@@ -1064,22 +885,9 @@ public class CreateAssetController {// extends BaseAssetController{
 			assetCategory = categoryRepo.findOne(Long.valueOf(assetCategoryId));
 			depRate = assetCategory.getDepriciationRate();
 			customeFields = assetCategory.getCustomeFields();
-			LOGGER.info("Custom Fields.."+customeFields);
 		}catch(Exception e) {
-			e.printStackTrace();
+			LOGGER.error("Error Occured : While fetching default CategoryDetails. Error -> "+e.getMessage());
 		}
-		
-		/*ObjectMapper mapper = new ObjectMapper();
-		String response = "";
-		try {
-			response = mapper.writeValueAsString(customeFields);
-		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		LOGGER.info("Mapoper.........."+response);*/
-		//model.addAttribute("customeFields", customeFields);
-		//final List<Bank> searchResultList = createBankService.search(bank);
 		String retVal = "";
 		try {
 			retVal = new StringBuilder("{ \"data\":")
@@ -1090,9 +898,7 @@ public class CreateAssetController {// extends BaseAssetController{
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
-		LOGGER.info("Return Value..."+retVal);
         return retVal;
-		//return customeFields;
 	}
 	
 	 public Object toSearchResultJson(final Object object) {
@@ -1101,136 +907,109 @@ public class CreateAssetController {// extends BaseAssetController{
 	        return gson.toJson(object);
 	 }
 	 
-		//@RequestMapping(value = "/fetchdetails", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
-		@GetMapping("/fetchdetails")
-		@ResponseBody
-		public String fetchDetails(HttpServletRequest request) {
-			LOGGER.info("Fetching Details..................");
-			String statusId = request.getParameter("status");
-			String modeId = request.getParameter("mode");
-			LOGGER.info("Fetching Details.................."+statusId+"..."+modeId);
-			AssetStatus status = new AssetStatus();
-			AssetModeOfAcquisition modeAcq = new AssetModeOfAcquisition();
-			JSONObject obj=new JSONObject();
-			try {
-				status = statusRepo.findOne(Long.valueOf(statusId));
-				modeAcq = acqRepo.findOne(Long.valueOf(modeId));
-			}catch(Exception e) {
-				e.printStackTrace();
-			}
-			obj.put("status",status.getCode());
-			obj.put("mode",modeAcq.getCode());
-			String retVal = "";
-			try {
-				retVal = new StringBuilder("{ \"data\":")
-		                .append(obj).append("}")
-		                .toString();
-			}catch(Exception e) {
-				e.printStackTrace();
-			}
-			LOGGER.info("Return Value..."+retVal);
-	        return obj.toString();
-			//return customeFields;
+	@GetMapping("/fetchdetails")
+	@ResponseBody
+	public String fetchDetails(HttpServletRequest request) {
+		LOGGER.info("Fetching Details..................");
+		String statusId = request.getParameter("status");
+		String modeId = request.getParameter("mode");
+		AssetStatus status = new AssetStatus();
+		AssetModeOfAcquisition modeAcq = new AssetModeOfAcquisition();
+		JSONObject obj=new JSONObject();
+		try {
+			status = statusRepo.findOne(Long.valueOf(statusId));
+			modeAcq = acqRepo.findOne(Long.valueOf(modeId));
+		}catch(Exception e) {
+			e.printStackTrace();
 		}
+		obj.put("status",status.getCode());
+		obj.put("mode",modeAcq.getCode());
+		String retVal = "";
+		try {
+			retVal = new StringBuilder("{ \"data\":")
+	                .append(obj).append("}")
+	                .toString();
+		}catch(Exception e) {
+			LOGGER.error("Error Occured : While fetching details w.r.t status. Error -> "+e.getMessage());
+		}
+        return obj.toString();
+	}
 		
-		@GetMapping("/test")
-		public String test(Model model) {
-			LOGGER.info("Fresh Operation..................");
-			
-			return "asset-create";
-			
-		}
+	@PostMapping(value = "/searchregister")
+	public String searchRegister(Model model) {
+		LOGGER.info("Search Register Report Operation..................");
+		assetBean = new AssetMaster();
+		model.addAttribute("assetBean", assetBean);
 		
-		@PostMapping(value = "/searchregister")
-		public String searchRegister(@ModelAttribute("assetBean") AssetMaster assetBean, Model model, HttpServletRequest request) {
-			LOGGER.info("Search Register Report Operation..................");
-			assetList = new ArrayList<>();
-			try {
-				Long statusId = null;
-				if(null != assetBean.getAssetStatus()) {
-					statusId = assetBean.getAssetStatus().getId();
-				}
-				assetList = masterRepo.findAll();
-				/*assetList = masterRepo.getAssetMasterRegisterDetails(assetBean.getCode(), 
-						assetBean.getAssetHeader().getAssetName(),
-						assetBean.getAssetHeader().getAssetCategory().getId(), 
-						assetBean.getAssetLocation().getId(), assetBean.getAssetHeader().getDescription(), statusId);*/
-				LOGGER.info("Asset Lists..."+assetList.toString());
-			} catch (Exception e) {
-				e.getMessage();
-			}
-			model.addAttribute("assetList", assetList);
-			try {
-				localityList = localityRepo.findAll();
-				assetStatusList = statusRepo.findAll();
-				assetCategoryList = categoryRepo.findAll();
-			} catch (Exception e) {
-				e.getMessage();
-			}
-			model.addAttribute("assetBean", assetBean);
-			model.addAttribute("localityList", localityList);
-			model.addAttribute("assetStatusList", assetStatusList);
-			model.addAttribute("assetCategoryList", assetCategoryList);
-			
-			return "asset-register-report";
+		try {
+			localityList = localityRepo.findAll();
+			assetStatusList = statusRepo.findAll();
+			assetCategoryList = categoryRepo.findAll();
+		} catch (Exception e) {
+			LOGGER.error("Error Occured : While fetching default dropdown values for SearchRegister. Error -> "+e.getMessage());
 		}
+		model.addAttribute("localityList", localityList);
+		model.addAttribute("assetStatusList", assetStatusList);
+		model.addAttribute("assetCategoryList", assetCategoryList);
+		model.addAttribute("isViewPage", true);
+		
+		return "asset-register-report";
+	}
 	
-		@PostMapping("/searchform/{param}")
-		public String searchform(@PathVariable("param") String param, Model model) {
-			LOGGER.info("Search Form..................");
-			assetBean = new AssetMaster();
-			model.addAttribute("assetBean", assetBean);
-			try {
-				localityList = localityRepo.findAll();
-				assetStatusList = statusRepo.findAll();
-				assetCategoryList = categoryRepo.findAll();
-				
-				assetList = masterRepo.findAll();
-				LOGGER.info("Asset Lists..."+assetList.toString());
-			} catch (Exception e) {
-				e.getMessage();
-			}
-			model.addAttribute("assetList", assetList);
-			model.addAttribute("localityList", localityList);
-			model.addAttribute("assetStatusList", assetStatusList);
-			model.addAttribute("assetCategoryList", assetCategoryList);
-			model.addAttribute("localityList", localityList);
-			model.addAttribute("mode", "add");
-			model.addAttribute("disabled", "");
-			if(param.equalsIgnoreCase("ref")) {
-				model.addAttribute("isReference", true);
-			}else {
-				model.addAttribute("isReference", false);
-			}
-			model.addAttribute("isViewPage", true);
-			return "asset-register-report";
-		}
-		
-		@PostMapping("/modifyform")
-		public String modifyform(Model model) {
-			LOGGER.info("View Form..................");
-			assetBean = new AssetMaster();
-			model.addAttribute("assetBean", assetBean);
-			try {
-				departmentList = deptRepo.findAll(); //microserviceUtils.getDepartments();
-				assetStatusList = statusRepo.findAll();
-				assetCategoryList = categoryRepo.findAll();
-				
-				assetList = masterRepo.findAll();
-				LOGGER.info("Asset Lists..."+assetList.toString());
-			} catch (Exception e) {
-				e.getMessage();
-			}
-			model.addAttribute("assetList", assetList);
-			model.addAttribute("departmentList", departmentList);
-			model.addAttribute("assetStatusList", assetStatusList);
-			model.addAttribute("assetCategoryList", assetCategoryList);
-			model.addAttribute("localityList", localityList);
-			model.addAttribute("mode", "update");
-			model.addAttribute("viewmode", "update");
-			model.addAttribute("disabled", "");
-			model.addAttribute("isViewPage", true);
+	@PostMapping("/searchform/{param}")
+	public String searchform(@PathVariable("param") String param, Model model) {
+		LOGGER.info("Search Form..................");
+		assetBean = new AssetMaster();
+		model.addAttribute("assetBean", assetBean);
+		try {
+			localityList = localityRepo.findAll();
+			assetStatusList = statusRepo.findAll();
+			assetCategoryList = categoryRepo.findAll();
 			
-			return "asset-modify";
+			//assetList = masterRepo.findAll();
+		} catch (Exception e) {
+			LOGGER.error("Error Occured : While fetching default dropdown values for modifyform. Error -> "+e.getMessage());
+		}
+		//model.addAttribute("assetList", assetList);
+		model.addAttribute("localityList", localityList);
+		model.addAttribute("assetStatusList", assetStatusList);
+		model.addAttribute("assetCategoryList", assetCategoryList);
+		model.addAttribute("localityList", localityList);
+		model.addAttribute("mode", "add");
+		model.addAttribute("disabled", "");
+		if(param.equalsIgnoreCase("ref")) {
+			model.addAttribute("isReference", true);
+		}else {
+			model.addAttribute("isReference", false);
+		}
+		model.addAttribute("isViewPage", true);
+		return "asset-register-report";
+	}
+		
+	@PostMapping("/modifyform")
+	public String modifyform(Model model) {
+		LOGGER.info("View Form..................");
+		assetBean = new AssetMaster();
+		model.addAttribute("assetBean", assetBean);
+		try {
+			departmentList = deptRepo.findAll(); //microserviceUtils.getDepartments();
+			assetStatusList = statusRepo.findAll();
+			assetCategoryList = categoryRepo.findAll();
+			
+			//assetList = masterRepo.findAll();
+		} catch (Exception e) {
+			e.getMessage();
+		}
+		//model.addAttribute("assetList", assetList);
+		model.addAttribute("departmentList", departmentList);
+		model.addAttribute("assetStatusList", assetStatusList);
+		model.addAttribute("assetCategoryList", assetCategoryList);
+		model.addAttribute("localityList", localityList);
+		model.addAttribute("mode", "update");
+		model.addAttribute("viewmode", "update");
+		model.addAttribute("disabled", "");
+		model.addAttribute("isViewPage", true);
+		
+		return "asset-modify";
 		}
 }

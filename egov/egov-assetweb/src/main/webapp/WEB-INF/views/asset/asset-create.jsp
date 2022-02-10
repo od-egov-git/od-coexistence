@@ -92,12 +92,16 @@
 				<label class="col-sm-3 control-label text-right"> <spring:message
 						code="asset-ref" text="assetReference" />
 				</label>
-				<div class="col-sm-3 add-margin" style="display: inline-flex">
+				<div class="col-sm-3 add-margin" style="display: flex">
 					<form:input class="form-control" id="assetReference"
 						path="assetHeader.assetReference" />
-					<input class="form-control search" type="button" id="assetRef"
+					<%-- <input class="form-control search" type="button" id="assetRef"
 						style="width: 25px; margin-left: 10px;" onclick="viewPop('${id}')"><i
-						class="bi bi-search"></i></input>
+						class="bi bi-search"></i></input> --%>
+					<button class="form-control search" type="button" id="assetRef" 
+							style="width: 35px; margin-left: 10px;text-align: center;" onclick="viewPop('${id}')">
+						<span class="glyphicon glyphicon-search"></span>
+					</button>
 				</div>
 				<label class="col-sm-3 control-label text-right"> <spring:message
 						code="asset-fund" text="fund" /> <span class="mandatory"></span>

@@ -1,7 +1,10 @@
 package org.egov.asset.web.controller;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -64,12 +67,25 @@ public class DepreciationController {
 	    //@Action(value = "/listData")
 	    public String searchDepreciation(@ModelAttribute("Depreciation") final Depreciation depreciation,final Model model,HttpServletRequest request,
 				final BindingResult resultBinder) {
-		
+		System.out.println("depreciation Date "+depreciation.getDepreciationDate());
+		String depreciationDate=depreciation.getDepreciationDate();
+		SimpleDateFormat sdf1 = new SimpleDateFormat("MM/dd/yyyy");
+        SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yyyy");
+        String newDate="";
+	      try {
+			 newDate = sdf2.format(sdf1.parse(depreciationDate));
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	    System.out.println("depreciation Date after "+newDate);  
+	    
 	    final StringBuffer query1 = new StringBuffer(500);
 		List<Object[]> list= null;
 		SQLQuery queryMain =  null;
 		query1
-		      .append("select ac.name,d.code,ac.asset_code,ah.asset_name,am.current_value ,ac.depriciation_rate from	asset_master am,asset_header ah,eg_department d,asset_category ac,asset_revaluation ar where am.id=ar.asset_master_id and am.asset_header=ah.id	and ah.asset_catagory =ac.id and d.id = ah.department and TO_CHAR(ar.rev_date,'dd-mm-yyyy') = '"+depreciation.getDepreciationDate()+"' ");
+		      .append("select ac.name,d.code,ac.asset_code,ah.asset_name,am.current_value ,ac.depriciation_rate from asset_master am,asset_header ah,eg_department d,asset_category ac,asset_revaluation ar where am.id=ar.asset_master_id and am.asset_header=ah.id	and ah.asset_category =ac.id and d.id = ah.department and TO_CHAR(ar.rev_date,'dd/mm/yyyy') = '"+newDate+"' ");
+
 		System.out.println("categoryName "+depreciation.getCategoryName());
 		if(depreciation.getCategoryName()!=null) {
 			query1.append(" and ac.name = '"+depreciation.getCategoryName()+"'");
@@ -92,11 +108,26 @@ public class DepreciationController {
 		}
 		System.out.println("assetCreatedFromDate "+depreciation.getFromDate());
 		if(depreciation.getFromDate()!=null) {
-			query1.append(" and TO_CHAR(ah.created_date,'dd-mm-yyyy') >= '"+depreciation.getFromDate()+"'");
+			String fromDate=depreciation.getFromDate();
+			String newFromDate="";
+		      try {
+				 newFromDate = sdf2.format(sdf1.parse(fromDate));
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			query1.append(" and TO_CHAR(ah.created_date,'dd/mm/yyyy') >= '"+newFromDate+"'");
 		}
 		System.out.println("assetCreatedToDate "+depreciation.getToDate());
 		if(depreciation.getToDate()!=null) {
-			query1.append(" and TO_CHAR(ah.created_date,'dd-mm-yyyy') <= '"+depreciation.getToDate()+"'");
+			String toDate=depreciation.getFromDate();
+			String newToDate="";
+		      try {
+				 newToDate = sdf2.format(sdf1.parse(toDate));
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+			query1.append(" and TO_CHAR(ah.created_date,'dd/mm/yyyy') <= '"+newToDate+"'");
 		}
 		
 		queryMain=this.persistenceService.getSession().createSQLQuery(query1.toString());

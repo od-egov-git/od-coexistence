@@ -76,6 +76,7 @@ import org.egov.commons.CChartOfAccountDetail;
 import org.egov.commons.CChartOfAccounts;
 import org.egov.commons.CGeneralLedger;
 import org.egov.commons.CGeneralLedgerDetail;
+import org.egov.commons.Fund;
 import org.egov.commons.dao.EgwStatusHibernateDAO;
 import org.egov.commons.dao.FunctionDAO;
 import org.egov.commons.dao.FundHibernateDAO;
@@ -88,6 +89,7 @@ import org.egov.egf.expensebill.service.ExpenseBillService;
 import org.egov.egf.expensebill.service.RefundBillService;
 import org.egov.egf.utils.FinancialUtils;
 import org.egov.eis.web.contract.WorkflowContainer;
+import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.exception.ApplicationException;
@@ -203,8 +205,17 @@ public class UpdateExpenseBillController extends BaseBillController {
 	private PaymentRefundUtils paymentRefundUtils;
     @Autowired
     private ChartOfAccountDetailService chartOfAccountDetailService;
+    private String fundnew="";
     
-    public UpdateExpenseBillController(final AppConfigValueService appConfigValuesService) {
+    public String getFundnew() {
+		return fundnew;
+	}
+
+	public void setFundnew(String fundnew) {
+		this.fundnew = fundnew;
+	}
+
+	public UpdateExpenseBillController(final AppConfigValueService appConfigValuesService) {
 		super(appConfigValuesService);
     }
 
@@ -270,7 +281,7 @@ public class UpdateExpenseBillController extends BaseBillController {
             }
        
         prepareCheckListForEdit(egBillregister, model);
-
+       
         String department = this.getDepartmentName(egBillregister.getEgBillregistermis().getDepartmentcode());
 
         if (department != null)

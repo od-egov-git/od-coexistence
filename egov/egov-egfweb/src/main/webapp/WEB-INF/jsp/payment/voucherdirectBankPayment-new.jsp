@@ -115,6 +115,7 @@
 <script>
 	path="${pageContext.request.contextPath}";
 	var showMode='<s:property value="showMode"/>';	
+	var fundid='<s:property value="fundId.id"/>';
 		var totaldbamt=0,totalcramt=0;
 		var OneFunctionCenter= <s:property value="isRestrictedtoOneFunctionCenter"/>; 
 		//bootbox.alert(">>.."+OneFunctionCenter);                 
@@ -236,7 +237,7 @@
 			{key:"subledgerCode",hidden:true, formatter:createSLTextFieldFormatterJV(SUBLEDGERLIST,".subledgerCode","hidden")},
 			{key:"glcode.id",label:'<s:text name="lbl.account.code"/> <span class="mandatory1">*</span>', formatter:createDropdownFormatterJV(SUBLEDGERLIST,"loaddropdown(this)"),  dropdownOptions:glcodeOptions},
 			{key:"detailTypeName",hidden:true, formatter:createSLTextFieldFormatterJV(SUBLEDGERLIST,".detailTypeName","hidden")},
-			{key:"detailType.id",label:'<s:text name="lbl.type"/> <span class="mandatory1">*</span>', formatter:createDropdownFormatterJV1(SUBLEDGERLIST),dropdownOptions:detailtypeOptions},
+			{key:"detailType.id",label:'<s:text name="lbl.type"/> <span class="mandatory1">*</span>', formatter:createDropdownFormatterJV1(SUBLEDGERLIST,"loaddropdown(this)"),dropdownOptions:detailtypeOptions},
 			{key:"detailCode",label:'<s:text name="lbl.code"/> <span class="mandatory1">*</span>', formatter:createSLDetailCodeTextFieldFormatterJV(SUBLEDGERLIST,".detailCode","splitEntitiesDetailCode(this)", ".search", "openSearchWindowFromJV(this)")},
 			{key:"detailKeyId",hidden:true, formatter:createSLHiddenFieldFormatterJV(SUBLEDGERLIST,".detailKeyId")},
 			{key:"detailKey",label:'<s:text name="lbl.name"/>', formatter:createSLLongTextFieldFormatterJV(SUBLEDGERLIST,".detailKey","")},
@@ -305,7 +306,7 @@
 
 </head>
 <body
-	onload="onLoadTask_new();loadDropDownCodesExcludingCashAndBank();loadDropDownCodesFunction();documentdep();onloadtriple();">
+	onload="onLoadTask_new();loadDropDownCodesExcludingCashAndBank();loadDropDownCodesFunction();populateSchemes('%{fundId.id}');loadBank('%{fundId.id}');">
 	<s:form action="directBankPayment" theme="css_xhtml" name="dbpform"
 		validate="true">
 		<s:push value="model">
@@ -342,7 +343,7 @@
 						<s:date name='voucherDate' var="voucherDateId" format='dd/MM/yyyy' />
 						<td class="bluebox" width="34%">
 							<div name="daterow">
-								<s:textfield id="voucherDate" name="voucherDate"
+								<s:textfield id="voucherDate" name="voucherDate" readOnly="true"
 									value="%{voucherDateId}" data-date-end-date="0d"
 									onkeyup="DateFormat(this,this.value,event,false,'3')"
 									placeholder="DD/MM/YYYY" class="form-control datepicker"
@@ -351,7 +352,7 @@
 							</div>
 						</td>
 					</tr>
-					<%@include file="directBankPayment-form.jsp"%>
+					<%@include file="voucherdirectBankPayment-form.jsp"%>
 
 
 					<div class="subheadsmallnew"></div>
@@ -361,9 +362,6 @@
 
 					</br>
 				</table>
-				<input type="hidden" id="commonBean.fundnew" name="commonBean.fundnew" value="${commonBean.fundnew}" />
-			<input type="hidden" id="commonBean.departmentnew" name="commonBean.departmentnew" value="${commonBean.departmentnew}" />
-			<input type="hidden" id="commonBean.functionnew" name="commonBean.functionnew" value="${commonBean.functionnew}" />
 				<s:hidden name="cutOffDate" id="cutOffDate" />
 				<s:hidden name="bankBalanceCheck" id="bankBalanceCheck" value="%{bankBalanceCheck}" />
             	<jsp:include page="../payment/commonWorkflowMatrix.jsp"/>
@@ -376,54 +374,6 @@
 		<s:token />
 	</s:form>
 	<script type="text/javascript">
-	
-	
-	var val=false;
-	 var paymentChequeNo=null;
-	 /* 
-	jQuery("#modeOfPaymentrtgs").change(function(){
-   if( $(this).is(":checked") ){ 
-      val = $(this).val(); 
-      
-   }
-   if(val==true){
-   	jQuery("#payemnttr").show();
-   }
-   else{
-   	jQuery("#payemnttr").hide();
-   	val=false;
-   }
-	}); */
-	
-	
-	jQuery("#paymentChequeNo").change(function(){
-		
-		paymentChequeNo = jQuery("#paymentChequeNo").val();
-		
-		if(null==paymentChequeNo||paymentChequeNo=="")
-		{
-			bootbox.alert('Please Enter Payment Cheque Number');
-			jQuery("#paymentChequeNo").val("");
-			undoLoadingMask();
-			
-			return false;
-		}
-		else if(!/^[0-9]+$/.test(paymentChequeNo)){
-			bootbox.alert('Please Enter valid Payment Cheque Number (Allowed input:0-9)');
-			jQuery("#paymentChequeNo").val("");
-			undoLoadingMask();
-		return false;
-		}
-		else if(paymentChequeNo.length!=6){
-			bootbox.alert('Please insert 6 Digit Cheque Number');
-			jQuery("#paymentChequeNo").val("");
-			undoLoadingMask();
-		return false;			
-	}
-		
-   });
-	
-	
 function onLoadTask_new()
 {
 	//bootbox.alert(showMode);                                                      
@@ -478,8 +428,7 @@ function onLoadTask_new()
 }
 
 function populateAccNum(branch){
-	//alert("populate Acc Num");
-	var fundObj = "1";//document.getElementById('fundId');
+	var fundObj = document.getElementById('fundId');
 	var bankbranchId = branch.options[branch.selectedIndex].value;
 	var index=bankbranchId.indexOf("-");
 	var bankId = bankbranchId.substring(0,index);
@@ -487,18 +436,34 @@ function populateAccNum(branch){
 	
 	var vTypeOfAccount = '<s:property value="%{typeOfAccount}"/>';
 	
-	populateaccountNumber({fundId:fundObj,bankId:bankId,branchId:brId,typeOfAccount:vTypeOfAccount})
+	populateaccountNumber({fundId: fundObj.options[fundObj.selectedIndex].value,bankId:bankId,branchId:brId,typeOfAccount:vTypeOfAccount})
 }
+
+function process(date){
+	   var parts = date.split("/");
+	   return new Date(parts[2], parts[1] - 1, parts[0]);
+	}
 function onSubmit()
 {
-	if(checkdate())
-	{
 	enableAll();
 	var balanceCheckMandatory='<s:text name="payment.mandatory"/>';
 	var balanceCheckWarning='<s:text name="payment.warning"/>';
 	var noBalanceCheck='<s:text name="payment.none"/>';
 	var firstsignatory='';
 	var backlogEntry='';
+	if(document.getElementById('voucherDate').value!=null && document.getElementById('documentDate').value!=null){
+		
+		var v1 = document.getElementById('voucherDate').value;
+		var d1 = document.getElementById('documentDate').value;		
+		
+		if(process(v1) < process(d1)){
+            
+			bootbox.alert("Voucher date can not be older than bill date.");
+			undoLoadingMask();
+			return false;
+		}
+		
+	}
 	if(document.getElementById('firstsignatory') == null || document.getElementById('firstsignatory').value == '-1')
 	{
 		bootbox.alert("Please select First Signatory");
@@ -509,7 +474,6 @@ function onSubmit()
 		{
 			firstsignatory=document.getElementById('firstsignatory').value;
 		}
-	/* comment by abhishek on 12042021 
 	var secondsignatory=''
 	if(document.getElementById('secondsignatory') == null || document.getElementById('secondsignatory').value == '-1')
 	{
@@ -518,23 +482,9 @@ function onSubmit()
 		return false;
 	}
 	else
-	{ */
+	{
 		secondsignatory=document.getElementById('secondsignatory').value;
-	//}
- 
-		if(document.getElementById("modeOfPaymentcheque").checked == true){
-			paymentChequeNo = jQuery("#paymentChequeNo").val();
-			
-			if(null==paymentChequeNo||paymentChequeNo=="")
-			{
-				bootbox.alert('Payment Cheque Number is mandatory ');
-				jQuery("#paymentChequeNo").val("");
-				undoLoadingMask();
-				return false;
-			}
-		}
-		
-	
+	}
 	if(document.getElementById('backlogEntry') == null || document.getElementById('backlogEntry').value == '-1')
 	{
 		bootbox.alert("Please select whether it is backdated entry");
@@ -542,125 +492,95 @@ function onSubmit()
 		return false;
 	}
 	else
-		{
+	{
 		backlogEntry=document.getElementById('backlogEntry').value;
-		}
+	}
 	if(document.getElementById("description") == null || document.getElementById("description").value =='')
-		{
+	{
 		bootbox.alert("<s:text name='msg.payment.narration.mandatory'/>");
-		 return false;
-		}
-	var submiturl='/services/EGF/payment/directBankPayment-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory+'&backlogEntry='+backlogEntry;																																									
- 
- 
+		return false;
+	}
 	if (!validateForm_directBankPayment()) {
-					
+		alert("validatefromdirectbankpayment");
 		undoLoadingMask();
 		return false;
 	}
 	else if (!updateAndCheckAmount()) {
-				  
 		undoLoadingMask();
 		return false;
 	}
 	else if(jQuery("#bankBalanceCheck").val()==noBalanceCheck)
+	{
+		/* if(document.getElementById("modeOfPaymentrtgs").checked == true || document.getElementById("modeOfPaymentpex").checked == true)
 		{
-					
-		if(document.getElementById("modeOfPaymentcheque").checked == true)
+			if(document.getElementById("subLedgerlist[0].glcode.id") == null  || document.getElementById("subLedgerlist[0].glcode.id").value == '0' || document.getElementById("subLedgerlist[0].detailType.id") == null || document.getElementById("subLedgerlist[0].detailType.id").value == '0' ||  document.getElementById("subLedgerlist[0].detailCode") == null || document.getElementById("subLedgerlist[0].detailCode").value == ''  || document.getElementById("subLedgerlist[0].amount") == null  || document.getElementById("subLedgerlist[0].amount").value == '')
 			{
-				
+				bootbox.alert("<s:text name='msg.sub.ledger.mandatory'/>");
+				 return false;
 			}
-									  
-		document.dbpform.action = submiturl;					  
+		} */
+		
+		document.dbpform.action = '/services/EGF/payment/voucherdirectBankPayment-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory+'&backlogEntry='+backlogEntry;
 		return true;
-		}
+	}
 	else if(!balanceCheck() && jQuery("#bankBalanceCheck").val()==balanceCheckMandatory){
 			 bootbox.alert("<s:text name='msg.insufficient.bank.balance'/>");
 			 return false;
-			}
+	}
 	else if(!balanceCheck() && jQuery("#bankBalanceCheck").val()==balanceCheckWarning){
-		if(document.getElementById("modeOfPaymentcheque").checked == true)
+		/* if(document.getElementById("modeOfPaymentrtgs").checked == true || document.getElementById("modeOfPaymentpex").checked == true)
 		{
-			
-		}
+			if(document.getElementById("subLedgerlist[0].glcode.id") == null  || document.getElementById("subLedgerlist[0].glcode.id").value == '0' || document.getElementById("subLedgerlist[0].detailType.id") == null || document.getElementById("subLedgerlist[0].detailType.id").value == '0' ||  document.getElementById("subLedgerlist[0].detailCode") == null || document.getElementById("subLedgerlist[0].detailCode").value == ''  || document.getElementById("subLedgerlist[0].amount") == null  || document.getElementById("subLedgerlist[0].amount").value == '')
+			{
+				bootbox.alert("<s:text name='msg.sub.ledger.mandatory'/>");
+				 return false;
+			}
+		} */
 		 var msg = confirm("<s:text name='msg.insuff.bank.bal.do.you.want.to.process'/>");
 		 if (msg == true) {
-			 document.dbpform.action = '/services/EGF/payment/directBankPayment-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory+'&backlogEntry='+backlogEntry;
-					 
-										
+			 document.dbpform.action = '/services/EGF/payment/voucherdirectBankPayment-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory+'&backlogEntry='+backlogEntry;
 			 document.dbpform.submit();
 			return true;
 		 } else {
-						
 			 undoLoadingMask();
 		   	return false;
 			}
 		}
 	else{
-
-				 
-		if(document.getElementById("modeOfPaymentcheque").checked == true)
+		/* if(document.getElementById("modeOfPaymentrtgs").checked == true || document.getElementById("modeOfPaymentpex").checked == true)
 		{
-			
+			if(document.getElementById("subLedgerlist[0].glcode.id") == null  || document.getElementById("subLedgerlist[0].glcode.id").value == '0' || document.getElementById("subLedgerlist[0].detailType.id") == null || document.getElementById("subLedgerlist[0].detailType.id").value == '0' ||  document.getElementById("subLedgerlist[0].detailCode") == null || document.getElementById("subLedgerlist[0].detailCode").value == ''  || document.getElementById("subLedgerlist[0].amount") == null  || document.getElementById("subLedgerlist[0].amount").value == '')
+			{
+				bootbox.alert("<s:text name='msg.sub.ledger.mandatory'/>");
+				 return false;
+			}
 		}
-		document.dbpform.action = '/services/EGF/payment/directBankPayment-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory+'&backlogEntry='+backlogEntry;
+		 */
+		document.dbpform.action = '/services/EGF/payment/voucherdirectBankPayment-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory+'&backlogEntry='+backlogEntry;
 		document.dbpform.submit();
 	}
-	}
-	else{
-		bootbox.alert("Please select back dated entry option correctly");
-		return false;
-	}
+	alert("end");	
 }
 
 function validateCutOff()
 {
-var cutOffDatePart=document.getElementById("cutOffDate").value.split("/");
-var voucherDatePart=document.getElementById("voucherDate").value.split("/");
-var cutOffDate = new Date(cutOffDatePart[1] + "/" + cutOffDatePart[0] + "/"
-		+ cutOffDatePart[2]);
-var voucherDate = new Date(voucherDatePart[1] + "/" + voucherDatePart[0] + "/"
-		+ voucherDatePart[2]);
-if(voucherDate<=cutOffDate)
-{
-	return true;
-}
-else{
-	var msg1='<s:text name="wf.vouchercutoffdate.message"/>';
-	var msg2='<s:text name="wf.cutoffdate.msg"/>';
-	bootbox.alert(msg1+" "+document.getElementById("cutOffDate").value+" "+msg2);
-		return false;
+	var cutOffDatePart=document.getElementById("cutOffDate").value.split("/");
+	var voucherDatePart=document.getElementById("voucherDate").value.split("/");
+	var cutOffDate = new Date(cutOffDatePart[1] + "/" + cutOffDatePart[0] + "/"
+			+ cutOffDatePart[2]);
+	var voucherDate = new Date(voucherDatePart[1] + "/" + voucherDatePart[0] + "/"
+			+ voucherDatePart[2]);
+	if(voucherDate<=cutOffDate)
+	{
+		return true;
 	}
-}
-
-function checkdate()
-{
-	//backlogEntry
-	var backlog=document.getElementById('backlogEntry').value;
-	var date2=document.getElementById('voucherDate').value;
-	var parts = date2.split("/");
-	var date = new Date(parts[1] + "/" + parts[0] + "/" + parts[2]);
-	var curdate = new Date();
-	if(backlog!='Y'){
-	if(date.setHours(0,0,0,0) == curdate.setHours(0,0,0,0)) {
-		if(backlog == 'N'){
-	    	return true;
-	    }
-	    return false;
-	}
-	else{
-		return false;
-	}
-	}else{
-		if(date.setHours(0,0,0,0) < curdate.setHours(0,0,0,0)){
-			console.log(":::: backdated");
-			return true;
-		}else{
-			console.log(":::: not backdated");
+	else
+	{
+		var msg1='<s:text name="wf.vouchercutoffdate.message"/>';
+		var msg2='<s:text name="wf.cutoffdate.msg"/>';
+		bootbox.alert(msg1+" "+document.getElementById("cutOffDate").value+" "+msg2);
 			return false;
-		}
 	}
-		
 }
 
 </SCRIPT>

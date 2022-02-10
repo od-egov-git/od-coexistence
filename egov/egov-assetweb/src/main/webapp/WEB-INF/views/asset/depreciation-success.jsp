@@ -68,7 +68,6 @@
     
         <div class="tab-pane fade in active" id="resultheader">
         <h3> Asset Depreciation</h3>
-	        <div class="panel panel-primary" data-collapsed="0">
 	        <form:hidden path="counter" id="counter" />
 	        	<div style="padding: 0 15px;">
 				<table class="table table-bordered" id="searchResult">
@@ -149,7 +148,6 @@
 			<br>
 			
 			<br>
-	        </div>
         </div>
         
     </div>

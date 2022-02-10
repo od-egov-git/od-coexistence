@@ -18,6 +18,10 @@ import javax.persistence.Table;
 
 import org.egov.infra.admin.master.entity.Department;
 
+/**
+ * @author Arnab Saha
+ */
+
 @Entity
 @Table(name = "asset_header")
 @SequenceGenerator(name = AssetHeader.SEQ_asset_header, sequenceName = AssetHeader.SEQ_asset_header, allocationSize = 1)

@@ -69,7 +69,7 @@ public class VoucherDetails {
     private String accounthead;
     private BigDecimal debitAmountDetail = BigDecimal.ZERO;
     private BigDecimal creditAmountDetail = BigDecimal.ZERO;
-
+    private String glcodeNameDetail;
     private CChartOfAccounts glcode;
     private Accountdetailtype detailType;
     private String detailTypeName;
@@ -81,7 +81,15 @@ public class VoucherDetails {
     private String subledgerCode;
     private String isSubledger;
 
-    public String getIsSubledger() {
+    public String getGlcodeNameDetail() {
+		return glcodeNameDetail;
+	}
+
+	public void setGlcodeNameDetail(String glcodeNameDetail) {
+		this.glcodeNameDetail = glcodeNameDetail;
+	}
+
+	public String getIsSubledger() {
         return isSubledger;
     }
 

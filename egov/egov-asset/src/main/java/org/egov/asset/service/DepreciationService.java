@@ -231,7 +231,7 @@ public class DepreciationService {
 		final BigDecimal minValue = BigDecimal.ONE;
         ReasonForFailure reason = null;
         String reason1="N/A";
-        String status = "FAIL";
+        String status = "SUCCESS";//"FAIL";
         BigDecimal amtToBeDepreciated = BigDecimal.ZERO;
         BigDecimal valueAfterDep = BigDecimal.ZERO;
 
@@ -239,22 +239,21 @@ public class DepreciationService {
         BigDecimal amtToBeDepreciatedRounded = BigDecimal.ZERO;
         Double depreciationRate;
         depreciationRate = dl.getDepreciationRate();
-        if (dl.getCurrentGrossValue() != null && dl.getCurrentGrossValue().compareTo(BigDecimal.ZERO) != 0)
-            if (depreciationRate == 0.0) {
-                reason = ReasonForFailure.DEPRECIATION_RATE_NOT_FOUND;
-        		reason1=ReasonForFailure.DEPRECIATION_RATE_NOT_FOUND.toString();
-            }
-            else if (dl.getCurrentGrossValue().compareTo(minValue) <= 0) {
-                reason = ReasonForFailure.ASSET_IS_FULLY_DEPRECIATED_TO_MINIMUN_VALUE;
-                reason1 = ReasonForFailure.ASSET_IS_FULLY_DEPRECIATED_TO_MINIMUN_VALUE.toString();
-            }
-            else if (dl.getCurrentGrossValue().compareTo(new BigDecimal(5000)) < 0) {
-                reason = ReasonForFailure.ASSET_IS_FULLY_DEPRECIATED_TO_MINIMUN_VALUE;
-                reason1= ReasonForFailure.ASSET_IS_FULLY_DEPRECIATED_TO_MINIMUN_VALUE.toString();
-            }
-            else {
-                status = "SUCCESS";
-            }
+		/*
+		 * if (dl.getCurrentGrossValue() != null &&
+		 * dl.getCurrentGrossValue().compareTo(BigDecimal.ZERO) != 0) if
+		 * (depreciationRate == 0.0) { reason =
+		 * ReasonForFailure.DEPRECIATION_RATE_NOT_FOUND;
+		 * reason1=ReasonForFailure.DEPRECIATION_RATE_NOT_FOUND.toString(); } else if
+		 * (dl.getCurrentGrossValue().compareTo(minValue) <= 0) { reason =
+		 * ReasonForFailure.ASSET_IS_FULLY_DEPRECIATED_TO_MINIMUN_VALUE; reason1 =
+		 * ReasonForFailure.ASSET_IS_FULLY_DEPRECIATED_TO_MINIMUN_VALUE.toString(); }
+		 * else if (dl.getCurrentGrossValue().compareTo(new BigDecimal(5000)) < 0) {
+		 * reason = ReasonForFailure.ASSET_IS_FULLY_DEPRECIATED_TO_MINIMUN_VALUE;
+		 * reason1=
+		 * ReasonForFailure.ASSET_IS_FULLY_DEPRECIATED_TO_MINIMUN_VALUE.toString(); }
+		 * else { status = "SUCCESS"; }
+		 */
                 amtToBeDepreciated = getAmountToBeDepreciated(dl);
                 System.out.println("amtToBeDepreciated "+amtToBeDepreciated);
                 amtToBeDepreciatedRounded = new BigDecimal(amtToBeDepreciated.setScale(2, BigDecimal.ROUND_HALF_UP).toString());  
@@ -272,7 +271,7 @@ public class DepreciationService {
         				" (select c.glcode from chartofaccounts c,asset_category ac where c.id = ac.depriciation_expense_account_id and ac.asset_code = '"+dl.getAssetCode()+"') as expense, " + 
         				" (select c.glcode from chartofaccounts c, asset_category ac where c.id = ac.revolution_reserve_account_code_id and ac.asset_code = '"+dl.getAssetCode()+"') as revolution_reverse, " + 
         				" ah.function,ah.fund,ah.description,al.location,am.id from asset_category ac, asset_catagory_type act, asset_header ah, asset_master am,asset_revaluation ar, asset_location al, " + 
-        				" asset_location_locality all2 where am.id = ar.asset_master_id and am.asset_header =ah.id and ah.asset_catagory =ac.id and ac.asset_catagory_type_id =act.id and am.asset_location =al.id " + 
+        				" asset_location_locality all2 where am.id = ar.asset_master_id and am.asset_header =ah.id and ah.asset_category =ac.id and ac.asset_catagory_type_id =act.id and am.asset_location =al.id " + 
         				/*"--and al.location =all2.id" +*/ 
         				" and ac.asset_code = '"+dl.getAssetCode()+"'");
         		System.out.println("query1 "+query1.toString());

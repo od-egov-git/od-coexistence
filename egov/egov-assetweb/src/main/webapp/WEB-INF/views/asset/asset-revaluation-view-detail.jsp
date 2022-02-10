@@ -28,6 +28,39 @@
 				</div>
 			</div>
 			<div class="panel-body">
+				<table width="100%">
+					<tr>
+						<td><label class="col-sm-3 control-label text-right">
+								<spring:message code="asset-code" text="Asset Code" />
+						</label>
+							<div class="col-sm-3 add-margin">
+								<a href="#" id="assetLink"
+									onclick="return openAsset('${assetRevaluation.assetMaster.id}');">${assetRevaluation.assetMaster.code}</a>
+							</div></td>
+						<td><label class="col-sm-3 control-label text-right">
+								<spring:message code="asset-name" text="Asset Name" />
+						</label>
+							<div class="col-sm-3 add-margin">
+								${assetRevaluation.assetMaster.assetHeader.assetName }</div></td>
+					</tr>
+					<tr>
+						<td><label class="col-sm-3 control-label text-right">
+								<spring:message code="asset-desc" text="Description" />
+						</label>
+							<div class="col-sm-3 add-margin">
+								${assetRevaluation.assetMaster.assetHeader.description }</div></td>
+						<td><label class="col-sm-3 control-label text-right">
+								<spring:message code="asset-cat" text="Asset Category Name" />
+						</label>
+							<div class="col-sm-3 add-margin">
+								${assetRevaluation.assetMaster.assetHeader.assetCategory.name }</div>
+						</td>
+					</tr>
+				</table>
+
+			</div>
+		</div>
+			<%-- <div class="panel-body">
 				<label class="col-sm-3 control-label text-right"> <spring:message
 						code="asset-code" text="Asset Code" />
 				</label>
@@ -51,12 +84,13 @@
 				<div class="col-sm-3 add-margin">
 					${assetRevaluation.assetMaster.assetHeader.assetCategory.name }</div>
 			</div>
-		</div>
+		</div> --%>
 		<!-- Revaluation Details -->
 		
 		<div class="panel panel-primary" data-collapsed="0">
 			<div class="panel-heading">
-				<div class="panel-title">text="Asset Revaluation Details" /></div>
+				<div class="panel-title"><spring:message code="lbl-reval-details"
+						text="Asset Revaluation Details" /></div>
 			</div>
 			<div class="panel-body">
 				<label class="col-sm-3 control-label text-right"> <spring:message
