@@ -9,7 +9,6 @@
 <div class="container">
 	<form:form name="assetRevaluation" method="post" action="${contextPath}/revaluate/view" modelAttribute="assetRevaluation" 
 		class="form-horizontal form-groups-bordered" enctype="multipart/form-data">
-
 			
 			<div class="panel panel-primary" data-collapsed="0" id="search-asset">
 				<div class="panel-heading">
@@ -18,24 +17,24 @@
 					</div>
 				</div>
 				<div class="panel-body">
-					<label class="col-sm-6 control-label text-right">
+					<label class="col-sm-3 control-label text-right">
 						<spring:message code="asset-code" text="assetCode"/>
 					</label>
-					<div class="col-sm-6 add-margin">
-						<form:input class="form-control" path="code"/>
+					<div class="col-sm-3 add-margin">
+						<form:input class="form-control" path="assetMaster.code"/>
 					</div>
 					<label class="col-sm-3 control-label text-right">
 						<spring:message code="asset-name" text="assetName"/>
 					</label>
-					<div class="col-sm-6 add-margin">
-						<form:input class="form-control" path="assetName"/>
+					<div class="col-sm-3 add-margin">
+						<form:input class="form-control" path="assetMaster.assetHeader.assetName"/>
 					</div>
-					<label class="col-sm-6 control-label text-right">
+					<label class="col-sm-3 control-label text-right">
 						<spring:message code="asset-cat" text="assetCategory"/>
 					    <span class="mandatory"></span>
 					</label>
-					<div class="col-sm-6 add-margin">
-						<form:select path="assetCategory" id="assetCategory" required="required" class="form-control">
+					<div class="col-sm-3 add-margin">
+						<form:select path="assetMaster.assetHeader.assetCategory" id="assetCategory" required="required" class="form-control">
 								<form:option value=""><spring:message code="lbl.select" /></form:option>
 								<form:options items="${assetCategoryList}" itemValue="id" itemLabel="name"/>  
 						</form:select>
@@ -43,17 +42,17 @@
 					<label class="col-sm-3 control-label text-right">
 						<spring:message code="asset-dept" text="department"/>
 					</label>
-					<div class="col-sm-6 add-margin">						
-						<form:select path="department" id="department" class="form-control">
+					<div class="col-sm-3 add-margin">						
+						<form:select path="assetMaster.assetHeader.department" id="department" class="form-control">
 							<form:option value=""><spring:message code="lbl.select" /></form:option>
 							<form:options items="${departmentList}" itemValue="id" itemLabel="name"/>  
 						</form:select>
 					</div>
-					<label class="col-sm-6 control-label text-right">
+					<label class="col-sm-3 control-label text-right">
 						<spring:message code="asset-status" text="status"/>
 					</label>
-					<div class="col-sm-6 add-margin">
-						<form:select path="assetStatus" id="assetStatus" class="form-control">
+					<div class="col-sm-3 add-margin">
+						<form:select path="assetMaster.assetStatus" id="assetStatus" class="form-control">
 								<form:option value=""><spring:message code="lbl.select" /></form:option>
 								<form:options items="${assetStatusList}" itemValue="id" itemLabel="description"/>  
 						</form:select>
@@ -71,6 +70,7 @@
 	</form:form>
 	
 	<!-- Result Table -->
+	<c:if test="${!isViewPage}">
 	<div class="panel panel-primary" data-collapsed="0">	
 		<div class="panel-heading">
 		<div class="panel-title">
@@ -127,6 +127,7 @@
 	</table>	
 	</div>
 	</div>
+	</c:if>
 	<!-- Result Table Ends -->
 </div>
 

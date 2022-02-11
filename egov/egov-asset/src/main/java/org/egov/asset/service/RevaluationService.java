@@ -142,21 +142,21 @@ public class RevaluationService {
 	}
 
 	//Search FUnctionality New
-	 public List<AssetRevaluation> searchAssets(final AssetRevaluation assetRev) {
+	public List<AssetRevaluation> searchAssets(final AssetRevaluation assetRev) {
     	String defaultQuery = "";
     	try {
     		defaultQuery = "FROM AssetRevaluation am where am.assetMaster.assetHeader.assetCategory.id="+assetRev.getAssetMaster().getAssetHeader().getAssetCategory().getId();
     		if(null != assetRev.getAssetMaster().getAssetHeader().getAssetName()) {
     			defaultQuery += " and am.assetMaster.assetHeader.assetName LIKE '%"+assetRev.getAssetMaster().getAssetHeader().getAssetName()+"%'";
     		}
-    		if(null != assetRev.getCode()) {
-    			defaultQuery += " and am.assetMaster.code LIKE '%"+assetRev.getCode()+"%'";
+    		if(null != assetRev.getAssetMaster().getCode()) {
+    			defaultQuery += " and am.assetMaster.code LIKE '%"+assetRev.getAssetMaster().getCode()+"%'";
     		}
     		if(null != assetRev.getAssetMaster().getAssetHeader().getDepartment()) {
     			defaultQuery += " and am.assetMaster.assetHeader.department="+assetRev.getAssetMaster().getAssetHeader().getDepartment().getId();
     		}
-    		if(null != assetRev.getAssetMaster().getAssetStatus()) {
-    			defaultQuery += " and am.assetMaster.assetStatus.id="+assetRev.getAssetMaster().getAssetStatus().getId();
+    		if(null != assetRev.getAssetStatus()) {
+    			defaultQuery += " and am.assetMaster.assetStatus.id="+assetRev.getAssetStatus().getId();
     		}
     		//For Register Search
     		if(null != assetRev.getAssetMaster().getAssetHeader().getDescription()) {
