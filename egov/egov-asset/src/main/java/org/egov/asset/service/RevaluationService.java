@@ -142,62 +142,33 @@ public class RevaluationService {
 	}
 
 	//Search FUnctionality New
-	/* public List<AssetRevaluation> searchAssets(final AssetMaster assetRev) {
+	public List<AssetRevaluation> searchAssets(final AssetRevaluation assetRev) {
     	String defaultQuery = "";
     	try {
-    		defaultQuery = "FROM AssetRevaluation am where am.assetMaster.assetHeader.assetCategory.id="+assetRev.getAssetHeader().getAssetCategory().getId();
-    		if(null != assetRev.getAssetHeader().getAssetName()) {
-    			defaultQuery += " and am.assetMaster.assetHeader.assetName LIKE '%"+assetRev.getAssetHeader().getAssetName()+"%'";
+    		defaultQuery = "FROM AssetRevaluation am where am.assetMaster.assetHeader.assetCategory.id="+assetRev.getAssetMaster().getAssetHeader().getAssetCategory().getId();
+    		if(null != assetRev.getAssetMaster().getAssetHeader().getAssetName()) {
+    			defaultQuery += " and am.assetMaster.assetHeader.assetName LIKE '%"+assetRev.getAssetMaster().getAssetHeader().getAssetName()+"%'";
     		}
-    		if(null != assetRev.getCode()) {
-    			defaultQuery += " and am.assetMaster.code LIKE '%"+assetRev.getCode()+"%'";
+    		if(null != assetRev.getAssetMaster().getCode()) {
+    			defaultQuery += " and am.assetMaster.code LIKE '%"+assetRev.getAssetMaster().getCode()+"%'";
     		}
-    		if(null != assetRev.getAssetHeader().getDepartment()) {
-    			defaultQuery += " and am.assetMaster.assetHeader.department="+assetRev.getAssetHeader().getDepartment().getId();
+    		if(null != assetRev.getAssetMaster().getAssetHeader().getDepartment()) {
+    			defaultQuery += " and am.assetMaster.assetHeader.department="+assetRev.getAssetMaster().getAssetHeader().getDepartment().getId();
     		}
     		if(null != assetRev.getAssetStatus()) {
     			defaultQuery += " and am.assetMaster.assetStatus.id="+assetRev.getAssetStatus().getId();
     		}
     		//For Register Search
-    		if(null != assetRev.getAssetHeader().getDescription()) {
-    			defaultQuery += " and am.assetMaster.assetHeader.description LIKE '%"+assetRev.getAssetHeader().getDescription()+"%'";
+    		if(null != assetRev.getAssetMaster().getAssetHeader().getDescription()) {
+    			defaultQuery += " and am.assetMaster.assetHeader.description LIKE '%"+assetRev.getAssetMaster().getAssetHeader().getDescription()+"%'";
     		}
-    		if(null != assetRev.getAssetLocation()) {
-    			defaultQuery += " and am.assetMaster.assetLocation.location.id="+assetRev.getAssetLocation().getLocation().getId();
+    		if(null != assetRev.getAssetMaster().getAssetLocation()) {
+    			defaultQuery += " and am.assetMaster.assetLocation.location.id="+assetRev.getAssetMaster().getAssetLocation().getLocation().getId();
     		}
     	}catch(Exception e) {
     		System.err.println("Error Occured : While Search Results. Error -> "+e.getMessage());
     	}
     	List<AssetRevaluation> assetRevList=em.createQuery(defaultQuery).getResultList();
         return assetRevList;
-    }*/
-	public List<AssetRevaluation> searchAssets(final AssetRevaluation assetRev) {
-		 String defaultQuery = "";
-		 try {
-		 defaultQuery = "FROM AssetRevaluation am where am.assetMaster.assetHeader.assetCategory.id="+assetRev.getAssetMaster().getAssetHeader().getAssetCategory().getId();
-		 if(null != assetRev.getAssetMaster().getAssetHeader().getAssetName()) {
-		 defaultQuery += " and am.assetMaster.assetHeader.assetName LIKE '%"+assetRev.getAssetMaster().getAssetHeader().getAssetName()+"%'";
-		 }
-		 if(null != assetRev.getAssetMaster().getCode()) {
-		 defaultQuery += " and am.assetMaster.code LIKE '%"+assetRev.getAssetMaster().getCode()+"%'";
-		 }
-		 if(null != assetRev.getAssetMaster().getAssetHeader().getDepartment()) {
-		 defaultQuery += " and am.assetMaster.assetHeader.department="+assetRev.getAssetMaster().getAssetHeader().getDepartment().getId();
-		 }
-		 if(null != assetRev.getAssetStatus()) {
-		 defaultQuery += " and am.assetMaster.assetStatus.id="+assetRev.getAssetStatus().getId();
-		 }
-		 //For Register Search
-		 if(null != assetRev.getAssetMaster().getAssetHeader().getDescription()) {
-		 defaultQuery += " and am.assetMaster.assetHeader.description LIKE '%"+assetRev.getAssetMaster().getAssetHeader().getDescription()+"%'";
-		 }
-		 if(null != assetRev.getAssetMaster().getAssetLocation()) {
-		 defaultQuery += " and am.assetMaster.assetLocation.location.id="+assetRev.getAssetMaster().getAssetLocation().getLocation().getId();
-		 }
-		 }catch(Exception e) {
-		 System.err.println("Error Occured : While Search Results. Error -> "+e.getMessage());
-		 }
-		 List<AssetRevaluation> assetRevList=em.createQuery(defaultQuery).getResultList();
-		 return assetRevList;
-		}
+    }
 }

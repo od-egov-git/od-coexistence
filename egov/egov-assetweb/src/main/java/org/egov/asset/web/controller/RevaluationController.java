@@ -225,15 +225,17 @@ public class RevaluationController {
 		LOGGER.info("Search revaluate for view");
 		assetRevaluation = new AssetRevaluation();
 		model.addAttribute("assetRevaluation", assetRevaluation);
+		assetBean = new AssetMaster();
+		model.addAttribute("assetBean", assetBean);
 		try {
 			departmentList = deptRepo.findAll();
 			//departmentList = microserviceUtils.getDepartments();
 			assetStatusList = statusRepo.findByCode("CAPITALIZED");
 			assetCategoryList = categoryRepo.findAll();
 			
-			revAssetList = revaluationRepository.findAll();
+			//revAssetList = revaluationRepository.findAll();
 			//revAssetList = assetService.searchAssets(assetBean);
-			LOGGER.info("Asset Lists..."+revAssetList.toString());
+			//LOGGER.info("Asset Lists..."+revAssetList.toString());
 		} catch (Exception e) {
 			e.getMessage();
 		}
@@ -242,25 +244,25 @@ public class RevaluationController {
 		model.addAttribute("assetStatusList", assetStatusList);
 		model.addAttribute("assetCategoryList", assetCategoryList);
 		model.addAttribute("mode", "view");
-		model.addAttribute("disabled", "");
+		model.addAttribute("isViewPage", true);
 		return "asset-view-revaluate";
 	}
 	
 	@PostMapping(value = "/view", params = "search")
-	public String view(@ModelAttribute("assetRevaluation") AssetRevaluation assetBean, Model model, HttpServletRequest request) {
+	public String view(@ModelAttribute("assetRevaluation") AssetRevaluation assetRevaluation, Model model, HttpServletRequest request) {
 		LOGGER.info("Search Operation..................");
-		assetList = new ArrayList<>();
+		//assetList = new ArrayList<>();
 		revAssetList = new ArrayList<>();
 		try {
-			/*assetList = assetService.searchAssets(assetBean.getAssetMaster());
-			LOGGER.info("Asset Lists..."+assetList);
+			/*assetList = assetService.searchAssets(assetBean);
+			LOGGER.info("Asset Lists..."+assetList.toString());
 			for(AssetMaster asset : assetList) {
 				AssetRevaluation rev = new AssetRevaluation();
 				rev.setAssetMaster(asset);
 				revAssetList.add(rev);
 			}*/
-			revAssetList = revaluationService.searchAssets(assetBean);//searchAssets
-			LOGGER.info("Asset Rev Lists..."+revAssetList);
+			revAssetList = revaluationService.searchAssets(assetRevaluation);//searchAssets
+			LOGGER.info("Asset Rev Lists..."+revAssetList.toString());
 		} catch (Exception e) {
 			e.getMessage();
 		}

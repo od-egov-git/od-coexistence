@@ -7,128 +7,128 @@
 
 
 <div class="container">
-<form:form name="assetRevaluation" method="post" action="${contextPath}/revaluate/view" modelAttribute="assetRevaluation" 
-class="form-horizontal form-groups-bordered" enctype="multipart/form-data">
-
-<div class="panel panel-primary" data-collapsed="0" id="search-asset">
-<div class="panel-heading">
-<div class="panel-title">
-<spring:message code="search.revaluate" text="View Asset For Revaluation"/>
-</div>
-</div>
-<div class="panel-body">
-<label class="col-sm-3 control-label text-right">
-<spring:message code="asset-code" text="assetCode"/>
-</label>
-<div class="col-sm-3 add-margin">
-<form:input class="form-control" path="assetMaster.code"/>
-</div>
-<label class="col-sm-3 control-label text-right">
-<spring:message code="asset-name" text="assetName"/>
-</label>
-<div class="col-sm-3 add-margin">
-<form:input class="form-control" path="assetMaster.assetHeader.assetName"/>
-</div>
-<label class="col-sm-3 control-label text-right">
-<spring:message code="asset-cat" text="assetCategory"/>
-   <span class="mandatory"></span>
-</label>
-<div class="col-sm-3 add-margin">
-<form:select path="assetMaster.assetHeader.assetCategory" id="assetCategory" required="required" class="form-control">
-<form:option value=""><spring:message code="lbl.select" /></form:option>
-<form:options items="${assetCategoryList}" itemValue="id" itemLabel="name"/>  
-</form:select>
-</div>
-<label class="col-sm-3 control-label text-right">
-<spring:message code="asset-dept" text="department"/>
-</label>
-<div class="col-sm-3 add-margin"> 
-<form:select path="assetMaster.assetHeader.department" id="department" class="form-control">
-<form:option value=""><spring:message code="lbl.select" /></form:option>
-<form:options items="${departmentList}" itemValue="id" itemLabel="name"/>  
-</form:select>
-</div>
-<label class="col-sm-3 control-label text-right">
-<spring:message code="asset-status" text="status"/>
-</label>
-<div class="col-sm-3 add-margin">
-<form:select path="assetMaster.assetStatus" id="assetStatus" class="form-control">
-<form:option value=""><spring:message code="lbl.select" /></form:option>
-<form:options items="${assetStatusList}" itemValue="id" itemLabel="description"/>  
-</form:select>
-</div>
-</div>
-</div>
-
-<div align="center" class="buttonbottom">
-<div class="row text-center">
-<input type="submit" class="btn btn-primary" name="search" value="Search"/>
-<input type="button" name="button2" id="button2" value="Close" class="btn btn-default" 
-onclick="window.parent.postMessage('close','*');window.close();"/>
-</div>
-</div>
-</form:form>
-
-<!-- Result Table -->
-<c:if test="${!isViewPage}">
-<div class="panel panel-primary" data-collapsed="0"> 
-<div class="panel-heading">
-<div class="panel-title">
-<spring:message code="asset-search-result" text="Search Result"/>
-</div>
-</div>
-<div class="panel-body">
-<table class="table table-bordered" id="resultHeader">
-<thead>
-<tr>
-<th><spring:message code="lbl-sl-no" text="Sr. No."/></th>
-<th><spring:message code="code" text="Code"/></th>
-<th><spring:message code="name" text="Name"/></th>
-<th><spring:message code="asset-cat" text="Asset Category Type"/></th>
-<th><spring:message code="asset-dept" text="Department"/></th>
-<th><spring:message code="asset-status" text="Status"/></th>
-</tr>
-</thead>
-<tbody>
-<c:choose>
-<c:when test="${revAssetList!=null && revAssetList.size() > 0}">
-<c:forEach items="${revAssetList}" var="asset" varStatus="item">
-
-<tr id="assetView">
-<td>
+	<form:form name="assetRevaluation" method="post" action="${contextPath}/revaluate/view" modelAttribute="assetRevaluation" 
+		class="form-horizontal form-groups-bordered" enctype="multipart/form-data">
+			
+			<div class="panel panel-primary" data-collapsed="0" id="search-asset">
+				<div class="panel-heading">
+					<div class="panel-title">
+						<spring:message code="search.revaluate" text="View Asset For Revaluation"/>
+					</div>
+				</div>
+				<div class="panel-body">
+					<label class="col-sm-3 control-label text-right">
+						<spring:message code="asset-code" text="assetCode"/>
+					</label>
+					<div class="col-sm-3 add-margin">
+						<form:input class="form-control" path="assetMaster.code"/>
+					</div>
+					<label class="col-sm-3 control-label text-right">
+						<spring:message code="asset-name" text="assetName"/>
+					</label>
+					<div class="col-sm-3 add-margin">
+						<form:input class="form-control" path="assetMaster.assetHeader.assetName"/>
+					</div>
+					<label class="col-sm-3 control-label text-right">
+						<spring:message code="asset-cat" text="assetCategory"/>
+					    <span class="mandatory"></span>
+					</label>
+					<div class="col-sm-3 add-margin">
+						<form:select path="assetMaster.assetHeader.assetCategory" id="assetCategory" required="required" class="form-control">
+								<form:option value=""><spring:message code="lbl.select" /></form:option>
+								<form:options items="${assetCategoryList}" itemValue="id" itemLabel="name"/>  
+						</form:select>
+					</div>
+					<label class="col-sm-3 control-label text-right">
+						<spring:message code="asset-dept" text="department"/>
+					</label>
+					<div class="col-sm-3 add-margin">						
+						<form:select path="assetMaster.assetHeader.department" id="department" class="form-control">
+							<form:option value=""><spring:message code="lbl.select" /></form:option>
+							<form:options items="${departmentList}" itemValue="id" itemLabel="name"/>  
+						</form:select>
+					</div>
+					<label class="col-sm-3 control-label text-right">
+						<spring:message code="asset-status" text="status"/>
+					</label>
+					<div class="col-sm-3 add-margin">
+						<form:select path="assetMaster.assetStatus" id="assetStatus" class="form-control">
+								<form:option value=""><spring:message code="lbl.select" /></form:option>
+								<form:options items="${assetStatusList}" itemValue="id" itemLabel="description"/>  
+						</form:select>
+					</div>
+				</div>
+			</div>
+		
+			<div align="center" class="buttonbottom">
+				<div class="row text-center">
+					<input type="submit" class="btn btn-primary" name="search" value="Search"/>
+					<input type="button" name="button2" id="button2" value="Close" class="btn btn-default" 
+					onclick="window.parent.postMessage('close','*');window.close();"/>
+				</div>
+			</div>
+	</form:form>
+	
+	<!-- Result Table -->
+	<c:if test="${!isViewPage}">
+	<div class="panel panel-primary" data-collapsed="0">	
+		<div class="panel-heading">
+		<div class="panel-title">
+			<spring:message code="asset-search-result" text="Search Result"/>
+		</div>
+		</div>
+		<div class="panel-body">
+		<table class="table table-bordered" id="resultHeader">
+		<thead>
+			<tr>
+				<th><spring:message code="lbl-sl-no" text="Sr. No."/></th>
+				<th><spring:message code="code" text="Code"/></th>
+				<th><spring:message code="name" text="Name"/></th>
+				<th><spring:message code="asset-cat" text="Asset Category Type"/></th>
+				<th><spring:message code="asset-dept" text="Department"/></th>
+				<th><spring:message code="asset-status" text="Status"/></th>
+			</tr>
+		</thead>
+		<tbody>
+			<c:choose>
+				<c:when test="${revAssetList!=null && revAssetList.size() > 0}">
+					 <c:forEach items="${revAssetList}" var="asset" varStatus="item">
+						
+						<tr id="assetView">
+							<td>
                                     ${item.index + 1}
                             </td>
-<td>
-<a href="#" target="popup"
+							<td>
+							<a href="#" target="popup"
                                   onclick="window.open('${contextPath}/revaluate/view/${asset.id}','popup','width=700,height=600'); return false;">
-${asset.assetMaster.code } </a>
-</td>
-<td>
-${asset.assetMaster.assetHeader.assetName }
-</td>
-<td>
-${asset.assetMaster.assetHeader.assetCategory.name }
-</td>
-<td>
-${asset.assetMaster.assetHeader.department.name}
-</td>
-<td>
-${asset.assetMaster.assetStatus.description }
-</td>
-</tr>
-</c:forEach> 
-</c:when>
-<c:otherwise>
-           <td colspan="6">No Records Found..</td>
-           
-        </c:otherwise>
-</c:choose>
-</tbody>
-</table> 
-</div>
-</div>
-</c:if>
-<!-- Result Table Ends -->
+								${asset.assetMaster.code } </a>
+							</td>
+							<td>
+								${asset.assetMaster.assetHeader.assetName }
+							</td>
+							<td>
+								${asset.assetMaster.assetHeader.assetCategory.name }
+							</td>
+							<td>
+								${asset.assetMaster.assetHeader.department.name}
+							</td>
+							<td>
+								${asset.assetMaster.assetStatus.description }
+							</td>
+						</tr>
+					</c:forEach> 
+				</c:when>
+				<c:otherwise>
+		            <td colspan="6">No Records Found..</td>
+		            
+		         </c:otherwise>
+			</c:choose>
+		</tbody>
+	</table>	
+	</div>
+	</div>
+	</c:if>
+	<!-- Result Table Ends -->
 </div>
 
 <script src="<cdn:url value='/resources/app/js/i18n/jquery.i18n.properties.js?rnd=${app_release_no}' context='/services/EGF'/>"></script>
@@ -163,14 +163,14 @@ ${asset.assetMaster.assetStatus.description }
 
 <script>
     $(document).ready(function() {
-   $('#resultHeader').DataTable( {
-       dom: 'Bfrtip',
-       aaSorting : [],
-       buttons: [
-           'copy', 'csv', 'excel', 'pdf', 'print'
-       ]
-   } );
-} );
+	    $('#resultHeader').DataTable( {
+	        dom: 'Bfrtip',
+	        aaSorting : [],
+	        buttons: [
+	            'copy', 'csv', 'excel', 'pdf', 'print'
+	        ]
+	    } );
+	} );
 
-
+	
 </script>

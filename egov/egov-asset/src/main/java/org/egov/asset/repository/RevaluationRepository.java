@@ -2,7 +2,6 @@ package org.egov.asset.repository;
 
 import java.util.List;
 
-import org.egov.asset.model.AssetMaster;
 import org.egov.asset.model.AssetRevaluation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
