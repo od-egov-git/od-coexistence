@@ -9,7 +9,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.egov.asset.model.AssetCatagory;
+import org.egov.asset.model.AssetHeader;
 import org.egov.asset.model.AssetHistory;
+import org.egov.asset.model.AssetLocation;
 import org.egov.asset.model.AssetMaster;
 import org.egov.asset.model.AssetRevaluation;
 import org.egov.asset.model.AssetStatus;
@@ -84,11 +86,14 @@ public class RevaluationController {
 	@PostMapping("/newform")
 	public String viewform(Model model) {
 		LOGGER.info("Search revaluate for create");
+		
 		assetBean = new AssetMaster();
+		assetBean.setAssetHeader(new AssetHeader());
+		assetBean.setAssetLocation(new AssetLocation());
 		model.addAttribute("assetBean", assetBean);
+		
 		try {
 			departmentList = deptRepo.findAll();
-			//departmentList = microserviceUtils.getDepartments();
 			assetStatusList = statusRepo.findByCode("CAPITALIZED");
 			assetCategoryList = categoryRepo.findAll();
 			
@@ -101,7 +106,6 @@ public class RevaluationController {
 					assetList.add(master);
 				}
 			}
-			LOGGER.info("Asset Lists..."+assetList.toString());
 		} catch (Exception e) {
 			e.getMessage();
 		}
@@ -119,15 +123,6 @@ public class RevaluationController {
 		LOGGER.info("Search Operation..................");
 		assetList = new ArrayList<>();
 		try {
-			/*Long statusId = null;
-			if(null != assetBean.getAssetStatus()) {
-				statusId = assetBean.getAssetStatus().getId();
-			}
-			assetList = masterRepo.getAssetMasterDetails(assetBean.getCode(), 
-					assetBean.getAssetHeader().getAssetName(),
-					assetBean.getAssetHeader().getAssetCategory().getId(), 
-					assetBean.getAssetHeader().getDepartment().getId(), statusId);
-			LOGGER.info("Asset Lists..."+assetList.toString());*/
 			assetList = assetService.searchAssets(assetBean);
 		} catch (Exception e) {
 			e.getMessage();
@@ -237,6 +232,7 @@ public class RevaluationController {
 			assetCategoryList = categoryRepo.findAll();
 			
 			revAssetList = revaluationRepository.findAll();
+			//revAssetList = assetService.searchAssets(assetBean);
 			LOGGER.info("Asset Lists..."+revAssetList.toString());
 		} catch (Exception e) {
 			e.getMessage();
@@ -251,19 +247,20 @@ public class RevaluationController {
 	}
 	
 	@PostMapping(value = "/view", params = "search")
-	public String view(@ModelAttribute("assetBean") AssetRevaluation assetBean, Model model, HttpServletRequest request) {
+	public String view(@ModelAttribute("assetRevaluation") AssetRevaluation assetBean, Model model, HttpServletRequest request) {
 		LOGGER.info("Search Operation..................");
+		assetList = new ArrayList<>();
 		revAssetList = new ArrayList<>();
 		try {
-			Long statusId = null;
-			if(null != assetBean.getAssetStatus()) {
-				statusId = assetBean.getAssetStatus().getId();
-			}
-			revAssetList = revaluationRepository.getAssetMasterDetails(assetBean.getCode(), 
-					assetBean.getAssetName(),
-					assetBean.getAssetCategory().getId(), 
-					assetBean.getDepartment(), statusId);
-			LOGGER.info("Asset Lists..."+revAssetList.toString());
+			/*assetList = assetService.searchAssets(assetBean.getAssetMaster());
+			LOGGER.info("Asset Lists..."+assetList);
+			for(AssetMaster asset : assetList) {
+				AssetRevaluation rev = new AssetRevaluation();
+				rev.setAssetMaster(asset);
+				revAssetList.add(rev);
+			}*/
+			revAssetList = revaluationService.searchAssets(assetBean);//searchAssets
+			LOGGER.info("Asset Rev Lists..."+revAssetList);
 		} catch (Exception e) {
 			e.getMessage();
 		}
@@ -277,9 +274,11 @@ public class RevaluationController {
 			e.getMessage();
 		}
 		model.addAttribute("assetBean", assetBean);
+		model.addAttribute("assetRevaluation", assetRevaluation);
 		model.addAttribute("departmentList", departmentList);
 		model.addAttribute("assetStatusList", assetStatusList);
 		model.addAttribute("assetCategoryList", assetCategoryList);
+		model.addAttribute("isViewPage", false);
 		
 		return "asset-view-revaluate";
 	}
