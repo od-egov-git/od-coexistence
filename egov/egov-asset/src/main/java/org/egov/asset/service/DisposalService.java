@@ -4,20 +4,24 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
+import java.util.stream.Collectors;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.asset.model.AssetCatagory;
 import org.egov.asset.model.AssetHistory;
 import org.egov.asset.model.AssetMaster;
-import org.egov.asset.model.AssetRevaluation;
 import org.egov.asset.model.AssetStatus;
+import org.egov.asset.model.DepreciationInputs;
 import org.egov.asset.model.Disposal;
 import org.egov.asset.repository.AccountcodePurposeRepository;
 import org.egov.asset.repository.AssetCatagoryRepository;
 import org.egov.asset.repository.AssetHistoryRepository;
 import org.egov.asset.repository.AssetMasterRepository;
 import org.egov.asset.repository.AssetStatusRepository;
+import org.egov.asset.repository.DepreciationRepository;
 import org.egov.asset.repository.DisposalRepository;
 import org.egov.commons.CChartOfAccounts;
 import org.egov.commons.CFunction;
@@ -29,8 +33,8 @@ import org.egov.commons.dao.FundHibernateDAO;
 import org.egov.commons.repository.CChartOfAccountsRepository;
 import org.egov.egf.expensebill.repository.DocumentUploadRepository;
 import org.egov.egf.utils.FinancialUtils;
-import org.egov.infra.admin.master.repository.DepartmentRepository;
 import org.egov.infra.admin.master.entity.Department;
+import org.egov.infra.admin.master.repository.DepartmentRepository;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.model.bills.DocumentUpload;
 import org.egov.model.voucher.VoucherDetails;
@@ -79,7 +83,11 @@ public class DisposalService {
 	private VoucherTypeBean voucherTypeBean;
 	@Autowired
 	private DepartmentRepository deptRepo;
+	@Autowired
+	private DepreciationRepository depreciationRepository;
 	
+	@PersistenceContext
+    private EntityManager em;
 	public transient CVoucherHeader voucherHeader = new CVoucherHeader();
 	
 	public transient WorkflowBean workflowBean = new WorkflowBean();
@@ -268,19 +276,54 @@ public class DisposalService {
 			if(null != assetBean.getAssetStatus()) {
 				statusId = String.valueOf(assetBean.getAssetStatus().getId());
 			}*/
+		
+		 String defaultQuery="From AssetMaster am where am.assetHeader.applicableForSale='true'";
+		 String queryAppender="";
 		 Long statusId = null;
 			if(null != assetBean.getAssetStatus()) {
 				statusId = assetBean.getAssetStatus().getId();
+				defaultQuery=defaultQuery+" and am.assetStatus.id="+statusId;
 			}
 			Long deptId=null;
 			if(null!=assetBean.getAssetHeader().getDepartment()) {
 				deptId=assetBean.getAssetHeader().getDepartment().getId();
+				defaultQuery=defaultQuery+" and am.assetHeader.department="+deptId;
 			}
-			
-				 List<AssetMaster> assetMasterDetails = disposalRepository.getAssetMasterDetails(assetBean.getCode(), 
+			Long assetCategoryId=null;
+			if(null!=assetBean.getAssetHeader().getAssetCategory()) {
+				assetCategoryId=assetBean.getAssetHeader().getAssetCategory().getId();
+				defaultQuery=defaultQuery+" and am.assetHeader.assetCategory.id="+assetCategoryId;
+			}
+			if(null!=assetBean.getCode()) {
+				defaultQuery=defaultQuery+" and am.code="+"'"+assetBean.getCode()+"'";
+			}
+			if(null!=assetBean.getAssetHeader().getAssetName()) {
+				defaultQuery=defaultQuery+" and am.assetHeader.assetName="+"'"+assetBean.getAssetHeader().getAssetName()+"'";
+			}
+
+			System.out.println("query "+defaultQuery);
+			List<AssetMaster> assetMasterList=new ArrayList<>();
+			List<AssetMaster> list=em.createQuery(defaultQuery).getResultList();
+			if(null!=list && list.size()>0 ) {
+			List<Long> assetIds = list.stream()
+			.map(am->am.getId())
+			.collect(Collectors.toList());
+			List<DepreciationInputs> depeciatedAsset = disposalRepository.getAssetForSaleDisposal(assetIds);
+			for(DepreciationInputs di:depeciatedAsset) {
+				list.stream()  
+		        .filter(am-> am.getId() ==di.getAssetId())
+		        .map(assetMaster->assetMaster)
+		        .forEach(am->
+		        assetMasterList.add(am)
+		        );
+			}
+			}
+			return assetMasterList;
+//			List<AssetMaster> assetMasterDetails1 = disposalRepository.getAssetMasterDetails1(defaultQuery);
+				 /*List<AssetMaster> assetMasterDetails = disposalRepository.getAssetMasterDetails(assetBean.getCode(), 
 					assetBean.getAssetHeader().getAssetName(),
-					assetBean.getAssetHeader().getAssetCategory().getId(),deptId,statusId);
-				 return assetMasterDetails;
+					assetCategoryId,deptId,statusId);
+				 return assetMasterDetails;*/
 
 
 	 }
@@ -305,19 +348,82 @@ public class DisposalService {
 			if(null != assetBean.getAssetStatus()) {
 				statusId = String.valueOf(assetBean.getAssetStatus().getId());
 			}*/
+		 String query="From Disposal dp where";
+		 boolean flag=false;
 		 Long statusId = null;
 			if(null != assetBean.getAssetStatus()) {
 				statusId = assetBean.getAssetStatus().getId();
+				if(flag) {
+					query=query+" and dp.asset.assetStatus.id="+statusId;
+				}else {
+					query=query+" dp.asset.assetStatus.id="+statusId;
+				}
+				
+				flag=true;
 			}
 			Long deptId=null;
 			if(null!=assetBean.getAssetHeader().getDepartment()) {
 				deptId=assetBean.getAssetHeader().getDepartment().getId();
+				
+				if(flag) {
+					query=query+" and dp.asset.assetHeader.department="+deptId;
+				}else {
+					query=query+" dp.asset.assetHeader.department="+deptId;
+				}
+				flag=true;
 			}
-			List<Disposal> disposalList = disposalRepository.getSaleAndDisposalList(assetBean.getCode(), 
+			Long assetCategoryId=null;
+			if(null!=assetBean.getAssetHeader().getAssetCategory()) {
+				assetCategoryId=assetBean.getAssetHeader().getAssetCategory().getId();
+				
+				if(flag) {
+					query=query+" and dp.asset.assetHeader.assetCategory.id="+assetCategoryId;
+				}else {
+					query=query+" dp.asset.assetHeader.assetCategory.id="+assetCategoryId;
+				}
+				flag=true;
+			}
+			if(null!=assetBean.getCode()) {
+				
+				if(flag) {
+					query=query+" and dp.asset.code="+"'"+assetBean.getCode()+"'";
+				}else {
+					query=query+" dp.asset.code="+"'"+assetBean.getCode()+"'";
+				}
+				flag=true;
+			}
+			if(null!=assetBean.getAssetHeader().getAssetName()) {
+				
+				if(flag) {
+					query=query+" and dp.asset.assetHeader.assetName="+"'"+assetBean.getAssetHeader().getAssetName()+"'";
+				}else {
+					query=query+" dp.asset.assetHeader.assetName="+"'"+assetBean.getAssetHeader().getAssetName()+"'";
+				}
+				flag=true;
+			}
+			System.out.println("query "+query);
+			
+			List<Disposal> disposalList=new ArrayList<>();
+			if(flag) {
+				List<Disposal> list=em.createQuery(query).getResultList();
+				if(list.size()>0) {
+					disposalList.addAll(list);
+				}
+			}else {
+				List<Disposal> findAll = disposalRepository.findAll();
+				if(findAll.size()>0) {
+					disposalList.addAll(findAll);
+				}
+			}
+			
+			
+			
+			return disposalList;
+			/*List<Disposal> disposalList = disposalRepository.getSaleAndDisposalList(assetBean.getCode(), 
 					assetBean.getAssetHeader().getAssetName(),
 					assetBean.getAssetHeader().getAssetCategory().getId(), 
 					deptId, statusId);
-			return disposalList;
+			return disposalList;*/
 	 }
 	 public AssetMaster getAssetById(Long aasetId) {
 		 

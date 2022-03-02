@@ -236,7 +236,7 @@
 		<label class="col-sm-3 control-label text-right"><spring:message code="lbl.sale.profiloss" text="Profit/Loss" /> 
 		</label>
 		<div class="col-sm-3 add-margin">
-			<form:input class="form-control" id="profitloss" value="${disposal.assetCurrentValueSale - disposal.saleValue}" path="" readonly="true"/>
+			<form:input class="form-control" id="profitloss" value="${disposal.saleValue - disposal.assetCurrentValueSale}" path="" readonly="true"/>
 	
 		</div>
 		<label class="col-sm-3 control-label text-right"><spring:message code="lbl.sale.voucherreferencenumber" text="Voucher Reference number" /> 

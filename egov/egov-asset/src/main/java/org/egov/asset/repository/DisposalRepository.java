@@ -25,4 +25,8 @@ public interface DisposalRepository extends JpaRepository<Disposal, Long> {
 	
 	@Query("FROM DepreciationInputs di WHERE di.assetId IN (:assetId)")
 	public List<DepreciationInputs> getAssetForSaleDisposal(@Param("assetId") List<Long> assetId);
+	
+	/*@Query(value = ":query")
+	public List<AssetMaster> getAssetMasterDetails1(@Param("query") String query);*/
+
 }

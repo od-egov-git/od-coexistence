@@ -7,53 +7,70 @@
 
 
 <div class="container">
+	<form:form  method="post" action="generate"
+		modelAttribute="transactionReport">
+
 		<div class="panel panel-primary" data-collapsed="0" id="search-asset">
 			<div class="panel-heading">
 				<div class="panel-title">
-					<spring:message code="view-asset" text="View Asset History" />
+					<spring:message code="view-asset" text="Generate Transaction Report" />
 				</div>
 			</div>
 			
 			<div class="panel-body">
+			<div class="form-group">
+			<label class="col-sm-3 control-label text-right">
+			<spring:message code="lbl.ulb" text="Select ULB" /> 
+			</label>
+			<div class="col-sm-3 add-margin">
+			<form:select path="ulbNames" class="form-control" multiple="true"> 
+				<form:option value="ALL">ALL</form:option>
+				<form:options items="${ulbList}"/>
+			</form:select>
+			<form:errors path="" cssClass="add-margin error-msg" />
+		</div>
+			</div>
+			</div>
+			<div align="center" class="buttonbottom">
+			<div class="row text-center">
+				<input type="submit" class="btn btn-primary"
+					value="Generate Report" /> <input type="button" name="button2" id="button2"
+					value="Close" class="btn btn-default"
+					onclick="window.parent.postMessage('close','*');window.close();" />
+			</div>
+		</div>
+		</div>
+
+		
+	</form:form>
+	<!-- Result Table -->
+	<div class="panel panel-primary" data-collapsed="0">
+		<div class="panel-heading">
+			<div class="panel-title">
+				<spring:message code="asset-search-result" text="Search Result" />
+			</div>
+		</div>
+		<div class="panel-body">
 		<table class="table table-bordered" id="resultHeader">
 			<thead>
 				<tr>
 					<th><spring:message code="lbl-sl-no" text="Sr. No." /></th>
-					<th><spring:message code="lbl-asset-assetcategoryname" text="Transaction Date" /></th>
-					<th><spring:message code="lbl-asset-department" text="Gross Value before Transaction(Rs.)" /></th>
-					<th><spring:message code="lbl-asset-code"
-							text="Transaction Type" /></th>
-					<th><spring:message code="lbl-asset-code" text="Transaction Amount" /></th>
-					<th><spring:message code="lbl-asset-code" text="Gross Value After Transaction(Rs.)" /></th>
-					<%-- <c:if test="${isReference}">
-						<th><spring:message code="lbl-action" text="Action" /></th>
-					</c:if> --%>
+					<th><spring:message code="lbl-ulb-name" text="Ulb Name" /></th>
+					<th><spring:message code="lbl-no-of-trxn-ve" text="No. of Transactions(Voucher Entry)" /></th>
+					<th><spring:message code="lbl-no-of-trxn-be" text="No. of Transactions(Bill Entry)" /></th>
+					
 				</tr>
 			</thead>
 			<tbody>
 				<c:choose>
-					<c:when test="${assetHistoryList!=null && assetHistoryList.size() > 0}">
-						<c:forEach items="${assetHistoryList}" var="assetHistory" varStatus="item">
+					<c:when test="${transactionReports!=null && transactionReports.size() > 0}">
+						<c:forEach items="${transactionReports}" var="report" varStatus="item">
 
-							<tr id="assetView">
-										<td>
-										${item.index + 1}
-										</td>
-										<td>
-										${assetHistory.transactionDate }
-										</td>
-										<td>
-										${assetHistory.valueBeforeTrxn }
-										</td>
-										<td>
-										${assetHistory.transactionType }
-										</td>
-										<td>
-										${assetHistory.trxnValue}
-										</td>
-										<td>
-										${assetHistory.valueAfterTrxn}
-										</td>
+							<tr id="reportView">
+								<td>${item.index + 1} </td>
+								<td>${report.ulbName } </a></td>
+								<td>${report.vNoOfTrxn }</td>
+								<td>${report.bNoOfTrxn }</td>
 							</tr>
 						</c:forEach>
 					</c:when>
@@ -65,11 +82,10 @@
 			</tbody>
 		</table>
 	</div>
-	</div>
 	<!-- Result Table Ends -->
-	<div align="center"><input type="button" name="button2" id="button2" value="Close" class="btn btn-primary" onclick="window.parent.postMessage('close','*');window.close();"/></div>
+	</div>
+	
 </div>
-
 
 <script src="<cdn:url value='/resources/app/js/i18n/jquery.i18n.properties.js?rnd=${app_release_no}' context='/services/EGF'/>"></script>
 <script src="<cdn:url value='/resources/app/js/common/helper.js?rnd=${app_release_no}' context='/services/EGF'/>"></script>
