@@ -19,10 +19,13 @@
 			
 			<div class="panel-body">
 			<div class="form-group">
+			<label class="col-sm-3 control-label text-right">
+			<spring:message code="lbl.ulb" text="Select ULB" /> 
+			</label>
 			<div class="col-sm-3 add-margin">
 			<form:select path="ulbNames" class="form-control" multiple="true"> 
 				<form:option value="ALL">ALL</form:option>
-				<form:options items="${ulbList}" itemLabel="ulbName" itemValue="ulbName"/>
+				<form:options items="${ulbList}"/>
 			</form:select>
 			<form:errors path="" cssClass="add-margin error-msg" />
 		</div>
