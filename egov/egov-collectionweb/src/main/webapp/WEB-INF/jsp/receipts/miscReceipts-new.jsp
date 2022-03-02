@@ -357,7 +357,7 @@ function resetMisc(){
 function onBodyLoadMiscReceipt()
 {
     document.getElementById("voucherDate").value=currDate;
-    document.getElementById("voucherDate").disabled = true;
+    //document.getElementById("voucherDate").disabled = true; //commented 28022022
     //document.getElementById("rebateDetails").style.display="none";
     //loadDropDownCodes();
     loadDropDownRebateCodes();

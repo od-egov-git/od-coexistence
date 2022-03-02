@@ -6,11 +6,9 @@ import java.net.URLDecoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,9 +17,6 @@ import org.apache.http.HttpStatus;
 import org.apache.log4j.Logger;
 import org.egov.billsaccounting.services.CreateVoucher;
 import org.egov.billsaccounting.services.VoucherConstant;
-
-//import org.egov.collection.entity.MisReceiptDetail;
-//import org.egov.collection.service.MisReceiptDetailService;
 import org.egov.commons.Accountdetailtype;
 import org.egov.commons.Bank;
 import org.egov.commons.CChartOfAccountDetail;
@@ -30,11 +25,10 @@ import org.egov.commons.CFunction;
 import org.egov.commons.CGeneralLedger;
 import org.egov.commons.CVoucherHeader;
 import org.egov.commons.EgModules;
-import org.egov.commons.Migration;
 import org.egov.commons.Fund;
+import org.egov.commons.Migration;
 import org.egov.commons.Vouchermis;
 import org.egov.commons.dao.FunctionDAO;
-import org.egov.egf.web.controller.expensebill.BaseBillController;
 import org.egov.commons.service.AccountDetailKeyService;
 import org.egov.commons.service.AccountdetailtypeService;
 import org.egov.commons.service.ChartOfAccountDetailService;
@@ -44,12 +38,15 @@ import org.egov.egf.autonumber.ExpenseBillNumberGenerator;
 import org.egov.egf.billsubtype.service.EgBillSubTypeService;
 import org.egov.egf.commons.bank.service.CreateBankService;
 import org.egov.egf.contract.model.AccountDetailContract;
+import org.egov.egf.contract.model.MigrationRequest;
+import org.egov.egf.contract.model.MigrationResponse;
 import org.egov.egf.contract.model.MisReceiptsDetailsRequest;
 import org.egov.egf.contract.model.MisReceiptsDetailsResponse;
 import org.egov.egf.contract.model.MisReceiptsPOJO;
 import org.egov.egf.contract.model.RefundRequest;
 import org.egov.egf.contract.model.RefundResponse;
 import org.egov.egf.contract.model.SubledgerDetailContract;
+import org.egov.egf.contract.model.TransactionDetail;
 import org.egov.egf.contract.model.Voucher;
 import org.egov.egf.contract.model.VoucherDetailsResponse;
 import org.egov.egf.contract.model.VoucherRequest;
@@ -58,7 +55,8 @@ import org.egov.egf.contract.model.VoucherSearchRequest;
 import org.egov.egf.expensebill.service.RefundBillService;
 import org.egov.egf.expensebill.service.VouchermisService;
 import org.egov.egf.masters.services.OtherPartyService;
-import org.egov.egf.utils.FinancialUtils;
+import org.egov.egf.voucher.repository.MigrationRepo;
+import org.egov.egf.contract.model.MisReceiptDetail;
 import org.egov.egf.web.controller.expensebill.BaseBillController;
 import org.egov.eis.web.contract.WorkflowContainer;
 import org.egov.infra.admin.master.entity.AppConfigValues;
@@ -74,19 +72,22 @@ import org.egov.model.bills.EgBillSubType;
 import org.egov.model.bills.EgBilldetails;
 import org.egov.model.bills.EgBillregister;
 import org.egov.model.bills.EgBillregistermis;
+import org.egov.model.common.ResponseInfo;
+import org.egov.model.common.ResponseInfoWrapper;
 import org.egov.model.masters.OtherParty;
 import org.egov.model.voucher.PreApprovedVoucher;
+import org.egov.services.voucher.MisReceiptDetailService;
 import org.egov.services.voucher.VoucherService;
 import org.egov.utils.FinancialConstants;
 import org.egov.utils.PaymentRefundUtils;
 import org.hibernate.SQLQuery;
-import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -96,13 +97,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.exilant.eGov.src.domain.GeneralLedger;
-import org.egov.egf.contract.model.TransactionDetail;
-import org.egov.egf.contract.model.MigrationRequest;
-import org.egov.egf.contract.model.MigrationResponse;
-import org.egov.egf.voucher.repository.MigrationRepo;
-import org.egov.model.common.ResponseInfo;
-import org.egov.model.common.ResponseInfoWrapper;
 @RestController
 public class VoucherController extends BaseBillController{
 	private static final Logger LOGGER = Logger.getLogger(VoucherController.class);
@@ -115,9 +111,8 @@ public class VoucherController extends BaseBillController{
 	private CreateVoucher createVoucher;
 	@Autowired
 	private VoucherService voucherService;
-	/*
-	 * @Autowired MisReceiptDetailService misReceiptDetailService;
-	 */
+	@Autowired
+	MisReceiptDetailService misReceiptDetailService;
 	@Autowired
 	protected AppConfigValueService appConfigValuesService;
 	@Autowired
@@ -309,6 +304,53 @@ public class VoucherController extends BaseBillController{
                 }
         }
 	
+	@PostMapping(value = "/rest/voucher/_misreceipt")
+	@ResponseBody
+	public MisReceiptsDetailsResponse  createMiscReceiptDetails(@RequestBody MisReceiptsDetailsRequest misReceiptsDetailsRequest ){
+		System.out.println("1....nEW");
+		ModelMap model =null;
+		MisReceiptsDetailsResponse res = new MisReceiptsDetailsResponse();
+		res.setSuccess(false);
+		MisReceiptDetail misReceiptDetail = null;
+		MisReceiptsPOJO m = misReceiptsDetailsRequest.getMisReceiptsPOJO();
+		Date date   = null;
+		 try {
+			 model= new ModelMap();
+			date   = new Date(m.getReceipt_date());
+			misReceiptDetail = new MisReceiptDetail();
+         	misReceiptDetail.setBank_branch(m.getBank_branch());
+         	misReceiptDetail.setBank_name(m.getBank_name());
+         	misReceiptDetail.setCollectedbyname(m.getCollectedbyname());
+         	misReceiptDetail.setGstno(m.getGstno());
+         	misReceiptDetail.setNarration(m.getNarration());
+         	misReceiptDetail.setPaid_by(m.getPaid_by());
+         	misReceiptDetail.setPayer_address(m.getPayer_address());
+         	misReceiptDetail.setPayment_mode(m.getPayment_mode());
+         	misReceiptDetail.setPayment_status(m.getPayment_status());
+         	misReceiptDetail.setPayments_id(m.getPayments_id());
+         	misReceiptDetail.setReceipt_number(m.getReceipt_number());
+         	misReceiptDetail.setReceipt_date(date);
+         	misReceiptDetail.setServicename(m.getServicename());
+         	misReceiptDetail.setSubdivison(m.getSubdivison());
+         	misReceiptDetail.setTotal_amt_paid(m.getTotal_amt_paid());
+         	misReceiptDetail.setChequeddno(m.getChequeddno());
+         	misReceiptDetail.setChequedddate(new Date(m.getChequedddate()));
+         	System.out.println("Details :::"+misReceiptDetail.toString());
+         	misReceiptDetail  = misReceiptDetailService.save(misReceiptDetail);
+         	System.out.println("Saved Successfully");
+         	res.setSuccess(true);
+         	res.setMessage("Saved Successfully");
+         	model.addAttribute("response", res);
+        	model.addAttribute("data",misReceiptDetail);
+         } catch (Exception e) {
+                 LOGGER.error(e.getMessage(), e);
+               //  throw new ApplicationRuntimeException(e.getMessage());
+                 e.printStackTrace();
+         }
+			 return res;
+	       
+	 
+	}
 	
 	@PostMapping(value = "/rest/voucher/migration_data_save")
 	@ResponseBody
@@ -712,7 +754,7 @@ public boolean checknullBigDecimal(BigDecimal value) {
     }
     
 	//@PostMapping(value = "/rest/voucher/refundBill")//, consumes = "application/json", produces = "application/json")
-	@RequestMapping(value = "/rest/voucher/refundBill", method = {RequestMethod.GET})
+	@RequestMapping(value = "/rest/voucher/refundBill", method = {RequestMethod.POST})
 	public RefundResponse refundBill(@RequestBody RefundRequest refundRequest, final Model model,
 			final BindingResult resultBinder, final HttpServletRequest request) throws IOException {
 	
@@ -765,7 +807,7 @@ public boolean checknullBigDecimal(BigDecimal value) {
 		
 		totalCrAmt = new BigDecimal(0); 
 	 	egBillregister.setBillamount(totalCrAmt);
-	 	final Long OtherCount=(Long) persistenceService.find("select count(*) from OtherParty where bankaccount='"+refundRequest.getReceipt().getBankAccount()+"'");	
+	 	final Long OtherCount=(Long) persistenceService.find("select count(*) from OtherParty where bankaccount='"+refundRequest.getReceipt().getBankAccount()+"' and name='"+refundRequest.getReceipt().getCitizenName()+"'");	
 		if(OtherCount==0)
 		{
 			System.out.println("inside no otherparty found"); 
@@ -783,6 +825,7 @@ public boolean checknullBigDecimal(BigDecimal value) {
 				otherParty.setBankAccount(refundRequest.getReceipt().getBankAccount());
 				otherParty.setIfscCode(refundRequest.getReceipt().getIfscCode());
 				otherParty.setCode(refundRequest.getReceipt().getCitizenName());
+				otherParty.setName(refundRequest.getReceipt().getCitizenName());
 				otherPartyService.create1(otherParty,approver);
 			}
 			catch(Exception e)
@@ -793,7 +836,7 @@ public boolean checknullBigDecimal(BigDecimal value) {
 		final List<CGeneralLedger> gllist = paymentRefundUtils
 				.getAccountDetails(Long.valueOf(vouchermis.getVoucherheaderid().getId()));
 		try {
-			final Long otherpartyid=(Long) persistenceService.find("select id from OtherParty where bankaccount='"+refundRequest.getReceipt().getBankAccount()+"'");
+			final Long otherpartyid=(Long) persistenceService.find("select id from OtherParty where bankaccount='"+refundRequest.getReceipt().getBankAccount()+"' and name='"+refundRequest.getReceipt().getCitizenName()+"'");
 	    	List<GeneralLedger> ledger=new ArrayList();
 			List<Object[]> list1= null;
 			final StringBuffer query1 = new StringBuffer(500);
@@ -922,4 +965,6 @@ public boolean checknullBigDecimal(BigDecimal value) {
 		//refundresponse.setResponseInfo(responseInfo);
 		return refundresponse;
 	}
+
+
 }

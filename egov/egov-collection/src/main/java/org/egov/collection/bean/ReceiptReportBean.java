@@ -21,6 +21,43 @@ public class ReceiptReportBean {
 	private BigDecimal depositAmount;
 	private String gstNo;
 	private String status;
+	private String department;
+	private String serviceCategory;
+	private String chequeddno;
+	private String chequedddate;
+	private String bank;
+	
+	
+	public String getDepartment() {
+		return department;
+	}
+	public void setDepartment(String department) {
+		this.department = department;
+	}
+	public String getServiceCategory() {
+		return serviceCategory;
+	}
+	public void setServiceCategory(String serviceCategory) {
+		this.serviceCategory = serviceCategory;
+	}
+	public String getChequeddno() {
+		return chequeddno;
+	}
+	public void setChequeddno(String chequeddno) {
+		this.chequeddno = chequeddno;
+	}
+	public String getChequedddate() {
+		return chequedddate;
+	}
+	public void setChequedddate(String chequedddate) {
+		this.chequedddate = chequedddate;
+	}
+	public String getBank() {
+		return bank;
+	}
+	public void setBank(String bank) {
+		this.bank = bank;
+	}
 	public String getSlNo() {
 		return slNo;
 	}

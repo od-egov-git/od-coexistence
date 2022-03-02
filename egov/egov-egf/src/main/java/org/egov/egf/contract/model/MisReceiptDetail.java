@@ -1,4 +1,4 @@
-package org.egov.egf.web.controller.cashbook;
+package org.egov.egf.contract.model;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -35,6 +35,9 @@ public class MisReceiptDetail {
 	private String collectedbyname ;
 	private String gstno ;
 	private String payment_mode ;
+	private String chequeddno;
+	private Date chequedddate;
+	
 	public Long getId() {
 		return id;
 	}
@@ -134,6 +137,18 @@ public class MisReceiptDetail {
 	}
 	public void setReceipt_date(Date receipt_date) {
 		this.receipt_date = receipt_date;
+	}
+	public String getChequeddno() {
+		return chequeddno;
+	}
+	public void setChequeddno(String chequeddno) {
+		this.chequeddno = chequeddno;
+	}
+	public Date getChequedddate() {
+		return chequedddate;
+	}
+	public void setChequedddate(Date chequedddate) {
+		this.chequedddate = chequedddate;
 	}
 
 }

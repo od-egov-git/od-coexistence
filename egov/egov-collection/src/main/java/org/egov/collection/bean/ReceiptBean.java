@@ -70,8 +70,45 @@ public class ReceiptBean {
     private String bankBranch;
     private String bank;
     private String remittanceReferenceNumber;
+    private String subDivision;
+    private String createdUser;
+    private String functionCode;
+    private String remittanceVouherNumber;
+    private Long voucherid;
+    
+    public String getRemittanceVouherNumber() {
+		return remittanceVouherNumber;
+	}
 
-    public Boolean getSelected() {
+	public void setRemittanceVouherNumber(String remittanceVouherNumber) {
+		this.remittanceVouherNumber = remittanceVouherNumber;
+	}
+
+	public String getFunctionCode() {
+		return functionCode;
+	}
+
+	public void setFunctionCode(String functionCode) {
+		this.functionCode = functionCode;
+	}
+
+	public String getCreatedUser() {
+		return createdUser;
+	}
+
+	public void setCreatedUser(String createdUser) {
+		this.createdUser = createdUser;
+	}
+
+	public String getSubDivision() {
+		return subDivision;
+	}
+
+	public void setSubDivision(String subDivision) {
+		this.subDivision = subDivision;
+	}
+
+	public Boolean getSelected() {
         return selected;
     }
 
@@ -214,5 +251,13 @@ public class ReceiptBean {
     public void setRemittanceReferenceNumber(String remittanceReferenceNumber) {
         this.remittanceReferenceNumber = remittanceReferenceNumber;
     }
+
+	public Long getVoucherid() {
+		return voucherid;
+	}
+
+	public void setVoucherid(Long voucherid) {
+		this.voucherid = voucherid;
+	}
 
 }

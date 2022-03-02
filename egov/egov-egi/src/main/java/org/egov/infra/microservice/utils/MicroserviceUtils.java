@@ -2018,7 +2018,12 @@ public class MicroserviceUtils {
         StringBuilder uri = new StringBuilder(appConfigManager.getEgovCollSerHost()).append(appConfigManager.getCollSerPaymentCreate());
         final RequestInfo requestInfo = getRequestInfo();
         PaymentRequest request = PaymentRequest.builder().requestInfo(requestInfo).payment(payment).build();
-        response = restTemplate.postForObject(uri.toString(), request , PaymentResponse.class);            
+        System.out.println("==========In Generate Payments============");
+        System.out.println("Req InstrumentDate========= "+request.getPayment().getInstrumentDate());
+        System.out.println("Req TransactionDate========= "+request.getPayment().getTransactionDate());
+        response = restTemplate.postForObject(uri.toString(), request , PaymentResponse.class);  
+        System.out.println("After Req InstrumentDate========= "+response.getPayments().get(0).getInstrumentDate());
+        System.out.println("After Req TransactionDate========= "+response.getPayments().get(0).getTransactionDate());
         return response;
     }
     

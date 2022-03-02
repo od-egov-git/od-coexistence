@@ -558,8 +558,7 @@ function onSubmit()
 		 */
 		document.dbpform.action = '/services/EGF/payment/voucherdirectBankPayment-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory+'&backlogEntry='+backlogEntry;
 		document.dbpform.submit();
-	}
-	alert("end");	
+	}	
 }
 
 function validateCutOff()

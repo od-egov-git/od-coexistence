@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.apache.struts2.convention.annotation.Action;
 import org.egov.commons.Fund;
+import org.egov.egf.contract.model.MisReceiptDetail;
 import org.egov.egf.model.BankAdviceReportInfo;
 import org.egov.egf.model.IEStatementEntry;
 import org.egov.egf.model.Statement;

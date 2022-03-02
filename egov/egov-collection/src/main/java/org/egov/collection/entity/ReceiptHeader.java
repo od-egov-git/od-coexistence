@@ -58,11 +58,16 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.Transient;
+
 import org.egov.collection.constants.CollectionConstants;
+import org.egov.commons.DocumentUploads;
+//import org.egov.commons.DocumentUploads;
 import org.egov.commons.EgwStatus;
 import org.egov.infra.admin.master.entity.Location;
 import org.egov.infra.persistence.entity.Auditable;
 import org.egov.infra.workflow.entity.StateAware;
+import org.egov.model.bills.DocumentUpload;
 import org.egov.model.instrument.InstrumentHeader;
 
 public class ReceiptHeader extends StateAware implements Auditable {
@@ -86,11 +91,13 @@ public class ReceiptHeader extends StateAware implements Auditable {
     private char receipttype;
     private String receiptnumber;
     private Date receiptdate;
+    private String receiptdatenew;
     private String manualreceiptnumber;
     private Date manualreceiptdate;
     private Boolean isModifiable;
 
     private String service;
+    private String serviceBusinessName;
     private Character collectiontype;
     private Set<ReceiptDetail> receiptDetails = new LinkedHashSet<>();
     private ReceiptMisc receiptMisc;
@@ -126,7 +133,7 @@ public class ReceiptHeader extends StateAware implements Auditable {
     private Long version;
     private String serviceCategory;
     private BigDecimal totalcramount;
-
+    private String remittanceVoucherNumber;
     private String curretnStatus;
     private String currentreceipttype;
     private String modOfPayment;
@@ -139,7 +146,35 @@ public class ReceiptHeader extends StateAware implements Auditable {
     private Date rrDate;
     private String subdivison;
     private String gstno;
-    public ReceiptHeader() {
+    private String createdByName;
+	private String department;
+	private String depositDate;
+	@Transient
+    private List<DocumentUpload> documentDetail = new ArrayList<>();
+    
+	private String serviceType;
+	private String chequeddno;
+	private String chequedddate;
+	private String bank;
+	
+    public String getRemittanceVoucherNumber() {
+		return remittanceVoucherNumber;
+	}
+
+	public void setRemittanceVoucherNumber(String remittanceVoucherNumber) {
+		this.remittanceVoucherNumber = remittanceVoucherNumber;
+	}
+
+    public List<DocumentUpload> getDocumentDetail() {
+		return documentDetail;
+	}
+
+	public void setDocumentDetail(List<DocumentUpload> documentDetail) {
+		if (documentDetail != null)
+            this.documentDetail.addAll(documentDetail);
+	}
+
+	public ReceiptHeader() {
     }
 
     public ReceiptHeader(final String referencenumber, final Date referencedate, final String consumerCode,
@@ -963,6 +998,79 @@ public class ReceiptHeader extends StateAware implements Auditable {
 
 	public void setGstno(String gstno) {
 		this.gstno = gstno;
+	}
+
+	public String getServiceBusinessName() {
+		return serviceBusinessName;
+	}
+
+	public void setServiceBusinessName(String serviceBusinessName) {
+		this.serviceBusinessName = serviceBusinessName;
+	}
+
+	public String getCreatedByName() {
+		return createdByName;
+	}
+
+	public void setCreatedByName(String createdByName) {
+		this.createdByName = createdByName;
+	}
+
+	
+	public String getReceiptdatenew() {
+		return receiptdatenew;
+	}
+
+	public void setReceiptdatenew(String receiptdatenew) {
+		this.receiptdatenew = receiptdatenew;
+	}
+	
+	public String getDepartment() {
+		return department;
+	}
+
+	public void setDepartment(String department) {
+		this.department = department;
+	}
+
+	public String getDepositDate() {
+		return depositDate;
+	}
+
+	public void setDepositDate(String depositDate) {
+		this.depositDate = depositDate;
+	}
+
+	public String getServiceType() {
+		return serviceType;
+	}
+
+	public void setServiceType(String serviceType) {
+		this.serviceType = serviceType;
+	}
+
+	public String getChequeddno() {
+		return chequeddno;
+	}
+
+	public void setChequeddno(String chequeddno) {
+		this.chequeddno = chequeddno;
+	}
+
+	public String getChequedddate() {
+		return chequedddate;
+	}
+
+	public void setChequedddate(String chequedddate) {
+		this.chequedddate = chequedddate;
+	}
+
+	public String getBank() {
+		return bank;
+	}
+
+	public void setBank(String bank) {
+		this.bank = bank;
 	}
 
 	

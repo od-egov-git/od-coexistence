@@ -54,22 +54,55 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.persistence.Transient;
+
 import org.egov.collection.bean.ReceiptBean;
 import org.egov.collection.constants.CollectionConstants;
 import org.egov.collection.entity.CollectionBankRemittanceReport;
 import org.egov.collection.entity.ReceiptHeader;
+import org.egov.common.contstants.CommonConstants;
+import org.egov.commons.CVoucherHeader;
+import org.egov.commons.DocumentUploads;
+import org.egov.commons.repository.CommonDocumentUploadRepository;
+import org.egov.commons.utils.DocumentUtils;
+import org.egov.egf.expensebill.repository.DocumentUploadRepository;
+import org.egov.egf.utils.FinancialUtils;
 import org.egov.infra.microservice.models.Receipt;
 import org.egov.infra.utils.DateUtils;
+import org.egov.model.bills.DocumentUpload;
 import org.egov.model.instrument.InstrumentHeader;
+import org.egov.utils.FinancialConstants;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 public abstract class RemittanceService implements Serializable {
     private static final long serialVersionUID = 1849734164810403255L;
-
+    @Autowired
+    private DocumentUtils docUtils; // added abhishek 24032021
+    @Autowired
+    private FinancialUtils financialUtils;
+	/*
+	 * @Autowired private static CommonDocumentUploadRepository
+	 * documentUploadRepository;// added abhishek 24032021
+	 */    @Transient
+	@Autowired
+	private DocumentUploadRepository documentUploadRepository;
+	 
+    private List<DocumentUpload> documentDetail = new ArrayList<>();
+    
     public abstract List<Receipt> createCashBankRemittance(List<ReceiptBean> receiptList, final String accountNumberId,
             final Date remittanceDate);
 
-    public abstract List<ReceiptBean> findCashRemittanceDetailsForServiceAndFund(final String boundaryIdList,
-            final String serviceCodes, final String fundCodes, Date startDate, Date endDate);
+	/*
+	 * public abstract List<ReceiptBean>
+	 * findCashRemittanceDetailsForServiceAndFund(final String boundaryIdList, final
+	 * String serviceCodes, final String fundCodes, Date startDate, Date endDate,
+	 * String serviceTypeId);
+	 */
+    public abstract List<ReceiptBean> findCashRemittanceDetailsForServiceAndFund( String classification, Date fromDate, Date toDate, String businessCode,
+    	    String receiptNo,String type);
+    
+   
 
     public List<CollectionBankRemittanceReport> prepareBankRemittanceReport(final List<ReceiptHeader> receiptHeaders) {
         final List<CollectionBankRemittanceReport> reportList = new ArrayList<CollectionBankRemittanceReport>(0);
@@ -88,7 +121,7 @@ public abstract class RemittanceService implements Serializable {
                     collBankRemitReport.setAmount(instHead.getInstrumentAmount().doubleValue());
                     collBankRemitReport.setReceiptNumber(receiptHead.getReceiptnumber());
                     collBankRemitReport.setReceiptDate(receiptHead.getReceiptDate());
-                    collBankRemitReport.setVoucherNumber(receiptHead.getRemittanceReferenceNumber());
+                    collBankRemitReport.setVoucherNumber(receiptHead.getRemittanceVoucherNumber());
                     reportList.add(collBankRemitReport);
                 } else {
                     collBankRemitReport.setVoucherNumber(receiptHead.getRemittanceReferenceNumber());
@@ -99,23 +132,18 @@ public abstract class RemittanceService implements Serializable {
         return reportList;
     }
 
-    public List<CollectionBankRemittanceReport> prepareChequeRemittanceReport(final List<ReceiptBean> receiptHeaders) {
-        final List<CollectionBankRemittanceReport> reportList = new ArrayList<CollectionBankRemittanceReport>(0);
-        for (final ReceiptBean receiptHead : receiptHeaders) {
+    public List<CollectionBankRemittanceReport> prepareChequeRemittanceReport(final ReceiptBean receiptHeaders) {
+    	final List<CollectionBankRemittanceReport> reportList = new ArrayList<CollectionBankRemittanceReport>(0);
+       // for (final ReceiptBean receiptHead : receiptHeaders) {
             final CollectionBankRemittanceReport collBankRemitReport = new CollectionBankRemittanceReport();
-            if (receiptHead.getSelected() != null && receiptHead.getSelected()) {
-                collBankRemitReport.setChequeNo(receiptHead.getInstrumentNumber());
-                collBankRemitReport.setBranchName(receiptHead.getBankBranch());
-                collBankRemitReport.setBankName(receiptHead.getBank());
-                collBankRemitReport.setChequeDate(DateUtils.toDateUsingDefaultPattern(receiptHead.getInstrumentDate().split(" ")[0]));
-                collBankRemitReport.setPaymentMode(receiptHead.getInstrumentType());
-                collBankRemitReport.setAmount(receiptHead.getInstrumentAmount().doubleValue());
-                collBankRemitReport.setReceiptNumber(receiptHead.getReceiptNumber());
-                collBankRemitReport.setReceiptDate(DateUtils.toDateUsingDefaultPattern(receiptHead.getReceiptDate().split(" ")[0]));
-                collBankRemitReport.setVoucherNumber(receiptHead.getRemittanceReferenceNumber());
-                reportList.add(collBankRemitReport);
-            }
-        }
+            //collBankRemitReport.setVoucherNumber(receiptHead.getReceiptNumber());
+            //collBankRemitReport.setReceiptNumber(receiptHead.getReceiptNumber());
+            //collBankRemitReport.setReceiptDate(new Date(receiptHead.getReceiptDate()));
+            //collBankRemitReport.setServiceType(receiptHead.getServiceName());
+            collBankRemitReport.setVoucherNumber(receiptHeaders.getRemittanceVouherNumber());
+            collBankRemitReport.setVoucherId(receiptHeaders.getVoucherid());
+            reportList.add(collBankRemitReport);
+        //}
         return reportList;
     }
 
@@ -131,9 +159,59 @@ public abstract class RemittanceService implements Serializable {
         }
         return reportList;
     }
+    
+    public List<CollectionBankRemittanceReport> prepareCashRemittanceReportNew(final ReceiptBean receiptHeaders) {
+        final List<CollectionBankRemittanceReport> reportList = new ArrayList<CollectionBankRemittanceReport>(0);
+        //for (final ReceiptBean receiptHead : receiptHeaders) {
+            final CollectionBankRemittanceReport collBankRemitReport = new CollectionBankRemittanceReport();
+            //collBankRemitReport.setVoucherNumber(receiptHead.getReceiptNumber());
+            //collBankRemitReport.setReceiptNumber(receiptHead.getReceiptNumber());
+            //collBankRemitReport.setReceiptDate(new Date(receiptHead.getReceiptDate()));
+            //collBankRemitReport.setServiceType(receiptHead.getServiceName());
+            collBankRemitReport.setVoucherNumber(receiptHeaders.getRemittanceVouherNumber());
+            collBankRemitReport.setVoucherId(receiptHeaders.getVoucherid());
+            reportList.add(collBankRemitReport);
+       // }
+        return reportList;
+    }
+    
 
-    public abstract List<ReceiptBean> findChequeRemittanceDetailsForServiceAndFund(final String boundaryIdList,
-            final String serviceCodes, final String fundCodes, Date startDate, Date endDate);
+    //added by Abhishek on 24032021
+    @Transactional
+    public void saveDocuments(ReceiptHeader receiptHeader)
+    {
+ 	   List<DocumentUpload> files = receiptHeader.getDocumentDetail() == null ? null : receiptHeader.getDocumentDetail();
+        final List<DocumentUpload> documentDetails;
+        documentDetails = financialUtils.getDocumentDetails(files, receiptHeader, CommonConstants.JOURNAL_VOUCHER_OBJECT);
+        if (!documentDetails.isEmpty()) {
+        	receiptHeader.setDocumentDetail(documentDetails);
+            persistDocuments(documentDetails);
+        }
+    }
+    
+    public void persistDocuments(final List<DocumentUpload> documentDetailsList) {
+        if (documentDetailsList != null && !documentDetailsList.isEmpty())
+            for (final DocumentUpload doc : documentDetailsList)
+                documentUploadRepository.save(doc);
+    }
+    
+	/*
+	 * public static void persistDocuments(final List<DocumentUploads>
+	 * documentDetailsList) { if (documentDetailsList != null &&
+	 * !documentDetailsList.isEmpty()) for (final DocumentUploads doc :
+	 * documentDetailsList) documentUploadRepository.save(doc); }
+	 */
+    //end
+    
+	public abstract List<ReceiptBean> findChequeRemittanceDetailsForServiceAndFund(String classification, Date fromDate, Date toDate, String businessCode,
+    	    String receiptNo,String type);
+	 
+	/*
+	 * public abstract List<ReceiptBean>
+	 * findChequeRemittanceDetailsForServiceAndFund(final String boundaryIdList,
+	 * final String serviceCodes, final String fundCodes, Date startDate, Date
+	 * endDate,String serviceTypeId);
+	 */
 
     public abstract List<Receipt> createChequeBankRemittance(List<ReceiptBean> receiptList, String accountNumberId,
             final Date remittanceDate, final String[] instrumentIdArray);

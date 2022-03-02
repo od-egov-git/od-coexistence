@@ -63,7 +63,8 @@ public class CollectionBankRemittanceReport implements Serializable {
     private String voucherNumber;
     private String serviceType;
     private String serviceName;
-
+    private Long voucherId;
+    
     public String getReceiptNumber() {
         return receiptNumber;
     }
@@ -151,5 +152,13 @@ public class CollectionBankRemittanceReport implements Serializable {
     public void setServiceName(String serviceName) {
         this.serviceName = serviceName;
     }
+
+	public Long getVoucherId() {
+		return voucherId;
+	}
+
+	public void setVoucherId(Long voucherId) {
+		this.voucherId = voucherId;
+	}
 
 }

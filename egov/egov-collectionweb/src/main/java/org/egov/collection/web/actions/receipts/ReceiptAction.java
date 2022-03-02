@@ -780,7 +780,8 @@ public class ReceiptAction extends BaseFormAction {
             // Set created by Date as this required to generate receipt
             // number before persist
             if (manualReceiptDate == null)
-                receiptHeader.setReceiptdate(new Date());
+                //receiptHeader.setReceiptdate(new Date());
+            	receiptHeader.setReceiptdate(voucherDate); // change by abhishek on 28022022 by reciptdate datepicker
             else {
                 // If the receipt has been manually created, the receipt
                 // date is same as the date of manual creation.

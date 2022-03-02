@@ -1697,13 +1697,17 @@ public class ReceiptHeaderService extends PersistenceService<ReceiptHeader, Long
                 .build();
         this.prepareInstrumentsDetails(payment,receiptHeader);
         PaymentResponse response = microserviceUtils.generatePayments(payment);
+        System.out.println("Response InstrumentDate========= "+response.getPayments().get(0).getInstrumentDate());
+        System.out.println("Response TransactionDate========= "+response.getPayments().get(0).getTransactionDate());
         return response.getPayments();
     }
     
     private void prepareInstrumentsDetails(Payment payment, ReceiptHeader receiptHeader) {
         try {
             InstrumentHeader instrumentHeader = receiptHeader.getInstruments(receiptHeader.getInstrumentType()).get(0);
-            Long instrumentDate = instrumentHeader.getInstrumentDate() != null ? instrumentHeader.getInstrumentDate().getTime() : new Date().getTime();
+            System.out.println("receiptDate1 "+receiptHeader.getReceiptdate());
+            Long instrumentDate = instrumentHeader.getInstrumentDate() != null ? instrumentHeader.getInstrumentDate().getTime() : receiptHeader.getReceiptdate().getTime();
+            //Long instrumentDate = instrumentHeader.getInstrumentDate() != null ? instrumentHeader.getInstrumentDate().getTime() : new Date().getTime();
             String instrumentNumber = instrumentHeader.getInstrumentNumber();
             InstrumentStatusEnum instrumentStatus = InstrumentStatusEnum.APPROVED;
             Long transactionDate = instrumentHeader.getTransactionDate() != null ? instrumentHeader.getTransactionDate().getTime() : instrumentDate;
@@ -1721,6 +1725,8 @@ public class ReceiptHeaderService extends PersistenceService<ReceiptHeader, Long
             payment.setIfscCode(ifscCode);
             payment.setBankBranch(branchName);
             payment.setBankName(bankName);
+            System.out.println("Payment Instrument Date========= "+payment.getInstrumentDate());
+            System.out.println("Payment Transaction Date========= "+payment.getTransactionDate());
         } catch (Exception e) {
             LOGGER.error("ERROR occurred while setting the instruments details",e);
         }

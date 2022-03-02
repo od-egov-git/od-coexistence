@@ -19,6 +19,8 @@ public class MisReceiptsPOJO {
 	private String collectedbyname;
 	private String gstno;
 	private String payment_mode;
+	private String chequeddno;
+	private Long chequedddate;
 	
 	
 	public String getPayments_id() {
@@ -115,6 +117,18 @@ public class MisReceiptsPOJO {
 	}
 	public void setTotal_amt_paid(BigDecimal total_amt_paid) {
 		this.total_amt_paid = total_amt_paid;
+	}
+	public String getChequeddno() {
+		return chequeddno;
+	}
+	public void setChequeddno(String chequeddno) {
+		this.chequeddno = chequeddno;
+	}
+	public Long getChequedddate() {
+		return chequedddate;
+	}
+	public void setChequedddate(Long chequedddate) {
+		this.chequedddate = chequedddate;
 	}
 	
 	
