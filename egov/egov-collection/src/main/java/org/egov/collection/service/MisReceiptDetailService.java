@@ -1,9 +1,9 @@
 package org.egov.collection.service;
 
+import org.egov.collection.entity.MisReceiptDetail;
+import org.egov.collection.repository.MisReceiptDetailRepo;
 import org.egov.egf.contract.model.MisReceiptsPOJO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.egov.collection.repository.MisReceiptDetailRepo;
-import org.egov.egf.contract.model.MisReceiptDetail;
 import org.springframework.stereotype.Service;
 
 @Service

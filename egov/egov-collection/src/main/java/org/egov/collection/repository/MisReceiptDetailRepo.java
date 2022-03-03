@@ -46,7 +46,7 @@
  *
  */
 package org.egov.collection.repository;
-import org.egov.egf.contract.model.MisReceiptDetail;
+import org.egov.collection.entity.MisReceiptDetail;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

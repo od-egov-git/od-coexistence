@@ -1,4 +1,4 @@
-package org.egov.egf.contract.model;
+package org.egov.collection.entity;
 
 import java.math.BigDecimal;
 import java.util.Date;
