@@ -1694,6 +1694,7 @@ public class ReceiptHeaderService extends PersistenceService<ReceiptHeader, Long
                 .narration(receiptHeader.getReferenceDesc())
                 .payerAddress(receiptHeader.getPayeeAddress())
                 .paymentStatus(PaymentStatusEnum.NEW)
+                .payerId("FIN")
                 .build();
         this.prepareInstrumentsDetails(payment,receiptHeader);
         PaymentResponse response = microserviceUtils.generatePayments(payment);
