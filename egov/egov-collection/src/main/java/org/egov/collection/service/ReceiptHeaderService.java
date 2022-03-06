@@ -1680,6 +1680,7 @@ public class ReceiptHeaderService extends PersistenceService<ReceiptHeader, Long
                     .tenantId(microserviceUtils.getTenentId())
                     .manualReceiptDate(receiptHeader.getManualreceiptdate() != null ? receiptHeader.getManualreceiptdate().getTime() : null)
                     .manualReceiptNumber(receiptHeader.getManualreceiptnumber())
+                    .receiptDate(receiptHeader.getReceiptdate().getTime())
                     .build();
             paymentDetails.add(pd);
         });
