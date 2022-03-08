@@ -521,7 +521,9 @@ function printVoucher(){
 
 		var frmIndex=0;
 		for(var i=0;i<document.forms[frmIndex].length;i++)
-		document.forms[frmIndex].elements[i].disabled =true;
+		//document.forms[frmIndex].elements[i].disabled =true;
+		//--work here to manually enable fields --  deep
+		document.getElementById("voucherNumber").disabled=true;
 		disableYUIAddDeleteButtons(true);
 		document.getElementById("closeButton").disabled=false;
 		if(null != document.getElementById("printPreview1")){
@@ -599,6 +601,8 @@ function printVoucher(){
 						value="%{firstsignatory}" />	
 					<s:hidden name="actionname" id="actionName" value="%{action}" />
 					<script>
+					var totalsnotmatchingamount='<s:text name="totals.not.matching.amount"/>';
+
 if(document.getElementById('actionName').value!='')
 		{
 			if(document.getElementById('wfBtn0'))
@@ -620,8 +624,21 @@ if(document.getElementById('actionName').value!='')
 	    </s:if>	    
 	    function onSubmit()
 	    {
+	    	if(	updateAndCheckAmount())
+	    	{
+	    	<s:if test="%{showApprove == true}">
+	    	var voucherNumber= document.getElementById("voucherNumber").value;
+	    	
+	    	document.forms[0].action='${pageContext.request.contextPath}/payment/directBankPayment-sendForApproval.action?voucherNumber='+voucherNumber;
+	    	</s:if>
+	    	<s:else>
 	    	document.forms[0].action='${pageContext.request.contextPath}/payment/directBankPayment-sendForApproval.action';
+	    	</s:else>
     		document.forms[0].submit();
+	    	}
+	    	else{
+	    		return false ;
+	    	}
 	    }
 </script>
 				</s:if>
