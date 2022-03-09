@@ -443,9 +443,10 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
         EmployeeInfo info = null;
         if (user != null && user.getId() != null)
             info = microserviceUtils.getEmployeeById(user.getId());
-
+      //  System.out.println("## initial position ::::"+paymentheader.getState().getInitiatorPosition());
         if (FinancialConstants.BUTTONREJECT.equalsIgnoreCase(workflowBean.getWorkFlowAction())) {
             final String stateValue = FinancialConstants.WORKFLOW_STATE_REJECTED;
+            
             paymentheader.transition().progressWithStateCopy().withSenderName(user.getName())
                     .withComments(workflowBean.getApproverComments())
                     .withStateValue(stateValue).withDateInfo(currentDate.toDate())
