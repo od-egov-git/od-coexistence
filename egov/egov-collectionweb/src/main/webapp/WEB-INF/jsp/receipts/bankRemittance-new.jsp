@@ -319,7 +319,7 @@
 		var narration=document.getElementById("narration").value;
 		var dept=document.getElementById("deptIdnew").value;
 		var func=document.getElementById("functionNew").value;
-		var subdiv=document.getElementById("subdivisonNew").value;
+		//var subdiv=document.getElementById("subdivisonNew").value;
 		var valSuccess = true;
 		if(narration==""){
 			bootbox.alert("Please Enter Narration");
@@ -334,12 +334,12 @@
 			bootbox.alert("Please Select Function Details");
 			return false;
 		}
-		if(subdiv =='-1')
+		/*if(subdiv =='-1')
 		{
 			bootbox.alert("Please Select Subdivison Details");
 			return false;
 		}
-		
+		*/
 		if (dom.get("remittanceDate") != null && dom.get("remittanceDate").value == "") {
 			bootbox.alert("Please Enter Date of Remittance");
 			return false;
@@ -699,10 +699,10 @@
 							<td class="bluebox"><s:select headerKey="-1"
 							headerValue="----Choose----" name="functionNew" id="functionNew" cssClass="selectwk" list="dropdownData.functionList" listKey="code" listValue="name"  value="%{functionNew}"/> 
 							</td>
-							<td class="bluebox"><s:text name="Sub divison"/><span class="mandatory"/></td>
+							<%-- <td class="bluebox"><s:text name="Sub divison"/><span class="mandatory"/></td>
 						    <td class="bluebox">
 						    <div class="yui-skin-sam"><s:select headerKey="-1"
-								headerValue="----Choose----" name="subdivisonNew" id="subdivisonNew"  cssClass="selectwk" list="dropdownData.subdivisonList" listKey="subdivisonCode" listValue="subdivisonName"  value="%{subdivisonNew}"/></td>
+								headerValue="----Choose----" name="subdivisonNew" id="subdivisonNew"  cssClass="selectwk" list="dropdownData.subdivisonList" listKey="subdivisonCode" listValue="subdivisonName"  value="%{subdivisonNew}"/></td> --%>
 						</tr>
 					</table>
 				</div>

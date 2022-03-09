@@ -1185,7 +1185,8 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
         return paymentAmtMap;
     }
 
-    private void validateEntity(final EntityType entity) {
+    private String validateEntity(final EntityType entity) {
+    	String message="";
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Starting validateEntity...");
         final List<ValidationError> errors = new ArrayList<ValidationError>();
@@ -1195,10 +1196,15 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
             errors.add(new ValidationError("paymentMode",
                     "BankName, BankAccount,IFSC Code, Pan number is mandatory for RTGS Payment for "
                             + entity.getName()));
-            throw new ValidationException(errors);
+            message="BankName, BankAccount,IFSC Code, PAN No is mandatory for RTGS Payment for "
+                    + entity.getName();
+            
+            //throw new ValidationException(errors);
         }
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Completed validateEntity.");
+        
+        return message;
     }
 
     /**
@@ -1210,14 +1216,14 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
      * @throws ApplicationException
      */
 
-    private void validateCBill(final PaymentBean bean, final String mode)
+    private String validateCBill(final PaymentBean bean, final String mode)
             throws ValidationException, ApplicationException {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Starting validateCBill...");
         final List<ValidationError> errors = new ArrayList<ValidationError>();
         EntityType entity = null;
         List<Object[]> list = null;
-
+        String message="";
         // check the payee deails for payable code
         if (mode.equalsIgnoreCase("Create"))
             list = persistenceService.findAllByNamedQuery("getPayeeDetailsForPayableCode", bean.getBillId(),
@@ -1241,23 +1247,30 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
             } else
                 for (final Object[] obj : list) {
                     entity = getEntity(Integer.valueOf(obj[0].toString()), Long.valueOf(obj[1].toString()));
-                    validateEntity(entity);
+                    message=validateEntity(entity);
                 }
         } else
             for (final Object[] obj : list) {
                 entity = getEntity(Integer.valueOf(obj[0].toString()), Long.valueOf(obj[1].toString()));
-                validateEntity(entity);
+                message=validateEntity(entity);
             }
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Completed validateCBill.");
+        
+        return message;
     }
 
-    public void validateForRTGSPayment(final List<PaymentBean> billList, final String type)
+	/*
+	 * public void validateForRTGSPayment(final List<PaymentBean> billList, final
+	 * String type) throws ValidationException, ApplicationException {
+	 */
+    public String validateForRTGSPayment(final List<PaymentBean> billList, final String type)
             throws ValidationException, ApplicationException {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Starting validateForRTGSPayment...");
         getGlcodeIds();
         EntityType entity = null;
+        String message="";
         final List<ValidationError> errors = new ArrayList<ValidationError>();
         Object[] obj = null;
         if (billList != null)
@@ -1272,8 +1285,12 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
                     obj = (Object[]) persistenceService.findByNamedQuery("getGlDetailForPayableCode", bean.getBillId(),
                             purchaseBillGlcodeList);
                 else if (type.equals(FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT))
-                    validateCBill(bean, "Create");
-
+                {    message=validateCBill(bean, "Create");
+	                if(!message.equalsIgnoreCase(""))
+	                {
+	                	return message;
+	                }
+                }
                 if (type.equals("Contractor") || type.equals("Supplier")) {
                     if (obj == null) {
                         LOGGER.error("Sub ledger details are missing for this bill id ->" + bean.getBillId());
@@ -1291,13 +1308,19 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
                         errors.add(new ValidationError("paymentMode",
                                 "BankName, BankAccount,IFSC Code, Tin number is mandatory for RTGS Payment for "
                                         + entity.getName()));
-                        throw new ValidationException(errors);
+                        message="BankName, BankAccount,IFSC Code, Tin number is mandatory for RTGS Payment for "
+                                + entity.getName();
+                        return message;
+                        //throw new ValidationException(errors);//comment by abhi for rtgs payon 08032022
                     } else
-                        validateEntity(entity);
+                        message=validateEntity(entity);
+                    return message;
                 }
             }
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Completed validateForRTGSPayment.");
+        
+        return "0";
     }
 
     public void validateForContractorSupplierDetailCodes(final List<PaymentBean> billList, final String type)
@@ -1339,7 +1362,9 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
                         errors.add(new ValidationError("paymentMode",
                                 "BankName, BankAccount,IFSC Code, Tin number is mandatory for RTGS Payment for "
                                         + entity.getName()));
-                        throw new ValidationException(errors);
+                        
+                      //throw new ValidationException(errors); // comment by abhi due rtgs payment showing oops error dated 08032022
+                        
                     } else
                         validateEntity(entity);
                 }

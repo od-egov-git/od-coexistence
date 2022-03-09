@@ -526,7 +526,7 @@ public class BankRemittanceAction extends BaseFormAction {
 		System.out.println("::::::re Size::: " + re.size());
 		ReceiptBean receipts =null;
 		
-		receipts=remittanceService.createCashBankRemittance(eblist.get(0), re, remittanceDate,narration,deptIdnew,functionNew,subdivisonNew,receiptNumbers);
+		receipts=remittanceService.createCashBankRemittance(eblist.get(0), re, remittanceDate,narration,deptIdnew,functionNew,receiptNumbers);
 		if(receipts!=null)
 		{
 			try 

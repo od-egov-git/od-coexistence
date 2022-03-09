@@ -170,7 +170,7 @@ public class RemittanceServiceImpl extends RemittanceService {
      */
     
     @Transactional
-    public ReceiptBean createCashBankRemittance(ReceiptBean receiptBean, List<RemitancePOJO> rp, Date remittanceDate, String narration, String deptIdnew, String functionNew, String subdivisonNew, String receiptNumbers) {   
+    public ReceiptBean createCashBankRemittance(ReceiptBean receiptBean, List<RemitancePOJO> rp, Date remittanceDate, String narration, String deptIdnew, String functionNew, String receiptNumbers) {   
 
         final SimpleDateFormat dateFomatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         InstrumentAccountCode accountCode = microserviceUtils.getInstrumentAccountGlCodeByType(CollectionConstants.INSTRUMENTTYPE_NAME_CASH);
@@ -248,7 +248,7 @@ public class RemittanceServiceImpl extends RemittanceService {
                         final Remittance remittance = populateAndPersistRemittanceNew(totalCashAmt, null, fundCode,
                                 cashInHandGLCode, null, serviceGlCodes, functionCode, receiptBean, createVoucher,
                                 narration,voucherDate, depositedBankAccount, totalCashVoucherAmt, BigDecimal.ZERO, Collections.EMPTY_LIST,
-                                null,deptIdnew,subdivisonNew);
+                                null,deptIdnew);
                         
                         receiptBean.setRemittanceReferenceNumber(remittance.getReferenceNumber());
                         receiptBean.setRemittanceVouherNumber(remittance.getReferenceVoucherNumber());
@@ -266,7 +266,7 @@ public class RemittanceServiceImpl extends RemittanceService {
 	                        mrd.setDepartment(deptIdnew);
 	                        mrd.setFunction(functionCode);
 	                        mrd.setNarration(narration);
-	                        mrd.setSubdivison(subdivisonNew);
+	                        //mrd.setSubdivison(subdivisonNew);
 	                        mrd.setReceiptnumbers(receiptNumbers);
 	                        misRemittanceDetailService.create(mrd);
                         	}
@@ -510,7 +510,7 @@ public class RemittanceServiceImpl extends RemittanceService {
                     totalDebitAmount);
             accountCodeList.add(accountcodedetailsHashMap);
         }
-        voucherHeader = financialsUtil.createRemittanceVoucher(prepareHeaderDetails(fundCode, functionCode, voucherDate,narration,null,subdivisonNew),
+        voucherHeader = financialsUtil.createRemittanceVoucher(prepareHeaderDetails(fundCode, functionCode, voucherDate,narration,null),
                 accountCodeList, new ArrayList<HashMap<String, Object>>(0));
         return voucherHeader;
     }
@@ -518,7 +518,7 @@ public class RemittanceServiceImpl extends RemittanceService {
     @Transactional
     public CVoucherHeader createVoucherForRemittanceNew(final String cashInHandGLCode, final String chequeInHandGLCode,
             final Map<String, BigDecimal> serviceGlCodes, final String functionCode, final List<BigDecimal> totalCashAmount,
-            final List<BigDecimal> totalChequeAmount, final Date voucherDate, final String fundCode, final String narration, String deptIdnew,String subdivisonNew) {
+            final List<BigDecimal> totalChequeAmount, final Date voucherDate, final String fundCode, final String narration, String deptIdnew) {
         CVoucherHeader voucherHeader;
         final List<HashMap<String, Object>> accountCodeList = new ArrayList<>(0);
         HashMap<String, Object> accountcodedetailsHashMap;
@@ -558,7 +558,7 @@ public class RemittanceServiceImpl extends RemittanceService {
         }
 		
        
-        voucherHeader = financialsUtil.createRemittanceVoucher(prepareHeaderDetails(fundCode, functionCode, voucherDate,narration,deptIdnew,subdivisonNew),
+        voucherHeader = financialsUtil.createRemittanceVoucher(prepareHeaderDetails(fundCode, functionCode, voucherDate,narration,deptIdnew),
                 accountCodeList, new ArrayList<HashMap<String, Object>>(0));
         return voucherHeader;
     }
@@ -584,7 +584,7 @@ public class RemittanceServiceImpl extends RemittanceService {
             final Map<String, BigDecimal> serviceGlCodes, final String functionCode, final ReceiptBean receiptBean,
             final String createVoucher,final String narration, final Date voucherDate, final List<Bankaccount> depositedBankAccount,
             final BigDecimal totalCashVoucherAmt, final BigDecimal totalChequeVoucherAmt, List<String> instrumentId,
-            Map<String, Set<Instrument>> receiptInstrumentMap, String deptIdnew, String subdivisonNew) {
+            Map<String, Set<Instrument>> receiptInstrumentMap, String deptIdnew) {
     	System.out.println("fundCode "+fundCode);
     	System.out.println("cashInHandGLCode "+cashInHandGLCode);
     	System.out.println("chequeInHandGLcode "+chequeInHandGLcode);
@@ -641,7 +641,7 @@ public class RemittanceServiceImpl extends RemittanceService {
                 && (totalCashVoucherAmt.compareTo(BigDecimal.ZERO) > 0
                         || totalChequeVoucherAmt.compareTo(BigDecimal.ZERO) > 0)) {
             voucherHeader = createVoucherForRemittanceNew(cashInHandGLCode, chequeInHandGLcode, serviceGlCodes,
-                    functionCode, totalCashAmount, totalChequeAmount, voucherDate, fundCode,narration,deptIdnew,subdivisonNew);
+                    functionCode, totalCashAmount, totalChequeAmount, voucherDate, fundCode,narration,deptIdnew);
             remittance.setVoucherHeader(voucherHeader);
             remittance.setVoucherid(voucherHeader.getId());
             remittance.setReferenceVoucherNumber(voucherHeader.getVoucherNumber());
@@ -806,7 +806,7 @@ public class RemittanceServiceImpl extends RemittanceService {
     }
 
     public HashMap<String, Object> prepareHeaderDetails(final String fundCode, final String functionCode,
-            final Date voucherDate,final String narration, String deptIdnew,String subdivisonNew) {
+            final Date voucherDate,final String narration, String deptIdnew) {
         final HashMap<String, Object> headerdetails = new HashMap<>(0);
 
         //final String deptCode = departmentService.getDepartmentByCode(deptIdnew).getCode();
@@ -824,7 +824,7 @@ public class RemittanceServiceImpl extends RemittanceService {
         headerdetails.put(VoucherConstant.FUNDCODE, fundCode);
         headerdetails.put(VoucherConstant.DEPARTMENTCODE, deptIdnew);
         headerdetails.put(VoucherConstant.FUNCTIONCODE, functionCode);
-        headerdetails.put(VoucherConstant.SUBDIVISON, subdivisonNew);
+        //headerdetails.put(VoucherConstant.SUBDIVISON, subdivisonNew);
         return headerdetails;
     }
 
@@ -2143,7 +2143,7 @@ public class RemittanceServiceImpl extends RemittanceService {
     }
     
     @Transactional
-    public ReceiptBean createChequeBankRemittance(ReceiptBean receiptBeanList, List<RemitancePOJO> rp, Date remittanceDate,String narration,String deptIdnew,String functionNew, String subdivisonNew,String receiptNumbers) {  
+    public ReceiptBean createChequeBankRemittance(ReceiptBean receiptBeanList, List<RemitancePOJO> rp, Date remittanceDate,String narration,String deptIdnew,String functionNew,String receiptNumbers) {  
 
     	final SimpleDateFormat dateFomatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         InstrumentAccountCode accountCode = microserviceUtils.getInstrumentAccountGlCodeByType(CollectionConstants.INSTRUMENTTYPE_NAME_CHEQUE);
@@ -2222,7 +2222,7 @@ public class RemittanceServiceImpl extends RemittanceService {
                         final Remittance remittance = populateAndPersistRemittanceNew(null, totalChequeAmt, fundCode,
                                 chequeInHandGlcode, null, serviceGlCodes, functionCode, receiptBeanList, createVoucher,
                                 narration,voucherDate, depositedBankAccount, totalChequeVoucherAmt, BigDecimal.ZERO, Collections.EMPTY_LIST,
-                                null,deptCode,subdivisonNew);
+                                null,deptCode);
                         
                         receiptBeanList.setRemittanceReferenceNumber(remittance.getReferenceNumber());
                         receiptBeanList.setRemittanceVouherNumber(remittance.getReferenceVoucherNumber());
@@ -2240,7 +2240,7 @@ public class RemittanceServiceImpl extends RemittanceService {
 	                        mrd.setDepartment(deptIdnew);
 	                        mrd.setFunction(functionCode);
 	                        mrd.setNarration(narration);
-	                        mrd.setSubdivison(subdivisonNew);
+	                        //mrd.setSubdivison(subdivisonNew);
 	                        mrd.setReceiptnumbers(receiptNumbers);
 	                        misRemittanceDetailService.create(mrd);
                         	}

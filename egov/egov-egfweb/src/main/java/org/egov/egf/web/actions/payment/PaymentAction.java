@@ -879,6 +879,7 @@ public class PaymentAction extends BasePaymentAction {
     @Action(value = "/payment/payment-save")
     public String save() throws ValidationException {
     	System.out.println("Save !!!");
+    	String result = "";
         final List<PaymentBean> paymentList = new ArrayList<PaymentBean>();
         final List<AppConfigValues> cutOffDateconfigValue = appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
                 "DataEntryCutOffDate");
@@ -946,11 +947,13 @@ public class PaymentAction extends BasePaymentAction {
             loadbankBranch(billregister.getEgBillregistermis().getFund());
             miscount = billList.size();
             LOGGER.info("Logger In Save Function Payment type::  "+parameters.get("paymentMode")[0]);
+            //modified by abhishek on 08032022 for RTGS payment 
+            
             if (parameters.get("paymentMode")[0].equalsIgnoreCase("RTGS")) {
-                paymentService.validateForRTGSPayment(contractorList, "Contractor");
-                paymentService.validateForRTGSPayment(supplierList, "Supplier");
+                result=paymentService.validateForRTGSPayment(contractorList, "Contractor");
+                result=paymentService.validateForRTGSPayment(supplierList, "Supplier");
                 if (billSubType == null || billSubType.equalsIgnoreCase(""))
-                    paymentService.validateForRTGSPayment(contingentList,
+                    result=paymentService.validateForRTGSPayment(contingentList,
                             FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT);
             }
             if(billList!=null)
@@ -1003,9 +1006,16 @@ public class PaymentAction extends BasePaymentAction {
         }
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Completed generatePayment.");
-        if (getBankBalanceCheck() == null || "".equals(getBankBalanceCheck()))
+        if (getBankBalanceCheck() == null || "".equals(getBankBalanceCheck())) {
             addActionMessage(getText("payment.bankbalance.controltype"));
-        return "form";
+        }
+        if(result.equalsIgnoreCase("")) {
+        	return "form";
+        }
+        else {
+        	addActionMessage(result);
+        	return "searchbills";
+        }
 
     }
     

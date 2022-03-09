@@ -225,7 +225,7 @@ function downloadExcel()
 	var toDate=document.getElementById('toDate').value;
 	var service=document.getElementById('serviceTypeIdforExcel').value;
 	var dept=document.getElementById('deptId').value;
-	var subdivison=document.getElementById('subdivison').value;
+	//var subdivison=document.getElementById('subdivison').value;
 	var receiptType=document.getElementById('receiptType').value;
 
 	document.searchReceiptForm.action="searchReceipt-downloadDayBookReportNew.action?fromDate="+fromDate+"&toDate="+toDate+"&serviceTypeDuringDownload="+service+"&deptId="+dept;
@@ -599,11 +599,11 @@ function onBodyLoad(){
 	    </tr>
 	    <tr>
 	     
-	      <td width="21%" class="bluebox"><s:text name="misc.receipt.sub.divison"/></td>
+	      <%-- <td width="21%" class="bluebox"><s:text name="misc.receipt.sub.divison"/></td>
 	      <td width="24%" class="bluebox">
 	      <div class="yui-skin-sam"><s:select headerKey="-1"
 							headerValue="----Choose----" name="subdivison" id="subdivison"  cssClass="selectwk" list="dropdownData.subdivisonList" listKey="subdivisonCode" listValue="subdivisonName"  value="%{subdivison}"/></td>
-	    
+	     --%>
 	    
 	    <td width="21%" class="bluebox2"><s:text name="misc.receipt.type"/></td>
 		  <td width="24%" class="bluebox2"><s:select name="receiptType"

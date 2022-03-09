@@ -682,7 +682,7 @@ function onChangeServiceClass(obj)
 <%-- <display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Bill Number" style="width:8%;text-align:right" property="referencenumber" /> --%>
 <display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Particulars" style="width:27%;text-align:left" property="referenceDesc" />
 <display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Paid By & Address" style="width:27%;text-align:left" property="paidBy" />
-<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Sub Divison" style="width:27%;text-align:left" property="subdivison" />
+<%-- <display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Sub Divison" style="width:27%;text-align:left" property="subdivison" /> --%>
 <display:column headerClass="bluebgheadtd" class="blueborderfortd" title="GST No." style="width:27%;text-align:left" property="gstno" />
 <display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Amount (Rs.)" property="totalAmount" style="width:8%; text-align: right" format="{0, number, #,##0.00}" />
 <display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Mode of Payment" style="width:8%"  property="modOfPayment"/>
