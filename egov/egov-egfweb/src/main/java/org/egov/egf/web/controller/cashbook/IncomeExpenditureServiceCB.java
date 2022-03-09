@@ -76,7 +76,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 @Service
-public class IncomeExpenditureService extends ReportService {
+public class IncomeExpenditureServiceCB extends ReportServiceCB {
  @Autowired
  @Qualifier("persistenceService")
  private PersistenceService persistenceService;
@@ -93,13 +93,13 @@ public class IncomeExpenditureService extends ReportService {
    // Date fromDate;
     //Date toDate;
     private static final BigDecimal NEGATIVE = new BigDecimal(-1);
-    private FunctionwiseIEService functionwiseIEService;
+    private FunctionwiseIEServiceCB functionwiseIEService;
 
-    public FunctionwiseIEService getFunctionwiseIEService() {
+    public FunctionwiseIEServiceCB getFunctionwiseIEService() {
         return functionwiseIEService;
     }
 
-    public void setFunctionwiseIEService(final FunctionwiseIEService functionwiseIEService) {
+    public void setFunctionwiseIEService(final FunctionwiseIEServiceCB functionwiseIEService) {
         this.functionwiseIEService = functionwiseIEService;
     }
 

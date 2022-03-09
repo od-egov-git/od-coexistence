@@ -61,7 +61,7 @@ public class CashBookController {
 	List<CashFlowReportDataBean> cashFlowFinalList = new ArrayList<CashFlowReportDataBean>();
 	Statement balanceSheet = new Statement();
 	@Autowired
-	BalanceSheetService balanceSheetService;
+	BalanceSheetServiceCB balanceSheetService;
 	private BigDecimal incomeOverExpenditureCurr = new BigDecimal(0);
 	private BigDecimal incomeOverExpenditurePrevYear = new BigDecimal(0);
 	private BigDecimal depreciationCurr = new BigDecimal(0);
@@ -216,7 +216,7 @@ public class CashBookController {
 	}
 
 	@Autowired
-	IncomeExpenditureService incomeExpenditureService;
+	IncomeExpenditureServiceCB incomeExpenditureService;
 
 	@RequestMapping(value = "/newForm", method = RequestMethod.POST)
 	public String cashBookForm(@ModelAttribute("cashBookReport") final CashBookReportBean cashBookReportBean,
@@ -782,19 +782,19 @@ public class CashBookController {
 		return lst1;
 	}
 
-	public BalanceSheetService getBalanceSheetService() {
+	public BalanceSheetServiceCB getBalanceSheetService() {
 		return balanceSheetService;
 	}
 
-	public void setBalanceSheetService(BalanceSheetService balanceSheetService) {
+	public void setBalanceSheetService(BalanceSheetServiceCB balanceSheetService) {
 		this.balanceSheetService = balanceSheetService;
 	}
 
-	public IncomeExpenditureService getIncomeExpenditureService() {
+	public IncomeExpenditureServiceCB getIncomeExpenditureService() {
 		return incomeExpenditureService;
 	}
 
-	public void setIncomeExpenditureService(IncomeExpenditureService incomeExpenditureService) {
+	public void setIncomeExpenditureService(IncomeExpenditureServiceCB incomeExpenditureService) {
 		this.incomeExpenditureService = incomeExpenditureService;
 	}
 

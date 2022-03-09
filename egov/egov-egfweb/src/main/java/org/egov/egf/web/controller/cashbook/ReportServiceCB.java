@@ -93,7 +93,7 @@ import java.util.Map.Entry;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-public abstract class ReportService {
+public abstract class ReportServiceCB {
    
  @Autowired
  @Qualifier("persistenceService")
@@ -109,7 +109,7 @@ public abstract class ReportService {
   
    
   
-    final static Logger LOGGER = Logger.getLogger(ReportService.class);
+    final static Logger LOGGER = Logger.getLogger(ReportServiceCB.class);
 
     public Date getPreviousYearFor(final Date date) {
         final GregorianCalendar previousYearToDate = new GregorianCalendar();

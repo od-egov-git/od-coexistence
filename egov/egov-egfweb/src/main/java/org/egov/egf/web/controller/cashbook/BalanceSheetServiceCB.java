@@ -88,7 +88,7 @@ import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 @Service
-public class BalanceSheetService extends ReportService {
+public class BalanceSheetServiceCB extends ReportServiceCB {
 	private static final String BS = "BS";
 	private static final String L = "L";
 	private static final BigDecimal NEGATIVE = new BigDecimal(-1);

@@ -78,7 +78,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class FunctionwiseIEService
+public class FunctionwiseIEServiceCB
 {
     
  @Autowired
@@ -87,7 +87,7 @@ public class FunctionwiseIEService
  @Autowired AppConfigValueService appConfigValuesService;
     protected SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Constants.LOCALE);
     protected SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy", Constants.LOCALE);
-    private static final Logger LOGGER = Logger.getLogger(FunctionwiseIEService.class);
+    private static final Logger LOGGER = Logger.getLogger(FunctionwiseIEServiceCB.class);
     private String capExpCodeCond = "";
     private String capExpCodesWithQuotesCond = "";
 
