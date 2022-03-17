@@ -642,7 +642,14 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
             else
                 voucherTypeBean.setVoucherSubType(billRegister.getEgBillregistermis().getEgBillSubType().getName());
         } else
-            voucherTypeBean.setVoucherSubType(voucherHeader.getName());
+        {
+        	if(voucherHeader.getType()!=null && voucherHeader.getType().equalsIgnoreCase("Receipt"))
+        	{
+        		voucherTypeBean.setVoucherSubType(voucherHeader.getType());
+        	}else {
+        		voucherTypeBean.setVoucherSubType(voucherHeader.getName());
+        	}
+        }
 
     }
 

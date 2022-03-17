@@ -715,8 +715,6 @@ public class JournalVoucherAction extends BaseVoucherAction
 	public void setFileno(String fileno) {
 		this.fileno = fileno;
 	}
-
-	
 	
 
 }

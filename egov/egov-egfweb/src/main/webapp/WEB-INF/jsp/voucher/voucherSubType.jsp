@@ -80,7 +80,7 @@
 			value="%{voucherTypeBean.partyBillNum}" /></td>
 	<td class="bluebox"><s:text name="jv.billNum" /></td>
 	<td class="bluebox"><s:textfield name="voucherTypeBean.billNum"
-			id="voucherTypeBean.billNum" value="%{voucherTypeBean.billNum}" /></td>
+			id="voucherTypeBean.billNum" value="%{voucherTypeBean.billNum}" onchange="validateBillNumber(this)" /></td>
 </tr>
 <tr>
 	<td style="width: 5%"></td>
@@ -106,6 +106,7 @@
 	value="${voucherTypeBean.voucherSubType}" />
 
 <script type="text/javascript">
+
 function onChangeVSubType(){
 	
 	var vType = document.getElementById('vType').value;
@@ -164,4 +165,5 @@ function isSpecialChar(Obj)
 {
   return true;
   }
+
 </script>

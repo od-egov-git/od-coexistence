@@ -271,6 +271,7 @@ public class CommonAction extends BaseFormAction {
     private ArrayList<Department> listOfDepartments;
 	private String fromDate;
 	private String toDate;
+	private String billNum;
 
     public String getSerialNo() {
         return serialNo;
@@ -1338,7 +1339,19 @@ public class CommonAction extends BaseFormAction {
             LOGGER.debug("Completed ajaxValidateChequeNumber.");
         return "result";
     }
-
+    @Action(value = "/voucher/validate-billnumber")
+    public String ajaxValidateBillNumber() {
+        if (LOGGER.isDebugEnabled())
+            LOGGER.info("Starting ajaxValidateReassignSurrenderChequeNumber...");
+       System.out.println("::::billNum:: "+billNum);
+        value = voucherService.isBillNumUnique(billNum) == true
+                ?  "~true"
+                : "~false";
+        System.out.println(value);
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Completed ajaxValidateReassignSurrenderChequeNumber.");
+        return "result";
+    }
     public String ajaxValidateRtgsNumber() {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Starting ajaxValidateRtgsNumber...");
@@ -4420,4 +4433,14 @@ public class CommonAction extends BaseFormAction {
 	public void setToDate(String toDate) {
 		this.toDate = toDate;
 	}
+
+	public String getBillNum() {
+		return billNum;
+	}
+
+	public void setBillNum(String billNum) {
+		this.billNum = billNum;
+	}
+	
+	
 }

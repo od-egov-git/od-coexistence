@@ -244,6 +244,7 @@ public interface FinancialConstants {
 	public static final String JOURNALVOUCHER_NAME_PENSIONJOURNAL = "Pension Journal";
 	public static final String JOURNALVOUCHER_NAME_LE_DEMAND = "LE-Demand-Voucher";
 	public static final String JOURNALVOUCHER_NAME_RECEIPT_REVERSAL = "Receipt Reversal";
+	public static final String JOURNALVOUCHER_NAME_RECEIPT = "Receipt Journal";
 
 	public static final Integer REVERSALVOUCHERSTATUS = 2;
 	public static final Integer REVERSEDVOUCHERSTATUS = 1;

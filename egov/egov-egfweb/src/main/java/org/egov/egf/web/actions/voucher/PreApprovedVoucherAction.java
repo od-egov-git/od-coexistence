@@ -561,8 +561,17 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
         final List<AppConfigValues> appList = appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
                 "pjv_saveasworkingcopy_enabled");
         String pjv_wc_enabled = appList.get(0).getValue();
-
+        if(null!=voucherHeader.getType()) {
+        if(voucherHeader.getType().equalsIgnoreCase("Receipt")) {
+        	type=voucherHeader.getType();
+        }else {
         type = billsService.getBillTypeforVoucher(voucherHeader);
+        }
+        }else {
+        	type = billsService.getBillTypeforVoucher(voucherHeader);
+        }
+        
+        //type = billsService.getBillTypeforVoucher(voucherHeader);
         if (null == type)
             // when the work flow started internally then define the type value
             // to "default".systems using the API
@@ -576,6 +585,7 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
             errors.add(new ValidationError("exp", e.getMessage()));
             throw new ValidationException(errors);
         }
+        
         getHeaderMandateFields();
         getSession().put("voucherId", parameters.get(VHID)[0]);
 
@@ -611,6 +621,10 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
 
                 } else if (voucherHeader.getName().equalsIgnoreCase(FinancialConstants.JOURNALVOUCHER_NAME_GENERAL)) {
                     type = FinancialConstants.JOURNALVOUCHER_NAME_GENERAL;
+                    result = "editVoucher";
+                    ismodifyJv = true;
+                }else if (voucherHeader.getName().equalsIgnoreCase(FinancialConstants.JOURNALVOUCHER_NAME_RECEIPT)) {
+                    type = FinancialConstants.JOURNALVOUCHER_NAME_RECEIPT;
                     result = "editVoucher";
                     ismodifyJv = true;
                 }
