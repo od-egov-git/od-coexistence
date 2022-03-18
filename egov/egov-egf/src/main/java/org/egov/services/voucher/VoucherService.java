@@ -543,7 +543,7 @@ public class VoucherService extends PersistenceService<CVoucherHeader, Long> {
 		CVoucherHeader existingVH = null;
 		try {
 			if (voucherHeader.getId() != null && voucherHeader.getId() != -1)
-				existingVH = find("from CVoucherHeader where id=?", voucherHeader.getId());
+				existingVH = (CVoucherHeader) persistenceService.find("from CVoucherHeader where id=?", voucherHeader.getId());
 			existingVH = getUpdatedVNumCGVN(existingVH, voucherHeader, voucherNumType);
 			existingVH.setFundId(voucherHeader.getFundId());
 			existingVH.getVouchermis().setDepartmentcode(voucherHeader.getVouchermis().getDepartmentcode());

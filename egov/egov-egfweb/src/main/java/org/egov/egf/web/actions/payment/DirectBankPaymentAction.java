@@ -80,6 +80,7 @@ import org.egov.commons.dao.FundHibernateDAO;
 import org.egov.commons.service.ChartOfAccountDetailService;
 import org.egov.commons.utils.EntityType;
 import org.egov.egf.commons.EgovCommon;
+import org.egov.egf.contract.model.Voucher;
 import org.egov.egf.expensebill.service.ExpenseBillService;
 import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.exception.ApplicationException;
@@ -113,6 +114,7 @@ import org.egov.utils.FinancialConstants;
 import org.egov.utils.PaymentRefundUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.context.WebApplicationContext;
@@ -162,6 +164,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
 		return entityManager.unwrap(Session.class);
 	}
 
+	private Voucher voucher = new Voucher();
 	@Autowired
 	@Qualifier("persistenceService")
 	private PersistenceService persistenceService;
@@ -719,15 +722,27 @@ public class DirectBankPaymentAction extends BasePaymentAction {
 				"select  distinct ih from InstrumentHeader ih join ih.instrumentVouchers iv where iv.voucherHeaderId.id=?")
 				.append(" order by ih.id");
 		voucherHeader = persistenceService.getSession().load(CVoucherHeader.class, voucherHeader.getId());
-
+		System.out.println("#### getModeOfPayment ::" + commonBean.getModeOfPayment());
+		System.out.println("### getFileno ::" + fileno);
 		LOGGER.info("voucherHeader.getId()  ::" + voucherHeader.getId());
 		System.out.println("first " + voucherHeader.getFirstsignatory());
+		paymentheader = new Paymentheader();
 		paymentheader = (Paymentheader) persistenceService.find("from Paymentheader where voucherheader=?",
 				voucherHeader);
+		
+		
 		commonBean.setAmount(paymentheader.getPaymentAmount());
 		commonBean.setAccountNumberId(paymentheader.getBankaccount().getId().toString());
 		commonBean.setAccnumnar(paymentheader.getBankaccount().getNarration());
-		commonBean.setFileno(voucherHeader.getFileno());
+
+		if (paymentheader.getFileno() == null) {
+			setFileno(voucherHeader.getFileno());
+			commonBean.setFileno(voucherHeader.getFileno());
+		} else {
+			setFileno(paymentheader.getFileno());
+			commonBean.setFileno(paymentheader.getFileno());
+		}
+
 		commonBean.setPaymentChequeNo(paymentheader.getPaymentChequeNo());
 		paymentChequeNo = paymentheader.getPaymentChequeNo();
 		LOGGER.info("paymentheader.getPaymentAmount()  ::" + paymentheader.getPaymentAmount());
@@ -761,10 +776,14 @@ public class DirectBankPaymentAction extends BasePaymentAction {
 		// (CVoucherHeader)vhInfoMap.get(Constants.VOUCHERHEADER);
 		billDetailslist = (List<VoucherDetails>) vhInfoMap.get(Constants.GLDEATILLIST);
 		subLedgerlist = (List<VoucherDetails>) vhInfoMap.get("subLedgerDetail");
+		BigDecimal debitAmtTotal = new BigDecimal(0);
+		for (final VoucherDetails vd : billDetailslist) {
 
-		for (final VoucherDetails vd : billDetailslist)
+			debitAmtTotal = debitAmtTotal.add(vd.getDebitAmountDetail());
+			commonBean.setAmount(debitAmtTotal);
 			if (vd.getGlcodeDetail().equalsIgnoreCase(bankGlcode))
 				bankdetail = vd;
+		}
 		if (bankdetail != null)
 			billDetailslist.remove(bankdetail);
 		loadAjaxedDropDowns();
@@ -826,6 +845,52 @@ public class DirectBankPaymentAction extends BasePaymentAction {
 		}
 
 		return VIEW;
+	}
+
+	public void editAfterRejection() {
+		CVoucherHeader billVhId = null;
+		voucherHeader.setType(FinancialConstants.STANDARD_VOUCHER_TYPE_PAYMENT);
+		removeEmptyRowsAccoutDetail(billDetailslist);
+		if (subLedgerlist != null) {
+			removeEmptyRowsSubledger(subLedgerlist);
+		}
+		validateFields();
+		voucherHeader = voucherService.updateVoucherHeader(voucherHeader);
+
+		try {
+//			if (!validateDBPData(billDetailslist, subLedgerlist)) {
+			if (commonBean.getModeOfPayment().equalsIgnoreCase(FinancialConstants.MODEOFPAYMENT_RTGS))
+				validateRTGS();
+
+			// reCreateLedger();
+			paymentheader = (Paymentheader) persistenceService.find("from Paymentheader where voucherheader=?",
+					voucherHeader);
+			paymentService.updatePaymentHeader(paymentheader, voucherHeader,
+					Integer.valueOf(commonBean.getAccountNumberId()), commonBean.getModeOfPayment(),
+					commonBean.getAmount());
+			if (commonBean.getDocumentId() != null)
+				billVhId = persistenceService.getSession().load(CVoucherHeader.class, commonBean.getDocumentId());
+			updateMiscBillDetail(billVhId);
+			/*
+			 * try { sendForApproval(); }catch(SQLException e) { e.printStackTrace(); }
+			 */
+			// addActionMessage(getText("directbankpayment.transaction.success") +
+			// voucherHeader.getVoucherNumber());
+			/*
+			 * } else throw new ValidationException( Arrays.asList(new
+			 * ValidationError("engine.validation.failed", "Validation Faild")));
+			 */
+		} catch (final NumberFormatException e) {
+			LOGGER.error(e.getMessage(), e);
+			throw new ValidationException(Arrays.asList(new ValidationError(e.getMessage(), e.getMessage())));
+		}
+
+		/*
+		 * finally { if (subLedgerlist.size() == 0) subLedgerlist.add(new
+		 * VoucherDetails()); loadAjaxedDropDowns(); }
+		 */
+
+		// return VIEW;
 	}
 
 	@ValidationErrorPage("reverse")
@@ -1107,10 +1172,41 @@ public class DirectBankPaymentAction extends BasePaymentAction {
 				}
 				showMode = "view";
 				return viewInboxItem();
+
 			} else {
-				String view = forwardVoucherAfterRejection();
-				return view;
+
+				/*
+				 * String view = forwardVoucherAfterRejection(); return view;
+				 */
+
+				createForForwardAfterRejection();
+				/*
+				 * if (paymentheader.getId() == null) paymentheader = getPayment();
+				 */
+				LOGGER.info("before populate work flow bean");
+				populateWorkflowBean();
+				LOGGER.info("before send for approval");
+				paymentActionHelper.sendForApprovalAfterRejection(paymentheader, workflowBean);
+
+				if (FinancialConstants.BUTTONREJECT.equalsIgnoreCase(workflowBean.getWorkFlowAction()))
+					addActionMessage(getText("payment.voucher.rejected",
+							new String[] { this.getEmployeeName(paymentheader.getState().getOwnerPosition()) }));
+				if (FinancialConstants.BUTTONFORWARD.equalsIgnoreCase(workflowBean.getWorkFlowAction()))
+					addActionMessage(getText("payment.voucher.approved",
+							new String[] { this.getEmployeeName(paymentheader.getState().getOwnerPosition()) }));
+				if (FinancialConstants.BUTTONCANCEL.equalsIgnoreCase(workflowBean.getWorkFlowAction()))
+					addActionMessage(getText("payment.voucher.cancelled"));
+				else if (FinancialConstants.BUTTONAPPROVE.equalsIgnoreCase(workflowBean.getWorkFlowAction())) {
+					addActionMessage(getText("payment.voucher.final.approval"));
+					setAction(workflowBean.getWorkFlowAction());
+
+				}
+				showMode = "view";
+				// return viewInboxItem();
+				prepareForViewModifyReverseAfterRejection(voucherHeader, commonBean, paymentheader);
+				return VIEW;
 			}
+
 		} else {
 			if (paymentheader.getId() == null)
 				paymentheader = getPayment();
@@ -1138,6 +1234,242 @@ public class DirectBankPaymentAction extends BasePaymentAction {
 
 	}
 
+	public void createForForwardAfterRejection() {
+		System.out.println(paymentChequeNo);
+		System.out.println(commonBean.getModeOfPayment());
+		if (paymentheader.getId() == null)
+			paymentheader = getPayment();
+
+		if (null != paymentChequeNo) {
+			paymentheader.setPaymentChequeNo(paymentChequeNo);
+
+			System.out.println(paymentheader.getPaymentChequeNo());
+
+		}
+
+		System.out.println(firstsignatory);
+		CVoucherHeader billVhId = null;
+		voucherHeader.setType(FinancialConstants.STANDARD_VOUCHER_TYPE_PAYMENT);
+		loadAjaxedDropDowns();
+		removeEmptyRowsAccoutDetail(billDetailslist);
+		if (subLedgerlist != null)
+			removeEmptyRowsSubledger(subLedgerlist);
+		final String voucherDate = formatter1.format(voucherHeader.getVoucherDate());
+		String cutOffDate1 = null;
+
+		try {
+			if (!validateDBPData(billDetailslist, subLedgerlist)) {
+				if (commonBean.getModeOfPayment().equalsIgnoreCase(FinancialConstants.MODEOFPAYMENT_RTGS)) {
+					if (LOGGER.isInfoEnabled())
+						LOGGER.info("calling Validate RTGS");
+					validateRTGS();
+
+				}
+
+				if (showMode != null && showMode.equalsIgnoreCase("nonbillPayment"))
+					if (voucherHeader.getId() != null)
+						billVhId = persistenceService.getSession().load(CVoucherHeader.class, voucherHeader.getId());
+
+				populateWorkflowBean();
+				if (backlogEntry != null && !backlogEntry.isEmpty()) {
+					backlogEntry = backlogEntry.split(",")[0];
+				}
+				if (firstsignatory != null && !firstsignatory.isEmpty()) {
+					firstsignatory = firstsignatory.split(",")[0];
+				}
+				if (secondsignatory != null && !secondsignatory.isEmpty()) {
+					secondsignatory = secondsignatory.split(",")[0];
+				}
+				voucherHeader.setBackdateentry(backlogEntry);
+				voucherHeader.setFileno(fileno);
+				paymentheader.setFileno(fileno);
+
+				if (null != paymentChequeNo) {
+					System.out.println("Executing paymenCno IF :::" + paymentChequeNo);
+					paymentheader.setPaymentChequeNo(paymentChequeNo);
+				}
+				paymentheader.setType(commonBean.getModeOfPayment());
+				// paymentheader.setVoucherheader(voucherHeader);
+				paymentheader.setPaymentAmount(commonBean.getAmount());
+				Transaction transaction = getCurrentSession().beginTransaction();
+				if (paymentheader.getId() != null) {
+
+					String queryStr1 = "update Paymentheader set paymentAmount =:paymentAmount ,type =:type ,paymentchequeno =:paymentchequeno , fileno =:fileno where voucherheaderid =:id ";
+					org.hibernate.Query queryResult1 = getCurrentSession().createQuery(queryStr1.toString());
+					queryResult1.setLong("id", voucherHeader.getId());
+					// commonBean.getPaymentChequeNo();
+					queryResult1.setBigDecimal("paymentAmount", commonBean.getAmount());
+					queryResult1.setString("paymentchequeno", paymentheader.getPaymentChequeNo());
+					queryResult1.setString("type", commonBean.getModeOfPayment());
+					queryResult1.setString("fileno", voucherHeader.getFileno());
+
+					int row1 = queryResult1.executeUpdate();
+					System.out.println("Row updated pay: " + row1);
+
+				}
+				if (voucherHeader.getId() != null) {
+					String queryStr2 = "update Vouchermis set departmentcode =:departmentcode  where voucherheaderid =:id ";
+					org.hibernate.Query queryResult2 = getCurrentSession().createQuery(queryStr2.toString());
+					queryResult2.setLong("id", voucherHeader.getId());
+					queryResult2.setString("departmentcode", voucherHeader.getVouchermis().getDepartmentcode());
+
+					int row2 = queryResult2.executeUpdate();
+					System.out.println("Row updated mis: " + row2);
+				}
+
+				if (voucherHeader.getId() != null) {
+					String queryStr2 = "update Miscbilldetail set amount =:amount, passedamount =:passedamount ,"
+							+ "paidamount=:paidamount, paidto =:paidto where payvhid =:id ";
+					org.hibernate.Query queryResult2 = getCurrentSession().createQuery(queryStr2.toString());
+					queryResult2.setLong("id", voucherHeader.getId());
+					queryResult2.setBigDecimal("amount", commonBean.getAmount());
+					queryResult2.setBigDecimal("passedamount", commonBean.getAmount());
+					queryResult2.setString("paidto", commonBean.getPaidTo());
+					queryResult2.setBigDecimal("paidamount", commonBean.getAmount());
+
+					int row2 = queryResult2.executeUpdate();
+					System.out.println("Row updated MISCBill: " + row2);
+				}
+
+				if (voucherHeader.getId() != null) {
+					int length = billDetailslist.size();
+					// List<CGeneralLedger> gllist =
+					// paymentRefundUtils.getAccountDetails(Long.valueOf(voucherHeader.getId()));
+
+					for (int i = 0; i <= length - 1; i++) {
+						BigDecimal credit = billDetailslist.get(i).getCreditAmountDetail();
+						BigDecimal debit = billDetailslist.get(i).getDebitAmountDetail();
+						String glcodeDetail = billDetailslist.get(i).getGlcodeDetail();
+						// String glcode =chartOfAccounts.getGlcode();
+						if (credit.intValue() != 0) {
+							String queryStr = "update CGeneralLedger set creditamount =:credit where voucherheaderid =:id and glcode =:glcodeDetail";
+							org.hibernate.Query queryResult = getCurrentSession().createQuery(queryStr.toString());
+							queryResult.setLong("id", voucherHeader.getId());
+							queryResult.setBigDecimal("credit", credit);
+							queryResult.setString("glcodeDetail", glcodeDetail);
+
+							int row2 = queryResult.executeUpdate();
+							System.out.println("Row updated gen: " + row2);
+						} else {
+							String queryStr = "update CGeneralLedger set debitamount =:debit where voucherheaderid =:id and glcode =:glcodeDetail";
+							org.hibernate.Query queryResult = getCurrentSession().createQuery(queryStr.toString());
+							queryResult.setLong("id", voucherHeader.getId());
+							queryResult.setBigDecimal("debit", debit);
+							queryResult.setString("glcodeDetail", glcodeDetail);
+
+							int row2 = queryResult.executeUpdate();
+							System.out.println("Row updated Gen: " + row2);
+						}
+					}
+				}
+
+				if (voucherHeader.getId() != null) {
+					String queryStr = "update CVoucherHeader set fileno =:fileno ,description =:description,firstsignatory =:firstsignatory , secondsignatory =:secondsignatory where id =:id ";
+					// firstsignatory =:firstsignatory
+					org.hibernate.Query queryResult = getCurrentSession().createQuery(queryStr.toString());
+					queryResult.setLong("id", voucherHeader.getId());
+					queryResult.setString("description", voucherHeader.getDescription());
+					queryResult.setString("firstsignatory", firstsignatory);
+					queryResult.setString("secondsignatory", secondsignatory);
+					queryResult.setString("fileno", fileno);
+
+					int row2 = queryResult.executeUpdate();
+					System.out.println("Row updated Voucher: " + row2);
+				}
+
+				transaction.commit();
+
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private void prepareForViewModifyReverseAfterRejection(CVoucherHeader voucherHeader, CommonBean commonBean,
+			Paymentheader paymentheader) {
+		final StringBuffer instrumentQuery = new StringBuffer(100);
+		instrumentQuery.append(
+				"select  distinct ih from InstrumentHeader ih join ih.instrumentVouchers iv where iv.voucherHeaderId.id=?")
+				.append(" order by ih.id");
+		// voucherHeader = persistenceService.getSession().load(CVoucherHeader.class,
+		// voucherHeader.getId());
+		System.out.println("#### getModeOfPayment ::" + commonBean.getModeOfPayment());
+		System.out.println("### getFileno ::" + fileno);
+		LOGGER.info("voucherHeader.getId()  ::" + voucherHeader.getId());
+		System.out.println("first " + voucherHeader.getFirstsignatory());
+		/*
+		 * paymentheader = new Paymentheader(); paymentheader = (Paymentheader)
+		 * persistenceService.find("from Paymentheader where voucherheader=?",
+		 * voucherHeader);
+		 */
+		commonBean.setAmount(paymentheader.getPaymentAmount());
+		commonBean.setAccountNumberId(paymentheader.getBankaccount().getId().toString());
+		commonBean.setAccnumnar(paymentheader.getBankaccount().getNarration());
+
+		if (paymentheader.getFileno() == null) {
+			setFileno(voucherHeader.getFileno());
+			commonBean.setFileno(voucherHeader.getFileno());
+		} else {
+			setFileno(paymentheader.getFileno());
+			commonBean.setFileno(paymentheader.getFileno());
+		}
+
+		commonBean.setPaymentChequeNo(paymentheader.getPaymentChequeNo());
+		paymentChequeNo = paymentheader.getPaymentChequeNo();
+		LOGGER.info("paymentheader.getPaymentAmount()  ::" + paymentheader.getPaymentAmount());
+		LOGGER.info("paymentheader.getBankaccount().getId().toString()  ::"
+				+ paymentheader.getBankaccount().getId().toString());
+		LOGGER.info(
+				"paymentheader.getBankaccount().getNarration()  ::" + paymentheader.getBankaccount().getNarration());
+
+		final String bankBranchId = paymentheader.getBankaccount().getBankbranch().getBank().getId() + "-"
+				+ paymentheader.getBankaccount().getBankbranch().getId();
+
+		LOGGER.info("bankBranchId  ::" + bankBranchId);
+		commonBean.setBankId(bankBranchId);
+		commonBean.setModeOfPayment(paymentheader.getType());
+		/*
+		 * final Miscbilldetail miscbillDetail = (Miscbilldetail) persistenceService
+		 * .find(" from Miscbilldetail where payVoucherHeader=?", voucherHeader);
+		 * commonBean.setDocumentNumber(miscbillDetail.getBillnumber());
+		 * commonBean.setDocumentDate(miscbillDetail.getBilldate());
+		 * commonBean.setPaidTo(miscbillDetail.getPaidto()); if
+		 * (miscbillDetail.getBillVoucherHeader() != null) {
+		 * commonBean.setDocumentId(miscbillDetail.getBillVoucherHeader().getId());
+		 * commonBean.setLinkReferenceNumber(miscbillDetail.getBillVoucherHeader().
+		 * getVoucherNumber()); }
+		 */
+		final String bankGlcode = paymentheader.getBankaccount().getChartofaccounts().getGlcode();
+		LOGGER.info("bankGlcode  ::" + bankGlcode);
+		VoucherDetails bankdetail = null;
+		final Map<String, Object> vhInfoMap = voucherService.getVoucherInfo(voucherHeader.getId());
+
+		// voucherHeader =
+		// (CVoucherHeader)vhInfoMap.get(Constants.VOUCHERHEADER);
+		billDetailslist = (List<VoucherDetails>) vhInfoMap.get(Constants.GLDEATILLIST);
+		subLedgerlist = (List<VoucherDetails>) vhInfoMap.get("subLedgerDetail");
+		BigDecimal debitAmtTotal = new BigDecimal(0);
+		for (final VoucherDetails vd : billDetailslist) {
+
+			debitAmtTotal = debitAmtTotal.add(vd.getDebitAmountDetail());
+			commonBean.setAmount(debitAmtTotal);
+			if (vd.getGlcodeDetail().equalsIgnoreCase(bankGlcode))
+				bankdetail = vd;
+		}
+		if (bankdetail != null)
+			billDetailslist.remove(bankdetail);
+		loadAjaxedDropDowns();
+		// find it last so that rest of the data loaded
+		if ("view".equalsIgnoreCase(showMode)) {
+			if (LOGGER.isDebugEnabled())
+				LOGGER.debug("fetching cheque detail ------------------------");
+
+			instrumentHeaderList = getPersistenceService().findAllBy(instrumentQuery.toString(),
+					paymentheader.getVoucherheader().getId());
+		}
+	}
+
 	private String forwardVoucherAfterRejection() {
 		// TODO Auto-generated method stub
 
@@ -1146,92 +1478,25 @@ public class DirectBankPaymentAction extends BasePaymentAction {
 		LOGGER.info("before populate work flow bean");
 		populateWorkflowBean();
 		LOGGER.info("before send for approval");
-		paymentheader = paymentActionHelper.sendForApprovalAfterRejection(paymentheader, workflowBean, commonBean);
-		if (paymentheader.getId() != null) {
 
-			String queryStr1 = "update Paymentheader set paymentAmount =:paymentAmount ,type =:type ,paymentchequeno =:paymentchequeno where voucherheaderid =:id ";
-			org.hibernate.Query queryResult1 = getCurrentSession().createQuery(queryStr1.toString());
-			queryResult1.setLong("id", voucherHeader.getId());
-			queryResult1.setBigDecimal("paymentAmount", commonBean.getAmount());
-			queryResult1.setString("paymentchequeno", paymentheader.getPaymentChequeNo());
-			queryResult1.setString("type", commonBean.getModeOfPayment());
-			// queryResult1.setString("paidto", commonBean.getPaidTo());
-
-			int row1 = queryResult1.executeUpdate();
-			System.out.println("Row updated pay: " + row1);
+		if (null != paymentChequeNo) {
+			paymentheader.setPaymentChequeNo(paymentChequeNo);
+			commonBean.setPaymentChequeNo(paymentChequeNo);
+			System.out.println(paymentheader.getPaymentChequeNo());
 
 		}
-		if (voucherHeader.getId() != null) {
-			String queryStr2 = "update Vouchermis set departmentcode =:departmentcode  where voucherheaderid =:id ";
-			org.hibernate.Query queryResult2 = getCurrentSession().createQuery(queryStr2.toString());
-			queryResult2.setLong("id", voucherHeader.getId());
-			queryResult2.setString("departmentcode", voucherHeader.getVouchermis().getDepartmentcode());
-
-			int row2 = queryResult2.executeUpdate();
-			System.out.println("Row updated mis: " + row2);
+		if (backlogEntry != null && !backlogEntry.isEmpty()) {
+			backlogEntry = backlogEntry.split(",")[0];
 		}
-
-		
-		if(voucherHeader.getId()!= null) {
-			String queryStr2 = "update Miscbilldetail set amount =:amount, passedamount =:passedamount ,"
-					+ "paidamount=:paidamount, paidto =:paidto where payvhid =:id ";
-			org.hibernate.Query queryResult2 = getCurrentSession().createQuery(queryStr2.toString());
-			queryResult2.setLong("id", voucherHeader.getId());
-			queryResult2.setBigDecimal("amount", commonBean.getAmount());
-			queryResult2.setBigDecimal("passedamount", commonBean.getAmount());
-			queryResult2.setString("paidto", commonBean.getPaidTo());
-			queryResult2.setBigDecimal("paidamount", commonBean.getAmount());
-			
-			int row2 = queryResult2.executeUpdate();
-			System.out.println("Row updated MISCBill: " + row2);
-
+		if (voucherHeader.getFirstsignatory() != null && !voucherHeader.getFirstsignatory().isEmpty()) {
+			firstsignatory = voucherHeader.getFirstsignatory().split(",")[0];
 		}
-		if (voucherHeader.getId() != null) {
-
-			int length = billDetailslist.size();
-			// List<CGeneralLedger> gllist =
-			// paymentRefundUtils.getAccountDetails(Long.valueOf(voucherHeader.getId()));
-
-			for (int i = 0; i <= length - 1; i++) {
-				BigDecimal credit = billDetailslist.get(i).getCreditAmountDetail();
-				BigDecimal debit = billDetailslist.get(i).getDebitAmountDetail();
-				String glcodeDetail = billDetailslist.get(i).getGlcodeDetail();
-				//String glcode = chartOfAccounts.getGlcode();
-				if (credit.intValue() != 0) {
-					String queryStr = "update CGeneralLedger set creditamount =:credit where voucherheaderid =:id and glcode =:glcodeDetail";
-					org.hibernate.Query queryResult = getCurrentSession().createQuery(queryStr.toString());
-					queryResult.setLong("id", voucherHeader.getId());
-					queryResult.setBigDecimal("credit", credit);
-					queryResult.setString("glcodeDetail", glcodeDetail);
-					int row2 = queryResult.executeUpdate();
-					System.out.println("Row updated gen: " + row2);
-
-				} else {
-					String queryStr = "update CGeneralLedger set debitamount =:debit where voucherheaderid =:id and glcode =:glcodeDetail";
-					org.hibernate.Query queryResult = getCurrentSession().createQuery(queryStr.toString());
-					queryResult.setLong("id", voucherHeader.getId());
-					queryResult.setBigDecimal("debit", debit);
-					queryResult.setString("glcodeDetail", glcodeDetail);
-					int row2 = queryResult.executeUpdate();
-					System.out.println("Row updated Gen: " + row2);
-
-
-				}
-			}
+		if (voucherHeader.getSecondsignatory() != null && !voucherHeader.getSecondsignatory().isEmpty()) {
+			secondsignatory = voucherHeader.getSecondsignatory().split(",")[0];
 		}
+		editAfterRejection();
 
-		if (voucherHeader.getId() != null) {
-			String queryStr = "update CVoucherHeader set description =:description , firstsignatory =:firstsignatory where id =:id ";
-			org.hibernate.Query queryResult = getCurrentSession().createQuery(queryStr.toString());
-			queryResult.setLong("id", voucherHeader.getId());
-			queryResult.setString("description", voucherHeader.getDescription());
-			queryResult.setString("firstsignatory", voucherHeader.getFirstsignatory());
-
-			int row2 = queryResult.executeUpdate();
-			System.out.println("Row updated Voucher: " + row2);
-
-		}
-
+//		paymentheader = paymentActionHelper.sendForApprovalAfterRejection(paymentheader, workflowBean, commonBean);
 		if (FinancialConstants.BUTTONREJECT.equalsIgnoreCase(workflowBean.getWorkFlowAction()))
 			addActionMessage(getText("payment.voucher.rejected",
 					new String[] { this.getEmployeeName(paymentheader.getState().getOwnerPosition()) }));

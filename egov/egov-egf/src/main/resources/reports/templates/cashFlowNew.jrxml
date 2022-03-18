@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.19.0.final using JasperReports Library version 6.19.0-646c68931cebf1a58bc65c4359d1f0ca223c5e94  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="cashFlowNew" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="88aa7435-3307-4225-87f9-8a1d8ade741f">
 	<property name="ireport.zoom" value="1.2100000000000006"/>
 	<property name="ireport.x" value="0"/>
@@ -84,16 +85,30 @@
 	<parameter name="incomeOverExpenditureCurr" class="java.math.BigDecimal"/>
 	<parameter name="incomeOverExpenditurePrevYear" class="java.math.BigDecimal"/>
 	<parameter name="cashFlowDataSource" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
+	<parameter name="header" class="java.lang.String"/>
+	<parameter name="nameOfUlb" class="java.lang.String"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
 	<pageHeader>
-		<band height="94" splitType="Stretch"/>
-	</pageHeader>
-	<detail>
-		<band height="370" splitType="Stretch">
+		<band height="70" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<textField>
-				<reportElement x="1" y="0" width="402" height="20" uuid="5941a2da-6745-4266-ab74-bd88d645fa87"/>
+				<reportElement x="0" y="0" width="802" height="30" uuid="4cebe9ed-fded-4835-a4ac-ca355426ece1"/>
+				<textElement textAlignment="Center">
+					<font size="16" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{nameOfUlb}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="30" width="802" height="20" uuid="47797cac-dfaa-49dd-8f49-bd04e481b68e"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{header}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="50" width="402" height="20" uuid="f5d6ce0e-b591-4935-b000-13b19465405e"/>
 				<box leftPadding="0">
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -102,12 +117,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement markup="none">
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[""]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="403" y="0" width="188" height="20" uuid="5d282e91-6dfb-4eee-933e-219280f6379f"/>
+				<reportElement x="402" y="50" width="188" height="20" uuid="2964b9e4-5079-4e8f-9f90-d4fb861bfeb9"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -116,12 +131,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" isBold="true" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" isBold="true" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[Current Year]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="591" y="0" width="211" height="20" uuid="9172073d-f936-4467-afae-0f0a5f31c0b8"/>
+				<reportElement x="590" y="50" width="211" height="20" uuid="9adb8575-197a-4329-8fa2-aaa8f7cbdb65"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -130,12 +145,16 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" isBold="true" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" isBold="true" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[Previous Year]]></text>
 			</staticText>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="370" splitType="Stretch">
 			<staticText>
-				<reportElement x="1" y="20" width="801" height="20" uuid="ec8ee79d-417b-42c6-9c26-dc54be06fe3a"/>
+				<reportElement x="1" y="1" width="801" height="20" uuid="ec8ee79d-417b-42c6-9c26-dc54be06fe3a"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -144,12 +163,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" size="12" isBold="true" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" isBold="true" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[ A. Cash flows from operating activities ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="1" y="59" width="801" height="20" uuid="777f2d5a-5859-4c03-b459-13631acbf4c8"/>
+				<reportElement x="1" y="40" width="801" height="20" uuid="777f2d5a-5859-4c03-b459-13631acbf4c8"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -158,12 +177,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" size="12" isBold="true" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" isBold="true" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[ Add:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="1" y="79" width="401" height="20" uuid="ce5b3b54-2827-4d2d-8dfb-fd1cd0029d59"/>
+				<reportElement x="1" y="60" width="401" height="20" uuid="ce5b3b54-2827-4d2d-8dfb-fd1cd0029d59"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -172,12 +191,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[ Depreciation]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="1" y="99" width="401" height="20" uuid="d0565384-f06f-4172-8563-f291dc69bc11"/>
+				<reportElement x="1" y="80" width="401" height="20" uuid="d0565384-f06f-4172-8563-f291dc69bc11"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -186,12 +205,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[ Interest and finance charges]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="1" y="119" width="801" height="20" uuid="bb5055d5-a93c-4b04-882c-52eacc67629c"/>
+				<reportElement x="1" y="100" width="801" height="20" uuid="bb5055d5-a93c-4b04-882c-52eacc67629c"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -200,12 +219,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" size="12" isBold="true" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" isBold="true" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[ Less:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="1" y="139" width="401" height="20" uuid="c91c2b8b-108c-4c15-bf9d-881bb2fdbc54"/>
+				<reportElement x="1" y="120" width="401" height="20" uuid="c91c2b8b-108c-4c15-bf9d-881bb2fdbc54"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -214,12 +233,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[ Profit on disposal of assets]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="1" y="159" width="401" height="20" uuid="12b09e58-ca43-4d2a-a5da-8d80b46487be"/>
+				<reportElement x="1" y="140" width="401" height="20" uuid="12b09e58-ca43-4d2a-a5da-8d80b46487be"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -228,12 +247,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[ Dividend Income]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="1" y="179" width="401" height="20" uuid="20477f26-cfb5-4857-8173-df18fc0f075e"/>
+				<reportElement x="1" y="160" width="401" height="20" uuid="20477f26-cfb5-4857-8173-df18fc0f075e"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -242,12 +261,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[ Investment income]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="1" y="199" width="401" height="29" uuid="2b846e45-daca-4d2a-aa42-6b93e1ca0fd2"/>
+				<reportElement x="1" y="180" width="401" height="29" uuid="2b846e45-daca-4d2a-aa42-6b93e1ca0fd2"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -256,13 +275,13 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[ Adjusted income over expenditure before effecting changes in current assets and current
  liabilities and extraordinary items]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="1" y="228" width="801" height="20" uuid="058d0176-e610-49d5-bf0b-a32fac9674f9"/>
+				<reportElement x="1" y="209" width="801" height="20" uuid="058d0176-e610-49d5-bf0b-a32fac9674f9"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -271,12 +290,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" size="12" isBold="true" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" isBold="true" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[ Changes in Current assets and Current liabilities]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="1" y="248" width="401" height="20" uuid="f3b3d16b-ce9e-4210-937c-19c9e09e7a08"/>
+				<reportElement x="1" y="229" width="401" height="20" uuid="f3b3d16b-ce9e-4210-937c-19c9e09e7a08"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -285,12 +304,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[ (Increase) / decrease in Sundry debtors]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="1" y="268" width="401" height="20" uuid="aebfe902-ca80-4a88-b265-3d91fb054371"/>
+				<reportElement x="1" y="249" width="401" height="20" uuid="aebfe902-ca80-4a88-b265-3d91fb054371"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -299,12 +318,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[ (Increase) / decrease in Stock in hand]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="1" y="288" width="401" height="20" uuid="2929614f-987c-4b07-ab23-03a3bd5f4f86"/>
+				<reportElement x="1" y="269" width="401" height="20" uuid="2929614f-987c-4b07-ab23-03a3bd5f4f86"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -313,12 +332,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[ (Increase) / decrease in prepaid expenses]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="1" y="308" width="401" height="20" uuid="80696f7d-535c-495c-9bc2-67131d45b5d3"/>
+				<reportElement x="1" y="289" width="401" height="20" uuid="80696f7d-535c-495c-9bc2-67131d45b5d3"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -327,12 +346,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[ (Increase) / decrease in other current assets]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="1" y="328" width="401" height="20" uuid="bc86a356-7b53-4a70-9b0f-446490ccd5c4"/>
+				<reportElement x="1" y="309" width="401" height="20" uuid="bc86a356-7b53-4a70-9b0f-446490ccd5c4"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -341,12 +360,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[ (Decrease)/ increase in Deposits received]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="1" y="348" width="401" height="22" uuid="493c5d40-68b5-4baa-89a5-b7a84b39195a"/>
+				<reportElement x="1" y="329" width="401" height="22" uuid="493c5d40-68b5-4baa-89a5-b7a84b39195a"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -355,12 +374,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[ (Decrease)/ increase in Deposits works]]></text>
 			</staticText>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="403" y="79" width="88" height="20" uuid="bb63c501-ce80-4d0f-9667-45eafdd9770e"/>
+				<reportElement x="403" y="60" width="88" height="20" uuid="bb63c501-ce80-4d0f-9667-45eafdd9770e"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -369,12 +388,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{depreciationCurr}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="591" y="79" width="102" height="20" uuid="574dc947-6ec3-429f-947e-255272042e32"/>
+				<reportElement x="591" y="60" width="102" height="20" uuid="574dc947-6ec3-429f-947e-255272042e32"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -383,12 +402,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{depreciationPrevYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="403" y="99" width="88" height="20" uuid="e7bd4709-4f8e-4671-96bc-6da6e44f6b8b"/>
+				<reportElement x="403" y="80" width="88" height="20" uuid="e7bd4709-4f8e-4671-96bc-6da6e44f6b8b"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -397,12 +416,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{interestFinanceChargesCurrYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="591" y="99" width="102" height="20" uuid="4695b562-18ce-4bd7-ae5e-7b81f2ada613"/>
+				<reportElement x="591" y="80" width="102" height="20" uuid="4695b562-18ce-4bd7-ae5e-7b81f2ada613"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -411,12 +430,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{interestFinanceChargesPrevYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="403" y="139" width="88" height="20" uuid="5154846f-9188-4c25-956e-69f8ab14e29e"/>
+				<reportElement x="403" y="120" width="88" height="20" uuid="5154846f-9188-4c25-956e-69f8ab14e29e"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -425,12 +444,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{profitOnDisposalOfAssetsCurrYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="591" y="139" width="102" height="20" uuid="dd77eb84-ab32-41c0-8e74-f7e62988d69c"/>
+				<reportElement x="591" y="120" width="102" height="20" uuid="dd77eb84-ab32-41c0-8e74-f7e62988d69c"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -439,12 +458,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{profitOnDisposalOfAssetsPrevYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="403" y="159" width="88" height="20" uuid="762b2f9f-d5b5-4d10-8774-e16a28a4a2f6"/>
+				<reportElement x="403" y="140" width="88" height="20" uuid="762b2f9f-d5b5-4d10-8774-e16a28a4a2f6"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -453,12 +472,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{dividendIncomeCurrYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="591" y="159" width="102" height="20" uuid="a14e5b7c-6a58-4911-85ec-4360de0db244"/>
+				<reportElement x="591" y="140" width="102" height="20" uuid="a14e5b7c-6a58-4911-85ec-4360de0db244"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -467,12 +486,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{dividendIncomePrevYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="403" y="179" width="88" height="20" uuid="68fc051c-0a18-4789-9d04-f778d6deabba"/>
+				<reportElement x="403" y="160" width="88" height="20" uuid="68fc051c-0a18-4789-9d04-f778d6deabba"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -481,12 +500,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{investmentIncomeCurrYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="591" y="179" width="102" height="20" uuid="615f06a7-f17c-4b3b-8f97-201c26084241"/>
+				<reportElement x="591" y="160" width="102" height="20" uuid="615f06a7-f17c-4b3b-8f97-201c26084241"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -495,12 +514,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{investmentIncomePrevYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="491" y="199" width="100" height="29" uuid="2b40a3e5-63db-4acf-9393-8b176b452e91"/>
+				<reportElement x="491" y="180" width="100" height="29" uuid="2b40a3e5-63db-4acf-9393-8b176b452e91"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -509,12 +528,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{adjustedIncomeCurrYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="693" y="199" width="109" height="29" uuid="11d9b29b-5f3b-43ea-b5b3-bbab29b67b2a"/>
+				<reportElement x="693" y="180" width="109" height="29" uuid="11d9b29b-5f3b-43ea-b5b3-bbab29b67b2a"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -523,12 +542,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{adjustedIncomePrevYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="491" y="248" width="100" height="20" uuid="8adddc94-81ea-47bb-bfa3-51352e3872a6"/>
+				<reportElement x="491" y="229" width="100" height="20" uuid="8adddc94-81ea-47bb-bfa3-51352e3872a6"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -537,12 +556,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{sundryDebtorsCurrYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="693" y="248" width="109" height="20" uuid="c117cc8b-2a1c-4125-921b-259ccf468195"/>
+				<reportElement x="693" y="229" width="109" height="20" uuid="c117cc8b-2a1c-4125-921b-259ccf468195"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -551,12 +570,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{sundryDebtorsPrevYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="491" y="268" width="100" height="20" uuid="17327dc6-2923-454a-b9ce-c0377241c88d"/>
+				<reportElement x="491" y="249" width="100" height="20" uuid="17327dc6-2923-454a-b9ce-c0377241c88d"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -565,12 +584,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{stockInhandCurrYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="693" y="268" width="109" height="20" uuid="57fc5154-97c5-487d-bad7-e938a36af3f4"/>
+				<reportElement x="693" y="249" width="109" height="20" uuid="57fc5154-97c5-487d-bad7-e938a36af3f4"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -579,12 +598,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{stockInhandPrevYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="491" y="288" width="100" height="20" uuid="adc6bb39-18bb-4a6d-be0b-95273920774a"/>
+				<reportElement x="491" y="269" width="100" height="20" uuid="adc6bb39-18bb-4a6d-be0b-95273920774a"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -593,12 +612,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{prepaidExpenseCurrYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="693" y="288" width="109" height="20" uuid="1374e057-38c5-45d4-8c46-2803335d362f"/>
+				<reportElement x="693" y="269" width="109" height="20" uuid="1374e057-38c5-45d4-8c46-2803335d362f"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -607,12 +626,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{prepaidExpensePrevYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="491" y="308" width="100" height="20" uuid="4cc71638-4e67-4041-8304-f41c21fee388"/>
+				<reportElement x="491" y="289" width="100" height="20" uuid="4cc71638-4e67-4041-8304-f41c21fee388"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -621,12 +640,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{otherCurrentAssetsCurrYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="693" y="308" width="109" height="20" uuid="a31d2a4e-da6b-4add-87d4-0c1fa5eaf079"/>
+				<reportElement x="693" y="289" width="109" height="20" uuid="a31d2a4e-da6b-4add-87d4-0c1fa5eaf079"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -635,12 +654,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{otherCurrentAssetsPrevYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="491" y="328" width="100" height="20" uuid="ec872920-6dca-4f66-b275-ac5c9e7c11dd"/>
+				<reportElement x="491" y="309" width="100" height="20" uuid="ec872920-6dca-4f66-b275-ac5c9e7c11dd"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -649,12 +668,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{depositsReceivedCurrYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="693" y="328" width="109" height="20" uuid="a7312115-473c-4846-87c3-4eb2f26f8ebc"/>
+				<reportElement x="693" y="309" width="109" height="20" uuid="a7312115-473c-4846-87c3-4eb2f26f8ebc"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -663,12 +682,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{depositsReceivedPrevYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="491" y="348" width="100" height="22" uuid="741e6a01-4201-49b2-a338-9319e3cf13e7"/>
+				<reportElement x="491" y="329" width="100" height="22" uuid="741e6a01-4201-49b2-a338-9319e3cf13e7"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -677,12 +696,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{depositWorksCurrYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="693" y="348" width="109" height="21" uuid="2ea38e89-d74a-44e0-9944-0505042595f3"/>
+				<reportElement x="693" y="329" width="109" height="21" uuid="2ea38e89-d74a-44e0-9944-0505042595f3"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -691,12 +710,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{depositWorksPrevYear}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="1" y="40" width="402" height="19" uuid="78f85358-9987-4acb-a228-726b534c5211"/>
+				<reportElement x="1" y="21" width="402" height="19" uuid="78f85358-9987-4acb-a228-726b534c5211"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -705,12 +724,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" size="12" isBold="false" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" isBold="false" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[Gross Surplus/(deficit) over expenditure]]></text>
 			</staticText>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="491" y="40" width="100" height="19" uuid="97a07364-c2ff-496f-8e94-710ab1b5b829"/>
+				<reportElement x="491" y="21" width="100" height="19" uuid="97a07364-c2ff-496f-8e94-710ab1b5b829"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -718,12 +737,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{incomeOverExpenditureCurr}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="693" y="40" width="109" height="19" uuid="1965569c-e63f-4d86-b818-1508428580af"/>
+				<reportElement x="693" y="21" width="109" height="19" uuid="1965569c-e63f-4d86-b818-1508428580af"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -731,15 +750,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{incomeOverExpenditurePrevYear}]]></textFieldExpression>
 			</textField>
-			<line>
-				<reportElement x="801" y="0" width="1" height="199" uuid="07c2c2e6-3dd3-4d31-be7a-71e668ae58a4"/>
-			</line>
 			<staticText>
-				<reportElement x="491" y="79" width="100" height="20" uuid="0abd6815-77a8-4ac4-bd93-defcf55b8992"/>
+				<reportElement x="491" y="60" width="100" height="20" uuid="0abd6815-77a8-4ac4-bd93-defcf55b8992"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -747,12 +763,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="491" y="99" width="100" height="20" uuid="d6577d4c-8f08-469c-bbcd-f676a22c1cda"/>
+				<reportElement x="491" y="80" width="100" height="20" uuid="d6577d4c-8f08-469c-bbcd-f676a22c1cda"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -760,12 +776,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="491" y="139" width="100" height="20" uuid="ec2634b0-e26f-4299-96b9-c17cdb51ba88"/>
+				<reportElement x="491" y="120" width="100" height="20" uuid="ec2634b0-e26f-4299-96b9-c17cdb51ba88"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -773,12 +789,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="491" y="159" width="100" height="20" uuid="6d0c5184-21ff-4cab-a290-8419297df429"/>
+				<reportElement x="491" y="140" width="100" height="20" uuid="6d0c5184-21ff-4cab-a290-8419297df429"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -786,12 +802,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="402" y="248" width="89" height="20" uuid="47b4b96d-fef2-481d-9fd8-180c3579deb8"/>
+				<reportElement x="402" y="229" width="89" height="20" uuid="47b4b96d-fef2-481d-9fd8-180c3579deb8"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -799,12 +815,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="402" y="268" width="89" height="20" uuid="7f2dd91f-3d55-470e-8268-ac38a0b9a0cb"/>
+				<reportElement x="402" y="249" width="89" height="20" uuid="7f2dd91f-3d55-470e-8268-ac38a0b9a0cb"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -812,12 +828,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="403" y="288" width="89" height="20" uuid="12395ec2-d609-4468-b3ff-dadbb57f1c0f"/>
+				<reportElement x="403" y="269" width="89" height="20" uuid="12395ec2-d609-4468-b3ff-dadbb57f1c0f"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -825,12 +841,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="403" y="308" width="89" height="20" uuid="19e08fef-0e0f-40bd-8bba-40b55fa53489"/>
+				<reportElement x="403" y="289" width="89" height="20" uuid="19e08fef-0e0f-40bd-8bba-40b55fa53489"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -838,12 +854,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="403" y="328" width="89" height="20" uuid="a7da1109-a967-4f27-a2d7-1c1c2ad9e77d"/>
+				<reportElement x="403" y="309" width="89" height="20" uuid="a7da1109-a967-4f27-a2d7-1c1c2ad9e77d"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -851,12 +867,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="402" y="348" width="89" height="21" uuid="60085c9f-df38-405b-b80a-9b174dce0d0f"/>
+				<reportElement x="402" y="329" width="89" height="21" uuid="60085c9f-df38-405b-b80a-9b174dce0d0f"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -864,12 +880,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="591" y="248" width="102" height="20" uuid="80ae4205-effc-4537-ab06-4aa12b684d86"/>
+				<reportElement x="591" y="229" width="102" height="20" uuid="80ae4205-effc-4537-ab06-4aa12b684d86"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -877,12 +893,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="591" y="268" width="102" height="20" uuid="506947ef-604b-47b1-9ea3-3347598b43e8"/>
+				<reportElement x="591" y="249" width="102" height="20" uuid="506947ef-604b-47b1-9ea3-3347598b43e8"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -890,12 +906,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="591" y="288" width="102" height="20" uuid="d10c1f0b-8f29-4855-9cbb-eb54f9ce615a"/>
+				<reportElement x="591" y="269" width="102" height="20" uuid="d10c1f0b-8f29-4855-9cbb-eb54f9ce615a"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -903,12 +919,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="591" y="308" width="102" height="20" uuid="b0a45fe9-2323-47c7-afb7-1b1fac45b5ee"/>
+				<reportElement x="591" y="289" width="102" height="20" uuid="b0a45fe9-2323-47c7-afb7-1b1fac45b5ee"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -916,12 +932,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="591" y="328" width="102" height="20" uuid="3a4e39e5-dc5d-4ff2-bf31-3f69d779726f"/>
+				<reportElement x="591" y="309" width="102" height="20" uuid="3a4e39e5-dc5d-4ff2-bf31-3f69d779726f"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -929,12 +945,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="591" y="348" width="102" height="21" uuid="e5c285ca-e7ab-4764-9a74-9eef081209c8"/>
+				<reportElement x="591" y="329" width="102" height="21" uuid="e5c285ca-e7ab-4764-9a74-9eef081209c8"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -942,12 +958,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="693" y="79" width="108" height="20" uuid="ae7df997-a950-40b8-af7a-60ba60f709bc"/>
+				<reportElement x="693" y="60" width="108" height="20" uuid="ae7df997-a950-40b8-af7a-60ba60f709bc"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -955,12 +971,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="693" y="139" width="108" height="20" uuid="4c51decc-eaa9-4a73-aaeb-89609b2df81a"/>
+				<reportElement x="693" y="120" width="108" height="20" uuid="4c51decc-eaa9-4a73-aaeb-89609b2df81a"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -968,12 +984,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="693" y="159" width="108" height="20" uuid="a959abc2-5829-4533-9404-433b3966693d"/>
+				<reportElement x="693" y="140" width="108" height="20" uuid="a959abc2-5829-4533-9404-433b3966693d"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -981,14 +997,41 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="693" y="160" width="108" height="20" uuid="3b4efde7-89c3-4d87-bc9a-2354be1ef0f3"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="694" y="80" width="108" height="20" uuid="c63c7731-8b2e-42fa-8d63-4f8a7a1e21d4"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 		</band>
-		<band height="119">
+		<band height="134">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<staticText>
-				<reportElement x="0" y="-1" width="402" height="20" uuid="03e169e0-cd6d-4694-a5e4-73fbd12dc288"/>
+				<reportElement x="0" y="-20" width="402" height="20" uuid="03e169e0-cd6d-4694-a5e4-73fbd12dc288"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -997,12 +1040,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[ (Decrease)/ increase in other current liabilities]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="19" width="402" height="20" uuid="abaedeaa-03f1-44ba-8d3a-aa1a6b3d499c"/>
+				<reportElement x="0" y="0" width="402" height="20" uuid="abaedeaa-03f1-44ba-8d3a-aa1a6b3d499c"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -1011,12 +1054,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[ (Decrease)/ increase in provisions]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="39" width="402" height="20" uuid="df2d25cc-0e94-4c09-ae0b-18eada20dd94"/>
+				<reportElement x="0" y="20" width="402" height="20" uuid="df2d25cc-0e94-4c09-ae0b-18eada20dd94"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -1025,12 +1068,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[ Extra ordinary items (Specify)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="59" width="402" height="20" uuid="5f74ca97-3197-4dab-823d-e4d1c81d4f9b"/>
+				<reportElement x="0" y="40" width="402" height="20" uuid="5f74ca97-3197-4dab-823d-e4d1c81d4f9b"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -1039,12 +1082,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[ (Decrease)/ increase in Deposits received]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="79" width="402" height="20" uuid="73e69ca0-4b5d-4a18-b8fb-ecf62482e596"/>
+				<reportElement x="0" y="60" width="402" height="20" uuid="73e69ca0-4b5d-4a18-b8fb-ecf62482e596"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -1053,12 +1096,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[ (Decrease)/ increase in Deposits works]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="99" width="402" height="20" uuid="cb385fd4-0b94-4dca-b5d2-c2042de18bc1"/>
+				<reportElement x="0" y="80" width="402" height="20" uuid="cb385fd4-0b94-4dca-b5d2-c2042de18bc1"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -1067,12 +1110,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[ (Decrease)/ increase in other current liabilities]]></text>
 			</staticText>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="693" y="-1" width="109" height="20" uuid="1d580259-999e-46f1-be8a-cba6764979bd"/>
+				<reportElement x="693" y="-20" width="109" height="20" uuid="1d580259-999e-46f1-be8a-cba6764979bd"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -1081,12 +1124,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{otherCurrentLiabilitiesPrevYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="491" y="-1" width="100" height="20" uuid="90296138-a78c-4a02-97f9-1b801ed504d2"/>
+				<reportElement x="491" y="-20" width="100" height="20" uuid="90296138-a78c-4a02-97f9-1b801ed504d2"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -1095,12 +1138,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{otherCurrentLiabilitiesCurrYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="491" y="19" width="100" height="20" uuid="e978728b-0355-4643-9479-dcede6260911"/>
+				<reportElement x="491" y="0" width="100" height="20" uuid="e978728b-0355-4643-9479-dcede6260911"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -1109,12 +1152,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{increaseInProvisionCurrYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="693" y="19" width="109" height="20" uuid="8eea211b-7502-4bb5-bfa2-6e38cc73af15"/>
+				<reportElement x="693" y="0" width="109" height="20" uuid="8eea211b-7502-4bb5-bfa2-6e38cc73af15"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -1123,12 +1166,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{increaseInProvisionPrevYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="693" y="39" width="109" height="20" uuid="fc6eb8f2-f424-401d-af5f-8b542973c39f"/>
+				<reportElement x="693" y="20" width="109" height="20" uuid="fc6eb8f2-f424-401d-af5f-8b542973c39f"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -1137,12 +1180,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{extraOrdinaryPrevYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="491" y="39" width="100" height="20" uuid="c3d19afe-c092-4f90-a79b-29701b49e117"/>
+				<reportElement x="491" y="20" width="100" height="20" uuid="c3d19afe-c092-4f90-a79b-29701b49e117"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -1151,12 +1194,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{extraOrdinaryCurrYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="491" y="59" width="100" height="20" uuid="8f4fd6f2-a50d-4ef6-a4b4-2ec1e3207629"/>
+				<reportElement x="491" y="40" width="100" height="20" uuid="8f4fd6f2-a50d-4ef6-a4b4-2ec1e3207629"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -1165,12 +1208,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{extraDepositReceivedCurrYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="693" y="59" width="109" height="20" uuid="addceedb-5bfd-43dd-806b-b1db346e5802"/>
+				<reportElement x="693" y="40" width="109" height="20" uuid="addceedb-5bfd-43dd-806b-b1db346e5802"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -1179,12 +1222,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{extraDepositReceivedPrevYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="491" y="79" width="100" height="20" uuid="9226cfa9-cb0d-49eb-9078-b73c7706c520"/>
+				<reportElement x="491" y="60" width="100" height="20" uuid="9226cfa9-cb0d-49eb-9078-b73c7706c520"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -1193,12 +1236,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{extraDepositWorksCurrYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="693" y="79" width="109" height="20" uuid="137382ff-03f8-4690-98d2-0f3195a86c6c"/>
+				<reportElement x="693" y="60" width="109" height="20" uuid="137382ff-03f8-4690-98d2-0f3195a86c6c"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -1207,12 +1250,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{extraDepositWorksPrevYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="693" y="99" width="109" height="20" uuid="3ef63af0-f761-41d0-b27f-85d5e7c01e73"/>
+				<reportElement x="693" y="80" width="109" height="20" uuid="3ef63af0-f761-41d0-b27f-85d5e7c01e73"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -1221,12 +1264,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{extraOtherCurrentLiabilitiesPrevYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="491" y="99" width="100" height="20" uuid="5c779d57-0690-42aa-92c6-1588db291391"/>
+				<reportElement x="491" y="80" width="100" height="20" uuid="5c779d57-0690-42aa-92c6-1588db291391"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -1235,12 +1278,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{extraOtherCurrentLiabilitiesCurrYear}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="403" y="19" width="89" height="20" uuid="4335e82f-0541-401a-b169-97f2fb5f5328"/>
+				<reportElement x="403" y="0" width="89" height="20" uuid="4335e82f-0541-401a-b169-97f2fb5f5328"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -1248,12 +1291,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="402" y="-1" width="89" height="20" uuid="f3757740-1586-4087-ad96-c784687e8b35"/>
+				<reportElement x="402" y="-20" width="89" height="20" uuid="f3757740-1586-4087-ad96-c784687e8b35"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -1261,12 +1304,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="403" y="39" width="89" height="20" uuid="c36eb469-b1be-4a51-8a6e-9d8761d95fa2"/>
+				<reportElement x="403" y="20" width="89" height="20" uuid="c36eb469-b1be-4a51-8a6e-9d8761d95fa2"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -1274,12 +1317,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="403" y="59" width="89" height="20" uuid="f1db0a5c-4730-493e-860a-8aef7818415f"/>
+				<reportElement x="403" y="40" width="89" height="20" uuid="f1db0a5c-4730-493e-860a-8aef7818415f"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -1287,12 +1330,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="403" y="79" width="89" height="20" uuid="8aae3b24-b94e-40f5-8fb1-6852cfe9a591"/>
+				<reportElement x="403" y="60" width="89" height="20" uuid="8aae3b24-b94e-40f5-8fb1-6852cfe9a591"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -1300,12 +1343,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="403" y="99" width="89" height="20" uuid="57161079-b099-4a2f-8b03-5dbb98609187"/>
+				<reportElement x="403" y="80" width="89" height="20" uuid="57161079-b099-4a2f-8b03-5dbb98609187"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -1313,12 +1356,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="591" y="-1" width="102" height="20" uuid="a1b8fd51-6a48-4614-a843-19f113af2dcd"/>
+				<reportElement x="591" y="-20" width="102" height="20" uuid="a1b8fd51-6a48-4614-a843-19f113af2dcd"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -1326,12 +1369,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="591" y="19" width="102" height="20" uuid="41336ba9-e04e-418b-a4fe-648ef86b6dda"/>
+				<reportElement x="591" y="0" width="102" height="20" uuid="41336ba9-e04e-418b-a4fe-648ef86b6dda"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -1339,12 +1382,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="591" y="39" width="102" height="20" uuid="d2f8b297-c08c-40c8-b7c2-ddfff024574f"/>
+				<reportElement x="591" y="20" width="102" height="20" uuid="d2f8b297-c08c-40c8-b7c2-ddfff024574f"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -1352,12 +1395,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="591" y="59" width="102" height="20" uuid="2adac6a9-d421-4d2d-91a5-09cdc7100c86"/>
+				<reportElement x="591" y="40" width="102" height="20" uuid="2adac6a9-d421-4d2d-91a5-09cdc7100c86"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -1365,12 +1408,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="591" y="79" width="102" height="20" uuid="a1e7c7f2-673e-49ad-8496-1dd0209f8701"/>
+				<reportElement x="591" y="60" width="102" height="20" uuid="a1e7c7f2-673e-49ad-8496-1dd0209f8701"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -1378,56 +1421,25 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
-		</band>
-		<band height="322">
-			<textField>
-				<reportElement x="1" y="0" width="401" height="20" uuid="a0a4581a-ca20-4589-a664-06ca75562ded"/>
-				<box leftPadding="0">
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement markup="none">
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
-				</textElement>
-				<textFieldExpression><![CDATA[""]]></textFieldExpression>
-			</textField>
 			<staticText>
-				<reportElement x="403" y="0" width="188" height="20" uuid="51ff5b69-ec6e-44d4-b101-88ddda63f06a"/>
+				<reportElement x="591" y="80" width="102" height="20" uuid="7e11ce5e-a203-445f-b1e3-68810e410b5f"/>
 				<box>
-					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
 					<bottomPen lineWidth="1.0"/>
 					<rightPen lineWidth="1.0"/>
 				</box>
-				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" isBold="true" pdfFontName="Times-Roman"/>
+				<textElement>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
 				</textElement>
-				<text><![CDATA[Current Year]]></text>
+				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="591" y="0" width="211" height="20" uuid="69d2366e-9dff-4d70-a760-37668901a67e"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" isBold="true" pdfFontName="Times-Roman"/>
-				</textElement>
-				<text><![CDATA[Previous Year]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="1" y="20" width="401" height="20" uuid="b5e16cbe-cd4f-4e3c-b9e2-8e1c906ab8f6"/>
+				<reportElement x="0" y="100" width="401" height="33" uuid="b3c397d1-2e62-4921-8821-2bd1efc113d6"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -1436,208 +1448,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" size="12" isBold="true" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" isBold="true" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[ Net cash generated from/ (used in) operating activities (a)]]></text>
 			</staticText>
-			<staticText>
-				<reportElement x="1" y="62" width="402" height="20" uuid="727ac50c-2ccb-41d7-8ea1-e92116f7c7a0"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement>
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
-				</textElement>
-				<text><![CDATA[ (Purchase) of fixed assets & CWIP]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="1" y="82" width="402" height="20" uuid="46b8ffec-ce24-4329-b3e6-d77ac189f50f"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement>
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
-				</textElement>
-				<text><![CDATA[ (Increase) / Decrease in Special funds/grants]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="1" y="102" width="402" height="20" uuid="25d60164-a4ea-4390-9dcf-2535b28f8390"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement>
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
-				</textElement>
-				<text><![CDATA[ (Increase) / Decrease in Earmarked funds]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="1" y="122" width="402" height="20" uuid="97d28894-101c-491c-be13-f2f8c8d4c705"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement>
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
-				</textElement>
-				<text><![CDATA[ (Purchase) of Investments]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="1" y="142" width="801" height="20" uuid="72eb0040-6d75-4b86-9aa3-861f0b05132e"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement>
-					<font fontName="Times New Roman" size="12" isBold="true" pdfFontName="Times-Roman"/>
-				</textElement>
-				<text><![CDATA[ Add:]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="1" y="162" width="401" height="20" uuid="03f550fb-5bef-4a6a-9c13-f4ec17f97b7d"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement>
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
-				</textElement>
-				<text><![CDATA[ Proceeds from disposal of assets]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="1" y="182" width="401" height="20" uuid="7c890fe9-cec1-4d52-8015-67bc932f52b0"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement>
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
-				</textElement>
-				<text><![CDATA[ Proceeds from disposal of investments]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="1" y="202" width="401" height="20" uuid="de147ea1-5d0d-473a-83aa-2a09b5f2cc0a"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement>
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
-				</textElement>
-				<text><![CDATA[ Investment income received]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="1" y="222" width="401" height="20" uuid="bcffba63-f059-4872-9e8a-be2e57df75a8"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement>
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
-				</textElement>
-				<text><![CDATA[ Interest income received]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="1" y="242" width="401" height="20" uuid="e80c19c5-b5ae-4f3c-8341-c20844b16dfd"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement>
-					<font fontName="Times New Roman" size="12" isBold="true" pdfFontName="Times-Roman"/>
-				</textElement>
-				<text><![CDATA[ Net cash generated from/ (used in) investing activities (b)]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="1" y="262" width="801" height="20" uuid="88a2d0b8-d1af-48fe-9a15-ad54c2c82f06"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement>
-					<font fontName="Times New Roman" size="12" isBold="true" pdfFontName="Times-Roman"/>
-				</textElement>
-				<text><![CDATA[ C. Cash flows from financing activities]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="1" y="282" width="801" height="20" uuid="5f627328-9931-4013-95c4-b3aafd6d06f2"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement>
-					<font fontName="Times New Roman" size="12" isBold="true" pdfFontName="Times-Roman"/>
-				</textElement>
-				<text><![CDATA[ Add:]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="1" y="302" width="401" height="20" uuid="7a4c6557-01cd-4ef6-919f-b038cf92da9d"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement>
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
-				</textElement>
-				<text><![CDATA[ Loans from banks/others received]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="1" y="40" width="801" height="22" uuid="25b8f54f-1cb3-4758-9c80-63db3609feb3"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement>
-					<font fontName="Times New Roman" size="12" isBold="true" pdfFontName="Times-Roman"/>
-				</textElement>
-				<text><![CDATA[ B. Cash flows from investing activities]]></text>
-			</staticText>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="403" y="62" width="88" height="20" uuid="ced83530-8300-4cb0-b21b-24496d39d63a"/>
+				<reportElement x="490" y="100" width="100" height="33" uuid="ef5abcd6-c360-49e0-a814-e08b63264f2f"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -1646,250 +1462,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{cwipCurrYear}]]></textFieldExpression>
-			</textField>
-			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="591" y="62" width="102" height="20" uuid="60f5c1c2-9787-489b-9f7a-1db4dbb55429"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{cwipPrevYear}]]></textFieldExpression>
-			</textField>
-			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="591" y="82" width="102" height="20" uuid="c4268436-7f63-404a-8d7c-fc295ed19a56"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{specialFundsGrantsPrevYear}]]></textFieldExpression>
-			</textField>
-			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="403" y="82" width="88" height="20" uuid="d1c04372-f5b9-446d-90c1-bc3f25282826"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{specialFundsGrantsCurrYear}]]></textFieldExpression>
-			</textField>
-			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="591" y="102" width="102" height="20" uuid="7cc990f0-ef45-41d9-9485-8d094c2c53f7"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{earmarkedFundsPrevYear}]]></textFieldExpression>
-			</textField>
-			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="403" y="102" width="88" height="20" uuid="0393c654-7cb1-43f6-8e52-d0a257e63f9e"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{earmarkedFundsCurrYear}]]></textFieldExpression>
-			</textField>
-			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="591" y="122" width="102" height="20" uuid="c9c9c8a7-5821-46e4-b9b3-7bc7e731208e"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{investmentsPrevYear}]]></textFieldExpression>
-			</textField>
-			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="403" y="122" width="88" height="20" uuid="1b77fca5-f98a-4700-92ea-1b928cafd76e"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{investmentsCurrYear}]]></textFieldExpression>
-			</textField>
-			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="402" y="162" width="89" height="20" uuid="5f2748d8-e4f8-403b-bc58-105e5fded203"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{disposalOfAssetsCurrYear}]]></textFieldExpression>
-			</textField>
-			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="591" y="162" width="102" height="20" uuid="2e7a5c92-13ae-48d8-89c1-0e84174aae26"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{disposalOfAssetsPrevYear}]]></textFieldExpression>
-			</textField>
-			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="591" y="182" width="102" height="20" uuid="f3020697-5c60-470f-8398-c53f229cda45"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{disposalOfInvestmentsPrevYear}]]></textFieldExpression>
-			</textField>
-			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="402" y="182" width="89" height="20" uuid="d1e72f63-550a-4076-a002-01dca4c0a623"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{disposalOfInvestmentsCurrYear}]]></textFieldExpression>
-			</textField>
-			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="591" y="202" width="102" height="20" uuid="d971ceff-2a53-430a-981f-6364c37adc89"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{investmentIncomeReceivedPrevYear}]]></textFieldExpression>
-			</textField>
-			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="402" y="202" width="89" height="20" uuid="eefab7d4-6801-4d17-9a89-4f1230bd5215"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{investmentIncomeReceivedCurrYear}]]></textFieldExpression>
-			</textField>
-			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="591" y="222" width="102" height="20" uuid="12bfbad1-15ff-46d9-817a-0c6d6bdcf459"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{interestIncomeReceivedPrevYear}]]></textFieldExpression>
-			</textField>
-			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="402" y="222" width="89" height="20" uuid="9a037d23-8c70-4e7f-ab2b-76802d200a14"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{interestIncomeReceivedCurrYear}]]></textFieldExpression>
-			</textField>
-			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="693" y="20" width="109" height="20" uuid="2a6af46a-cb7b-4728-bd23-1283a49b6aa9"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{aPrevYear}]]></textFieldExpression>
-			</textField>
-			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="491" y="20" width="100" height="20" uuid="677e2a6e-0ce7-4e36-beea-fd067b3a853a"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{aCurrYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="693" y="242" width="109" height="20" uuid="f8de443e-eba0-4397-9959-11ecaaecb79b"/>
+				<reportElement x="693" y="100" width="109" height="33" uuid="3ec9ac7b-5645-40b3-8466-00fe7c148198"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -1898,57 +1476,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{bPrevYear}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{aPrevYear}]]></textFieldExpression>
 			</textField>
-			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="491" y="242" width="100" height="20" uuid="fa622562-13d8-412e-b531-2d1aff4b6399"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{bCurrYear}]]></textFieldExpression>
-			</textField>
-			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="591" y="302" width="102" height="20" uuid="d37e3845-f6f2-48e2-b51b-e9fb79bf65d2"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{loansFromBankReceivedPrevYear}]]></textFieldExpression>
-			</textField>
-			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="402" y="302" width="89" height="20" uuid="419c4ac2-3e19-4908-9717-da0c86c61902"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{loansFromBankReceivedCurrYear}]]></textFieldExpression>
-			</textField>
-			<line>
-				<reportElement x="801" y="0" width="1" height="322" uuid="94db020a-fe39-476e-bb0b-19482b3a2427"/>
-			</line>
 			<staticText>
-				<reportElement x="491" y="62" width="100" height="20" uuid="6759ffb3-b79e-4592-bd70-8f561e1e7ab6"/>
+				<reportElement x="591" y="100" width="102" height="33" uuid="bfb9d85c-1b83-4732-9e1f-e655372c6a2c"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -1956,12 +1489,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="491" y="82" width="100" height="20" uuid="6183ad2f-afa4-41ed-8192-1555ffac6f63"/>
+				<reportElement x="400" y="100" width="89" height="33" uuid="eb23dd15-021d-4d3a-b97e-20e7d961a955"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -1969,144 +1502,15 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
-				</textElement>
-				<text><![CDATA[]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="491" y="102" width="100" height="20" uuid="ef2208d8-375f-4671-bab0-7fa3a77b295e"/>
-				<box>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
-				</textElement>
-				<text><![CDATA[]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="693" y="62" width="108" height="20" uuid="c17ac01c-1d45-49c4-91f6-d73308ef7d71"/>
-				<box>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
-				</textElement>
-				<text><![CDATA[]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="693" y="82" width="108" height="20" uuid="cac9eb13-c485-4523-9af6-f40cf5286205"/>
-				<box>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
-				</textElement>
-				<text><![CDATA[]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="693" y="102" width="108" height="20" uuid="a15e7816-20e8-44fc-8e75-f9eebb0cad8c"/>
-				<box>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
-				</textElement>
-				<text><![CDATA[]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="693" y="162" width="108" height="20" uuid="611ad8fa-eb6e-49ef-a77b-6e92f07520d7"/>
-				<box>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
-				</textElement>
-				<text><![CDATA[]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="693" y="182" width="108" height="20" uuid="b195a92f-08c2-488d-932b-dde31271aa5f"/>
-				<box>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
-				</textElement>
-				<text><![CDATA[]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="693" y="202" width="108" height="20" uuid="c3d8272b-b716-4339-89b7-49c69b40cf59"/>
-				<box>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
-				</textElement>
-				<text><![CDATA[]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="491" y="162" width="100" height="20" uuid="44782dd6-27cc-4f2f-ac06-b7b0e3157aa7"/>
-				<box>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
-				</textElement>
-				<text><![CDATA[]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="491" y="182" width="100" height="20" uuid="7999d677-397f-4f42-8aab-9146eb63ed88"/>
-				<box>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
-				</textElement>
-				<text><![CDATA[]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="491" y="202" width="100" height="20" uuid="a290c256-2c4f-43ce-9813-76846e33b439"/>
-				<box>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 		</band>
-		<band height="243">
+		<band height="284">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<staticText>
-				<reportElement x="0" y="1" width="802" height="20" uuid="3a49f168-3648-4be6-8d8d-ca8eccb598cb"/>
+				<reportElement x="1" y="22" width="402" height="20" uuid="727ac50c-2ccb-41d7-8ea1-e92116f7c7a0"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -2115,12 +1519,689 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" size="12" isBold="true" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
+				</textElement>
+				<text><![CDATA[ (Purchase) of fixed assets & CWIP]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="42" width="402" height="20" uuid="46b8ffec-ce24-4329-b3e6-d77ac189f50f"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
+				</textElement>
+				<text><![CDATA[ (Increase) / Decrease in Special funds/grants]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="62" width="402" height="20" uuid="25d60164-a4ea-4390-9dcf-2535b28f8390"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
+				</textElement>
+				<text><![CDATA[ (Increase) / Decrease in Earmarked funds]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="82" width="402" height="20" uuid="97d28894-101c-491c-be13-f2f8c8d4c705"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
+				</textElement>
+				<text><![CDATA[ (Purchase) of Investments]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="102" width="801" height="20" uuid="72eb0040-6d75-4b86-9aa3-861f0b05132e"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font fontName="SansSerif" size="12" isBold="true" pdfFontName="Times-Roman"/>
+				</textElement>
+				<text><![CDATA[ Add:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="122" width="401" height="20" uuid="03f550fb-5bef-4a6a-9c13-f4ec17f97b7d"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
+				</textElement>
+				<text><![CDATA[ Proceeds from disposal of assets]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="142" width="401" height="20" uuid="7c890fe9-cec1-4d52-8015-67bc932f52b0"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
+				</textElement>
+				<text><![CDATA[ Proceeds from disposal of investments]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="162" width="401" height="20" uuid="de147ea1-5d0d-473a-83aa-2a09b5f2cc0a"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
+				</textElement>
+				<text><![CDATA[ Investment income received]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="182" width="401" height="20" uuid="bcffba63-f059-4872-9e8a-be2e57df75a8"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
+				</textElement>
+				<text><![CDATA[ Interest income received]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="202" width="401" height="20" uuid="e80c19c5-b5ae-4f3c-8341-c20844b16dfd"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font fontName="SansSerif" size="12" isBold="true" pdfFontName="Times-Roman"/>
+				</textElement>
+				<text><![CDATA[ Net cash generated from/ (used in) investing activities (b)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="222" width="801" height="20" uuid="88a2d0b8-d1af-48fe-9a15-ad54c2c82f06"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font fontName="SansSerif" size="12" isBold="true" pdfFontName="Times-Roman"/>
+				</textElement>
+				<text><![CDATA[ C. Cash flows from financing activities]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="242" width="801" height="20" uuid="5f627328-9931-4013-95c4-b3aafd6d06f2"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font fontName="SansSerif" size="12" isBold="true" pdfFontName="Times-Roman"/>
+				</textElement>
+				<text><![CDATA[ Add:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="262" width="401" height="20" uuid="7a4c6557-01cd-4ef6-919f-b038cf92da9d"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
+				</textElement>
+				<text><![CDATA[ Loans from banks/others received]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="0" width="801" height="22" uuid="25b8f54f-1cb3-4758-9c80-63db3609feb3"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font fontName="SansSerif" size="12" isBold="true" pdfFontName="Times-Roman"/>
+				</textElement>
+				<text><![CDATA[ B. Cash flows from investing activities]]></text>
+			</staticText>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement x="403" y="22" width="88" height="20" uuid="ced83530-8300-4cb0-b21b-24496d39d63a"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{cwipCurrYear}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement x="591" y="22" width="102" height="20" uuid="60f5c1c2-9787-489b-9f7a-1db4dbb55429"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{cwipPrevYear}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement x="591" y="42" width="102" height="20" uuid="c4268436-7f63-404a-8d7c-fc295ed19a56"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{specialFundsGrantsPrevYear}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement x="403" y="42" width="88" height="20" uuid="d1c04372-f5b9-446d-90c1-bc3f25282826"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{specialFundsGrantsCurrYear}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement x="591" y="62" width="102" height="20" uuid="7cc990f0-ef45-41d9-9485-8d094c2c53f7"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{earmarkedFundsPrevYear}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement x="403" y="62" width="88" height="20" uuid="0393c654-7cb1-43f6-8e52-d0a257e63f9e"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{earmarkedFundsCurrYear}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement x="591" y="82" width="102" height="20" uuid="c9c9c8a7-5821-46e4-b9b3-7bc7e731208e"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{investmentsPrevYear}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement x="403" y="82" width="88" height="20" uuid="1b77fca5-f98a-4700-92ea-1b928cafd76e"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{investmentsCurrYear}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement x="402" y="122" width="89" height="20" uuid="5f2748d8-e4f8-403b-bc58-105e5fded203"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{disposalOfAssetsCurrYear}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement x="591" y="122" width="102" height="20" uuid="2e7a5c92-13ae-48d8-89c1-0e84174aae26"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{disposalOfAssetsPrevYear}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement x="591" y="142" width="102" height="20" uuid="f3020697-5c60-470f-8398-c53f229cda45"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{disposalOfInvestmentsPrevYear}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement x="402" y="142" width="89" height="20" uuid="d1e72f63-550a-4076-a002-01dca4c0a623"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{disposalOfInvestmentsCurrYear}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement x="591" y="162" width="102" height="20" uuid="d971ceff-2a53-430a-981f-6364c37adc89"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{investmentIncomeReceivedPrevYear}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement x="402" y="162" width="89" height="20" uuid="eefab7d4-6801-4d17-9a89-4f1230bd5215"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{investmentIncomeReceivedCurrYear}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement x="591" y="182" width="102" height="20" uuid="12bfbad1-15ff-46d9-817a-0c6d6bdcf459"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{interestIncomeReceivedPrevYear}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement x="402" y="182" width="89" height="20" uuid="9a037d23-8c70-4e7f-ab2b-76802d200a14"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{interestIncomeReceivedCurrYear}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement x="693" y="202" width="109" height="20" uuid="f8de443e-eba0-4397-9959-11ecaaecb79b"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{bPrevYear}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement x="491" y="202" width="100" height="20" uuid="fa622562-13d8-412e-b531-2d1aff4b6399"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{bCurrYear}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement x="591" y="262" width="102" height="20" uuid="d37e3845-f6f2-48e2-b51b-e9fb79bf65d2"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{loansFromBankReceivedPrevYear}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement x="402" y="262" width="89" height="20" uuid="419c4ac2-3e19-4908-9717-da0c86c61902"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{loansFromBankReceivedCurrYear}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="491" y="22" width="100" height="20" uuid="6759ffb3-b79e-4592-bd70-8f561e1e7ab6"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="491" y="42" width="100" height="20" uuid="6183ad2f-afa4-41ed-8192-1555ffac6f63"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="491" y="62" width="100" height="20" uuid="ef2208d8-375f-4671-bab0-7fa3a77b295e"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="693" y="22" width="108" height="20" uuid="c17ac01c-1d45-49c4-91f6-d73308ef7d71"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="693" y="42" width="108" height="20" uuid="cac9eb13-c485-4523-9af6-f40cf5286205"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="693" y="62" width="108" height="20" uuid="a15e7816-20e8-44fc-8e75-f9eebb0cad8c"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="693" y="122" width="108" height="20" uuid="611ad8fa-eb6e-49ef-a77b-6e92f07520d7"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="693" y="142" width="108" height="20" uuid="b195a92f-08c2-488d-932b-dde31271aa5f"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="693" y="162" width="108" height="20" uuid="c3d8272b-b716-4339-89b7-49c69b40cf59"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="491" y="122" width="100" height="20" uuid="44782dd6-27cc-4f2f-ac06-b7b0e3157aa7"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="491" y="142" width="100" height="20" uuid="7999d677-397f-4f42-8aab-9146eb63ed88"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="491" y="162" width="100" height="20" uuid="a290c256-2c4f-43ce-9813-76846e33b439"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="694" y="183" width="107" height="18" uuid="08254c4d-4a86-40c4-bde7-ed3c10fb013e">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="693" y="262" width="108" height="20" uuid="f86b92e0-cd64-43f8-a890-1649c4905d09"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="694" y="82" width="108" height="20" uuid="e878474c-8fe1-47b5-a55c-3dd404c4f6c9"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+		</band>
+		<band height="225">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<staticText>
+				<reportElement x="0" y="-1" width="802" height="20" uuid="3a49f168-3648-4be6-8d8d-ca8eccb598cb"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font fontName="SansSerif" size="12" isBold="true" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[ Less:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="21" width="402" height="20" uuid="311c2131-01ec-4111-bf94-15dd7e27db1f"/>
+				<reportElement x="0" y="19" width="402" height="20" uuid="311c2131-01ec-4111-bf94-15dd7e27db1f"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -2129,12 +2210,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[ Loans repaid during the period]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="41" width="402" height="20" uuid="e3aac4c3-9a05-4ac3-8433-fa4d0b5ef236"/>
+				<reportElement x="0" y="39" width="402" height="20" uuid="e3aac4c3-9a05-4ac3-8433-fa4d0b5ef236"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -2143,12 +2224,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[ Loans & advances to employees]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="61" width="402" height="20" uuid="c6464ee5-1090-43b7-ab02-727ec7ad570f"/>
+				<reportElement x="0" y="59" width="402" height="20" uuid="c6464ee5-1090-43b7-ab02-727ec7ad570f"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -2157,12 +2238,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[ Loans to others]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="81" width="402" height="20" uuid="04078581-ba2a-489c-a3cc-2fee7245647d"/>
+				<reportElement x="0" y="79" width="402" height="20" uuid="04078581-ba2a-489c-a3cc-2fee7245647d"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -2171,12 +2252,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[ Finance expenses]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="101" width="402" height="20" uuid="5a7f6bbb-4a22-4952-8c9e-ec6eedad4872"/>
+				<reportElement x="0" y="99" width="402" height="20" uuid="5a7f6bbb-4a22-4952-8c9e-ec6eedad4872"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -2185,12 +2266,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" size="12" isBold="true" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" isBold="true" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[ Net cash generated from (used in) financing activities (c)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="121" width="802" height="20" uuid="25da7254-13ef-40a2-889c-716a678dd435"/>
+				<reportElement x="0" y="118" width="402" height="40" uuid="750df3e9-815c-4a54-82d4-d19d97211198"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -2199,26 +2280,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
-				</textElement>
-				<text><![CDATA[ ]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="0" y="141" width="402" height="20" uuid="750df3e9-815c-4a54-82d4-d19d97211198"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement>
-					<font fontName="Times New Roman" size="12" isBold="true" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" isBold="true" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[ Net increase/ (decrease) in cash and cash equivalents (a + b + c)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="161" width="802" height="20" uuid="5e7e5f79-f237-4dfb-87b5-9fa17a7afc1b"/>
+				<reportElement x="0" y="158" width="403" height="20" uuid="14fa068d-23c8-4b33-baaf-6b41bc942a25"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -2227,26 +2294,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
-				</textElement>
-				<text><![CDATA[ ]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="0" y="181" width="403" height="20" uuid="14fa068d-23c8-4b33-baaf-6b41bc942a25"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement>
-					<font fontName="Times New Roman" size="12" isBold="true" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" isBold="true" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[ Cash and cash equivalents at beginning of period]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="201" width="403" height="20" uuid="cee7a2c5-81a7-4002-9b83-5a61ef60646d"/>
+				<reportElement x="0" y="178" width="403" height="20" uuid="cee7a2c5-81a7-4002-9b83-5a61ef60646d"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -2255,12 +2308,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" size="12" isBold="true" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" isBold="true" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[ Cash and cash equivalents at end of period]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="221" width="403" height="22" uuid="9dbd1279-528c-4a7b-9e04-b8faae3884eb"/>
+				<reportElement x="0" y="198" width="403" height="22" uuid="9dbd1279-528c-4a7b-9e04-b8faae3884eb"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -2269,12 +2322,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" size="12" isBold="true" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" isBold="true" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[ Total]]></text>
 			</staticText>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="591" y="21" width="102" height="20" uuid="f770ad60-4c6e-4413-9e15-e8e54daab553"/>
+				<reportElement x="591" y="19" width="102" height="20" uuid="f770ad60-4c6e-4413-9e15-e8e54daab553"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -2283,12 +2336,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{loansRepaidDuringPrevYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="402" y="21" width="89" height="20" uuid="6e621aac-5e98-4474-9bdd-09ba108ce39f"/>
+				<reportElement x="402" y="19" width="89" height="20" uuid="6e621aac-5e98-4474-9bdd-09ba108ce39f"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -2297,12 +2350,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{loansRepaidDuringCurrYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="591" y="41" width="102" height="20" uuid="cc436f62-dfc2-4477-82d9-e765c274035c"/>
+				<reportElement x="591" y="39" width="102" height="20" uuid="cc436f62-dfc2-4477-82d9-e765c274035c"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -2311,12 +2364,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{advanceToEmployeesPrevYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="402" y="41" width="89" height="20" uuid="da3ac1cc-c651-4233-905d-ca4e1161b637"/>
+				<reportElement x="402" y="39" width="89" height="20" uuid="da3ac1cc-c651-4233-905d-ca4e1161b637"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -2325,12 +2378,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{advanceToEmployeesCurrYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="591" y="61" width="102" height="20" uuid="b8c05172-e6ac-4d7f-9ffb-9e3da8c761ca"/>
+				<reportElement x="591" y="59" width="102" height="20" uuid="b8c05172-e6ac-4d7f-9ffb-9e3da8c761ca"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -2339,12 +2392,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{loansToOthersPrevYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="402" y="61" width="89" height="20" uuid="997a8108-2a58-47ef-af55-64c00a7841fe"/>
+				<reportElement x="402" y="59" width="89" height="20" uuid="997a8108-2a58-47ef-af55-64c00a7841fe"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -2353,12 +2406,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{loansToOthersCurrYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="591" y="81" width="102" height="20" uuid="f98418d7-1045-4c93-b9d5-ac56eb264ded"/>
+				<reportElement x="591" y="79" width="102" height="20" uuid="f98418d7-1045-4c93-b9d5-ac56eb264ded"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -2367,12 +2420,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{financeExpensePrevYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="402" y="81" width="89" height="20" uuid="f8ab9381-5be4-411c-89e5-e57388bbc8bc"/>
+				<reportElement x="402" y="79" width="89" height="20" uuid="f8ab9381-5be4-411c-89e5-e57388bbc8bc"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -2381,12 +2434,15 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{financeExpenseCurrYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="491" y="101" width="100" height="20" uuid="7b5871fe-f979-4e75-a5aa-d3cb2e001bae"/>
+				<reportElement x="491" y="100" width="100" height="18" uuid="7b5871fe-f979-4e75-a5aa-d3cb2e001bae">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -2395,12 +2451,15 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{cCurrYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="693" y="101" width="109" height="20" uuid="4b35be45-8066-4398-857f-64aa6014941f"/>
+				<reportElement x="693" y="100" width="109" height="18" uuid="4b35be45-8066-4398-857f-64aa6014941f">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -2409,12 +2468,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{cPrevYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="488" y="141" width="103" height="20" uuid="7fe9f635-9008-4bd7-a0f1-4d942cccf15d"/>
+				<reportElement x="491" y="118" width="99" height="40" uuid="7fe9f635-9008-4bd7-a0f1-4d942cccf15d"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -2423,12 +2482,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{abcCurrYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="693" y="141" width="109" height="20" uuid="4eddfe83-74d9-4fc5-bc99-30a4352662c2"/>
+				<reportElement x="693" y="118" width="109" height="40" uuid="4eddfe83-74d9-4fc5-bc99-30a4352662c2"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -2437,12 +2496,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{abcPrevYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="489" y="181" width="102" height="20" uuid="60aff958-ecfd-4875-877d-8d6791510bad"/>
+				<reportElement x="492" y="158" width="98" height="20" uuid="60aff958-ecfd-4875-877d-8d6791510bad"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -2451,12 +2510,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{atBeginingPeriodCurrYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="693" y="181" width="109" height="20" uuid="89e6324e-849e-4e8c-9722-c065e51d9d77"/>
+				<reportElement x="693" y="158" width="109" height="20" uuid="89e6324e-849e-4e8c-9722-c065e51d9d77"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -2465,12 +2524,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{atBeginingPeriodPrevYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="489" y="201" width="102" height="20" uuid="23b25061-d62c-4787-a5d1-2ca022359ea0"/>
+				<reportElement x="492" y="178" width="98" height="20" uuid="23b25061-d62c-4787-a5d1-2ca022359ea0"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -2479,12 +2538,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{atEndPeriodCurrYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="693" y="201" width="109" height="20" uuid="6892be6b-38f5-4bc1-9efb-e4708dca8479"/>
+				<reportElement x="693" y="178" width="109" height="20" uuid="6892be6b-38f5-4bc1-9efb-e4708dca8479"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -2493,12 +2552,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{atEndPeriodPrevYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="489" y="222" width="102" height="20" uuid="2508aec9-c289-4097-986c-9da8e2a1d814"/>
+				<reportElement x="492" y="199" width="98" height="21" uuid="2508aec9-c289-4097-986c-9da8e2a1d814"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -2507,12 +2566,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{totalCurrYear}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement x="693" y="222" width="109" height="20" uuid="ccff8c20-4c12-4337-8e6d-601f2a1ada5b"/>
+				<reportElement x="693" y="199" width="109" height="21" uuid="ccff8c20-4c12-4337-8e6d-601f2a1ada5b"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -2521,12 +2580,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center">
-					<font fontName="Times New Roman" size="12" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{totalPrevYear}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="403" y="181" width="85" height="20" uuid="93c1ab8e-787c-4829-99bd-91a93dfd12ed"/>
+				<reportElement x="403" y="158" width="89" height="20" uuid="93c1ab8e-787c-4829-99bd-91a93dfd12ed"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -2534,12 +2593,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="591" y="181" width="102" height="20" uuid="4e97c0f8-6021-41a6-9abd-bdbdacb1ca4b"/>
+				<reportElement x="591" y="158" width="102" height="20" uuid="4e97c0f8-6021-41a6-9abd-bdbdacb1ca4b"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -2547,12 +2606,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="591" y="221" width="102" height="22" uuid="55372161-ebc5-44f5-bd7f-d99134b5964e"/>
+				<reportElement x="591" y="198" width="102" height="22" uuid="55372161-ebc5-44f5-bd7f-d99134b5964e"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -2560,12 +2619,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="591" y="202" width="102" height="20" uuid="e777905e-106f-4d01-8b90-3fe8821197bf"/>
+				<reportElement x="591" y="179" width="102" height="20" uuid="e777905e-106f-4d01-8b90-3fe8821197bf"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -2573,12 +2632,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="403" y="202" width="85" height="20" uuid="7be587f6-efae-4937-86de-4e220d6f9711"/>
+				<reportElement x="403" y="179" width="89" height="20" uuid="7be587f6-efae-4937-86de-4e220d6f9711"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -2586,12 +2645,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="402" y="221" width="86" height="22" uuid="4125e31d-2ac0-4711-88d4-0c9737efeb10"/>
+				<reportElement x="402" y="198" width="90" height="22" uuid="4125e31d-2ac0-4711-88d4-0c9737efeb10"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -2599,28 +2658,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
-				</textElement>
-				<text><![CDATA[]]></text>
-			</staticText>
-			<line>
-				<reportElement x="801" y="2" width="1" height="241" uuid="26498493-c961-40e4-b714-590ec5117e0b"/>
-			</line>
-			<staticText>
-				<reportElement x="491" y="21" width="100" height="20" uuid="a9db61c8-4931-463a-99e3-d89ec84e1322"/>
-				<box>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="491" y="41" width="100" height="20" uuid="dd46ed8f-509e-419f-a377-cd530c1ce3cf"/>
+				<reportElement x="491" y="19" width="100" height="20" uuid="a9db61c8-4931-463a-99e3-d89ec84e1322"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -2628,12 +2671,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="491" y="61" width="100" height="20" uuid="9ee3f6dd-edef-4eef-87ab-5eba3c88a2ee"/>
+				<reportElement x="491" y="39" width="100" height="20" uuid="dd46ed8f-509e-419f-a377-cd530c1ce3cf"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -2641,12 +2684,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="693" y="21" width="108" height="20" uuid="94ac6fa8-d0cb-4985-87af-bc85ea321af6"/>
+				<reportElement x="491" y="59" width="100" height="20" uuid="9ee3f6dd-edef-4eef-87ab-5eba3c88a2ee"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -2654,12 +2697,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="693" y="41" width="108" height="20" uuid="d40c259c-1d7f-485f-82ca-566eb91db16c"/>
+				<reportElement x="693" y="19" width="108" height="20" uuid="94ac6fa8-d0cb-4985-87af-bc85ea321af6"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -2667,12 +2710,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="693" y="61" width="108" height="20" uuid="cd1019be-360f-44f1-b030-44f582b23b6d"/>
+				<reportElement x="693" y="39" width="108" height="20" uuid="d40c259c-1d7f-485f-82ca-566eb91db16c"/>
 				<box>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
@@ -2680,10 +2723,105 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement>
-					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
+			<staticText>
+				<reportElement x="693" y="59" width="108" height="20" uuid="cd1019be-360f-44f1-b030-44f582b23b6d"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="402" y="100" width="88" height="18" uuid="dbb924b6-0f89-4594-a079-e55d43e152ca">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="591" y="99" width="102" height="18" uuid="7f14104a-c2d2-4288-b90d-074214aa9b37">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font fontName="SansSerif" pdfFontName="Times-Roman"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement x="403" y="118" width="87" height="40" uuid="ea289a91-3fd3-4443-b008-35017ce7c509"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
+				</textElement>
+			</textField>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement x="590" y="118" width="103" height="40" uuid="b71b3c6f-7c46-4455-9466-e22fda119f6c"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
+				</textElement>
+			</textField>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement x="693" y="79" width="109" height="20" uuid="85ff7ce1-0ffe-4f9f-b50b-eaacca890a82"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
+				</textElement>
+			</textField>
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement x="491" y="79" width="100" height="20" uuid="20acb384-daba-46be-8a31-d9c6f69a4349"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="12" pdfFontName="Times-Roman"/>
+				</textElement>
+			</textField>
 		</band>
 	</detail>
 </jasperReport>

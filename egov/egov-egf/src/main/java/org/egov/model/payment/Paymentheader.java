@@ -92,7 +92,7 @@ public class Paymentheader extends StateAware {
         return type;
     }
 
-    public void setType(final String type) {
+    public void setType(String type) {
         this.type = type;
     }
 
@@ -125,7 +125,7 @@ public class Paymentheader extends StateAware {
         return paymentAmount;
     }
 
-    public void setPaymentAmount(final BigDecimal paymentAmount) {
+    public void setPaymentAmount( BigDecimal paymentAmount) {
         this.paymentAmount = paymentAmount;
     }
 

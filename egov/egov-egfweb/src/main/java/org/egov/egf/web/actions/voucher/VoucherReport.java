@@ -92,7 +92,9 @@ public class VoucherReport {
     public String getSlCode() {
         //persistenceService.setType(CGeneralLedgerDetail.class);
         if (generalLedger != null) {
-            final List<CGeneralLedgerDetail> generalLedgerDetail = persistenceService.findAllBy(
+        	return generalLedger.getGlcodeId().getName();
+        }
+            /*final List<CGeneralLedgerDetail> generalLedgerDetail = persistenceService.findAllBy(
                     "from CGeneralLedgerDetail where generalLedgerId.id=?",generalLedger.getId());
             if (generalLedgerDetail.size() > 1)
                 return MULTIPLE;
@@ -112,7 +114,7 @@ public class VoucherReport {
 
                 return entityType.getCode() + "/" + entityType.getEntityDescription();
             }
-        }
+        }*/
         return "";
     }
 

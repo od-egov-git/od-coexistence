@@ -21,7 +21,9 @@ import org.egov.collection.entity.MisReceiptDetail;
 import org.egov.egf.model.IEStatementEntry;
 import org.egov.egf.model.Statement;
 import org.egov.egf.model.StatementEntry;
+import org.egov.infra.admin.master.service.CityService;
 import org.egov.infra.exception.ApplicationRuntimeException;
+import org.egov.infra.reporting.util.ReportUtil;
 import org.egov.infstr.services.PersistenceService;
 import org.hibernate.SQLQuery;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +33,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -50,7 +53,8 @@ public class CashBookController {
 	@Autowired
 	@Qualifier("persistenceService")
 	private PersistenceService persistenceService;
-
+	@Autowired
+	private CityService cityService;
 	public static final Locale LOCALE = new Locale("en", "IN");
 	public static final SimpleDateFormat DDMMYYYYFORMAT1 = new SimpleDateFormat("dd-MMM-yyyy", LOCALE);
 	private static final long MILLIS_IN_A_YEAR = (long) 1000 * 60 * 60 * 24 * 365;
@@ -84,6 +88,15 @@ public class CashBookController {
 	private BigDecimal fixedAssetCreditAmt = new BigDecimal(0);
 	private BigDecimal investmentDebitAmt = new BigDecimal(0);
 	private BigDecimal investmentCreditAmt = new BigDecimal(0);
+	private String titleName = "";
+
+	public String getTitleName() {
+		return titleName;
+	}
+
+	public void setTitleName(String titleName) {
+		this.titleName = titleName;
+	}
 
 	public BigDecimal getIncomeOverExpenditureCurr() {
 		return incomeOverExpenditureCurr;
@@ -229,6 +242,7 @@ public class CashBookController {
 	public String cashBookSearchResult(@ModelAttribute("cashBookReport") final CashBookReportBean cashBookReportBean,
 			final Model model, HttpServletRequest request) {
 		try {
+			titleName = getUlbName().toUpperCase() + " ";
 			final StringBuffer recQuery = new StringBuffer(500);
 
 			List<Object[]> recqueryList = null;
@@ -311,7 +325,10 @@ public class CashBookController {
 				}
 			}
 			cashBookReportBean.setCashBookResultList(finalList);
-
+			cashBookReportBean.setTitleName(titleName + " Cash Book Report");
+			cashBookReportBean
+					.setHeader("Cash Book Report from " + DDMMYYYYFORMAT1.format(cashBookReportBean.getFromDate())
+							+ " to " + DDMMYYYYFORMAT1.format(cashBookReportBean.getToDate()));
 			model.addAttribute("cashBookReport", cashBookReportBean);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -415,6 +432,11 @@ public class CashBookController {
 					finalList.add(obj);
 				}
 			}
+			titleName = getUlbName().toUpperCase() + " ";
+			cashBookReportBean.setTitleName(titleName + " Cash Book Report");
+			cashBookReportBean
+					.setHeader("Cash Book Report from " + DDMMYYYYFORMAT1.format(cashBookReportBean.getFromDate())
+							+ " to " + DDMMYYYYFORMAT1.format(cashBookReportBean.getToDate()));
 			RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
 			HttpServletResponse response = ((ServletRequestAttributes) requestAttributes).getResponse();
 			response.setHeader("Content-Disposition", "attachment; filename=CashBookReport.pdf");
@@ -441,7 +463,8 @@ public class CashBookController {
 		final JRBeanCollectionDataSource source = new JRBeanCollectionDataSource(auditList);
 		final Map<String, Object> parameters = new HashMap<>();
 		parameters.put("cashBookDataSource", getDataSource(auditList));
-		parameters.put("nameOfUlb", "ULB name that will be passed as parameter");
+		parameters.put("nameOfUlb", cashBookReportBean.getTitleName());
+		parameters.put("header", cashBookReportBean.getHeader());
 		parameters.put("receiptSideTotal", "Total : " + getReceiptSideTotal(cashBookReportBean) + " ");
 		parameters.put("paymentSideTotal", "Total : " + getPaymentSideTotal(cashBookReportBean) + " ");
 		final JasperPrint print = JasperFillManager.fillReport(report, parameters, source);
@@ -496,7 +519,8 @@ public class CashBookController {
 	@RequestMapping(value = "/cashFlow/newForm", method = RequestMethod.POST)
 	public String cashFlowNewForm(@ModelAttribute("cashFlowReport") final CashBookReportBean cashBookReportBean,
 			final Model model, HttpServletRequest request) {
-
+		cashBookReportBean.setFlag("block");
+		model.addAttribute("cashFlowResult", cashBookReportBean);
 		return "cashFlowReport";
 	}
 
@@ -528,6 +552,12 @@ public class CashBookController {
 			cashBookReportBean.setAbcPrevYear(balanceSheetService.getabcPreviousYear(cashBookReportBean));
 			cashBookReportBean.setFinalBalanceSheetL(finalBalanceSheetL);
 			cashBookReportBean.setCashFlowResultList(lst1);
+			titleName = getUlbName().toUpperCase() + " ";
+			cashBookReportBean.setTitleName(titleName + " Cash Flow Report");
+			cashBookReportBean
+					.setHeader("Cash Flow Report from " + DDMMYYYYFORMAT1.format(cashBookReportBean.getFromDate())
+							+ " to " + DDMMYYYYFORMAT1.format(cashBookReportBean.getToDate()));
+			cashBookReportBean.setFlag("show");
 			model.addAttribute("cashFlowResult", cashBookReportBean);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -548,10 +578,14 @@ public class CashBookController {
 		List<CashFlowReportDataBean> lst1 = new ArrayList<CashFlowReportDataBean>();
 		List<IEStatementEntry> resultEntries = incomeExpenditureStatement.getIeEntries();
 		CashFlowReportDataBean obj = new CashFlowReportDataBean();
-
+		BigDecimal totalIncomeCurrentYear = new BigDecimal(0);
+		BigDecimal totalIncomePrevYear = new BigDecimal(0);
+		BigDecimal totalExpenseCurrYear = new BigDecimal(0);
+		BigDecimal totalExpensePrevYear = new BigDecimal(0);
 		for (IEStatementEntry ieStatementEntry : resultEntries) {
 			BigDecimal thisYearAmount = new BigDecimal(0);
 			BigDecimal prevYearAmount = new BigDecimal(0);
+			
 			Map<String, BigDecimal> thisYearAmountMap = new HashMap<String, BigDecimal>();
 			Map<String, BigDecimal> prevYearAmountMap = new HashMap<String, BigDecimal>();
 			thisYearAmountMap = ieStatementEntry.getNetAmount();
@@ -560,10 +594,21 @@ public class CashBookController {
 				System.out.println(
 						String.format("Key (name) is: %s, Value (age) is : %s", pair.getKey(), pair.getValue()));
 				thisYearAmount = pair.getValue();
-				if (ieStatementEntry.getGlCode().equalsIgnoreCase("A-B")) {
-					obj.setIncomeOverExpenditureCurr(thisYearAmount);
-					incomeOverExpenditureCurr = thisYearAmount;
+				if (ieStatementEntry.getGlCode().equalsIgnoreCase("A")) {
+					totalIncomeCurrentYear = (thisYearAmount == null ? new BigDecimal(0) : thisYearAmount);
+
 				}
+				if (ieStatementEntry.getGlCode().equalsIgnoreCase("B")) {
+					totalExpenseCurrYear = (thisYearAmount == null ? new BigDecimal(0) : thisYearAmount);
+
+				}
+				obj.setIncomeOverExpenditureCurr(totalIncomeCurrentYear.subtract(totalExpenseCurrYear));
+				incomeOverExpenditureCurr = totalIncomeCurrentYear.subtract(totalExpenseCurrYear);
+				/*
+				 * if (ieStatementEntry.getGlCode().equalsIgnoreCase("A-B")) {
+				 * obj.setIncomeOverExpenditureCurr(thisYearAmount); incomeOverExpenditureCurr =
+				 * thisYearAmount; }
+				 */
 				if (ieStatementEntry.getGlCode().equalsIgnoreCase("272")) {
 					obj.setDepreciationCurr(thisYearAmount);
 					depreciationCurr = thisYearAmount;
@@ -594,11 +639,24 @@ public class CashBookController {
 				System.out.println(
 						String.format("Key (name) is: %s, Value (age) is : %s", pair.getKey(), pair.getValue()));
 				prevYearAmount = pair.getValue();
-				if (ieStatementEntry.getGlCode().equalsIgnoreCase("A-B")) {
-					obj.setIncomeOverExpenditurePrevYear(prevYearAmount);
-					incomeOverExpenditurePrevYear = prevYearAmount;
 
+				if (ieStatementEntry.getGlCode().equalsIgnoreCase("A")) {
+
+					totalIncomePrevYear = (prevYearAmount == null ? new BigDecimal(0) : prevYearAmount);
 				}
+				if (ieStatementEntry.getGlCode().equalsIgnoreCase("B")) {
+
+					totalExpensePrevYear = (prevYearAmount == null ? new BigDecimal(0) : prevYearAmount);
+				}
+				obj.setIncomeOverExpenditurePrevYear(totalIncomePrevYear.subtract(totalExpensePrevYear));
+				incomeOverExpenditurePrevYear = totalIncomePrevYear.subtract(totalExpensePrevYear);
+				/*
+				 * if (ieStatementEntry.getGlCode().equalsIgnoreCase("A-B")) {
+				 * obj.setIncomeOverExpenditurePrevYear(prevYearAmount);
+				 * incomeOverExpenditurePrevYear = prevYearAmount;
+				 * 
+				 * }
+				 */
 				if (ieStatementEntry.getGlCode().equalsIgnoreCase("272")) {
 					obj.setDepreciationPrevYear(prevYearAmount);
 					depreciationPrevYear = prevYearAmount;
@@ -622,7 +680,7 @@ public class CashBookController {
 				adjustedIncomePrevYear = incomeOverExpenditurePrevYear.add(depreciationPrevYear)
 						.add(interestFinanceChargesPrevYear).subtract(profitOnDisposalOfAssetsPrevYear)
 						.subtract(dividendIncomePrevYear).subtract(investmentIncomePrevYear);
-				obj.setAdjustedIncomeCurrYear(adjustedIncomePrevYear);
+				obj.setAdjustedIncomePrevYear(adjustedIncomePrevYear);
 			}
 		}
 		lst1.add(obj);
@@ -643,7 +701,7 @@ public class CashBookController {
 		fixedAssetCreditAmt = balanceSheetService.getFixedAssetCreditAmount("410", fromDate, toDate);
 		investmentDebitAmt = balanceSheetService.getInvestmentDEbitAmount("420", fromDate, toDate);
 		investmentCreditAmt = balanceSheetService.getInvestmentCreditAmount("420", fromDate, toDate);
-		balanceSheet = new Statement(); 
+		balanceSheet = new Statement();
 		balanceSheet.setToDate(toDate);
 		balanceSheet.setFromDate(fromDate);
 		balanceSheet.setFunds(balanceSheetService.getFunds());
@@ -654,6 +712,10 @@ public class CashBookController {
 		CashFlowReportDataBean obj = new CashFlowReportDataBean();
 		ieStatementEntry = resultEntries;
 		// for (StatementEntry ieStatementEntry : resultEntries) {
+		BigDecimal otherCurrentAssetsCurrYear1 = new BigDecimal(0);
+		BigDecimal otherCurrentAssetsCurrYear2 = new BigDecimal(0);
+		BigDecimal otherCurrentAssetsPrevYear1 = new BigDecimal(0);
+		BigDecimal otherCurrentAssetsPrevYear2 = new BigDecimal(0);
 		for (int i = 0; i < resultEntries.size(); i++) {
 			System.out.println("##year::" + yearType + "### glcode::" + ieStatementEntry.get(i).getGlCode() + "::"
 					+ ieStatementEntry.get(i).getCurrentYearTotal() + "::"
@@ -675,12 +737,15 @@ public class CashBookController {
 				if (ieStatementEntry.get(i).getGlCode().equalsIgnoreCase("440")) {
 					obj.setPrepaidExpenseCurrYear(thisYearAmount);
 				}
-				if (ieStatementEntry.get(i).getGlCode().equalsIgnoreCase("460")
-						|| ieStatementEntry.get(i).getGlCode().equalsIgnoreCase("470")) {
-					obj.setOtherCurrentAssetsCurrYear(thisYearAmount);
+				if (ieStatementEntry.get(i).getGlCode().equalsIgnoreCase("460")) {
+					otherCurrentAssetsCurrYear1 = thisYearAmount;
+				}
+				if(ieStatementEntry.get(i).getGlCode().equalsIgnoreCase("470")) {
+					otherCurrentAssetsCurrYear2 = thisYearAmount;
 
 				}
-				if (ieStatementEntry.get(i).getGlCode().equalsIgnoreCase("3400")) {
+				obj.setOtherCurrentAssetsCurrYear(otherCurrentAssetsCurrYear1.add(otherCurrentAssetsCurrYear2));
+				if (ieStatementEntry.get(i).getGlCode().equalsIgnoreCase("340")) {
 					obj.setDepositsReceivedCurrYear(thisYearAmount);
 
 				}
@@ -743,12 +808,15 @@ public class CashBookController {
 				if (ieStatementEntry.get(i).getGlCode().equalsIgnoreCase("440")) {
 					obj.setPrepaidExpensePrevYear(prevYearAmount);
 				}
-				if (ieStatementEntry.get(i).getGlCode().equalsIgnoreCase("460")
-						|| ieStatementEntry.get(i).getGlCode().equalsIgnoreCase("470")) {
-					obj.setOtherCurrentAssetsPrevYear(prevYearAmount);
-
+				if (ieStatementEntry.get(i).getGlCode().equalsIgnoreCase("460")) {
+					otherCurrentAssetsPrevYear1 = prevYearAmount;
 				}
-				if (ieStatementEntry.get(i).getGlCode().equalsIgnoreCase("3400")) {
+				if(ieStatementEntry.get(i).getGlCode().equalsIgnoreCase("470")) {
+					
+					otherCurrentAssetsPrevYear2 = prevYearAmount;
+				}
+				obj.setOtherCurrentAssetsPrevYear(otherCurrentAssetsPrevYear1.add(otherCurrentAssetsPrevYear2));
+				if (ieStatementEntry.get(i).getGlCode().equalsIgnoreCase("340")) {
 					obj.setDepositsReceivedPrevYear(prevYearAmount);
 
 				}
@@ -799,11 +867,15 @@ public class CashBookController {
 	}
 
 	@RequestMapping(value = "/cashFlow/searchCashFlowReportData", params = "exportpdf")
+	//@RequestMapping(value = "/cashFlow/searchCashFlowReportExportData")
 	public @ResponseBody void cashFlowExportToPdf(
 			@ModelAttribute("cashFlowReport") final CashBookReportBean cashBookReportBean, final Model model,
 			final HttpServletRequest request) throws IOException, JRException {
 		try {
-
+			/*
+			 * cashBookReportBean.setFromDate(fromDate);
+			 * cashBookReportBean.setToDate(toDate);
+			 */
 			List<CashFlowReportDataBean> lst1 = populateIncomeExpenditureDataSource(cashBookReportBean.getToDate(),
 					cashBookReportBean.getFromDate());
 			List<CashFlowReportDataBean> balanceSheetLNow = new ArrayList<CashFlowReportDataBean>();
@@ -826,6 +898,11 @@ public class CashBookController {
 			cashBookReportBean.setcPrevYear(new BigDecimal(0));
 			cashBookReportBean.setAbcCurrentYear(balanceSheetService.getabcCurrentYear(cashBookReportBean));
 			cashBookReportBean.setAbcPrevYear(balanceSheetService.getabcPreviousYear(cashBookReportBean));
+			titleName = getUlbName().toUpperCase() + " ";
+			cashBookReportBean.setTitleName(titleName + " Cash Flow Report");
+			cashBookReportBean
+					.setHeader("Cash Flow Report from " + DDMMYYYYFORMAT1.format(cashBookReportBean.getFromDate())
+							+ " to " + DDMMYYYYFORMAT1.format(cashBookReportBean.getToDate()));
 			Map<String, Object> reportParams = new HashMap<String, Object>();
 			reportParams = balanceSheetService.prepareMapForCashFlowReport(lst1, finalBalanceSheetL,
 					cashBookReportBean);
@@ -845,4 +922,7 @@ public class CashBookController {
 		}
 	}
 
+	private String getUlbName() {
+		return ReportUtil.getCityName() + " " + (cityService.getCityGrade() == null ? "" : cityService.getCityGrade());
+	}
 }

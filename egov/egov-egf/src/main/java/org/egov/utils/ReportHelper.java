@@ -196,6 +196,7 @@ public class ReportHelper {
             inputStream = new ByteArrayInputStream(outputBytes.toByteArray());
             closeStream(reportStream);
         } catch (final JRException e) {
+        	e.printStackTrace();
             if (LOGGER.isDebugEnabled())
                 LOGGER.debug("Error" + e.getMessage());
             throw new ApplicationRuntimeException("report.exception", e);
@@ -241,7 +242,7 @@ public class ReportHelper {
         closeStream(reportStream);
         return inputStream;
     }
-
+    
     public InputStream exportPdf(InputStream inputStream, final JasperPrint jasperPrint) throws JRException, IOException {
         outputBytes = new ByteArrayOutputStream(1 * MB);
         JasperExportManager.exportReportToPdfStream(jasperPrint, outputBytes);
@@ -956,6 +957,7 @@ public class ReportHelper {
 
     private void exportReport(final JasperPrint jasperPrint, final String sizeUnitPoint)
             throws JRException {
+    	try {
         final JRHtmlExporter exporter = new JRHtmlExporter();
         exporter
         .setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
@@ -969,6 +971,9 @@ public class ReportHelper {
                 false);
         exporter.setParameter(JRHtmlExporterParameter.SIZE_UNIT, sizeUnitPoint);
         exporter.exportReport();
+    	}catch(Exception e) {
+    		e.printStackTrace();
+    	}
     }
 
     public JasperPrint exportMajorAndMinorCodewise(
