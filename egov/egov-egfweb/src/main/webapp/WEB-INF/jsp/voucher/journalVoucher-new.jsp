@@ -235,6 +235,32 @@
 		document.getElementById("approverDepartment").value="DEPT_25";
 		loadDesignationFromMatrix1();
 	} */
+	//validating bill number
+	function validateBillNumber(obj)
+		{			
+		console.log("calling");
+			var url = '${pageContext.request.contextPath}/voucher/validate-billnumber.action?billNum='+obj.value;
+			console.log(url);
+			var transaction = YAHOO.util.Connect.asyncRequest('POST', url, validateBillNumberResult, null);
+			console.log(transaction);
+		}
+		
+		var validateBillNumberResult = {
+			success: function(o) {
+				var res=o.responseText;
+				console.log(res);
+				res = res.split('~');
+				console.log(res[1]);
+				if(res[1]=='false')
+				{
+					bootbox.alert("Entered bill number already being used");     
+					
+				}
+		    },
+		    failure: function(o) {
+		    	bootbox.alert('failure');
+		    }
+		}
 	
 			if(dom.get('targetvalue').value=='success')
 			{
@@ -300,7 +326,6 @@
 		}
 		
 	}
-	
 	// jayanta for save as draft
 	function onSubmitDraft()
 	{

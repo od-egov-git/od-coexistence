@@ -260,8 +260,26 @@ public class PaymentRefundController extends BaseBillController {
     @Autowired
     VoucherService voucherService;
     
+    private String fundnew="";
+    private String departmentnew="";
     
-    public PaymentRefundController(final AppConfigValueService appConfigValuesService) {
+    public String getFundnew() {
+		return fundnew;
+	}
+
+	public void setFundnew(String fundnew) {
+		this.fundnew = fundnew;
+	}
+
+	public String getDepartmentnew() {
+		return departmentnew;
+	}
+
+	public void setDepartmentnew(String departmentnew) {
+		this.departmentnew = departmentnew;
+	}
+
+	public PaymentRefundController(final AppConfigValueService appConfigValuesService) {
         super(appConfigValuesService);
     }
 
@@ -304,8 +322,35 @@ public class PaymentRefundController extends BaseBillController {
 		VOUCHER_TYPES.put(FinancialConstants.STANDARD_VOUCHER_TYPE_JOURNAL, FinancialConstants.STANDARD_VOUCHER_TYPE_JOURNAL);
 		VOUCHER_TYPES.put(FinancialConstants.STANDARD_VOUCHER_TYPE_RECEIPT, FinancialConstants.STANDARD_VOUCHER_TYPE_RECEIPT);		
 		model.addAttribute("voucherTypeList", VOUCHER_TYPES);
-		model.addAttribute("departmentList", masterDataCache.get("egi-department"));
-		model.addAttribute("fundList",	paymentRefundUtils.getAllFunds());
+		
+		//model.addAttribute("departmentList", masterDataCache.get("egi-department"));
+		//model.addAttribute("fundList",	paymentRefundUtils.getAllFunds());
+		Fund fund = new Fund();
+		List<Fund> fund1 = new ArrayList();
+		List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","fund");
+        for(AppConfigValues value:appConfigValuesList)
+        {
+	       	fund = fundHibernateDAO.fundByCode(value.getValue());
+	       	setFundnew(String.valueOf(fund.getId()));
+	       	fund1.add(fundHibernateDAO.fundByCode(value.getValue()));
+        }
+        
+        model.addAttribute("fundList", fund1);
+        appConfigValuesList=null;
+        List dept1=new ArrayList();
+		appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","department");
+        for(AppConfigValues value:appConfigValuesList)
+        {
+        	dept1=microserviceUtils.getDepartments(value.getValue());
+        }
+        model.addAttribute("departmentList", dept1);
+        for(AppConfigValues value:appConfigValuesList)
+        {
+        	setDepartmentnew(value.getValue());
+        }
+        appConfigValuesList=null;
+        model.addAttribute("fundnew",getFundnew());
+        model.addAttribute("departmentnew",getDepartmentnew());
 		model.addAttribute("serviceTypeList", microserviceUtils.getBusinessService(null));
 		model.addAttribute(VOUCHER_SEARCH, voucherSearch);
 		model.addAttribute("bankList", createBankService.getByIsActiveTrueOrderByName());//getallBank());

@@ -1284,7 +1284,7 @@ public class VoucherService extends PersistenceService<CVoucherHeader, Long> {
 			System.out.println("::::::::::::::::"+voucherHeader.getId());
 			egBillregister = (EgBillregister) persistenceService.find(
 					"from EgBillregister br where br.egBillregistermis.voucherHeader.id=" + voucherHeader.getId());
-			
+			if(null!=egBillregister) {
 			final EgBillregistermis egBillregistermis = egBillregister.getEgBillregistermis();
 			
 			if (null != voucherTypeBean.getBillDate())
@@ -1323,6 +1323,7 @@ public class VoucherService extends PersistenceService<CVoucherHeader, Long> {
 
 			prepareBillDetails(egBillregister, billDetailslist, subLedgerlist, voucherHeader, egBilldetailes);
 			egBillRegisterService.update(egBillregister);
+			}
 
 		} catch (final ValidationException e) {
 			final List<ValidationError> errors = new ArrayList<>();
@@ -1508,7 +1509,7 @@ System.out.println(":::::::::::::"+accountDetail.getGlcodeIdDetail());
 		return egBilldetailes;
 	}
 
-	private boolean isBillNumUnique(final String billNumber) {
+	public boolean isBillNumUnique(final String billNumber) {
 
 		final String billNum = (String) persistenceService.find(
 				"select billnumber from EgBillregister where upper(billnumber)='" + billNumber.toUpperCase() + "'");

@@ -167,6 +167,8 @@ public class DepreciationController {
 	    public String save(@ModelAttribute("Depreciation") final Depreciation depreciation,final Model model,HttpServletRequest request,
 				final BindingResult resultBinder) {
 	    	System.out.println("create called");
+	    	List msg=new ArrayList();
+	    	String message=null;
 	    	List<DepreciationList> resultList=depreciation.getResultList();
 	    	DepreciationInputs inputList=new DepreciationInputs();
 	    	List<DepreciationInputs> finalList= new ArrayList();
@@ -176,12 +178,20 @@ public class DepreciationController {
 	    	for(DepreciationList i:resultList) {
 	    		System.out.println(("checked "+i.isChecked()));
 	    		if(i.isChecked()==true) {
-	    			inputList=depreciationService.saveDepreciationAsset(i,depreciation.getDepreciationDate(),cnt,depreciationList);
-	    			finalList.add(inputList);
-	    			cnt++;
+	    			if (i.getCurrentGrossValue().compareTo(BigDecimal.ZERO) > 0) {
+		    			inputList=depreciationService.saveDepreciationAsset(i,depreciation.getDepreciationDate(),cnt,depreciationList);
+		    			finalList.add(inputList);
+		    			cnt++;
+	    			}
+	    			else {
+	    				message="Asset Code "+i.getAssetCode()+", Current Gross Value is 0";
+	    				msg.add(message);
+	    				return "depreciation-create";
+	    			}
 	    		}
 	    	}
 	    	depreciation.setResultList(depreciationList);
+	    	model.addAttribute("errorMessage", msg);
 	    	return "depreciation-success";
 	    }
 	    @RequestMapping(value = "/viewAssetDepreciation", method = RequestMethod.POST)
