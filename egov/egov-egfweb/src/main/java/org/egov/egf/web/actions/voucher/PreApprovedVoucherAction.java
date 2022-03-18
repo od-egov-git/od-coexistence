@@ -614,6 +614,12 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
                     result = "editVoucher";
                     ismodifyJv = true;
                 }
+                else if (voucherHeader.getName().equalsIgnoreCase(FinancialConstants.JOURNALVOUCHER_NAME_RECEIPT)) {
+                    type = FinancialConstants.JOURNALVOUCHER_NAME_RECEIPT;
+                    result = "editVoucher";
+                    ismodifyJv = true;
+                }
+                
             }
             else {
                 type = FinancialConstants.JOURNALVOUCHER_NAME_GENERAL;

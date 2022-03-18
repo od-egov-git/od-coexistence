@@ -83,6 +83,7 @@ function fetchDeptId() {
 }
 
 function printVoucher(){
+	//document.forms[0].action='../voucher/preApprovedVoucher-loadvoucherview.action?vhid=<s:property value="paymentheader.id"/>';
 	document.forms[0].action='../report/billPaymentVoucherPrint-print.action?id=<s:property value="paymentheader.id"/>';
 	document.forms[0].submit();
 } 

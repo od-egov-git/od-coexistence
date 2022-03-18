@@ -1,6 +1,11 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%@ include file="/includes/taglibs.jsp"%>
-
+<script type="text/javascript">
+window.onload=function(){
+	document.getElementById("fundId").value=document.getElementById("fundnew").value;
+	document.getElementById("deptCode").value=document.getElementById("departmentnew").value;
+}
+</script>
 <form:form role="form" action="/ajax/_voucherSearch" modelAttribute="voucherSearch" id="voucherSearchform" cssClass="form-horizontal form-groups-bordered" enctype="multipart/form-data">
 	<div class="row">
 		<div class="col-md-12">
@@ -19,10 +24,10 @@
 								<form:options items="${voucherTypeList}"/>
 							</form:select>
 						</div>
-						 <label class="col-sm-3 control-label text-right"></label>
+						<!--  <label class="col-sm-3 control-label text-right"></label>
 						<div class="col-sm-3 add-margin">
 							<a href="/services/EGF/refund/_paymentRequestblankvoucherForm">Refund request for amount collected before 01/06/2020</a>
-						</div>
+						</div> -->
 					</div>
 					<div class="form-group">
 						<label class="col-sm-3 control-label text-right"><spring:message code="voucher.number" text="Voucher Number"/> </label>
@@ -94,6 +99,8 @@
 			<spring:message code='lbl.search' text="Search"/>
 		</button>		
 	</div>
+	<input type="hidden" path="" id="fundnew" value="${fundnew}"/>
+	<input type="hidden" path="" id="departmentnew" value="${departmentnew}"/>
 </form:form>
 
 <div class="row display-hide report-section">

@@ -65,11 +65,43 @@
        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.1/jquery-ui.min.js"></script>
 <script type="text/javascript">
-					
+
+/* function validate(){
+	alert("validate called");
+	var slNos=document.getElementsByName('slNo');
+	alert("slNo "+slNos.length);
+	alert("slNo val "+document.getElementById("resultList[0].slNo").value);
+	
+	var cnt=0;
+	for (i = 0; i < slNos.length; i++) {
+		alert("inside for");
+		if(document.getElementById("selected_"+i).checked){
+			alert("inside if")
+			cnt++;
+		}
+	}
+	alert("cnt "+cnt);
+	return false;
+} */
+
 </script>
 <div class="container">
     <form:form name="Depreciation" role="form" method="post" action="searchDepreciation" modelAttribute="Depreciation" id="depreciation" class="form-horizontal form-groups-bordered" enctype="multipart/form-data">
     <div class="panel-heading">
+		<c:if test="${not empty successMsg}">
+			<div class="alert alert-info" role="alert">${successMsg}</div>
+		</c:if>
+		<c:if test="${not empty errorMessage}">
+			<div class="alert alert-danger" role="alert">${errorMessage}</div>
+		</c:if>
+	</div>
+    <div class="panel-heading">
+    	<c:if test="${not empty successMsg}">
+			<div class="alert alert-info" role="alert">${successMsg}</div>
+		</c:if>
+		<c:if test="${not empty errorMessage}">
+			<div class="alert alert-danger" role="alert">${errorMessage}</div>
+		</c:if>
 		<div class="panel-title">
 			<table width="100%" cellspacing="0" cellpadding="0" border="0">
 				<tr>
@@ -164,7 +196,7 @@
 					<c:forEach items="${Depreciation.resultList}" var="result" varStatus="status">
 						<tr>
 							<td>
-								<form:checkbox path="resultList[${status.index}].checked"/>
+								<form:checkbox path="resultList[${status.index}].checked" id="selected_[${status.index}]"/>
 								<form:hidden path="resultList[${status.index}].slNo" id="resultList[${status.index}].slNo"/>
 						    </td>
 						    <td>
@@ -205,7 +237,7 @@
 				</div>
 			<br>
 			<div class="buttonbottom" align="center">
-		        	<input type="submit" id="save" class="btn btn-primary btn-wf-primary" name="save"  value="Submit"/>
+		        	<input type="submit" id="save" class="btn btn-primary btn-wf-primary" name="save"  value="Submit" />
 		        </div>
 			<br>
 	        </div>

@@ -340,14 +340,17 @@ function addYUIRow_billDetailTable(obj)
 		
 		}
 function printVoucher(){
-	
+	//alert("direct print called "+'${pageContext.request.contextPath}/voucher/preApprovedVoucher-loadvoucherview.action?vhid='+document.getElementById("directBankPayment_id").value);
 	document.forms[0].action='../report/billPaymentVoucherPrint-print.action?id=<s:property value="paymentheader.id"/>';
+	//document.forms[0].action='${pageContext.request.contextPath}/voucher/preApprovedVoucher-loadvoucherview.action?vhid='+document.getElementById("directBankPayment_id").value;
+	//document.forms[0].submit();
+	//document.forms[0].action= '/services/EGF/voucher/preApprovedVoucher-loadvoucherview.action?vhid='+ document.getElementById("directBankPayment_id").value;
 	document.forms[0].submit();
 }
 
 	</script>
 </head>
-<body onload="documentdep();">
+<body>
 	<s:form action="directBankPayment" theme="simple" name="dbpform">
 	<div class="formmainbox">
 		<s:push value="model">
