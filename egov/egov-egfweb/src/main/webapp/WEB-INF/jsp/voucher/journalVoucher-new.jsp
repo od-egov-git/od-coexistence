@@ -253,7 +253,11 @@
 				console.log(res[1]);
 				if(res[1]=='false')
 				{
-					bootbox.alert("Entered bill number already being used");     
+					var enteredBillNumber=document.getElementById('voucherTypeBean.billNum').value;
+					bootbox.alert("Entered bill number "+enteredBillNumber+" already being used billnumber must be unique.");
+					document.getElementById('voucherTypeBean.billNum').value="";
+					
+					
 					
 				}
 		    },
