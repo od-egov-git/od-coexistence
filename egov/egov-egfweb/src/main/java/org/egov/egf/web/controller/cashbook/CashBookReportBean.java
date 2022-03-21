@@ -28,6 +28,21 @@ public class CashBookReportBean {
 	private BigDecimal cPrevYear = new BigDecimal(0);
 	private BigDecimal abcCurrentYear = new BigDecimal(0);
 	private BigDecimal abcPrevYear = new BigDecimal(0);
+	private String titleName= ""; 
+	private String header = "";
+	private String flag="";
+	public String getFlag() {
+		return flag;
+	}
+	public void setFlag(String flag) {
+		this.flag = flag;
+	}
+	public String getTitleName() {
+		return titleName;
+	}
+	public void setTitleName(String titleName) {
+		this.titleName = titleName;
+	}
 	public BigDecimal getaCurrentYear() {
 		return aCurrentYear;
 	}
@@ -96,5 +111,11 @@ public class CashBookReportBean {
 	}
 	public void setCashBookResultList(List<CashBookReportDataBean> cashBookResultList) {
 		this.cashBookResultList = cashBookResultList;
+	}
+	public String getHeader() {
+		return header;
+	}
+	public void setHeader(String header) {
+		this.header = header;
 	}
 }

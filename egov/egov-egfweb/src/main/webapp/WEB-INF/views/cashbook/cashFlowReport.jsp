@@ -2,13 +2,25 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ taglib uri="/WEB-INF/taglibs/cdn.tld" prefix="cdn"%>
+<script>
+function exportToPDF() {
+	alert('ok');
+	var fromDate = document.getElementById('fromDate');
+	var toDate = document.getEl;emetById('toDate');
+	alert(fromDate);
+	alert(toDate);
+	var url = "/services/EGF/cashBookReport/cashFlow/searchCashFlowReportExportData?fromDate="+fromDate+"&toDate="+toDate;
+	
+	window.location.href(url);
+}
+</script>
 <form:form name="cashBookReport" role="form" method="post"
 	action="searchCashFlowReportData" modelAttribute="cashFlowReport"
 	id="cashFlowReport" class="form-horizontal form-groups-bordered"
 	enctype="multipart/form-data" style="margin-top:-20px;">
 	<div class="tab-pane fade in active">
 		<div class="panel panel-primary" data-collapsed="0">
-			<div class="form-group" style="padding: 50px 20px 250px;">
+			<div class="form-group" style="padding: 50px 20px 35px;">
 				<label class="col-sm-3 control-label text-left-audit1">From Date<span
 					class="mandatory"></span></label>
 				<div class="col-sm-3 add-margin">
@@ -33,11 +45,29 @@
 			class="btn btn-primary btn-wf-primary" name="search" value="Search" />
 	</div>
 	<br>
-	<div class="tab-pane fade in active" id="resultheader">
+	<!-- <div class="tab-pane fade in active" id="resultheader"> -->
+	<div id="resultheader">
 		<h3>Search Result</h3>
 		<div class="panel panel-primary" data-collapsed="0">
 
 			<div style="padding: 0 15px;">
+			<div style="padding: 0 15px;">
+	        	<c:if test="${cashFlowReport.titleName != null &&  !cashFlowReport.titleName.isEmpty()}">
+	        		<table width="100%" border="1" cellspacing="0" cellpadding="0">
+				<tr>
+					<th class="bluebgheadtd" width="100%" colspan="5"><strong
+						style="font-size: 15px;"> ${cashFlowReport.titleName}</strong></th>
+				</tr>
+			</table>
+	        	</c:if>
+	        	<c:if test="${cashFlowReport.header != null &&  !cashFlowReport.header.isEmpty()}">
+	        		<table width="100%" border="1" cellspacing="0" cellpadding="0">
+				<tr>
+					<th class="bluebgheadtd" width="100%" colspan="5"><strong
+						style="font-size: 15px;"> ${cashFlowReport.header}</strong></th>
+				</tr>
+			</table>
+	        	</c:if>
 				<table class="table table-bordered" id="searchResult">
 					<thead>
 						<tr>
@@ -182,7 +212,7 @@
 									<td aligh="center">${result.increaseInProvisionPrevYear }</td>
 								</tr>
 							</c:forEach>
-						</c:if>
+						
 						<tr>
 							<td colspan="5">Extra ordinary items (Specify)</td>
 							
@@ -213,8 +243,9 @@
 							<td colspan="2">Current Year</td>
 							<td colspan="2">Previous Year</td>
 						</tr>
+						</c:if>
 						<c:if
-							test="${cashFlowReport.aCurrentYear != null &&  cashFlowReport.aPrevYear != null}">
+							test="${cashFlowReport.aCurrentYear != 0 ||  cashFlowReport.aPrevYear != 0}">
 						<tr>
 							<td>Net cash generated from/ (used in) operating activities
 								(a)</td>
@@ -224,11 +255,12 @@
 							<td aligh="center">${cashFlowReport.aPrevYear }</td>
 						</tr>
 						</c:if>
-						<tr>
-							<td colspan="5">B. Cash flows from investing activities</td>
-						</tr>
+						
 						<c:if
 							test="${cashFlowReport.finalBalanceSheetL != null &&  !cashFlowReport.finalBalanceSheetL.isEmpty()}">
+							<tr>
+							<td colspan="5">B. Cash flows from investing activities</td>
+						</tr>
 							<c:forEach items="${cashFlowReport.finalBalanceSheetL}"
 								var="result" varStatus="status">
 								<tr>
@@ -302,7 +334,7 @@
 							</c:forEach>
 						</c:if>
 						<c:if
-							test="${cashFlowReport.bCurrentYear != null &&  cashFlowReport.bPrevYear != null}">
+							test="${cashFlowReport.flag == show}">
 							<tr>
 								<td>Net cash generated from/ (used in) investing activities (b)</td>
 								<td></td>
@@ -311,6 +343,8 @@
 								<td aligh="center">${cashFlowReport.bPrevYear }</td>
 							</tr>
 							</c:if>
+							<c:if
+							test="${cashFlowReport.flag == show}">
 							<tr>
 								<td colspan="5">C. Cash flows from financing activities</td>
 							</tr>
@@ -358,8 +392,7 @@
 								<td></td>
 								<td></td>
 							</tr>
-							<c:if
-							test="${cashFlowReport.cCurrentYear != null &&  cashFlowReport.cPrevYear != null}">
+							
 							<tr>
 								<td>Net cash generated from (used in) financing activities (c)</td>
 								<td></td>
@@ -368,6 +401,8 @@
 								<td aligh="center">${cashFlowReport.cPrevYear }</td>
 							</tr>
 							</c:if>
+							<c:if
+							test="${cashFlowReport.abcCurrentYear != 0 &&  cashFlowReport.abcPrevYear != 0}">
 							<tr>
 								<td></td>
 								<td></td>
@@ -375,8 +410,7 @@
 								<td></td>
 								<td></td>
 							</tr>
-							<c:if
-							test="${cashFlowReport.abcCurrentYear != null &&  cashFlowReport.abcPrevYear != null}">
+							
 							<tr>
 								<td>Net increase/ (decrease) in cash and cash equivalents (a + b + c)</td>
 								<td></td>
@@ -404,7 +438,7 @@
 								<td aligh="center">${result.atEndPeriodPrevYear }</td>
 							</tr>
 							</c:forEach>
-							</c:if>
+							
 							<tr>
 								<td>Total</td>
 								<td></td>
@@ -412,14 +446,19 @@
 								<td></td>
 								<td></td>
 							</tr>
+							</c:if>
 					</tbody>
 
 				</table>
 			</div>
 		</div>
+		<!-- <div class="buttonbottom" align="center">
+			<input type="button" class="btn btn-primary btn-wf-primary"
+				id="exportpdf" name="exportpdf" value="EXPORT" onclick="exportToPDF();"/>
+		</div> -->
 		<div class="buttonbottom" align="center">
 			<input type="submit" class="btn btn-primary btn-wf-primary"
-				id="exportpdf" name="exportpdf" value="EXPORT" />
+				id="exportpdf" name="exportpdf" value="EXPORT"/>
 		</div>
 	</div>
 </form:form>

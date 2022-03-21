@@ -1,9 +1,11 @@
 package org.egov.asset.web.controller;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletContext;
@@ -26,6 +28,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 @Controller
 @RequestMapping("/sale")
@@ -40,9 +44,7 @@ public class SaleDisposalController {
 	public static final String FILESTORE_MODULECODE = "EGF";
 	final private static String FILESTORE_MODULEOBJECT="disposal";
 	private static final int BUFFER_SIZE = 4096;
-	
-	
-	
+
 	@ModelAttribute
 	public void addDropDownValuesToModel(Model model) {
 		//model.addAttribute("assetList", disposalService.getAssets());
@@ -61,8 +63,8 @@ public class SaleDisposalController {
 		model.addAttribute("assetAccounts", disposalService.getAssetAccount());
 		return "disposal-sale-form";
 	}
-	@PostMapping("/createDisposal")
-	public String createDisposal(@ModelAttribute("disposal") Disposal disposal,Model model,final HttpServletRequest request )throws IOException {
+	@PostMapping(value="/createDisposal",consumes = {"multipart/form-data"})
+	public String createDisposal(@RequestParam("file") MultipartFile file,@ModelAttribute("disposal") Disposal disposal,Model model,final HttpServletRequest request )throws IOException {
 		//disposalValidator.validateDisposal(disposal);
 		
 		/*String[] contentType = ((MultiPartRequestWrapper) request).getContentTypes("file");
@@ -81,10 +83,25 @@ public class SaleDisposalController {
             upload.setContentType(contentType[i]);
             list.add(upload);
         }
-        System.out.println(list);*/
+        System.out.println(list);
+        */
+		List<DocumentUpload> list = new ArrayList<>();
+        try {
+        if(!file.isEmpty()) {
+        DocumentUpload upload = new DocumentUpload();
+        ByteArrayInputStream bios = (ByteArrayInputStream) file.getInputStream();//new ByteArrayInputStream(FileUtils.readFileToByteArray(file.getInputStream()));
+        upload.setInputStream(bios);
+        upload.setFileName(file.getOriginalFilename());
+           upload.setContentType(file.getContentType());
+           list.add(upload);
+        }
+        }catch(Exception e) {
+        e.printStackTrace();
+        }
+        
         Long createdBy=ApplicationThreadLocals.getUserId();
         disposal.setCreatedBy(createdBy);
-       // disposal.setDocuments(list);
+       disposal.setDocuments(list);
 			Disposal createDisposal = disposalService.createDisposal(disposal);
 			String successMsg=createDisposal.getTransactionType()+" "+"created successuflly"+" with reference "+createDisposal.getProfitLossVoucherReference();
 			model.addAttribute("successMsg", successMsg);
@@ -164,14 +181,6 @@ public class SaleDisposalController {
 	 		model.addAttribute("assetBean", new AssetMaster());
 	 		return "search-asset-for-sale-disposal";
 	 	}*/
-	 	@PostMapping("/search")
-		public String viewform(Model model) {
-			
-	 		AssetMaster assetBean = new AssetMaster();
-			model.addAttribute("assetBean", assetBean);
-			
-			return "search-asset-for-sale-disposal";
-		}
 	 	@PostMapping(value = "/search", params = "search")
 		public String search(@ModelAttribute("assetBean") AssetMaster assetBean, Model model, HttpServletRequest request) {
 			List<AssetMaster> assetList = disposalService.getAssetMasterDetails(assetBean);

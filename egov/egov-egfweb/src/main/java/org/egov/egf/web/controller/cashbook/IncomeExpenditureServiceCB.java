@@ -334,23 +334,32 @@ public class IncomeExpenditureServiceCB extends ReportServiceCB {
         for (final String str : netFundSet)
             if (incomeFundTotals.getNetAmount().containsKey(str)) {
                 final BigDecimal amount = zeroOrValue(incomeFundTotals.getNetAmount().get(str));
-                //netTotal.put(str, amount.subtract(zeroOrValue(expenditureFundTotals.getNetAmount().get(str))));
-                final BigDecimal netExpenseVal = zeroOrValue(expenditureFundTotals.getNetAmount().get(str));
-                netTotal.put(str, netExpenseVal.subtract(amount));
+                netTotal.put(str, amount.subtract(zeroOrValue(expenditureFundTotals.getNetAmount().get(str))));
+				/*
+				 * final BigDecimal netExpenseVal =
+				 * zeroOrValue(expenditureFundTotals.getNetAmount().get(str)); netTotal.put(str,
+				 * netExpenseVal.subtract(amount));
+				 */
             } else if (expenditureFundTotals.getNetAmount().containsKey(str)
                     && !incomeFundTotals.getNetAmount().containsKey(str)) {
                 final BigDecimal amount = zeroOrValue(incomeFundTotals.getNetAmount().get(str));
-                //netTotal.put(str, amount.subtract(zeroOrValue(expenditureFundTotals.getNetAmount().get(str))));
-                final BigDecimal netExpenseVal = zeroOrValue(expenditureFundTotals.getNetAmount().get(str));
-                netTotal.put(str, netExpenseVal.subtract(amount));
+                netTotal.put(str, amount.subtract(zeroOrValue(expenditureFundTotals.getNetAmount().get(str))));
+				/*
+				 * final BigDecimal netExpenseVal =
+				 * zeroOrValue(expenditureFundTotals.getNetAmount().get(str)); netTotal.put(str,
+				 * netExpenseVal.subtract(amount));
+				 */
 
             }
         for (final String pstr : preFundSet)
             if (incomeFundTotals.getPreviousYearAmount().containsKey(pstr)) {
                 final BigDecimal amount = zeroOrValue(incomeFundTotals.getPreviousYearAmount().get(pstr));
-                //preTotal.put(pstr, amount.subtract(zeroOrValue(expenditureFundTotals.getPreviousYearAmount().get(pstr))));
-                final BigDecimal netExpenseVal = zeroOrValue(expenditureFundTotals.getNetAmount().get(pstr));
-                preTotal.put(pstr, netExpenseVal.subtract(amount));
+                preTotal.put(pstr, amount.subtract(zeroOrValue(expenditureFundTotals.getPreviousYearAmount().get(pstr))));
+				/*
+				 * final BigDecimal netExpenseVal =
+				 * zeroOrValue(expenditureFundTotals.getNetAmount().get(pstr));
+				 * preTotal.put(pstr, netExpenseVal.subtract(amount));
+				 */
 
             } else if (expenditureFundTotals.getPreviousYearAmount().containsKey(pstr)
                     && !incomeFundTotals.getPreviousYearAmount().containsKey(pstr)) {

@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.19.0.final using JasperReports Library version 6.19.0-646c68931cebf1a58bc65c4359d1f0ca223c5e94  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="journalVoucherReport" pageWidth="595" pageHeight="900" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="f2914511-217a-45fb-9be9-a524aca30fcf">
 	<property name="ireport.scriptlethandling" value="0"/>
 	<property name="ireport.encoding" value="UTF-8"/>
 	<property name="ireport.zoom" value="1.3310000000000004"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="218"/>
-	<import value="net.sf.jasperreports.engine.*"/>
 	<import value="java.util.*"/>
 	<import value="net.sf.jasperreports.engine.data.*"/>
+	<import value="net.sf.jasperreports.engine.*"/>
 	<parameter name="bpvNumber" class="java.lang.String"/>
 	<parameter name="voucherDate" class="java.lang.String"/>
 	<parameter name="bankName" class="java.lang.String"/>
@@ -140,7 +141,7 @@
 					</textElement>
 					<textFieldExpression><![CDATA[$P{bpvNumber}]]></textFieldExpression>
 				</textField>
-				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 					<reportElement x="98" y="99" width="429" height="20" uuid="ee2dfd58-3e65-465b-bf8a-4e684d92cae1"/>
 					<textElement>
 						<font size="8"/>
@@ -175,7 +176,7 @@
 					</textElement>
 					<textFieldExpression><![CDATA[$P{bankAccountNumber}]]></textFieldExpression>
 				</textField>
-				<textField isStretchWithOverflow="true">
+				<textField textAdjust="StretchHeight">
 					<reportElement x="99" y="131" width="429" height="20" uuid="2c711f79-58cb-4178-8a3c-cd0f75378b63">
 						<printWhenExpression><![CDATA[$P{paymentMode}=="rtgs"]]></printWhenExpression>
 					</reportElement>
