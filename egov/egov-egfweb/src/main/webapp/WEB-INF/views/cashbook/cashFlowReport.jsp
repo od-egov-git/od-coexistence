@@ -238,11 +238,7 @@ function exportToPDF() {
 							<td></td>
 							<td></td>
 						</tr>
-						<tr>
-							<td></td>
-							<td colspan="2">Current Year</td>
-							<td colspan="2">Previous Year</td>
-						</tr>
+						
 						</c:if>
 						<c:if
 							test="${cashFlowReport.aCurrentYear != 0 ||  cashFlowReport.aPrevYear != 0}">
@@ -403,13 +399,6 @@ function exportToPDF() {
 							</c:if>
 							<c:if
 							test="${cashFlowReport.abcCurrentYear != 0 &&  cashFlowReport.abcPrevYear != 0}">
-							<tr>
-								<td></td>
-								<td></td>
-								<td></td>
-								<td></td>
-								<td></td>
-							</tr>
 							
 							<tr>
 								<td>Net increase/ (decrease) in cash and cash equivalents (a + b + c)</td>

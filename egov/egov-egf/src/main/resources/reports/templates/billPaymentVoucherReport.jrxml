@@ -6,9 +6,9 @@
 	<property name="ireport.zoom" value="1.3310000000000004"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="218"/>
+	<import value="net.sf.jasperreports.engine.*"/>
 	<import value="java.util.*"/>
 	<import value="net.sf.jasperreports.engine.data.*"/>
-	<import value="net.sf.jasperreports.engine.*"/>
 	<parameter name="bpvNumber" class="java.lang.String"/>
 	<parameter name="voucherDate" class="java.lang.String"/>
 	<parameter name="bankName" class="java.lang.String"/>
@@ -141,7 +141,7 @@
 					</textElement>
 					<textFieldExpression><![CDATA[$P{bpvNumber}]]></textFieldExpression>
 				</textField>
-				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<textField isBlankWhenNull="true">
 					<reportElement x="98" y="99" width="429" height="20" uuid="ee2dfd58-3e65-465b-bf8a-4e684d92cae1"/>
 					<textElement>
 						<font size="8"/>
@@ -176,7 +176,7 @@
 					</textElement>
 					<textFieldExpression><![CDATA[$P{bankAccountNumber}]]></textFieldExpression>
 				</textField>
-				<textField textAdjust="StretchHeight">
+				<textField>
 					<reportElement x="99" y="131" width="429" height="20" uuid="2c711f79-58cb-4178-8a3c-cd0f75378b63">
 						<printWhenExpression><![CDATA[$P{paymentMode}=="rtgs"]]></printWhenExpression>
 					</reportElement>

@@ -57,7 +57,7 @@
 <script type="text/javascript"
 	src="${pageContext.request.contextPath}/resources/javascript/voucherHelper.js?rnd=${app_release_no}"></script>
 <script type="text/javascript"
-	src="${pageContext.request.contextPath}/resources/javascript/directBankPaymentHelper.js"></script>
+	src="${pageContext.request.contextPath}/resources/javascript/directBankPaymentHelper.js?rnd=${app_release_no}"></script>
 <link href="/services/EGF/resources/css/budget.css?rnd=${app_release_no}" rel="stylesheet"
 	type="text/css" />
 <link href="/services/EGF/resources/css/commonegovnew.css?rnd=${app_release_no}" rel="stylesheet"
@@ -153,9 +153,12 @@ var url="../voucher/common-showHistory.action?stateId="+stateId;
 }
 
 	path="${pageContext.request.contextPath}";
+	var showMode='<s:property value="showMode"/>';	
+	
 		var totaldbamt=0,totalcramt=0;
 		var makeVoucherDetailTable = function() {  
-		<s:if test='%{isRestrictedtoOneFunctionCenter == true}'>                
+		<s:if test='%{isRestrictedtoOneFunctionCenter == true}'>    
+		      
 		var voucherDetailColumns = [        
 			{key:"functionid",hidden:true, formatter:createTextFieldFormatterJV(VOUCHERDETAILLIST,".functionIdDetail","hidden")},
 			{key:"function",hidden:true,label:'Function Name', formatter:createTextFieldFormatterForFunctionJV(VOUCHERDETAILLIST,".functionDetail","hidden")},
@@ -169,6 +172,7 @@ var url="../voucher/common-showHistory.action?stateId="+stateId;
 		];	
 		</s:if>
 		<s:else>
+		
 		var voucherDetailColumns = [ 
    			{key:"functionid",hidden:true,  formatter:createTextFieldFormatterJV(VOUCHERDETAILLIST,".functionIdDetail","hidden")},
    			{key:"function",label:'Function Name', formatter:createTextFieldFormatterForFunctionJV(VOUCHERDETAILLIST,".functionDetail","text")},         
@@ -183,7 +187,36 @@ var url="../voucher/common-showHistory.action?stateId="+stateId;
 	</s:else>   
 	    var voucherDetailDS = new YAHOO.util.DataSource(); 
 		billDetailsTable = new YAHOO.widget.DataTable("billDetailTable",voucherDetailColumns, voucherDetailDS);
-		
+		billDetailsTable.on('cellClickEvent',function (oArgs) {
+			var target = oArgs.target;
+			var record = this.getRecord(target);
+			var column = this.getColumn(target);
+			if (column.key == 'Add') { 
+			 	if(showMode=='nonbillPayment')
+			 	return;
+					billDetailsTable.addRow({SlNo:billDetailsTable.getRecordSet().getLength()+1});
+				updateAccountTableIndex();
+			}
+			if (column.key == 'Delete') { 	
+				if(showMode=='nonbillPayment')
+			 		return;
+				if(this.getRecordSet().getLength()>1){			
+					this.deleteRow(record);
+					allRecords=this.getRecordSet();
+					for(var i=0;i<allRecords.getLength();i++){
+						this.updateCell(this.getRecord(i),this.getColumn('SlNo'),""+(i+1));
+					}
+					updateDebitAmountJV();updateCreditAmountJV();
+					check();
+				}
+				else{
+					bootbox.alert("<s:text name='msg.this.row.can.not.be.deleted'/>");
+				}
+			}
+			
+			        
+		}
+		);
 		<s:iterator value="billDetailslist" status="stat">
 				billDetailsTable.addRow({SlNo:billDetailsTable.getRecordSet().getLength()+1,
 					"functionid":'<s:property value="functionIdDetail"/>',
@@ -251,7 +284,32 @@ detailtypeOptions.push({label: '<s:property value="name"/>', value: '<s:property
 		];
 	    var subledgerDS = new YAHOO.util.DataSource(); 
 		subLedgersTable = new YAHOO.widget.DataTable("subLedgerTable",subledgerColumns, subledgerDS);
-		
+		subLedgersTable.on('cellClickEvent',function (oArgs) {
+			var target = oArgs.target;
+			var record = this.getRecord(target);
+			var column = this.getColumn(target);
+			if (column.key == 'Add') { 
+			if(showMode=='nonbillPayment')
+			 		return;
+				subLedgersTable.addRow({SlNo:subLedgersTable.getRecordSet().getLength()+1});
+				updateSLTableIndex();
+				check();
+			}
+			if (column.key == 'Delete') { 	
+			if(showMode=='nonbillPayment')
+			 		return;		
+				if(this.getRecordSet().getLength()>1){			
+					this.deleteRow(record);
+					allRecords=this.getRecordSet();
+					for(var i=0;i<allRecords.getLength();i++){
+						this.updateCell(this.getRecord(i),this.getColumn('SlNo'),""+(i+1));
+					}
+				}
+				else{
+					bootbox.alert("<s:text name='msg.this.row.can.not.be.deleted'/>");
+				}
+			}        
+		});
 	
 		<s:iterator value="subLedgerlist" status="stat">
 				subLedgersTable.addRow({SlNo:subLedgersTable.getRecordSet().getLength()+1,
@@ -276,6 +334,11 @@ detailtypeOptions.push({label: '<s:property value="name"/>', value: '<s:property
 			</s:iterator>
 
     };
+    var amountshouldbenumeric='<s:text  name="amount.should.be.numeric"/>';
+	var succesMessage='<s:text name="directbank.transaction.succcess"/>';
+	var totalsnotmatchingamount='<s:text name="totals.not.matching.amount"/>';
+	var button='<s:property value="button"/>';
+	
 	function addYUIRow_subLedgersTable(obj)
 		{
 		if(obj.disabled==true)
@@ -347,10 +410,74 @@ function printVoucher(){
 	//document.forms[0].action= '/services/EGF/voucher/preApprovedVoucher-loadvoucherview.action?vhid='+ document.getElementById("directBankPayment_id").value;
 	document.forms[0].submit();
 }
-
+function populateAccNum(branch){
+	//alert("populate Acc Num");
+	var fundObj = "1";//document.getElementById('fundId');
+	var bankbranchId = branch.options[branch.selectedIndex].value;
+	var index=bankbranchId.indexOf("-");
+	var bankId = bankbranchId.substring(0,index);
+	var brId=bankbranchId.substring(index+1,bankbranchId.length);
+	
+	var vTypeOfAccount = '<s:property value="%{typeOfAccount}"/>';
+	
+	populateaccountNumber({fundId:fundObj,bankId:bankId,branchId:brId,typeOfAccount:vTypeOfAccount})
+}
+function onLoadTask_new()
+{
+	//bootbox.alert(showMode);                                                      
+	if(button!=null && button!="")
+	{
+		if(document.getElementById("Errors").innerHTML=='')  
+		{
+			bootbox.alert(succesMessage);
+			if(button=="Save_Close")
+				{
+				window.close();
+				}
+			else if(button=="Save_View")
+				{
+						var vhId='<s:property value="voucherHeader.id"/>';
+						document.forms[0].action = "${pageContext.request.contextPath}/voucher/preApprovedVoucher-loadvoucherview.action?vhid="+vhId;
+						return true;
+				}
+			else if(button=="Save_New")
+				{      	
+					document.forms[0].button.value='';
+				    document.forms[0].action = "directBankPayment-newform.action";
+				 	return true;
+				}
+		}
+		
+		
+ 	}else
+ 	{
+ 		
+ 		<s:if test="%{showMode=='nonbillPayment'}">
+			//bootbox.alert('<s:property value="showMode"/>');
+			if(document.getElementById("Errors").innerHTML!='')
+			{
+			document.getElementById('buttondiv').style.display="none";
+			document.getElementById('buttondivdefault').style.display="block";
+			}
+		</s:if>
+ 	}
+ 	
+		
+		if(showMode=='nonbillPayment')
+		{
+		disableForNonBillPayment();	
+		disableYUIAddDeleteButtons(true);
+		}
+		if(document.getElementById('approverDepartment'))
+			document.getElementById('approverDepartment').value = "-1";
+		if (jQuery("#bankBalanceCheck") == null || jQuery("#bankBalanceCheck").val() == "") {
+			disableForm();
+		}
+}
 	</script>
 </head>
-<body>
+<body 
+onload="onLoadTask_new();loadDropDownCodesExcludingCashAndBank();loadDropDownCodesFunction();documentdep();">
 	<s:form action="directBankPayment" theme="simple" name="dbpform">
 	<div class="formmainbox">
 		<s:push value="model">
@@ -527,9 +654,9 @@ function printVoucher(){
 		//document.forms[frmIndex].elements[i].disabled =true;
 		//--work here to manually enable fields --  deep
 		document.getElementById("voucherNumber").disabled=true;
-		document.getElementById("bankId").disabled=true;
+		/* document.getElementById("bankId").disabled=true;
 		document.getElementById("accountNumber").disabled=true;
-		disableYUIAddDeleteButtons(true);
+		disableYUIAddDeleteButtons(true); */
 		document.getElementById("closeButton").disabled=false;
 		if(null != document.getElementById("printPreview1")){
 			document.getElementById("printPreview1").disabled=false;

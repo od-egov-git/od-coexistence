@@ -1294,7 +1294,8 @@ public class DirectBankPaymentAction extends BasePaymentAction {
 				Transaction transaction = getCurrentSession().beginTransaction();
 				if (paymentheader.getId() != null) {
 
-					String queryStr1 = "update Paymentheader set paymentAmount =:paymentAmount ,type =:type ,paymentchequeno =:paymentchequeno , fileno =:fileno where voucherheaderid =:id ";
+					String queryStr1 = "update Paymentheader set paymentAmount =:paymentAmount ,type =:type ,paymentchequeno =:paymentchequeno , fileno =:fileno, bankaccount =:bankAcc "
+							+ "where voucherheaderid =:id ";
 					org.hibernate.Query queryResult1 = getCurrentSession().createQuery(queryStr1.toString());
 					queryResult1.setLong("id", voucherHeader.getId());
 					// commonBean.getPaymentChequeNo();
@@ -1302,6 +1303,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
 					queryResult1.setString("paymentchequeno", paymentheader.getPaymentChequeNo());
 					queryResult1.setString("type", commonBean.getModeOfPayment());
 					queryResult1.setString("fileno", voucherHeader.getFileno());
+					queryResult1.setInteger("bankAcc", Integer.parseInt(commonBean.getAccountNumberId()));
 
 					int row1 = queryResult1.executeUpdate();
 					System.out.println("Row updated pay: " + row1);
@@ -1333,33 +1335,45 @@ public class DirectBankPaymentAction extends BasePaymentAction {
 
 				if (voucherHeader.getId() != null) {
 					int length = billDetailslist.size();
-					// List<CGeneralLedger> gllist =
-					// paymentRefundUtils.getAccountDetails(Long.valueOf(voucherHeader.getId()));
-
-					for (int i = 0; i <= length - 1; i++) {
+					List<CGeneralLedger> gllist =
+					paymentRefundUtils.getAccountDetails(Long.valueOf(voucherHeader.getId()));
+					for(CGeneralLedger cGeneralLedger : gllist) {
+						int linenumber = cGeneralLedger.getVoucherlineId();
+					for (int i = 0; i <= length-1; i++) {
 						BigDecimal credit = billDetailslist.get(i).getCreditAmountDetail();
 						BigDecimal debit = billDetailslist.get(i).getDebitAmountDetail();
 						String glcodeDetail = billDetailslist.get(i).getGlcodeDetail();
+						long glcodeIdDetail = billDetailslist.get(i).getGlcodeIdDetail();
+						long functionIdDetail = billDetailslist.get(i).getFunctionIdDetail();
+						
 						// String glcode =chartOfAccounts.getGlcode();
 						if (credit.intValue() != 0) {
-							String queryStr = "update CGeneralLedger set creditamount =:credit where voucherheaderid =:id and glcode =:glcodeDetail";
+							String queryStr = "update CGeneralLedger set creditamount =:credit,glcodeId =:glcodeIdDetail,glcode =:glcodeDetail,functionId =:functionIdDetail"
+									+ " where voucherheaderid =:id and voucherlineId =:linenumber";
 							org.hibernate.Query queryResult = getCurrentSession().createQuery(queryStr.toString());
 							queryResult.setLong("id", voucherHeader.getId());
 							queryResult.setBigDecimal("credit", credit);
 							queryResult.setString("glcodeDetail", glcodeDetail);
+							queryResult.setLong("glcodeIdDetail", glcodeIdDetail);
+							queryResult.setLong("functionIdDetail", functionIdDetail);
+							queryResult.setInteger("linenumber", i+1);
 
 							int row2 = queryResult.executeUpdate();
 							System.out.println("Row updated gen: " + row2);
 						} else {
-							String queryStr = "update CGeneralLedger set debitamount =:debit where voucherheaderid =:id and glcode =:glcodeDetail";
+							String queryStr = "update CGeneralLedger set debitamount =:debit ,glcodeId =:glcodeIdDetail,glcode =:glcodeDetail,functionId =:functionIdDetail"
+									+ " where voucherheaderid =:id and voucherlineId =:linenumber";
 							org.hibernate.Query queryResult = getCurrentSession().createQuery(queryStr.toString());
 							queryResult.setLong("id", voucherHeader.getId());
 							queryResult.setBigDecimal("debit", debit);
 							queryResult.setString("glcodeDetail", glcodeDetail);
-
+							queryResult.setLong("glcodeIdDetail", glcodeIdDetail);
+							queryResult.setLong("functionIdDetail", functionIdDetail);
+							queryResult.setInteger("linenumber", i+1);
 							int row2 = queryResult.executeUpdate();
 							System.out.println("Row updated Gen: " + row2);
 						}
+					}
 					}
 				}
 
@@ -1404,7 +1418,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
 		 * voucherHeader);
 		 */
 		commonBean.setAmount(paymentheader.getPaymentAmount());
-		commonBean.setAccountNumberId(paymentheader.getBankaccount().getId().toString());
+		//commonBean.setAccountNumberId(paymentheader.getBankaccount().getId().toString());
 		commonBean.setAccnumnar(paymentheader.getBankaccount().getNarration());
 
 		if (paymentheader.getFileno() == null) {
@@ -1427,28 +1441,21 @@ public class DirectBankPaymentAction extends BasePaymentAction {
 				+ paymentheader.getBankaccount().getBankbranch().getId();
 
 		LOGGER.info("bankBranchId  ::" + bankBranchId);
-		commonBean.setBankId(bankBranchId);
-		commonBean.setModeOfPayment(paymentheader.getType());
 		/*
-		 * final Miscbilldetail miscbillDetail = (Miscbilldetail) persistenceService
-		 * .find(" from Miscbilldetail where payVoucherHeader=?", voucherHeader);
-		 * commonBean.setDocumentNumber(miscbillDetail.getBillnumber());
-		 * commonBean.setDocumentDate(miscbillDetail.getBilldate());
-		 * commonBean.setPaidTo(miscbillDetail.getPaidto()); if
-		 * (miscbillDetail.getBillVoucherHeader() != null) {
-		 * commonBean.setDocumentId(miscbillDetail.getBillVoucherHeader().getId());
-		 * commonBean.setLinkReferenceNumber(miscbillDetail.getBillVoucherHeader().
-		 * getVoucherNumber()); }
+		 * commonBean.setBankId(paymentheader.getBankaccount().getId().toString());
+		 * commonBean.setBankBranchId(bankBranchId);
 		 */
+		commonBean.setModeOfPayment(paymentheader.getType());
+		
 		final String bankGlcode = paymentheader.getBankaccount().getChartofaccounts().getGlcode();
 		LOGGER.info("bankGlcode  ::" + bankGlcode);
 		VoucherDetails bankdetail = null;
-		final Map<String, Object> vhInfoMap = voucherService.getVoucherInfo(voucherHeader.getId());
-
-		// voucherHeader =
-		// (CVoucherHeader)vhInfoMap.get(Constants.VOUCHERHEADER);
-		billDetailslist = (List<VoucherDetails>) vhInfoMap.get(Constants.GLDEATILLIST);
-		subLedgerlist = (List<VoucherDetails>) vhInfoMap.get("subLedgerDetail");
+		/*
+		 * final Map<String, Object> vhInfoMap =
+		 * voucherService.getVoucherInfo(voucherHeader.getId()); billDetailslist =
+		 * (List<VoucherDetails>) vhInfoMap.get(Constants.GLDEATILLIST); subLedgerlist =
+		 * (List<VoucherDetails>) vhInfoMap.get("subLedgerDetail");
+		 */
 		BigDecimal debitAmtTotal = new BigDecimal(0);
 		for (final VoucherDetails vd : billDetailslist) {
 
