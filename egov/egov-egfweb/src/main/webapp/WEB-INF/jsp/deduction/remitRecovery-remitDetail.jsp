@@ -262,6 +262,7 @@ function onLoad1(){
 	if (jQuery("#bankBalanceCheck") == null || jQuery("#bankBalanceCheck").val() == "") {
 		disableForm();
 	}
+	documentdep();
 }
 function onSubmit()
 {
@@ -387,7 +388,8 @@ var curdate = new Date();
 }
 </script>
 </head>
-<body onload="onLoad1();documentdep();">
+<!-- <body onload="onLoad1();documentdep();"> -->
+<body onload="return onLoad1();">
 	<s:form action="remitRecovery" theme="simple" name="remittanceForm"
 		id="remittanceForm">
 		<s:push value="model">
@@ -469,19 +471,19 @@ var curdate = new Date();
 																<tr>
 																	<td class="bluebox">&nbsp;</td>
 																	<egov:ajaxdropdown id="bank" fields="['Text','Value']"
-																		dropdownId="bank"
-																		url="voucher/common-ajaxLoadBanksByFundAndType.action" />
+																		dropdownId="bankId"
+																		url="/voucher/common-ajaxLoadBanksByFundAndType.action"/>
 																	<td class="bluebox"><s:text name="bank" />&nbsp;<span
 																		class="bluebox"><span class="mandatory1">*</span></span></td>
 																	<td class="bluebox"><s:select name="bank"
 																			id="bank" list="dropdownData.bankList"
-																			listKey="id"
-																			listValue="name" headerKey="-1"
+																			listKey="bankBranchId" listValue="bankBranchName" headerKey="-1"
 																			headerValue="%{getText('lbl.choose.options')}" onclick="validateFund()"
 																			onChange="populateAccNumbers(this);" /></td>
+																			
 																	<egov:ajaxdropdown id="accountNumber"
 																		fields="['Text','Value']" dropdownId="bankaccount"
-																		url="voucher/common-ajaxLoadAccNumAndType.action" />
+																		url="voucher/common-ajaxLoadAccNumAndType.action"/>
 																	<td class="bluebox"><s:text name="account.number" />&nbsp;<span
 																		class="bluebox"><span class="mandatory1">*</span></span></td>
 																	<td class="bluebox"><s:select

@@ -72,7 +72,7 @@ function loadDesignationFromMatrix1() {
 	var additionalRule = dom.get('additionalRule').value;
 	var pendingAction = document.getElementById('pendingActions').value;
 	var stateType = '<s:property value="%{stateType}"/>';
-	alert("stateType "+stateType);
+	//alert("stateType "+stateType);
 	//var stateType = 'CVoucherHeader';
 	document.getElementById("approverDesignation").value="-1";
 	//alert(stateType+" "+dept+" "+currentState+" "+amountRule+" "+additionalRule+" "+pendingAction);

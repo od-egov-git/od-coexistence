@@ -130,6 +130,7 @@ import org.egov.services.voucher.VoucherService;
 import org.egov.utils.Constants;
 import org.egov.utils.FinancialConstants;
 import org.hibernate.FlushMode;
+import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -178,7 +179,7 @@ public class RemitRecoveryAction extends BasePaymentAction {
     private CommonBean commonBean;
     private String modeOfPayment;
     private String selectedPartialDeductionRows = "";
-
+    private String typeOfAccount;
     @Autowired
     private FunctionService functionService;
     @Autowired
@@ -310,8 +311,63 @@ public class RemitRecoveryAction extends BasePaymentAction {
         final List<Recovery> listRecovery = recoveryService.getAllActiveRecoverys();
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("RemitRecoveryAction | Tds list size : " + listRecovery.size());
-        List<Bank> activeBanks = bankHibernateDAO.getAllBankHavingBranchAndAccounts();
-        addDropdownData("bankList", activeBanks);
+        //modified abhishek on 22032022 for branch id not showing in bank
+        //List<Bank> activeBanks = bankHibernateDAO.getAllBankHavingBranchAndAccounts();
+        typeOfAccount = FinancialConstants.TYPEOFACCOUNT_PAYMENTS + ","
+				+ FinancialConstants.TYPEOFACCOUNT_RECEIPTS_PAYMENTS;
+        List<Map<String, Object>> bankBranchList = new ArrayList<Map<String, Object>>();
+		int index = 0;
+		String[] strArray = null;
+		final StringBuffer query = new StringBuffer();
+		query.append(
+				"select DISTINCT concat(concat(bank.id,'-'),bankBranch.id) as bankbranchid,concat(concat(bank.name,' '),bankBranch.branchname) as bankbranchname ")
+				.append("FROM Bank bank,Bankbranch bankBranch,Bankaccount bankaccount where  bank.isactive=true  and bankBranch.isactive=true and ")
+				.append(" bankaccount.isactive=true and bank.id = bankBranch.bank.id and bankBranch.id = bankaccount.bankbranch.id ");
+		if (voucherHeader.getFundId() != null)
+			query.append("and bankaccount.fund.id=? and bankaccount.type in(");
+		else
+			query.append("and bankaccount.type in(");
+		if (typeOfAccount.indexOf(",") != -1) {
+			strArray = typeOfAccount.split(",");
+			for (final String type : strArray) {
+				index++;
+				query.append("'").append(type).append("'");
+				if (strArray.length > index)
+					query.append(",");
+
+			}
+		} else
+			query.append("'").append(typeOfAccount).append("'");
+		query.append(") order by 2 ");
+		try {
+			List<Object[]> bankBranch = null;
+			if (voucherHeader.getFundId() != null)
+				bankBranch = getPersistenceService().findAllBy(query.toString(), voucherHeader.getFundId().getId());
+			else
+				bankBranch = getPersistenceService().findAllBy(query.toString());
+
+			if (LOGGER.isDebugEnabled())
+				LOGGER.debug("Bank list size is " + bankBranch.size());
+
+			Map<String, Object> bankBrmap;
+			for (final Object[] element : bankBranch) {
+				bankBrmap = new HashMap<String, Object>();
+				bankBrmap.put("bankBranchId", element[0].toString());
+				bankBrmap.put("bankBranchName", element[1].toString());
+				bankBranchList.add(bankBrmap);
+			}
+
+		} catch (final HibernateException e) {
+			LOGGER.error("Exception occured while getting the data for bank dropdown " + e.getMessage(),
+					new HibernateException(e.getMessage()));
+
+		} catch (final Exception e) {
+			LOGGER.error("Exception occured while getting the data for bank dropdown " + e.getMessage(),
+					new Exception(e.getMessage()));
+		}
+
+		addDropdownData("bankList", bankBranchList);
+        //addDropdownData("bankList", activeBanks);
         addDropdownData("branchList", Collections.EMPTY_LIST);
         addDropdownData("recoveryList", listRecovery);
         addDropdownData("accNumList", Collections.EMPTY_LIST);
@@ -941,7 +997,7 @@ public class RemitRecoveryAction extends BasePaymentAction {
 
     private void loadAjaxedDropDowns() {
         loadSchemeSubscheme();
-        loadBankBranchForFundAndType();
+        //loadBankBranchForFundAndType();
         loadBankAccountNumberForFundAndType();
     }
 
@@ -1577,6 +1633,14 @@ public class RemitRecoveryAction extends BasePaymentAction {
 
 	public void setBackdateentry(String backdateentry) {
 		this.backdateentry = backdateentry;
+	}
+
+	public String getTypeOfAccount() {
+		return typeOfAccount;
+	}
+
+	public void setTypeOfAccount(String typeOfAccount) {
+		this.typeOfAccount = typeOfAccount;
 	}
 
 	

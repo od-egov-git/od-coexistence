@@ -49,6 +49,13 @@ package org.egov.egf.web.actions.report;
 
 
 import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.ParentPackage;
@@ -428,25 +435,95 @@ public class BillPaymentVoucherPrintAction extends BaseFormAction {
         return voucher == null || voucher.getDescription() == null ? "" : voucher.getDescription();
     }
 
+	/*
+	 * @Action(value = "/report/billPaymentVoucherPrint-exportPdf") public String
+	 * exportPdf() throws JRException, IOException { populateVoucher(); inputStream
+	 * = reportHelper.exportPdf(inputStream, JASPERPATH, getParamMap(),
+	 * voucherReportList); return "PDF"; }
+	 * 
+	 * public String exportHtml() { populateVoucher(); inputStream =
+	 * reportHelper.exportHtml(inputStream, JASPERPATH, getParamMap(),
+	 * voucherReportList, "px"); return "HTML"; }
+	 * 
+	 * @Action(value = "/report/billPaymentVoucherPrint-exportXls") public String
+	 * exportXls() throws JRException, IOException { populateVoucher(); inputStream
+	 * = reportHelper.exportXls(inputStream, JASPERPATH, getParamMap(),
+	 * voucherReportList); return "XLS"; }
+	 */
     @Action(value = "/report/billPaymentVoucherPrint-exportPdf")
-    public String exportPdf() throws JRException, IOException {
-        populateVoucher();
-        inputStream = reportHelper.exportPdf(inputStream, JASPERPATH, getParamMap(), voucherReportList);
-        return "PDF";
-    }
+	public String exportPdf() throws JRException, IOException {
+		try {
+			final InputStream stream = this.getClass()
+					.getResourceAsStream("/reports/templates/billPaymentVoucherReport.jrxml");
+			final JasperReport report = JasperCompileManager.compileReport(stream);
+			populateVoucher();
+			final JRBeanCollectionDataSource source = new JRBeanCollectionDataSource(voucherReportList);
+			final JasperPrint print = JasperFillManager.fillReport(report, getParamMap(), source);
+			inputStream = reportHelper.exportPdf(inputStream, print);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return "PDF";
+	}
 
-    public String exportHtml() {
-        populateVoucher();
-        inputStream = reportHelper.exportHtml(inputStream, JASPERPATH, getParamMap(), voucherReportList, "px");
-        return "HTML";
-    }
+	public String exportHtml() {
+																												 
+																																
+														
+														
+												
+															 
+																						
+															   
+																
+					   
+	 
 
-    @Action(value = "/report/billPaymentVoucherPrint-exportXls")
-    public String exportXls() throws JRException, IOException {
-        populateVoucher();
-        inputStream = reportHelper.exportXls(inputStream, JASPERPATH, getParamMap(), voucherReportList);
-        return "XLS";
-    }
+		try {
+																									   
+	 
+
+			final InputStream stream = this.getClass()
+					.getResourceAsStream("/reports/templates/billPaymentVoucherReport.jrxml");
+			final JasperReport report = JasperCompileManager.compileReport(stream);
+			populateVoucher();
+			final JRBeanCollectionDataSource source = new JRBeanCollectionDataSource(voucherReportList);
+			final JasperPrint print = JasperFillManager.fillReport(report, getParamMap(), source);
+			inputStream = reportHelper.exportHtml(inputStream, print);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+															
+									  
+																
+
+		return "HTML";
+															  
+															  
+																		 
+																			   
+										
+											 
+	}
+
+	@Action(value = "/report/billPaymentVoucherPrint-exportXls")
+	public String exportXls() throws JRException, IOException {
+		try {
+		final InputStream stream = this.getClass()
+				.getResourceAsStream("/reports/templates/billPaymentVoucherReport.jrxml");
+		final JasperReport report = JasperCompileManager.compileReport(stream);
+		populateVoucher();
+		final JRBeanCollectionDataSource source = new JRBeanCollectionDataSource(voucherReportList);
+		final JasperPrint print = JasperFillManager.fillReport(report, getParamMap(), source);
+		inputStream = reportHelper.exportXls(inputStream, print);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return "XLS";
+	}
 
     public Map<String, Object> getAccountDetails(final Integer detailtypeid, final Integer detailkeyid,
                                                  final Map<String, Object> tempMap) throws ApplicationException {

@@ -96,7 +96,7 @@ function onSubmit(){
 	});
 </script>
 </head>
-<body>
+<body onload="documentdep();">
 	<s:form action="budgetLoad" theme="css_xhtml" name="budgetLoad"
 		id="budgetLoad" enctype="multipart/form-data" method="post">
 		<div class="formmainbox">
