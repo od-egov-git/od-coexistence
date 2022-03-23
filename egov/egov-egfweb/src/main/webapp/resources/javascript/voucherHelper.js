@@ -886,7 +886,6 @@ function autocompletecodeFunction(obj,myEvent)
 	
 	var src = obj;	
 	var target = document.getElementById('codescontainer');	
-	
 	var posSrc=findPos(src); 
 	target.style.left=posSrc[0];	
 	target.style.top=posSrc[1]-40;

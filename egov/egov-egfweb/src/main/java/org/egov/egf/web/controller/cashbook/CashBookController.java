@@ -716,18 +716,28 @@ public class CashBookController {
 		BigDecimal otherCurrentAssetsCurrYear2 = new BigDecimal(0);
 		BigDecimal otherCurrentAssetsPrevYear1 = new BigDecimal(0);
 		BigDecimal otherCurrentAssetsPrevYear2 = new BigDecimal(0);
+		BigDecimal thisYearAmount = new BigDecimal(0);
+		BigDecimal prevYearAmount = new BigDecimal(0);
 		for (int i = 0; i < resultEntries.size(); i++) {
 			System.out.println("##year::" + yearType + "### glcode::" + ieStatementEntry.get(i).getGlCode() + "::"
 					+ ieStatementEntry.get(i).getCurrentYearTotal() + "::"
 					+ ieStatementEntry.get(i).getPreviousYearTotal());
-			BigDecimal thisYearAmount = new BigDecimal(0);
-			BigDecimal prevYearAmount = new BigDecimal(0);
+			LOGGER.info("##year::" + yearType + "### glcode::" + ieStatementEntry.get(i).getGlCode() + "::"
+					+ ieStatementEntry.get(i).getCurrentYearTotal() + "::"
+					+ ieStatementEntry.get(i).getPreviousYearTotal());
 
-			if (ieStatementEntry != null && ieStatementEntry.get(i).getCurrentYearTotal() != null
-					&& ieStatementEntry.get(i).getGlCode() != null
-					&& ieStatementEntry.get(i).getPreviousYearTotal() != null) {
-				thisYearAmount = ieStatementEntry.get(i).getCurrentYearTotal();
-				prevYearAmount = ieStatementEntry.get(i).getPreviousYearTotal();
+			if (ieStatementEntry != null && ieStatementEntry.get(i).getGlCode() != null) {
+				if(ieStatementEntry.get(i).getCurrentYearTotal() == null) {
+					thisYearAmount = new BigDecimal(0);
+					
+				}else {
+					thisYearAmount = ieStatementEntry.get(i).getCurrentYearTotal();
+				}
+				if(ieStatementEntry.get(i).getPreviousYearTotal() == null) {
+					prevYearAmount = new BigDecimal(0);
+				}else {
+					prevYearAmount = ieStatementEntry.get(i).getPreviousYearTotal();
+				}
 				if (ieStatementEntry.get(i).getGlCode().equalsIgnoreCase("431")) {
 					obj.setSundryDebtorsCurrYear(thisYearAmount);
 				}
@@ -745,6 +755,8 @@ public class CashBookController {
 
 				}
 				obj.setOtherCurrentAssetsCurrYear(otherCurrentAssetsCurrYear1.add(otherCurrentAssetsCurrYear2));
+				LOGGER.info("460 ::otherCurrentAssetsCurrYear1 ::"+otherCurrentAssetsCurrYear1);
+				LOGGER.info("470 :: otherCurrentAssetsCurrYear2 ::"+otherCurrentAssetsCurrYear2);
 				if (ieStatementEntry.get(i).getGlCode().equalsIgnoreCase("340")) {
 					obj.setDepositsReceivedCurrYear(thisYearAmount);
 
@@ -816,6 +828,8 @@ public class CashBookController {
 					otherCurrentAssetsPrevYear2 = prevYearAmount;
 				}
 				obj.setOtherCurrentAssetsPrevYear(otherCurrentAssetsPrevYear1.add(otherCurrentAssetsPrevYear2));
+				LOGGER.info("460 ::otherCurrentAssetsPrevYear1 ::"+otherCurrentAssetsPrevYear1);
+				LOGGER.info("470 :: otherCurrentAssetsPrevYear2 ::"+otherCurrentAssetsPrevYear2);
 				if (ieStatementEntry.get(i).getGlCode().equalsIgnoreCase("340")) {
 					obj.setDepositsReceivedPrevYear(prevYearAmount);
 
