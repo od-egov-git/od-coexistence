@@ -10,6 +10,7 @@ import org.egov.asset.model.AssetCatagory;
 import org.egov.asset.model.CustomeFields;
 import org.egov.asset.repository.AssetCatagoryTypeRepository;
 import org.egov.asset.service.AssetCatagoryService;
+import org.egov.asset.service.AssetService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -174,7 +175,7 @@ public class AssetCatagoryController {
 			System.out.println("id is null");
 		}
 		model.addAttribute("assetCatagory",assetCatagory);
-		return "update-assetcatagory-form";
+		return "update-assetcatagory-with-no-cf-form";
 	}
 	@GetMapping(value = "/editCustomField/{id}/{name}")
 	public String editCustomField(@PathVariable Long id,@PathVariable String name, Model model) {
@@ -235,6 +236,23 @@ public class AssetCatagoryController {
 		
 		model.addAttribute("assetCatagory", assetCategory);
 		System.out.println("viewAssetCategory is calling with id "+id);
+		return "view-assetcategory-modified";
+	}
+	@PostMapping(value = "/updateAssetCategory", params = "add")
+	public String addCustomField(@ModelAttribute("assetCatagory") AssetCatagory catagory, Model model,
+			HttpServletRequest request) {
+		
+		String id= request.getParameter("id");
+		if(null!=id) {
+			catagory.setId(Long.parseLong(id));
+		}
+		Long updatedBy=ApplicationThreadLocals.getUserId();
+		catagory.setUpdatedBy(updatedBy);
+		catagory.setCreatedBy(updatedBy);
+		assetCatagoryService.addNewCustomField(catagory);
+		AssetCatagory response = assetCatagoryService.getAssetCategory(catagory.getId());
+		model.addAttribute("successMsg", catagory.getCustomeField().getName() + " added successfully..!!");
+		model.addAttribute("assetCatagory", response);
 		return "view-assetcategory-modified";
 	}
 }

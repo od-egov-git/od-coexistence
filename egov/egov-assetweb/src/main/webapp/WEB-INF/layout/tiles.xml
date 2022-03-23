@@ -38,6 +38,10 @@
         <put-attribute name="page-title" value="title.asset.catagory.update" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/asset/update-assetcatagory-form.jsp"/>
     </definition>
+    <definition name="update-assetcatagory-with-no-cf-form" extends="base_layout">
+        <put-attribute name="page-title" value="title.asset.catagory.update" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/asset/update-assetcatagory-with-no-cf-form.jsp"/>
+    </definition>
      <definition name="disposal-sale-form" extends="base_layout">
         <put-attribute name="page-title" value="title.asset.saledisposal" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/asset/disposal-sale-form.jsp"/>

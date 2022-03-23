@@ -92,24 +92,9 @@ public class VoucherReport {
     public String getSlCode() {
         //persistenceService.setType(CGeneralLedgerDetail.class);
         if (generalLedger != null) {
+
         	return generalLedger.getGlcodeId().getName();// modified Abhishek on 17032022 for change source code print preview
-			/*
-			 * final List<CGeneralLedgerDetail> generalLedgerDetail =
-			 * persistenceService.findAllBy(
-			 * "from CGeneralLedgerDetail where generalLedgerId.id=?",generalLedger.getId())
-			 * ; if (generalLedgerDetail.size() > 1) return MULTIPLE; if
-			 * (generalLedgerDetail.size() > 0) { final Integer detailTypeId =
-			 * generalLedgerDetail.get(0).getDetailTypeId().getId();
-			 * //persistenceService.setType(Accountdetailtype.class); final List detailType
-			 * = persistenceService.findAllBy("from Accountdetailtype where id=?",
-			 * detailTypeId); egovCommon.setPersistenceService(persistenceService); final
-			 * Integer detailKeyId = generalLedgerDetail.get(0).getDetailKeyId(); EntityType
-			 * entityType = null; try { entityType =
-			 * egovCommon.getEntityType((Accountdetailtype) detailType.get(0), detailKeyId);
-			 * } catch (final ApplicationException e) { if (LOGGER.isDebugEnabled())
-			 * LOGGER.debug("Error" + e.getMessage(), e); } return entityType.getCode() +
-			 * "/" + entityType.getEntityDescription(); }
-			 */
+			
         }
         return "";
     }

@@ -11,7 +11,7 @@
 	enctype="multipart/form-data" style="margin-top:-20px;">
 <div class="tab-pane fade in active">
 <div class="panel panel-primary" data-collapsed="0">
-		<div class="form-group" style="padding: 50px 20px 250px;">
+		<div class="form-group" style="padding: 50px 20px 35px;">
 			<label class="col-sm-3 control-label text-left-audit1">From Date <span
 				class="mandatory"></span></label>
 			<div class="col-sm-3 add-margin">
@@ -40,6 +40,22 @@
 	        <div class="panel panel-primary" data-collapsed="0">
 	        
 	        	<div style="padding: 0 15px;">
+	        	<c:if test="${cashBookReport.titleName != null &&  !cashBookReport.titleName.isEmpty()}">
+	        		<table width="100%" border="1" cellspacing="0" cellpadding="0">
+				<tr>
+					<th class="bluebgheadtd" width="100%" colspan="5"><strong
+						style="font-size: 15px;"> ${cashBookReport.titleName}</strong></th>
+				</tr>
+			</table>
+	        	</c:if>
+	        	<c:if test="${cashBookReport.header != null &&  !cashBookReport.header.isEmpty()}">
+	        		<table width="100%" border="1" cellspacing="0" cellpadding="0">
+				<tr>
+					<th class="bluebgheadtd" width="100%" colspan="5"><strong
+						style="font-size: 15px;"> ${cashBookReport.header}</strong></th>
+				</tr>
+			</table>
+	        	</c:if>
 				<table class="table table-bordered" id="searchResult">
 					<thead>
 					<tr>
@@ -122,10 +138,11 @@
 			<br>
 	        </div>
 	        
-			<div class="buttonbottom" align="center">
+		
+        </div>   
+        <div class="buttonbottom" align="center">
         <input type="submit" class="btn btn-primary btn-wf-primary" id="exportpdf" name="exportpdf" value="EXPORT"/>
-        </div>
-        </div>     
+        </div>  
         
 </form:form>
 

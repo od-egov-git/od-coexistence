@@ -527,6 +527,8 @@ function printVoucher(){
 		//document.forms[frmIndex].elements[i].disabled =true;
 		//--work here to manually enable fields --  deep
 		document.getElementById("voucherNumber").disabled=true;
+		document.getElementById("bankId").disabled=true;
+		document.getElementById("accountNumber").disabled=true;
 		disableYUIAddDeleteButtons(true);
 		document.getElementById("closeButton").disabled=false;
 		if(null != document.getElementById("printPreview1")){

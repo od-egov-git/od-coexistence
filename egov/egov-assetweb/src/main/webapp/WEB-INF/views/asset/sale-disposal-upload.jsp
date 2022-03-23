@@ -47,7 +47,7 @@
   --%>
 
 <%@ include file="/includes/taglibs.jsp" %>
-<%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"%>
+<%-- <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"%> --%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
@@ -97,18 +97,18 @@
                                     <td>
                                         <input type="file" name="file" id="file1" onchange="isValidFile(this.id)" class="padding-10">
                                     </td>
-                                    <td>
+                                    <!-- <td>
                                     	<input type="button" name="remove" id="remove" value ="Remove" onclick="deleteFileInputField(this.row)">
-                                    </td>
+                                    </td> -->
                                 </tr>
                                 </tbody></table>
                             </td>
                         </tr>
-                        <tr>
+                        <%-- <tr>
                             <td align="center">
                                 <button id="attachNewFileBtn" type="button" class="btn btn-primary" onclick="addFileInputField()"><spring:message code="lbl.addfile" text="Add File"/></button>
                             </td>
-                        </tr>
+                        </tr> --%>
                         </tbody>
             </table>
         </div>

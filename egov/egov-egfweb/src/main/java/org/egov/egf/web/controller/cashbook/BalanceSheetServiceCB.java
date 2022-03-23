@@ -807,7 +807,8 @@ public class BalanceSheetServiceCB extends ReportServiceCB {
 					atEndPeriodPrevYear = new BigDecimal(0);
 				}
 				obj.setAtBeginingPeriodPrevYear(atBeginingPeriodPrevYear);
-				obj.setAtEndPeriodPrevYear(atEndPeriodPrevYear);
+				//obj.setAtEndPeriodPrevYear(atEndPeriodPrevYear);
+				obj.setAtEndPeriodPrevYear(atBeginingPeriodCurrYear);
 			}
 			obj.setSundryDebtorsCurrYear(sundryDebtorsCurrYear);
 			obj.setSundryDebtorsPrevYear(sundryDebtorsPrevYear);
@@ -925,6 +926,8 @@ public class BalanceSheetServiceCB extends ReportServiceCB {
 			reportMap.put("abcCurrYear", cashFlowReportBean.getAbcCurrentYear());
 			reportMap.put("abcPrevYear", cashFlowReportBean.getAbcPrevYear());
 			reportMap.put("cashFlowDataSource", finalBalanceSheetL);
+			reportMap.put("nameOfUlb", cashFlowReportBean.getTitleName());
+			reportMap.put("header", cashFlowReportBean.getHeader());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

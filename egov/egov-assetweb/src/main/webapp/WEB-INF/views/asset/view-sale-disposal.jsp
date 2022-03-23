@@ -276,7 +276,7 @@
 			<tr>
 			<td>${tagStatus.index+1}</td>
 			<td>
-			<a href="/services/EGF/sale/downloadSaleDisposalDoc?disposalId=${disposal.id }&fileStoreId=${document.fileStore.fileStoreId }">${document.fileStore.fileName }</a>
+			<a href="/services/asset/sale/downloadSaleDisposalDoc?disposalId=${disposal.id }&fileStoreId=${document.fileStore.fileStoreId }">${document.fileStore.fileName }</a>
 			</td>
 			
 			</tr>

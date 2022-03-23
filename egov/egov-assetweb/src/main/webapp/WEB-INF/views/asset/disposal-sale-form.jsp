@@ -258,7 +258,7 @@
 		
 		</div>
 		</div>
-		<%-- <jsp:include page="sale-disposal-upload.jsp"/> --%>
+		<jsp:include page="sale-disposal-upload.jsp"/>
 		<div class="sale-create-button" style="display: none;">
 		<div align="center">
 			<input type="submit" onclick="return validateSaleForm()" class="btn btn-primary" name="create" value="Create" />

@@ -1,10 +1,15 @@
 package org.egov.asset.service;
 
+import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
+import javax.persistence.PersistenceContext;
 
 import org.apache.log4j.Logger;
 import org.egov.asset.model.AssetCatagory;
@@ -57,6 +62,8 @@ public class AssetCatagoryService {
 	private CustomeFieldsRepository customeFieldsRepository;
 	@Autowired
 	private CChartOfAccountsRepository cChartOfAccountsRepository;
+	@PersistenceContext
+    private EntityManager em;
 
 	public List<CustomFieldDataType> getCustomFieldDataType() {
 		return customFieldDataTypeRepository.findAll();
@@ -293,11 +300,48 @@ public class AssetCatagoryService {
 			}
 				
 		}
+		
 		AssetCatagory save=assetCatagoryRepository.save(findOne);
 //		AssetCatagory save = assetCatagoryRepository.saveAndFlush(assetCategory);
 		save.setErrorMessage("Record updated successfully..!!");
 		
 		return save;
+	}
+	@Transactional
+	public void addNewCustomField(AssetCatagory assetCategory) {
+		//AssetCatagory findOne = assetCatagoryRepository.findOne(assetCategory.getId());
+		String query="INSERT INTO custome_fields (id, active, columns, create_date, created_by, custom_field_type_id, data_type, mandatory, name, orders, update_date, updated_by, vlaues, asset_catagory_id) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)";
+		
+			
+					CustomeFields custom = assetCategory.getCustomeField();
+					//List<CustomeFields> cfs=findOne.getCustomeFields();
+					Date date1 = new Date(); 
+					DateFormat dateFormat1 = new SimpleDateFormat("yyyy-mm-dd");  
+					String createDate1 = dateFormat1.format(date1); 
+					custom.setCreateDate(createDate1);
+					custom.setCreatedBy(assetCategory.getUpdatedBy());
+					custom.setDataType(custom.getCustomFieldDataType().getDataTypes());
+					//findOne.getCustomeFields().add(custom);
+					//findOne.setCustomeFields(cfs);
+					
+					em.createNativeQuery(query)
+						.setParameter(1,customeFieldsRepository.getNextValMySequence())
+					   .setParameter(2,custom.isActive())
+					   .setParameter(3,custom.getColumns())
+					   .setParameter(4,custom.getCreateDate())
+					   .setParameter(5,custom.getCreatedBy())
+					   .setParameter(6,custom.getCustomFieldDataType().getId())
+					   .setParameter(7,custom.getDataType())
+					   .setParameter(8,custom.isMandatory())
+					   .setParameter(9,custom.getName())
+					   .setParameter(10,custom.getOrders())
+					   .setParameter(11,custom.getUpdateDate())
+					   .setParameter(12,BigInteger.valueOf(custom.getCreatedBy()))
+					   .setParameter(13,custom.getVlaues())
+					   .setParameter(14,assetCategory.getId())
+					   .executeUpdate();
+										
+		
 	}
 	public AssetCatagory getAssetCategory(Long id) {
 		return assetCatagoryRepository.getOne(id);
