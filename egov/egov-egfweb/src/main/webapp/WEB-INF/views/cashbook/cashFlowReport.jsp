@@ -409,25 +409,27 @@ function exportToPDF() {
 							</tr>
 							</c:if>
 							<c:if
-							test="${cashFlowReport.finalBalanceSheetL != null &&  !cashFlowReport.finalBalanceSheetL.isEmpty()}">
-							<c:forEach items="${cashFlowReport.finalBalanceSheetL}"
-								var="result" varStatus="status">
+							test="${cashFlowReport.atBeginingCurr != 0 ||  cashFlowReport.atBeginingPrev != 0}">
 							<tr>
 								<td>Cash and cash equivalents at beginning of period</td>
 								<td></td>
-								<td aligh="center">${result.atBeginingPeriodCurrYear }</td>
+								<td aligh="center">${cashFlowReport.atBeginingCurr }</td>
 								<td></td>
-								<td aligh="center">${result.atBeginingPeriodPrevYear }</td>
+								<td aligh="center">${cashFlowReport.atBeginingPrev }</td>
 							</tr>
+							</c:if>
+							<c:if
+							test="${cashFlowReport.atEndCurr != 0 ||  cashFlowReport.atEndPrev != 0}">
 							<tr>
 								<td>Cash and cash equivalents at end of period</td>
 								<td></td>
-								<td aligh="center">${result.atEndPeriodCurrYear }</td>
+								<td aligh="center">${cashFlowReport.atEndCurr }</td>
 								<td></td>
-								<td aligh="center">${result.atEndPeriodPrevYear }</td>
+								<td aligh="center">${cashFlowReport.atEndPrev }</td>
 							</tr>
-							</c:forEach>
-							
+							</c:if>
+							<c:if
+							test="${cashFlowReport.flag == show}">
 							<tr>
 								<td>Total</td>
 								<td></td>

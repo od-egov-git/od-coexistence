@@ -729,8 +729,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
 		paymentheader = new Paymentheader();
 		paymentheader = (Paymentheader) persistenceService.find("from Paymentheader where voucherheader=?",
 				voucherHeader);
-		
-		
+
 		commonBean.setAmount(paymentheader.getPaymentAmount());
 		commonBean.setAccountNumberId(paymentheader.getBankaccount().getId().toString());
 		commonBean.setAccnumnar(paymentheader.getBankaccount().getNarration());
@@ -1334,47 +1333,51 @@ public class DirectBankPaymentAction extends BasePaymentAction {
 				}
 
 				if (voucherHeader.getId() != null) {
-					int length = billDetailslist.size();
-					List<CGeneralLedger> gllist =
-					paymentRefundUtils.getAccountDetails(Long.valueOf(voucherHeader.getId()));
-					for(CGeneralLedger cGeneralLedger : gllist) {
-						int linenumber = cGeneralLedger.getVoucherlineId();
-					for (int i = 0; i <= length-1; i++) {
-						BigDecimal credit = billDetailslist.get(i).getCreditAmountDetail();
-						BigDecimal debit = billDetailslist.get(i).getDebitAmountDetail();
-						String glcodeDetail = billDetailslist.get(i).getGlcodeDetail();
-						long glcodeIdDetail = billDetailslist.get(i).getGlcodeIdDetail();
-						long functionIdDetail = billDetailslist.get(i).getFunctionIdDetail();
-						
-						// String glcode =chartOfAccounts.getGlcode();
-						if (credit.intValue() != 0) {
-							String queryStr = "update CGeneralLedger set creditamount =:credit,glcodeId =:glcodeIdDetail,glcode =:glcodeDetail,functionId =:functionIdDetail"
-									+ " where voucherheaderid =:id and voucherlineId =:linenumber";
-							org.hibernate.Query queryResult = getCurrentSession().createQuery(queryStr.toString());
-							queryResult.setLong("id", voucherHeader.getId());
-							queryResult.setBigDecimal("credit", credit);
-							queryResult.setString("glcodeDetail", glcodeDetail);
-							queryResult.setLong("glcodeIdDetail", glcodeIdDetail);
-							queryResult.setLong("functionIdDetail", functionIdDetail);
-							queryResult.setInteger("linenumber", i+1);
-
-							int row2 = queryResult.executeUpdate();
-							System.out.println("Row updated gen: " + row2);
-						} else {
-							String queryStr = "update CGeneralLedger set debitamount =:debit ,glcodeId =:glcodeIdDetail,glcode =:glcodeDetail,functionId =:functionIdDetail"
-									+ " where voucherheaderid =:id and voucherlineId =:linenumber";
-							org.hibernate.Query queryResult = getCurrentSession().createQuery(queryStr.toString());
-							queryResult.setLong("id", voucherHeader.getId());
-							queryResult.setBigDecimal("debit", debit);
-							queryResult.setString("glcodeDetail", glcodeDetail);
-							queryResult.setLong("glcodeIdDetail", glcodeIdDetail);
-							queryResult.setLong("functionIdDetail", functionIdDetail);
-							queryResult.setInteger("linenumber", i+1);
-							int row2 = queryResult.executeUpdate();
-							System.out.println("Row updated Gen: " + row2);
-						}
-					}
-					}
+					
+					String queryStr = "DELETE FROM CGeneralLedger C WHERE C.voucherHeaderId =:id";
+					org.hibernate.Query queryResult = getCurrentSession().createQuery(queryStr.toString()); 
+					queryResult.setLong("id",voucherHeader.getId());
+					int row2 = queryResult.executeUpdate();
+					
+					
+					/*
+					 * int length = billDetailslist.size(); List<CGeneralLedger> gllist =
+					 * paymentRefundUtils .getAccountDetails(Long.valueOf(voucherHeader.getId()));
+					 * for (CGeneralLedger cGeneralLedger : gllist) { int linenumber =
+					 * cGeneralLedger.getVoucherlineId(); if (linenumber != 1) { for (int i = 0; i
+					 * <= length - 1; i++) { BigDecimal credit =
+					 * billDetailslist.get(i).getCreditAmountDetail(); BigDecimal debit =
+					 * billDetailslist.get(i).getDebitAmountDetail(); String glcodeDetail =
+					 * billDetailslist.get(i).getGlcodeDetail(); long glcodeIdDetail =
+					 * billDetailslist.get(i).getGlcodeIdDetail(); long functionIdDetail =
+					 * billDetailslist.get(i).getFunctionIdDetail();
+					 * 
+					 * // String glcode =chartOfAccounts.getGlcode(); if (credit.intValue() != 0) {
+					 * String queryStr =
+					 * "update CGeneralLedger set creditamount =:credit,glcodeId =:glcodeIdDetail,glcode =:glcodeDetail,functionId =:functionIdDetail"
+					 * + " where voucherheaderid =:id and voucherlineId =:linenumber";
+					 * org.hibernate.Query queryResult = getCurrentSession()
+					 * .createQuery(queryStr.toString()); queryResult.setLong("id",
+					 * voucherHeader.getId()); queryResult.setBigDecimal("credit", credit);
+					 * queryResult.setString("glcodeDetail", glcodeDetail);
+					 * queryResult.setLong("glcodeIdDetail", glcodeIdDetail);
+					 * queryResult.setLong("functionIdDetail", functionIdDetail);
+					 * queryResult.setInteger("linenumber", i + 1);
+					 * 
+					 * int row2 = queryResult.executeUpdate();
+					 * System.out.println("Row updated gen: " + row2); } else { String queryStr =
+					 * "update CGeneralLedger set debitamount =:debit ,glcodeId =:glcodeIdDetail,glcode =:glcodeDetail,functionId =:functionIdDetail"
+					 * + " where voucherheaderid =:id and voucherlineId =:linenumber";
+					 * org.hibernate.Query queryResult = getCurrentSession()
+					 * .createQuery(queryStr.toString()); queryResult.setLong("id",
+					 * voucherHeader.getId()); queryResult.setBigDecimal("debit", debit);
+					 * queryResult.setString("glcodeDetail", glcodeDetail);
+					 * queryResult.setLong("glcodeIdDetail", glcodeIdDetail);
+					 * queryResult.setLong("functionIdDetail", functionIdDetail);
+					 * queryResult.setInteger("linenumber", i + 1); int row2 =
+					 * queryResult.executeUpdate(); System.out.println("Row updated Gen: " + row2);
+					 * } } } }
+					 */
 				}
 
 				if (voucherHeader.getId() != null) {
@@ -1392,7 +1395,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
 				}
 
 				transaction.commit();
-
+				paymentActionHelper.createVoucherAndledgerAfterRejection(voucherHeader,commonBean,billDetailslist,subLedgerlist);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1418,7 +1421,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
 		 * voucherHeader);
 		 */
 		commonBean.setAmount(paymentheader.getPaymentAmount());
-		//commonBean.setAccountNumberId(paymentheader.getBankaccount().getId().toString());
+		// commonBean.setAccountNumberId(paymentheader.getBankaccount().getId().toString());
 		commonBean.setAccnumnar(paymentheader.getBankaccount().getNarration());
 
 		if (paymentheader.getFileno() == null) {
@@ -1446,7 +1449,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
 		 * commonBean.setBankBranchId(bankBranchId);
 		 */
 		commonBean.setModeOfPayment(paymentheader.getType());
-		
+
 		final String bankGlcode = paymentheader.getBankaccount().getChartofaccounts().getGlcode();
 		LOGGER.info("bankGlcode  ::" + bankGlcode);
 		VoucherDetails bankdetail = null;

@@ -58,6 +58,7 @@ public class CashBookController {
 	public static final Locale LOCALE = new Locale("en", "IN");
 	public static final SimpleDateFormat DDMMYYYYFORMAT1 = new SimpleDateFormat("dd-MMM-yyyy", LOCALE);
 	private static final long MILLIS_IN_A_YEAR = (long) 1000 * 60 * 60 * 24 * 365;
+	private static final long MILLIS_IN_A_DAY = (long) 1000*60*60*24;
 	private static final Logger LOGGER = Logger.getLogger(CashBookController.class);
 	private List<MisReceiptDetail> misReceiptDetails = new ArrayList<MisReceiptDetail>();
 	private List<MisRemittanceDetails> misRemittanceDetails = new ArrayList<MisRemittanceDetails>();
@@ -535,7 +536,8 @@ public class CashBookController {
 			List<CashFlowReportDataBean> finalBalanceSheetL = new ArrayList<CashFlowReportDataBean>();
 			// for balance sheet
 			Date prevFromDate = new Date(cashBookReportBean.getFromDate().getTime() - MILLIS_IN_A_YEAR);
-			Date prevToDate = new Date(cashBookReportBean.getToDate().getTime() - MILLIS_IN_A_YEAR);
+			//Date prevToDate = new Date(cashBookReportBean.getToDate().getTime() - MILLIS_IN_A_YEAR);
+			Date prevToDate = new Date(cashBookReportBean.getFromDate().getTime() - MILLIS_IN_A_DAY);
 			// get previous year
 
 			balanceSheetLNow = populateDataSource(cashBookReportBean.getToDate(), cashBookReportBean.getFromDate(),
@@ -550,6 +552,10 @@ public class CashBookController {
 			cashBookReportBean.setcPrevYear(new BigDecimal(0));
 			cashBookReportBean.setAbcCurrentYear(balanceSheetService.getabcCurrentYear(cashBookReportBean));
 			cashBookReportBean.setAbcPrevYear(balanceSheetService.getabcPreviousYear(cashBookReportBean));
+			cashBookReportBean.setAtEndCurr(balanceSheetService.getAtEndCurrentYear(finalBalanceSheetL,cashBookReportBean));
+			cashBookReportBean.setAtBeginingCurr(finalBalanceSheetL.get(0).getAtBeginingPeriodCurrYear());
+			cashBookReportBean.setAtBeginingPrev(finalBalanceSheetL.get(0).getAtBeginingPeriodPrevYear());
+			cashBookReportBean.setAtEndPrev(balanceSheetService.getatendPrevYear(finalBalanceSheetL,cashBookReportBean));
 			cashBookReportBean.setFinalBalanceSheetL(finalBalanceSheetL);
 			cashBookReportBean.setCashFlowResultList(lst1);
 			titleName = getUlbName().toUpperCase() + " ";
@@ -897,11 +903,13 @@ public class CashBookController {
 			List<CashFlowReportDataBean> finalBalanceSheetL = new ArrayList<CashFlowReportDataBean>();
 			// for balance sheet
 			Date prevFromDate = new Date(cashBookReportBean.getFromDate().getTime() - MILLIS_IN_A_YEAR);
-			Date prevToDate = new Date(cashBookReportBean.getToDate().getTime() - MILLIS_IN_A_YEAR);
+			//Date prevToDate = new Date(cashBookReportBean.getToDate().getTime() - MILLIS_IN_A_YEAR);
+			Date prevToDate = new Date(cashBookReportBean.getToDate().getTime() - MILLIS_IN_A_DAY);
 			// get previous year
 
 			balanceSheetLNow = populateDataSource(cashBookReportBean.getToDate(), cashBookReportBean.getFromDate(),
 					"current");
+			
 			balanceSheetLPrev = populateDataSource(prevToDate, prevFromDate, "prev");
 			finalBalanceSheetL = balanceSheetService.getFinalVBalanceSheetList(balanceSheetLNow, balanceSheetLPrev);
 			cashBookReportBean.setaCurrentYear(balanceSheetService.getACurrentYear(lst1, finalBalanceSheetL));
@@ -912,6 +920,10 @@ public class CashBookController {
 			cashBookReportBean.setcPrevYear(new BigDecimal(0));
 			cashBookReportBean.setAbcCurrentYear(balanceSheetService.getabcCurrentYear(cashBookReportBean));
 			cashBookReportBean.setAbcPrevYear(balanceSheetService.getabcPreviousYear(cashBookReportBean));
+			cashBookReportBean.setAtEndCurr(balanceSheetService.getAtEndCurrentYear(finalBalanceSheetL,cashBookReportBean));
+			cashBookReportBean.setAtBeginingCurr(finalBalanceSheetL.get(0).getAtBeginingPeriodCurrYear());
+			cashBookReportBean.setAtBeginingPrev(finalBalanceSheetL.get(0).getAtBeginingPeriodPrevYear());
+			cashBookReportBean.setAtEndPrev(balanceSheetService.getatendPrevYear(finalBalanceSheetL,cashBookReportBean));
 			titleName = getUlbName().toUpperCase() + " ";
 			cashBookReportBean.setTitleName(titleName + " Cash Flow Report");
 			cashBookReportBean

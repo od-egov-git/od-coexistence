@@ -28,6 +28,34 @@ public class CashBookReportBean {
 	private BigDecimal cPrevYear = new BigDecimal(0);
 	private BigDecimal abcCurrentYear = new BigDecimal(0);
 	private BigDecimal abcPrevYear = new BigDecimal(0);
+	private BigDecimal atBeginingCurr = new BigDecimal(0);
+	private BigDecimal atBeginingPrev = new BigDecimal(0);
+	private BigDecimal atEndCurr = new BigDecimal(0);
+	private BigDecimal atEndPrev = new BigDecimal(0);
+	public BigDecimal getAtBeginingCurr() {
+		return atBeginingCurr;
+	}
+	public void setAtBeginingCurr(BigDecimal atBeginingCurr) {
+		this.atBeginingCurr = atBeginingCurr;
+	}
+	public BigDecimal getAtBeginingPrev() {
+		return atBeginingPrev;
+	}
+	public void setAtBeginingPrev(BigDecimal atBeginingPrev) {
+		this.atBeginingPrev = atBeginingPrev;
+	}
+	public BigDecimal getAtEndCurr() {
+		return atEndCurr;
+	}
+	public void setAtEndCurr(BigDecimal atEndCurr) {
+		this.atEndCurr = atEndCurr;
+	}
+	public BigDecimal getAtEndPrev() {
+		return atEndPrev;
+	}
+	public void setAtEndPrev(BigDecimal atEndPrev) {
+		this.atEndPrev = atEndPrev;
+	}
 	private String titleName= ""; 
 	private String header = "";
 	private String flag="";

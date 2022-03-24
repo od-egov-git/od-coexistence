@@ -115,7 +115,7 @@
 <script>
 	path="${pageContext.request.contextPath}";
 	var showMode='<s:property value="showMode"/>';	
-	alert(showMode+'in new');
+	
 		var totaldbamt=0,totalcramt=0;
 		var OneFunctionCenter= <s:property value="isRestrictedtoOneFunctionCenter"/>; 
 		//bootbox.alert(">>.."+OneFunctionCenter);                 

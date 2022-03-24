@@ -771,6 +771,92 @@ public class PaymentActionHelper {
 		return voucherHeader;
 
 	}
+	@Transactional
+	public void createVoucherAndledgerAfterRejection(CVoucherHeader voucherHeader, CommonBean commonBean,
+			List<VoucherDetails> billDetailslist, List<VoucherDetails> subLedgerlist) {
+		try {
+			final HashMap<String, Object> headerDetails = createHeaderAndMisDetails(voucherHeader);
+			// update DirectBankPayment source path
+			headerDetails.put(VoucherConstant.SOURCEPATH,
+					"/services/EGF/payment/directBankPayment-beforeView.action?voucherHeader.id=");
+			HashMap<String, Object> detailMap = null;
+			HashMap<String, Object> subledgertDetailMap = null;
+			final List<HashMap<String, Object>> accountdetails = new ArrayList<HashMap<String, Object>>();
+			final List<HashMap<String, Object>> subledgerDetails = new ArrayList<HashMap<String, Object>>();
+
+			detailMap = new HashMap<String, Object>();
+			detailMap.put(VoucherConstant.CREDITAMOUNT, commonBean.getAmount().toString());
+			detailMap.put(VoucherConstant.DEBITAMOUNT, ZERO);
+			final Bankaccount account = (Bankaccount) persistenceService.getSession().load(Bankaccount.class,
+					Long.valueOf(commonBean.getAccountNumberId()));
+			detailMap.put(VoucherConstant.GLCODE, account.getChartofaccounts().getGlcode());
+			accountdetails.add(detailMap);
+			final Map<String, Object> glcodeMap = new HashMap<String, Object>();
+			for (final VoucherDetails voucherDetail : billDetailslist)
+
+			{
+				detailMap = new HashMap<String, Object>();
+				if (voucherDetail.getFunctionIdDetail() != null) {
+					final CFunction function = (CFunction) persistenceService.getSession().load(CFunction.class,
+							voucherDetail.getFunctionIdDetail());
+					detailMap.put(VoucherConstant.FUNCTIONCODE, function.getCode());
+				}
+				if (voucherDetail.getCreditAmountDetail().compareTo(BigDecimal.ZERO) == 0) {
+
+					detailMap.put(VoucherConstant.DEBITAMOUNT, voucherDetail.getDebitAmountDetail().toString());
+					detailMap.put(VoucherConstant.CREDITAMOUNT, ZERO);
+					detailMap.put(VoucherConstant.GLCODE, voucherDetail.getGlcodeDetail());
+					accountdetails.add(detailMap);
+					glcodeMap.put(voucherDetail.getGlcodeDetail(), VoucherConstant.DEBIT);
+				} else {
+					detailMap.put(VoucherConstant.CREDITAMOUNT, voucherDetail.getCreditAmountDetail().toString());
+					detailMap.put(VoucherConstant.DEBITAMOUNT, ZERO);
+					detailMap.put(VoucherConstant.GLCODE, voucherDetail.getGlcodeDetail());
+					accountdetails.add(detailMap);
+					glcodeMap.put(voucherDetail.getGlcodeDetail(), VoucherConstant.CREDIT);
+				}
+
+			}
+			if (subLedgerlist != null) {
+				for (final VoucherDetails voucherDetail : subLedgerlist) {
+					subledgertDetailMap = new HashMap<String, Object>();
+					final String amountType = glcodeMap.get(voucherDetail.getSubledgerCode()) != null
+							? glcodeMap.get(voucherDetail.getSubledgerCode()).toString()
+							: null; // Debit or Credit.
+					if (null != amountType && amountType.equalsIgnoreCase(VoucherConstant.DEBIT))
+						subledgertDetailMap.put(VoucherConstant.DEBITAMOUNT, voucherDetail.getAmount());
+					else if (null != amountType)
+						subledgertDetailMap.put(VoucherConstant.CREDITAMOUNT, voucherDetail.getAmount());
+					subledgertDetailMap.put(VoucherConstant.DETAILTYPEID, voucherDetail.getDetailType().getId());
+					subledgertDetailMap.put(VoucherConstant.DETAILKEYID, voucherDetail.getDetailKeyId());
+					subledgertDetailMap.put(VoucherConstant.GLCODE, voucherDetail.getSubledgerCode());
+					subledgerDetails.add(subledgertDetailMap);
+				}
+			}
+			createVoucher.createPreApprovedVoucherAfterRejection(headerDetails,accountdetails, subledgerDetails,voucherHeader);
+
+		} catch (final HibernateException e) {
+			LOGGER.error(e.getMessage(), e);
+			throw new ValidationException(Arrays.asList(new ValidationError(EXCEPTION_WHILE_SAVING_DATA, FAILED)));
+		} catch (final ApplicationRuntimeException e) {
+			LOGGER.error(e.getMessage(), e);
+			throw new ValidationException(Arrays.asList(new ValidationError(e.getMessage(), e.getMessage())));
+		} catch (final ValidationException e) {
+			LOGGER.error(e.getMessage(), e);
+			final List<ValidationError> errors = new ArrayList<ValidationError>();
+			errors.add(new ValidationError("exp", e.getErrors().get(0).getMessage()));
+			throw new ValidationException(errors);
+		} catch (final Exception e) {
+			// handle engine exception
+			LOGGER.error(e.getMessage(), e);
+			throw new ValidationException(Arrays.asList(new ValidationError(e.getMessage(), e.getMessage())));
+		}
+		if (LOGGER.isDebugEnabled())
+			LOGGER.debug("Posted to Ledger " + voucherHeader.getId());
+		
+
+	}
+
 
 	protected HashMap<String, Object> createHeaderAndMisDetails(CVoucherHeader voucherHeader)
 			throws ValidationException {
