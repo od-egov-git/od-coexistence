@@ -258,8 +258,15 @@ public class DisposalService {
 		return assetAccount;
 	 }
 	 public List<Department> getDepartments() {
-	
-		 return deptRepo.findAll();
+		 List<Department> departmentList = new ArrayList<>();
+			List<Department> findAll=deptRepo.findAll();
+			findAll.stream()  
+	        .filter(dept-> dept.getName().equalsIgnoreCase("Accounts Branch"))
+	        .map(department->department)
+	        .forEach(dep->
+	        departmentList.add(dep)
+	        );
+		 return departmentList;
 		 
 	 }
 	 public List<AssetMaster> getAssets(){
@@ -277,7 +284,7 @@ public class DisposalService {
 				statusId = String.valueOf(assetBean.getAssetStatus().getId());
 			}*/
 		
-		 String defaultQuery="From AssetMaster am where am.assetHeader.applicableForSale='true'";
+		 String defaultQuery="From AssetMaster am where am.assetHeader.applicableForSale='false'";
 		 String queryAppender="";
 		 Long statusId = null;
 			if(null != assetBean.getAssetStatus()) {

@@ -176,11 +176,11 @@ public class SaleDisposalController {
 	 		model.addAttribute("assetAccounts", disposalService.getAssetAccount());
 	 		return "view-sale-disposal";
 	 	}
-	 	/*@GetMapping("search")
+	 	@PostMapping("search")
 	 	public String searchSalaDisposal(Model model) {
 	 		model.addAttribute("assetBean", new AssetMaster());
 	 		return "search-asset-for-sale-disposal";
-	 	}*/
+	 	}
 	 	@PostMapping(value = "/search", params = "search")
 		public String search(@ModelAttribute("assetBean") AssetMaster assetBean, Model model, HttpServletRequest request) {
 			List<AssetMaster> assetList = disposalService.getAssetMasterDetails(assetBean);

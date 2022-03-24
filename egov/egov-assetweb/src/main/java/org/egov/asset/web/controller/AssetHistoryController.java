@@ -47,7 +47,7 @@ public class AssetHistoryController {
 	}
 	@PostMapping(value = "/search", params = "search")
 	public String search(@ModelAttribute("assetBean") AssetMaster assetBean, Model model, HttpServletRequest request) {
-		List<AssetMaster> assetList = assetHistoryService.getAssetMasterDetails(assetBean);
+		List<AssetMaster> assetList = assetHistoryService.getAssetMasterDetail(assetBean);
 		model.addAttribute("assetList", assetList);
 		model.addAttribute("assetBean", assetBean);
 		return "search-asset-history";

@@ -177,11 +177,28 @@ public class CreateAssetController {// extends BaseAssetController{
 		model.addAttribute("assetBean", assetBean);
 		try {
 			fundList = fundHibernateDAO.findAllActiveFunds();
-			departmentList = deptRepo.findAll(); //masterDataCache.get("egi-department");		//microserviceUtils.getDepartments();
+			//departmentList = deptRepo.findAll(); //masterDataCache.get("egi-department");		//microserviceUtils.getDepartments();
+			departmentList = new ArrayList<Department>();
+			functionList = new ArrayList<CFunction>();
+			List<Department> findAll = deptRepo.findAll();
+			findAll.stream()  
+	        .filter(dept-> dept.getName().equalsIgnoreCase("Accounts Branch"))
+	        .map(department->department)
+	        .forEach(dep->
+	        departmentList.add(dep)
+	        );
 			modeOfAcquisitionList = acqRepo.findAll();
 			assetStatusList = statusRepo.findAll();
 			assetCategoryList = categoryRepo.findAll();
-			functionList = functionDAO.getAllActiveFunctions();
+			//functionList = functionDAO.getAllActiveFunctions();
+			functionList = new ArrayList<CFunction>();
+			List<CFunction> function=functionDAO.getAllActiveFunctions();
+			function.stream()  
+	        .filter(func-> func.getName().equalsIgnoreCase("Finance Accounts Audit"))
+	        .map(functions->functions)
+	        .forEach(fun->
+	        functionList.add(fun)
+	        );
 			
 			localityList = localityRepo.findAll();
 			blockList = blockRepo.findAll();
@@ -353,7 +370,15 @@ public class CreateAssetController {// extends BaseAssetController{
 		assetBean = new AssetMaster();
 		model.addAttribute("assetBean", assetBean);
 		try {
-			departmentList = deptRepo.findAll(); //microserviceUtils.getDepartments();
+			//departmentList = deptRepo.findAll(); //microserviceUtils.getDepartments();
+			departmentList = new ArrayList<Department>();
+			List<Department> findAll = deptRepo.findAll();
+			findAll.stream()  
+	        .filter(dept-> dept.getName().equalsIgnoreCase("Accounts Branch"))
+	        .map(department->department)
+	        .forEach(dep->
+	        departmentList.add(dep)
+	        );
 			assetStatusList = statusRepo.findAll();
 			assetCategoryList = categoryRepo.findAll();
 			
@@ -382,7 +407,15 @@ public class CreateAssetController {// extends BaseAssetController{
 		assetBean = new AssetMaster();
 		model.addAttribute("assetBean", assetBean);
 		try {
-			departmentList = deptRepo.findAll(); //microserviceUtils.getDepartments();
+			//departmentList = deptRepo.findAll(); //microserviceUtils.getDepartments();
+			departmentList = new ArrayList<Department>();
+			List<Department> findAll = deptRepo.findAll();
+			findAll.stream()  
+	        .filter(dept-> dept.getName().equalsIgnoreCase("Accounts Branch"))
+	        .map(department->department)
+	        .forEach(dep->
+	        departmentList.add(dep)
+	        );
 			assetStatusList = statusRepo.findAll();
 			assetCategoryList = categoryRepo.findAll();
 			
@@ -460,12 +493,27 @@ public class CreateAssetController {// extends BaseAssetController{
 		mapperList = assetBean.getAssetCustomFieldMappers();
 		try {
 			fundList = fundHibernateDAO.findAllActiveFunds();
-			departmentList = deptRepo.findAll(); //microserviceUtils.getDepartments();
+			//departmentList = deptRepo.findAll(); //microserviceUtils.getDepartments();
+			departmentList = new ArrayList<Department>();
+			List<Department> findAll = deptRepo.findAll();
+			findAll.stream()  
+	        .filter(dept-> dept.getName().equalsIgnoreCase("Accounts Branch"))
+	        .map(department->department)
+	        .forEach(dep->
+	        departmentList.add(dep)
+	        );
 			modeOfAcquisitionList = acqRepo.findAll();
 			assetStatusList = statusRepo.findAll();
 			assetCategoryList = categoryRepo.findAll();
-			functionList = functionDAO.getAllActiveFunctions();
-			
+			//functionList = functionDAO.getAllActiveFunctions();
+			functionList = new ArrayList<CFunction>();
+			List<CFunction> function=functionDAO.getAllActiveFunctions();
+			function.stream()  
+	        .filter(func-> func.getName().equalsIgnoreCase("Finance Accounts Audit"))
+	        .map(functions->functions)
+	        .forEach(fun->
+	        functionList.add(fun)
+	        );
 			localityList = localityRepo.findAll();
 			blockList = blockRepo.findAll();
 			electionWardList = electionWardRepo.findAll();
@@ -523,12 +571,27 @@ public class CreateAssetController {// extends BaseAssetController{
 		mapperList = assetBean.getAssetCustomFieldMappers();
 		try {
 			fundList = fundHibernateDAO.findAllActiveFunds();
-			departmentList = deptRepo.findAll(); //microserviceUtils.getDepartments();
+			//departmentList = deptRepo.findAll(); //microserviceUtils.getDepartments();
+			departmentList = new ArrayList<Department>();
+			List<Department> findAll = deptRepo.findAll();
+			findAll.stream()  
+	        .filter(dept-> dept.getName().equalsIgnoreCase("Accounts Branch"))
+	        .map(department->department)
+	        .forEach(dep->
+	        departmentList.add(dep)
+	        );
 			modeOfAcquisitionList = acqRepo.findAll();
 			assetStatusList = statusRepo.findAll();
 			assetCategoryList = categoryRepo.findAll();
-			functionList = functionDAO.getAllActiveFunctions();
-			
+			//functionList = functionDAO.getAllActiveFunctions();
+			functionList = new ArrayList<CFunction>();
+			List<CFunction> function=functionDAO.getAllActiveFunctions();
+			function.stream()  
+	        .filter(func-> func.getName().equalsIgnoreCase("Finance Accounts Audit"))
+	        .map(functions->functions)
+	        .forEach(fun->
+	        functionList.add(fun)
+	        );
 			localityList = localityRepo.findAll();
 			blockList = blockRepo.findAll();
 			electionWardList = electionWardRepo.findAll();
@@ -644,7 +707,15 @@ public class CreateAssetController {// extends BaseAssetController{
 			//assetList = searchResult(assetBean);
 			assetList = assetService.searchAssets(assetBean);
 			model.addAttribute("assetList", assetList);
-			departmentList = deptRepo.findAll();
+			//departmentList = deptRepo.findAll();
+			departmentList = new ArrayList<Department>();
+			List<Department> findAll = deptRepo.findAll();
+			findAll.stream()  
+	        .filter(dept-> dept.getName().equalsIgnoreCase("Accounts Branch"))
+	        .map(department->department)
+	        .forEach(dep->
+	        departmentList.add(dep)
+	        );
 			assetStatusList = statusRepo.findAll();
 			assetCategoryList = categoryRepo.findAll();
 		} catch (Exception e) {
@@ -672,7 +743,15 @@ public class CreateAssetController {// extends BaseAssetController{
 		try {
 			assetList = assetService.searchAssets(assetBean);
 			model.addAttribute("assetList", assetList);
-			departmentList = deptRepo.findAll();
+			//departmentList = deptRepo.findAll();
+			departmentList = new ArrayList<Department>();
+			List<Department> findAll = deptRepo.findAll();
+			findAll.stream()  
+	        .filter(dept-> dept.getName().equalsIgnoreCase("Accounts Branch"))
+	        .map(department->department)
+	        .forEach(dep->
+	        departmentList.add(dep)
+	        );
 			assetStatusList = statusRepo.findAll();
 			assetCategoryList = categoryRepo.findAll();
 		} catch (Exception e) {
@@ -839,12 +918,27 @@ public class CreateAssetController {// extends BaseAssetController{
 		model.addAttribute("assetBean", assetBean);
 		try {
 			fundList = fundHibernateDAO.findAllActiveFunds();
-			departmentList = deptRepo.findAll(); //microserviceUtils.getDepartments();
+			//departmentList = deptRepo.findAll(); //microserviceUtils.getDepartments();
+			departmentList = new ArrayList<Department>();
+			List<Department> findAll = deptRepo.findAll();
+			findAll.stream()  
+	        .filter(dept-> dept.getName().equalsIgnoreCase("Accounts Branch"))
+	        .map(department->department)
+	        .forEach(dep->
+	        departmentList.add(dep)
+	        );
 			modeOfAcquisitionList = acqRepo.findAll();
 			assetStatusList = statusRepo.findAll();
 			assetCategoryList = categoryRepo.findAll();
-			functionList = functionDAO.getAllActiveFunctions();
-			
+			//functionList = functionDAO.getAllActiveFunctions();
+			functionList = new ArrayList<CFunction>();
+			List<CFunction> function=functionDAO.getAllActiveFunctions();
+			function.stream()  
+	        .filter(func-> func.getName().equalsIgnoreCase("Finance Accounts Audit"))
+	        .map(functions->functions)
+	        .forEach(fun->
+	        functionList.add(fun)
+	        );
 			localityList = localityRepo.findAll();
 			blockList = blockRepo.findAll();
 			electionWardList = electionWardRepo.findAll();
@@ -992,7 +1086,15 @@ public class CreateAssetController {// extends BaseAssetController{
 		assetBean = new AssetMaster();
 		model.addAttribute("assetBean", assetBean);
 		try {
-			departmentList = deptRepo.findAll(); //microserviceUtils.getDepartments();
+			//departmentList = deptRepo.findAll(); //microserviceUtils.getDepartments();
+			departmentList = new ArrayList<Department>();
+			List<Department> findAll = deptRepo.findAll();
+			findAll.stream()  
+	        .filter(dept-> dept.getName().equalsIgnoreCase("Accounts Branch"))
+	        .map(department->department)
+	        .forEach(dep->
+	        departmentList.add(dep)
+	        );
 			assetStatusList = statusRepo.findAll();
 			assetCategoryList = categoryRepo.findAll();
 			

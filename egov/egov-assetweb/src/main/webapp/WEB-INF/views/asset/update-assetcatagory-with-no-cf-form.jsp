@@ -260,7 +260,7 @@
 		</tbody>
 	</table>
 	
-		<div class="form-group">
+		<div class="form-popup" id="customForm">
 		<label class="col-sm-3 control-label text-right"><spring:message code="lbl.custom.name" text="Name" /> 
 			<span class="mandatory"></span>
 		</label>
@@ -339,7 +339,7 @@
 	<form:hidden path="customeField.createDate" name="cusCreateDate" value="${customeField.createDate}"/>
 	<form:hidden path="customeField.id" name="cusId" value="${customeField.id}"/>
 	
-	<div align="center">
+	<div id="createbotton" align="center">
 			<input type="submit" class="btn btn-primary" value="update" />
 	</div>
 	

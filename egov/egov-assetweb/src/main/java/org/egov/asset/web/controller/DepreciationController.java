@@ -16,6 +16,8 @@ import org.egov.asset.model.DepreciationList;
 import org.egov.asset.repository.AssetCatagoryRepository;
 import org.egov.asset.service.AssetCatagoryService;
 import org.egov.asset.service.DepreciationService;
+import org.egov.infra.admin.master.entity.Department;
+import org.egov.infra.admin.master.repository.DepartmentRepository;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infstr.services.PersistenceService;
 import org.egov.infstr.utils.EgovMasterDataCaching;
@@ -44,7 +46,8 @@ public class DepreciationController {
 	
 	@Autowired
 	MicroserviceUtils microserviceUtils;
-	
+	@Autowired
+	private DepartmentRepository deptRepo;
 	@Autowired
 	private AssetCatagoryRepository categoryRepo;
 	@Autowired
@@ -52,6 +55,8 @@ public class DepreciationController {
 	@Autowired
     private DepreciationService depreciationService;
 	
+	
+	List<Department> departmentList = new ArrayList<Department>();
 	 @RequestMapping(value = "/createAssetDepreciation", method = RequestMethod.POST)
 		public String newDepreciationForm(@ModelAttribute("Depreciation") final Depreciation depreciation,final Model model,HttpServletRequest request) {
 			System.out.println("calling");
@@ -59,7 +64,15 @@ public class DepreciationController {
 			assetCategoryList = categoryRepo.findAll();
 		  	model.addAttribute("categoryName", assetCategoryList);
 		    model.addAttribute("categoryType", assetCatagoryService.getAssetCatagoryType());
-			model.addAttribute("departments",microserviceUtils.getDepartments());
+			//model.addAttribute("departments",microserviceUtils.getDepartments());
+		    List<Department> findAll = deptRepo.findAll();
+			findAll.stream()  
+	        .filter(dept-> dept.getName().equalsIgnoreCase("Accounts Branch"))
+	        .map(department->department)
+	        .forEach(dep->
+	        departmentList.add(dep)
+	        );
+			model.addAttribute("departments",departmentList);
 			return "depreciation-create";
 		}
 	 	
@@ -158,7 +171,15 @@ public class DepreciationController {
 			assetCategoryList = categoryRepo.findAll();
 		  	model.addAttribute("categoryName", assetCategoryList);
 		    model.addAttribute("categoryType", assetCatagoryService.getAssetCatagoryType());
-			model.addAttribute("departments", microserviceUtils.getDepartments());
+			//model.addAttribute("departments", microserviceUtils.getDepartments());
+			List<Department> findAll = deptRepo.findAll();
+			findAll.stream()  
+	        .filter(dept-> dept.getName().equalsIgnoreCase("Accounts Branch"))
+	        .map(department->department)
+	        .forEach(dep->
+	        departmentList.add(dep)
+	        );
+			model.addAttribute("departments",departmentList);
 	    	return "depreciation-create";
 	    }
 	
