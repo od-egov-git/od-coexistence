@@ -1265,13 +1265,13 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
 	 * public void validateForRTGSPayment(final List<PaymentBean> billList, final
 	 * String type) throws ValidationException, ApplicationException {
 	 */
-    public String validateForRTGSPayment(final List<PaymentBean> billList, final String type)
+    public String validateForRTGSPayment(final List<PaymentBean> billList, final String type,String message)
             throws ValidationException, ApplicationException {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Starting validateForRTGSPayment...");
         getGlcodeIds();
         EntityType entity = null;
-        String message="";
+        //String message="";
         final List<ValidationError> errors = new ArrayList<ValidationError>();
         Object[] obj = null;
         if (billList != null)
@@ -1321,7 +1321,7 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Completed validateForRTGSPayment.");
         
-        return "0";
+        return message;
     }
 
     public void validateForContractorSupplierDetailCodes(final List<PaymentBean> billList, final String type)
