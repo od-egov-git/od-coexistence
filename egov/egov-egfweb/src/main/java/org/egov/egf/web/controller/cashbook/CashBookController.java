@@ -18,13 +18,19 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.egov.collection.entity.MisReceiptDetail;
+import org.egov.commons.CFinancialYear;
+import org.egov.commons.CFunction;
+import org.egov.commons.Fund;
 import org.egov.egf.model.IEStatementEntry;
 import org.egov.egf.model.Statement;
 import org.egov.egf.model.StatementEntry;
 import org.egov.infra.admin.master.service.CityService;
 import org.egov.infra.exception.ApplicationRuntimeException;
+import org.egov.infra.microservice.models.Department;
+import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.reporting.util.ReportUtil;
 import org.egov.infstr.services.PersistenceService;
+import org.egov.services.report.BalanceSheetService;
 import org.hibernate.SQLQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -58,7 +64,7 @@ public class CashBookController {
 	public static final Locale LOCALE = new Locale("en", "IN");
 	public static final SimpleDateFormat DDMMYYYYFORMAT1 = new SimpleDateFormat("dd-MMM-yyyy", LOCALE);
 	private static final long MILLIS_IN_A_YEAR = (long) 1000 * 60 * 60 * 24 * 365;
-	private static final long MILLIS_IN_A_DAY = (long) 1000*60*60*24;
+	private static final long MILLIS_IN_A_DAY = (long) 1000 * 60 * 60 * 24;
 	private static final Logger LOGGER = Logger.getLogger(CashBookController.class);
 	private List<MisReceiptDetail> misReceiptDetails = new ArrayList<MisReceiptDetail>();
 	private List<MisRemittanceDetails> misRemittanceDetails = new ArrayList<MisRemittanceDetails>();
@@ -67,6 +73,8 @@ public class CashBookController {
 	Statement balanceSheet = new Statement();
 	@Autowired
 	BalanceSheetServiceCB balanceSheetService;
+	@Autowired
+	BalanceSheetService balancesheetServiceOld;
 	private BigDecimal incomeOverExpenditureCurr = new BigDecimal(0);
 	private BigDecimal incomeOverExpenditurePrevYear = new BigDecimal(0);
 	private BigDecimal depreciationCurr = new BigDecimal(0);
@@ -90,6 +98,30 @@ public class CashBookController {
 	private BigDecimal investmentDebitAmt = new BigDecimal(0);
 	private BigDecimal investmentCreditAmt = new BigDecimal(0);
 	private String titleName = "";
+	private Date todayDate;
+	@Autowired
+	public MicroserviceUtils microserviceUtils;
+	@Autowired
+	@Qualifier("persistenceService")
+	protected transient PersistenceService persistenceService1;
+	private StringBuffer header = new StringBuffer();
+	public static final SimpleDateFormat DDMMYYYYFORMATS = new SimpleDateFormat("dd/MM/yyyy", LOCALE);
+
+	public PersistenceService getPersistenceService1() {
+		return persistenceService1;
+	}
+
+	public void setPersistenceService1(PersistenceService persistenceService1) {
+		this.persistenceService1 = persistenceService1;
+	}
+
+	public Date getTodayDate() {
+		return todayDate;
+	}
+
+	public void setTodayDate(Date todayDate) {
+		this.todayDate = todayDate;
+	}
 
 	public String getTitleName() {
 		return titleName;
@@ -525,6 +557,50 @@ public class CashBookController {
 		return "cashFlowReport";
 	}
 
+	protected void setRelatedEntitesOn() {
+		setTodayDate(new Date());
+		if (balanceSheet.getFinancialYear() != null && balanceSheet.getFinancialYear().getId() != null)
+			balanceSheet.setFinancialYear((CFinancialYear) getPersistenceService1()
+					.find("from CFinancialYear where id=?", balanceSheet.getFinancialYear().getId()));
+		if (balanceSheet.getDepartment() != null && balanceSheet.getDepartment().getCode() != null
+				&& !balanceSheet.getDepartment().getCode().isEmpty()) {
+			Department dept = microserviceUtils.getDepartmentByCode(balanceSheet.getDepartment().getCode());
+			balanceSheet.setDepartment(dept);
+			header.append(" in " + balanceSheet.getDepartment().getName());
+		} else
+			balanceSheet.setDepartment(null);
+
+		if (balanceSheet.getFund() != null && balanceSheet.getFund().getId() != null
+				&& balanceSheet.getFund().getId() != 0) {
+			balanceSheet.setFund(
+					(Fund) getPersistenceService1().find("from Fund where id=?", balanceSheet.getFund().getId()));
+			header.append(" for " + balanceSheet.getFund().getName());
+		}
+		if (balanceSheet.getFunction() != null && balanceSheet.getFunction().getId() != null
+				&& balanceSheet.getFunction().getId() != 0) {
+			balanceSheet.setFunction((CFunction) getPersistenceService1().find("from CFunction where id=?",
+					balanceSheet.getFunction().getId()));
+			header.append(" for " + balanceSheet.getFunction().getName());
+		}
+
+		if (balanceSheet.getAsOndate() != null)
+			header.append(" as on " + DDMMYYYYFORMATS.format(balanceSheet.getAsOndate()));
+		header.toString();
+	}
+
+	protected void populateDataSource() {
+
+		setRelatedEntitesOn();
+
+		if (balanceSheet.getFund() != null && balanceSheet.getFund().getId() != null) {
+			final List<Fund> selFund = new ArrayList<Fund>();
+			selFund.add(balanceSheet.getFund());
+			balanceSheet.setFunds(selFund);
+		} else
+			balanceSheet.setFunds(balanceSheetService.getFunds());
+		balancesheetServiceOld.populateBalanceSheet(balanceSheet);
+	}
+
 	@RequestMapping(value = "/cashFlow/searchCashFlowReportData", method = RequestMethod.POST, params = "search")
 	public String cashFlowSearchResult(@ModelAttribute("cashFlowReport") final CashBookReportBean cashBookReportBean,
 			final Model model, HttpServletRequest request) {
@@ -536,13 +612,36 @@ public class CashBookController {
 			List<CashFlowReportDataBean> finalBalanceSheetL = new ArrayList<CashFlowReportDataBean>();
 			// for balance sheet
 			Date prevFromDate = new Date(cashBookReportBean.getFromDate().getTime() - MILLIS_IN_A_YEAR);
-			//Date prevToDate = new Date(cashBookReportBean.getToDate().getTime() - MILLIS_IN_A_YEAR);
-			Date prevToDate = new Date(cashBookReportBean.getFromDate().getTime() - MILLIS_IN_A_DAY);
+			Date prevToDate = new Date(cashBookReportBean.getToDate().getTime() - MILLIS_IN_A_YEAR);
+			// Date prevToDate = new Date(cashBookReportBean.getFromDate().getTime() -
+			// MILLIS_IN_A_DAY);
 			// get previous year
-
-			balanceSheetLNow = populateDataSource(cashBookReportBean.getToDate(), cashBookReportBean.getFromDate(),
-					"current");
-			balanceSheetLPrev = populateDataSource(prevToDate, prevFromDate, "prev");
+			balanceSheet.setFromDate(cashBookReportBean.getFromDate());
+			balanceSheet.setToDate(cashBookReportBean.getToDate());
+			balanceSheet.setPeriod("Date");
+			balanceSheet.setFinancialYear(balancesheetServiceOld.getfinancialYear(balanceSheet.getFromDate()));
+			populateDataSource();
+			List<StatementEntry> balanceSheetCurrent = balanceSheet.getEntries();
+			for (StatementEntry obj : balanceSheetCurrent) {
+				System.out.println("Current Year Scene ::gl code ::" + obj.getGlCode() + "## current year total ::"
+						+ obj.getCurrentYearTotal() + "## previous year total::" + obj.getPreviousYearTotal()
+						+ "###fin year ::" + balanceSheet.getFinancialYear());
+			}
+			balanceSheet = new Statement();
+			balanceSheet.setFromDate(prevFromDate);
+			balanceSheet.setToDate(prevToDate);
+			balanceSheet.setPeriod("Date");
+			balanceSheet.setFinancialYear(balancesheetServiceOld.getfinancialYear(balanceSheet.getFromDate()));
+			populateDataSource();
+			List<StatementEntry> balanceSheetPrev = balanceSheet.getEntries();
+			for (StatementEntry obj : balanceSheetPrev) {
+				System.out.println("Previous year scene :: gl code ::" + obj.getGlCode() + "## current year total ::"
+						+ obj.getCurrentYearTotal() + "## previous year total::" + obj.getPreviousYearTotal()
+						+ "###fin year ::" + balanceSheet.getFinancialYear());
+			}
+			balanceSheetLNow = populateDataSourceForList(balanceSheetCurrent, cashBookReportBean.getToDate(),
+					cashBookReportBean.getFromDate(), "current");
+			balanceSheetLPrev = populateDataSourceForList(balanceSheetPrev, prevToDate, prevFromDate, "prev");
 			finalBalanceSheetL = balanceSheetService.getFinalVBalanceSheetList(balanceSheetLNow, balanceSheetLPrev);
 			cashBookReportBean.setaCurrentYear(balanceSheetService.getACurrentYear(lst1, finalBalanceSheetL));
 			cashBookReportBean.setaPrevYear(balanceSheetService.getAPreviousYear(lst1, finalBalanceSheetL));
@@ -552,10 +651,12 @@ public class CashBookController {
 			cashBookReportBean.setcPrevYear(new BigDecimal(0));
 			cashBookReportBean.setAbcCurrentYear(balanceSheetService.getabcCurrentYear(cashBookReportBean));
 			cashBookReportBean.setAbcPrevYear(balanceSheetService.getabcPreviousYear(cashBookReportBean));
-			cashBookReportBean.setAtEndCurr(balanceSheetService.getAtEndCurrentYear(finalBalanceSheetL,cashBookReportBean));
+			cashBookReportBean
+					.setAtEndCurr(balanceSheetService.getAtEndCurrentYear(finalBalanceSheetL, cashBookReportBean));
 			cashBookReportBean.setAtBeginingCurr(finalBalanceSheetL.get(0).getAtBeginingPeriodCurrYear());
 			cashBookReportBean.setAtBeginingPrev(finalBalanceSheetL.get(0).getAtBeginingPeriodPrevYear());
-			cashBookReportBean.setAtEndPrev(balanceSheetService.getatendPrevYear(finalBalanceSheetL,cashBookReportBean));
+			cashBookReportBean
+					.setAtEndPrev(balanceSheetService.getatendPrevYear(finalBalanceSheetL, cashBookReportBean));
 			cashBookReportBean.setFinalBalanceSheetL(finalBalanceSheetL);
 			cashBookReportBean.setCashFlowResultList(lst1);
 			titleName = getUlbName().toUpperCase() + " ";
@@ -591,7 +692,7 @@ public class CashBookController {
 		for (IEStatementEntry ieStatementEntry : resultEntries) {
 			BigDecimal thisYearAmount = new BigDecimal(0);
 			BigDecimal prevYearAmount = new BigDecimal(0);
-			
+
 			Map<String, BigDecimal> thisYearAmountMap = new HashMap<String, BigDecimal>();
 			Map<String, BigDecimal> prevYearAmountMap = new HashMap<String, BigDecimal>();
 			thisYearAmountMap = ieStatementEntry.getNetAmount();
@@ -701,20 +802,15 @@ public class CashBookController {
 		this.cashFlowFinalList = cashFlowFinalList;
 	}
 
-	protected List<CashFlowReportDataBean> populateDataSource(Date toDate, Date fromDate, String yearType) {
+	protected List<CashFlowReportDataBean> populateDataSourceForList(List<StatementEntry> resultEntries, Date toDate,
+			Date fromDate, String yearType) {
 		List<CashFlowReportDataBean> lst1 = new ArrayList<CashFlowReportDataBean>();
 		fixedAssetDebitAmt = balanceSheetService.getFixedAssetDEbitAmount("410", fromDate, toDate);
 		fixedAssetCreditAmt = balanceSheetService.getFixedAssetCreditAmount("410", fromDate, toDate);
 		investmentDebitAmt = balanceSheetService.getInvestmentDEbitAmount("420", fromDate, toDate);
 		investmentCreditAmt = balanceSheetService.getInvestmentCreditAmount("420", fromDate, toDate);
-		balanceSheet = new Statement();
-		balanceSheet.setToDate(toDate);
-		balanceSheet.setFromDate(fromDate);
-		balanceSheet.setFunds(balanceSheetService.getFunds());
-		balanceSheetService.populateBalanceSheet(balanceSheet);
-		List<StatementEntry> resultEntries = new ArrayList<StatementEntry>();
+		
 		List<StatementEntry> ieStatementEntry = new ArrayList<StatementEntry>();
-		resultEntries = balanceSheet.getEntries();
 		CashFlowReportDataBean obj = new CashFlowReportDataBean();
 		ieStatementEntry = resultEntries;
 		// for (StatementEntry ieStatementEntry : resultEntries) {
@@ -725,23 +821,26 @@ public class CashBookController {
 		BigDecimal thisYearAmount = new BigDecimal(0);
 		BigDecimal prevYearAmount = new BigDecimal(0);
 		for (int i = 0; i < resultEntries.size(); i++) {
-			System.out.println("##year::" + yearType + "### glcode::" + ieStatementEntry.get(i).getGlCode() + "::"
-					+ ieStatementEntry.get(i).getCurrentYearTotal() + "::"
-					+ ieStatementEntry.get(i).getPreviousYearTotal());
-			LOGGER.info("##year::" + yearType + "### glcode::" + ieStatementEntry.get(i).getGlCode() + "::"
-					+ ieStatementEntry.get(i).getCurrentYearTotal() + "::"
-					+ ieStatementEntry.get(i).getPreviousYearTotal());
+			/*
+			 * System.out.println("##year::" + yearType + "### glcode::" +
+			 * ieStatementEntry.get(i).getGlCode() + "::" +
+			 * ieStatementEntry.get(i).getCurrentYearTotal() + "::" +
+			 * ieStatementEntry.get(i).getPreviousYearTotal()); LOGGER.info("##year::" +
+			 * yearType + "### glcode::" + ieStatementEntry.get(i).getGlCode() + "::" +
+			 * ieStatementEntry.get(i).getCurrentYearTotal() + "::" +
+			 * ieStatementEntry.get(i).getPreviousYearTotal());
+			 */
 
 			if (ieStatementEntry != null && ieStatementEntry.get(i).getGlCode() != null) {
-				if(ieStatementEntry.get(i).getCurrentYearTotal() == null) {
+				if (ieStatementEntry.get(i).getCurrentYearTotal() == null) {
 					thisYearAmount = new BigDecimal(0);
-					
-				}else {
+
+				} else {
 					thisYearAmount = ieStatementEntry.get(i).getCurrentYearTotal();
 				}
-				if(ieStatementEntry.get(i).getPreviousYearTotal() == null) {
+				if (ieStatementEntry.get(i).getPreviousYearTotal() == null) {
 					prevYearAmount = new BigDecimal(0);
-				}else {
+				} else {
 					prevYearAmount = ieStatementEntry.get(i).getPreviousYearTotal();
 				}
 				if (ieStatementEntry.get(i).getGlCode().equalsIgnoreCase("431")) {
@@ -756,13 +855,13 @@ public class CashBookController {
 				if (ieStatementEntry.get(i).getGlCode().equalsIgnoreCase("460")) {
 					otherCurrentAssetsCurrYear1 = thisYearAmount;
 				}
-				if(ieStatementEntry.get(i).getGlCode().equalsIgnoreCase("470")) {
+				if (ieStatementEntry.get(i).getGlCode().equalsIgnoreCase("470")) {
 					otherCurrentAssetsCurrYear2 = thisYearAmount;
 
 				}
 				obj.setOtherCurrentAssetsCurrYear(otherCurrentAssetsCurrYear1.add(otherCurrentAssetsCurrYear2));
-				LOGGER.info("460 ::otherCurrentAssetsCurrYear1 ::"+otherCurrentAssetsCurrYear1);
-				LOGGER.info("470 :: otherCurrentAssetsCurrYear2 ::"+otherCurrentAssetsCurrYear2);
+				LOGGER.info("460 ::otherCurrentAssetsCurrYear1 ::" + otherCurrentAssetsCurrYear1);
+				LOGGER.info("470 :: otherCurrentAssetsCurrYear2 ::" + otherCurrentAssetsCurrYear2);
 				if (ieStatementEntry.get(i).getGlCode().equalsIgnoreCase("340")) {
 					obj.setDepositsReceivedCurrYear(thisYearAmount);
 
@@ -829,13 +928,13 @@ public class CashBookController {
 				if (ieStatementEntry.get(i).getGlCode().equalsIgnoreCase("460")) {
 					otherCurrentAssetsPrevYear1 = prevYearAmount;
 				}
-				if(ieStatementEntry.get(i).getGlCode().equalsIgnoreCase("470")) {
-					
+				if (ieStatementEntry.get(i).getGlCode().equalsIgnoreCase("470")) {
+
 					otherCurrentAssetsPrevYear2 = prevYearAmount;
 				}
 				obj.setOtherCurrentAssetsPrevYear(otherCurrentAssetsPrevYear1.add(otherCurrentAssetsPrevYear2));
-				LOGGER.info("460 ::otherCurrentAssetsPrevYear1 ::"+otherCurrentAssetsPrevYear1);
-				LOGGER.info("470 :: otherCurrentAssetsPrevYear2 ::"+otherCurrentAssetsPrevYear2);
+				LOGGER.info("460 ::otherCurrentAssetsPrevYear1 ::" + otherCurrentAssetsPrevYear1);
+				LOGGER.info("470 :: otherCurrentAssetsPrevYear2 ::" + otherCurrentAssetsPrevYear2);
 				if (ieStatementEntry.get(i).getGlCode().equalsIgnoreCase("340")) {
 					obj.setDepositsReceivedPrevYear(prevYearAmount);
 
@@ -857,11 +956,11 @@ public class CashBookController {
 				if (ieStatementEntry.get(i).getGlCode().equalsIgnoreCase("450")) {
 					if (yearType.equalsIgnoreCase("current")) {
 						obj.setAtBeginingPeriodCurrYear(prevYearAmount);
-						obj.setAtEndPeriodCurrYear(thisYearAmount);
+						//obj.setAtEndPeriodCurrYear(thisYearAmount);
 					}
 					if (yearType.equalsIgnoreCase("prev")) {
 						obj.setAtBeginingPeriodPrevYear(prevYearAmount);
-						obj.setAtEndPeriodPrevYear(thisYearAmount);
+						//obj.setAtEndPeriodPrevYear(thisYearAmount);
 					}
 				}
 			}
@@ -887,7 +986,7 @@ public class CashBookController {
 	}
 
 	@RequestMapping(value = "/cashFlow/searchCashFlowReportData", params = "exportpdf")
-	//@RequestMapping(value = "/cashFlow/searchCashFlowReportExportData")
+	// @RequestMapping(value = "/cashFlow/searchCashFlowReportExportData")
 	public @ResponseBody void cashFlowExportToPdf(
 			@ModelAttribute("cashFlowReport") final CashBookReportBean cashBookReportBean, final Model model,
 			final HttpServletRequest request) throws IOException, JRException {
@@ -901,16 +1000,40 @@ public class CashBookController {
 			List<CashFlowReportDataBean> balanceSheetLNow = new ArrayList<CashFlowReportDataBean>();
 			List<CashFlowReportDataBean> balanceSheetLPrev = new ArrayList<CashFlowReportDataBean>();
 			List<CashFlowReportDataBean> finalBalanceSheetL = new ArrayList<CashFlowReportDataBean>();
+
 			// for balance sheet
 			Date prevFromDate = new Date(cashBookReportBean.getFromDate().getTime() - MILLIS_IN_A_YEAR);
-			//Date prevToDate = new Date(cashBookReportBean.getToDate().getTime() - MILLIS_IN_A_YEAR);
-			Date prevToDate = new Date(cashBookReportBean.getToDate().getTime() - MILLIS_IN_A_DAY);
+			Date prevToDate = new Date(cashBookReportBean.getToDate().getTime() - MILLIS_IN_A_YEAR);
+			// Date prevToDate = new Date(cashBookReportBean.getFromDate().getTime() - MILLIS_IN_A_DAY);
 			// get previous year
+			balanceSheet.setFromDate(cashBookReportBean.getFromDate());
+			balanceSheet.setToDate(cashBookReportBean.getToDate());
+			balanceSheet.setPeriod("Date");
+			balanceSheet.setFinancialYear(balancesheetServiceOld.getfinancialYear(balanceSheet.getFromDate()));
+			populateDataSource();
+			List<StatementEntry> balanceSheetCurrent = balanceSheet.getEntries();
+			for (StatementEntry obj : balanceSheetCurrent) {
+				LOGGER.info("Current Year Scene ::gl code ::" + obj.getGlCode() + "## current year total ::"
+						+ obj.getCurrentYearTotal() + "## previous year total::" + obj.getPreviousYearTotal()
+						+ "###fin year ::" + balanceSheet.getFinancialYear());
+			}
+			balanceSheet = new Statement();
+			balanceSheet.setFromDate(prevFromDate);
+			balanceSheet.setToDate(prevToDate);
+			balanceSheet.setPeriod("Date");
+			balanceSheet.setFinancialYear(balancesheetServiceOld.getfinancialYear(balanceSheet.getFromDate()));
+			populateDataSource();
+			List<StatementEntry> balanceSheetPrev = balanceSheet.getEntries();
+			for (StatementEntry obj : balanceSheetPrev) {
+				LOGGER.info("Previous year scene :: gl code ::" + obj.getGlCode() + "## current year total ::"
+						+ obj.getCurrentYearTotal() + "## previous year total::" + obj.getPreviousYearTotal()
+						+ "###fin year ::" + balanceSheet.getFinancialYear());
+			}
 
-			balanceSheetLNow = populateDataSource(cashBookReportBean.getToDate(), cashBookReportBean.getFromDate(),
-					"current");
-			
-			balanceSheetLPrev = populateDataSource(prevToDate, prevFromDate, "prev");
+			balanceSheetLNow = populateDataSourceForList(balanceSheetCurrent, cashBookReportBean.getToDate(),
+					cashBookReportBean.getFromDate(), "current");
+
+			balanceSheetLPrev = populateDataSourceForList(balanceSheetPrev, prevToDate, prevFromDate, "prev");
 			finalBalanceSheetL = balanceSheetService.getFinalVBalanceSheetList(balanceSheetLNow, balanceSheetLPrev);
 			cashBookReportBean.setaCurrentYear(balanceSheetService.getACurrentYear(lst1, finalBalanceSheetL));
 			cashBookReportBean.setaPrevYear(balanceSheetService.getAPreviousYear(lst1, finalBalanceSheetL));
@@ -920,10 +1043,12 @@ public class CashBookController {
 			cashBookReportBean.setcPrevYear(new BigDecimal(0));
 			cashBookReportBean.setAbcCurrentYear(balanceSheetService.getabcCurrentYear(cashBookReportBean));
 			cashBookReportBean.setAbcPrevYear(balanceSheetService.getabcPreviousYear(cashBookReportBean));
-			cashBookReportBean.setAtEndCurr(balanceSheetService.getAtEndCurrentYear(finalBalanceSheetL,cashBookReportBean));
+			cashBookReportBean
+					.setAtEndCurr(balanceSheetService.getAtEndCurrentYear(finalBalanceSheetL, cashBookReportBean));
 			cashBookReportBean.setAtBeginingCurr(finalBalanceSheetL.get(0).getAtBeginingPeriodCurrYear());
 			cashBookReportBean.setAtBeginingPrev(finalBalanceSheetL.get(0).getAtBeginingPeriodPrevYear());
-			cashBookReportBean.setAtEndPrev(balanceSheetService.getatendPrevYear(finalBalanceSheetL,cashBookReportBean));
+			cashBookReportBean
+					.setAtEndPrev(balanceSheetService.getatendPrevYear(finalBalanceSheetL, cashBookReportBean));
 			titleName = getUlbName().toUpperCase() + " ";
 			cashBookReportBean.setTitleName(titleName + " Cash Flow Report");
 			cashBookReportBean

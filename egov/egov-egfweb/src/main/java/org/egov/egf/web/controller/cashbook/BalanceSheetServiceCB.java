@@ -616,6 +616,7 @@ public class BalanceSheetServiceCB extends ReportServiceCB {
 			finalObj.setDisposalOfInvestmentsCurrYear(currobj.getDisposalOfInvestmentsCurrYear());
 			finalObj.setAtBeginingPeriodCurrYear(currobj.getAtBeginingPeriodCurrYear());
 			//finalObj.setAtEndPeriodCurrYear(currobj.getAtBeginingPeriodCurrYear().add(cashBookReportBean.getAbcCurrentYear()));;
+			//finalObj.setAtEndPeriodCurrYear(currobj.getAtEndPeriodCurrYear());
 		}
 		if (prevobj != null) {
 			finalObj.setSundryDebtorsPrevYear(
@@ -642,6 +643,7 @@ public class BalanceSheetServiceCB extends ReportServiceCB {
 			finalObj.setDisposalOfInvestmentsPrevYear(prevobj.getDisposalOfInvestmentsPrevYear());
 			finalObj.setAtBeginingPeriodPrevYear(prevobj.getAtBeginingPeriodPrevYear());
 			//finalObj.setAtEndPeriodPrevYear(prevobj.getAtBeginingPeriodPrevYear().add(cashBookReportBean.getAbcPrevYear()));
+			//finalObj.setAtEndPeriodPrevYear(prevobj.getAtEndPeriodPrevYear());
 		}
 		finalBalanceSheetL.add(finalObj);
 		return finalBalanceSheetL;
@@ -775,11 +777,11 @@ public class BalanceSheetServiceCB extends ReportServiceCB {
 				}
 				if(lstObj.getAtEndPeriodCurrYear() == null) {
 					atEndPeriodCurrYear = new BigDecimal(0);
-				}else {
-					atEndPeriodCurrYear = lstObj.getAtEndPeriodCurrYear();
-				}
+				} /*
+					 * else { atEndPeriodCurrYear = lstObj.getAtEndPeriodCurrYear(); }
+					 */
 				obj.setAtBeginingPeriodCurrYear(atBeginingPeriodCurrYear);
-				obj.setAtEndPeriodCurrYear(atEndPeriodCurrYear);
+				//obj.setAtEndPeriodCurrYear(atEndPeriodCurrYear);
 			}
 			if (yearType.equalsIgnoreCase("prev")) {
 				if (lstObj.getCwipPrevYear() == null) {
@@ -814,10 +816,12 @@ public class BalanceSheetServiceCB extends ReportServiceCB {
 				}
 				if(lstObj.getAtEndPeriodPrevYear() == null) {
 					atEndPeriodPrevYear = new BigDecimal(0);
-				}
+				} /*
+					 * else { atEndPeriodPrevYear = lstObj.getAtEndPeriodPrevYear(); }
+					 */
 				obj.setAtBeginingPeriodPrevYear(atBeginingPeriodPrevYear);
 				//obj.setAtEndPeriodPrevYear(atEndPeriodPrevYear);
-				obj.setAtEndPeriodPrevYear(atBeginingPeriodCurrYear);
+				//obj.setAtEndPeriodPrevYear(atBeginingPeriodCurrYear);
 			}
 			obj.setSundryDebtorsCurrYear(sundryDebtorsCurrYear);
 			obj.setSundryDebtorsPrevYear(sundryDebtorsPrevYear);
