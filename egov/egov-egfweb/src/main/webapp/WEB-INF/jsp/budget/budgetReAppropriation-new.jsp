@@ -63,7 +63,7 @@
 }
 </STYLE>
 </head>
-<body>
+<body onload="documentdep();">
 	<%@ include file='common-includes.jsp'%>
 	<jsp:include page="budgetHeader.jsp" />
 	<%@ include file='budgetReAppropriationSetUp.jsp'%>

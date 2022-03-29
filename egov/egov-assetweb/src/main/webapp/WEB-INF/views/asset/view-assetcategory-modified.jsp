@@ -329,7 +329,7 @@
 		</div>
 		</c:if>
 		<c:if test="${ not empty assetCatagory.customeFields}">
-		<div align="center"><input type="button" name="button2" id="button2" value="Close" class="btn btn-primary" onclick="window.parent.postMessage('close','*');window.close();"/></div>
+		<div id="createbotton" align="center"><input type="button" name="button2" id="button2" value="Close" class="btn btn-primary" onclick="window.parent.postMessage('close','*');window.close();"/></div>
 		</c:if>
 		</form:form>
 	</div>	

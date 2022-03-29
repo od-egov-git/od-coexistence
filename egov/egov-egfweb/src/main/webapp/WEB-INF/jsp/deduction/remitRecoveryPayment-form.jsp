@@ -217,7 +217,15 @@ function calcTotal(index,obj){
 	document.getElementById('totalAmount').value =  totalAmount.toFixed(2);
 }
 
-
+function setTotal(){
+	for(var index=0;index<recoveryTableIndex;index++){
+		var partialAmt = parseFloat(document.getElementById('listRemitBean['+index+'].partialAmount').value);
+		totalAmount = parseFloat(totalAmount + partialAmt);
+	}
+	totalAmount= totalAmount.toFixed(2);
+	document.getElementById('totalAmount').value = totalAmount;
+	document.getElementById("remitAmount").innerHTML=totalAmount;
+}
 function calcTotalForPayment(){
  var totalAmount=0;
  var selectedDedRowForPartialPayment='';

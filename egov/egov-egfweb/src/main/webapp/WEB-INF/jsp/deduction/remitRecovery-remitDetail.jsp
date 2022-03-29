@@ -263,6 +263,8 @@ function onLoad1(){
 		disableForm();
 	}
 	documentdep();
+	setTotal();
+	
 }
 function onSubmit()
 {

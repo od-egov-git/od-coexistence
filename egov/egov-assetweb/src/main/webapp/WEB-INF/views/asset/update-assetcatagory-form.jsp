@@ -260,8 +260,8 @@
 			<span class="mandatory"></span>
 		</label>
 		<div class="col-sm-3 add-margin">
-			<form:select path="customeField.customFieldDataType" class="form-control" readonly="true"> 
-			<form:option value="" readonly="true">-select value-</form:option>
+			<form:select path="customeField.customFieldDataType" class="form-control"> 
+			<form:option value="">-select value-</form:option>
 			<form:options items="${customFieldDataType}" itemLabel="DataTypes" itemValue="id"/>
 			</form:select>
 		</div>

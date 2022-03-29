@@ -80,6 +80,7 @@ public class RevaluationController {
 	List<AssetMaster> assetTempList = new ArrayList<AssetMaster>();
 	List<AssetRevaluation> revAssetList = new ArrayList<AssetRevaluation>();
 	List<CFunction> functionList = new ArrayList<CFunction>();
+	
 	List<Fund> fundList = new ArrayList<Fund>();
 	
 
@@ -93,7 +94,14 @@ public class RevaluationController {
 		model.addAttribute("assetBean", assetBean);
 		
 		try {
-			departmentList = deptRepo.findAll();
+			departmentList = new ArrayList<Department>();
+			List<Department> findAll = deptRepo.findAll();
+			findAll.stream()  
+	        .filter(dept-> dept.getName().equalsIgnoreCase("Accounts Branch"))
+	        .map(department->department)
+	        .forEach(dep->
+	        departmentList.add(dep)
+	        );
 			assetStatusList = statusRepo.findByCode("CAPITALIZED");
 			assetCategoryList = categoryRepo.findAll();
 			
@@ -129,7 +137,14 @@ public class RevaluationController {
 		}
 		model.addAttribute("assetList", assetList);
 		try {
-			departmentList = deptRepo.findAll();
+			departmentList = new ArrayList<Department>();
+			List<Department> findAll = deptRepo.findAll();
+			findAll.stream()  
+	        .filter(dept-> dept.getName().equalsIgnoreCase("Accounts Branch"))
+	        .map(department->department)
+	        .forEach(dep->
+	        departmentList.add(dep)
+	        );
 			//departmentList = microserviceUtils.getDepartments();
 			assetStatusList = statusRepo.findByCode("CAPITALIZED");
 			assetCategoryList = categoryRepo.findAll();
@@ -156,7 +171,15 @@ public class RevaluationController {
 		assetRevaluation.setMasterId(assetBean.getId());
 		assetRevaluation.setUpdatedCurrentValue(new BigDecimal(assetBean.getGrossValue())); // change to current value
 		assetRevaluation.setCurrent_value(new BigDecimal(assetBean.getGrossValue())); // change to current value
-		functionList = functionDAO.getAllActiveFunctions();
+		//functionList = functionDAO.getAllActiveFunctions();
+		functionList = new ArrayList<CFunction>();
+		List<CFunction> function=functionDAO.getAllActiveFunctions();
+		function.stream()  
+        .filter(func-> func.getName().equalsIgnoreCase("Finance Accounts Audit"))
+        .map(functions->functions)
+        .forEach(fun->
+        functionList.add(fun)
+        );
 		fundList = fundHibernateDAO.findAllActiveFunds();
 		model.addAttribute("fundList", fundList);
 		model.addAttribute("functionList", functionList);
@@ -228,7 +251,14 @@ public class RevaluationController {
 		assetBean = new AssetMaster();
 		model.addAttribute("assetBean", assetBean);
 		try {
-			departmentList = deptRepo.findAll();
+			departmentList = new ArrayList<Department>();
+			List<Department> findAll = deptRepo.findAll();
+			findAll.stream()  
+	        .filter(dept-> dept.getName().equalsIgnoreCase("Accounts Branch"))
+	        .map(department->department)
+	        .forEach(dep->
+	        departmentList.add(dep)
+	        );
 			//departmentList = microserviceUtils.getDepartments();
 			assetStatusList = statusRepo.findByCode("CAPITALIZED");
 			assetCategoryList = categoryRepo.findAll();
@@ -268,7 +298,14 @@ public class RevaluationController {
 		}
 		model.addAttribute("revAssetList", revAssetList);
 		try {
-			departmentList = deptRepo.findAll();
+			departmentList = new ArrayList<Department>();
+			List<Department> findAll = deptRepo.findAll();
+			findAll.stream()  
+	        .filter(dept-> dept.getName().equalsIgnoreCase("Accounts Branch"))
+	        .map(department->department)
+	        .forEach(dep->
+	        departmentList.add(dep)
+	        );
 			//departmentList = microserviceUtils.getDepartments();
 			assetStatusList = statusRepo.findByCode("CAPITALIZED");
 			assetCategoryList = categoryRepo.findAll();
@@ -292,7 +329,15 @@ public class RevaluationController {
 		assetRevaluation= new AssetRevaluation();
 		assetRevaluation = revaluationRepository.findOne(Long.valueOf(assetId));
 		assetRevaluation.setMasterId(assetRevaluation.getAssetMaster().getId());
-		functionList = functionDAO.getAllActiveFunctions();
+		//functionList = functionDAO.getAllActiveFunctions();
+		functionList = new ArrayList<CFunction>();
+		List<CFunction> function=functionDAO.getAllActiveFunctions();
+		function.stream()  
+        .filter(func-> func.getName().equalsIgnoreCase("Finance Accounts Audit"))
+        .map(functions->functions)
+        .forEach(fun->
+        functionList.add(fun)
+        );
 		fundList = fundHibernateDAO.findAllActiveFunds();
 		model.addAttribute("assetRevaluation", assetRevaluation);
 		model.addAttribute("fundList", fundList);

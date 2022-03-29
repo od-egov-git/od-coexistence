@@ -208,7 +208,12 @@ public class AssetCatagoryService {
 		String updatedDate = dateFormat.format(date);
 		assetCategory.setUpdateDate(updatedDate);
 		if(null!=assetCategory.getCustomeField().getName()) {
-		customField.setDataType(assetCategory.getCustomeField().getCustomFieldDataType().getDataTypes());
+			if(null!=assetCategory.getCustomeField()) {
+				if(null!=assetCategory.getCustomeField().getCustomFieldDataType()) {
+					customField.setDataType(assetCategory.getCustomeField().getCustomFieldDataType().getDataTypes());
+				}
+			}
+		
 		
 		customField.setUpdateDate(updatedDate);
 		customField.setUpdatedBy(assetCategory.getUpdatedBy());
@@ -280,7 +285,8 @@ public class AssetCatagoryService {
 								
 							}if(null!=assetCategory.getCustomeFields().get(i).getCreateDate()) {
 								findOne.getCustomeFields().get(j).setCreateDate(assetCategory.getCustomeFields().get(i).getCreateDate());
-							}if(null!=assetCategory.getCustomeFields().get(i).getCustomFieldDataType().getDataTypes()) {
+							//}if(null!=assetCategory.getCustomeFields().get(i).getCustomFieldDataType().getDataTypes()) {
+							}if(null!=assetCategory.getCustomeFields().get(i).getCustomFieldDataType()) {
 								findOne.getCustomeFields().get(j).getCustomFieldDataType().setDataTypes(assetCategory.getCustomeFields().get(i).getCustomFieldDataType().getDataTypes());
 							}if(null!=assetCategory.getCustomeFields().get(i).getDataType()) {
 								findOne.getCustomeFields().get(j).setDataType(assetCategory.getCustomeFields().get(i).getDataType());
