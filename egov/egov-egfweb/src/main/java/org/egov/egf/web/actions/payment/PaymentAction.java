@@ -950,11 +950,11 @@ public class PaymentAction extends BasePaymentAction {
             //modified by abhishek on 08032022 for RTGS payment 
             
             if (parameters.get("paymentMode")[0].equalsIgnoreCase("RTGS")) {
-                result=paymentService.validateForRTGSPayment(contractorList, "Contractor");
-                result=paymentService.validateForRTGSPayment(supplierList, "Supplier");
+                result=paymentService.validateForRTGSPayment(contractorList, "Contractor",result);
+                result=paymentService.validateForRTGSPayment(supplierList, "Supplier",result);
                 if (billSubType == null || billSubType.equalsIgnoreCase(""))
                     result=paymentService.validateForRTGSPayment(contingentList,
-                            FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT);
+                            FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT,result);
             }
             if(billList!=null)
             {

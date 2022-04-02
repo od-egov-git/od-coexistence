@@ -790,6 +790,7 @@ public class PaymentActionHelper {
 			final Bankaccount account = (Bankaccount) persistenceService.getSession().load(Bankaccount.class,
 					Long.valueOf(commonBean.getAccountNumberId()));
 			detailMap.put(VoucherConstant.GLCODE, account.getChartofaccounts().getGlcode());
+			detailMap.put(VoucherConstant.FUNCTIONCODE,voucherHeader.getVouchermis().getFunction().getCode());
 			accountdetails.add(detailMap);
 			final Map<String, Object> glcodeMap = new HashMap<String, Object>();
 			for (final VoucherDetails voucherDetail : billDetailslist)
