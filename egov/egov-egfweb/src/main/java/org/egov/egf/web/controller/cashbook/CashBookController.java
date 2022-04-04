@@ -964,8 +964,9 @@ public class CashBookController {
 					}
 				}
 			}
-		}
+		
 		lst1.add(obj);
+		}
 		return lst1;
 	}
 
