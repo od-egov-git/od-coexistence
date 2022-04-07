@@ -278,6 +278,44 @@ public class BalanceSheetService extends ReportService {
 		if (removeEntrysWithZeroAmount.equalsIgnoreCase("Yes"))
 			removeEntrysWithZeroAmount(balanceSheet);
 	}
+	public void populateBalanceSheetForCashFlow(final Statement balanceSheet) {
+		try {
+			final List<AppConfigValues> configValues = appConfigValuesService.getConfigValuesByModuleAndKey(
+					FinancialConstants.MODULE_NAME_APPCONFIG,
+					FinancialConstants.REMOVE_ENTRIES_WITH_ZERO_AMOUNT_IN_REPORT);
+
+			for (final AppConfigValues appConfigVal : configValues)
+				removeEntrysWithZeroAmount = appConfigVal.getValue();
+		} catch (final Exception e) {
+			throw new ApplicationRuntimeException(
+					"Appconfig value for remove entries with zero amount in report is not defined in the system");
+		}
+		minorCodeLength = Integer.valueOf(getAppConfigValueFor(Constants.EGF, "coa_minorcode_length"));
+		coaType.add('A');
+		coaType.add('L');
+
+		final Date fromDate = getFromDate(balanceSheet);
+		final Date toDate = getToDate(balanceSheet);
+		String voucherStatusToExclude = getAppConfigValueFor("EGF", "statusexcludeReport");
+		final List<Fund> fundList = balanceSheet.getFunds();
+		final String filterQuery = getFilterQuery(balanceSheet);
+		populateCurrentYearAmountPerFund(balanceSheet, fundList, filterQuery, toDate, fromDate, BS);
+		populatePreviousYearTotals(balanceSheet, filterQuery, toDate, fromDate, BS, "'L','A'");
+		addCurrentOpeningBalancePerFund(balanceSheet, fundList, getTransactionQuery(balanceSheet));
+		addOpeningBalancePrevYear(balanceSheet, getTransactionQuery(balanceSheet), fromDate);
+		final String glCodeForExcessIE = getGlcodeForPurposeCode(7);// purpose is ExcessIE
+		addExcessIEForCurrentYear(balanceSheet, fundList, glCodeForExcessIE, filterQuery, toDate, fromDate);
+		addExcessIEForPreviousYear(balanceSheet, fundList, glCodeForExcessIE, filterQuery, toDate, fromDate);
+		computeCurrentYearTotals(balanceSheet, Constants.LIABILITIES, Constants.ASSETS);
+		populateSchedule(balanceSheet, BS);
+		removeFundsWithNoData(balanceSheet);
+		groupBySubSchedule(balanceSheet);
+		computeTotalAssetsAndLiabilities(balanceSheet);
+		/*
+		 * if (removeEntrysWithZeroAmount.equalsIgnoreCase("Yes"))
+		 * removeEntrysWithZeroAmount(balanceSheet);
+		 */
+	}
 
 	private void computeTotalAssetsAndLiabilities(final Statement balanceSheet) {
 		BigDecimal currentYearTotal = BigDecimal.ZERO;

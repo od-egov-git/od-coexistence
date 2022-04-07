@@ -598,7 +598,7 @@ public class CashBookController {
 			balanceSheet.setFunds(selFund);
 		} else
 			balanceSheet.setFunds(balanceSheetService.getFunds());
-		balancesheetServiceOld.populateBalanceSheet(balanceSheet);
+		balancesheetServiceOld.populateBalanceSheetForCashFlow(balanceSheet);
 	}
 
 	@RequestMapping(value = "/cashFlow/searchCashFlowReportData", method = RequestMethod.POST, params = "search")
@@ -616,6 +616,8 @@ public class CashBookController {
 			// Date prevToDate = new Date(cashBookReportBean.getFromDate().getTime() -
 			// MILLIS_IN_A_DAY);
 			// get previous year
+			balanceSheet = null;
+			balanceSheet = new Statement();
 			balanceSheet.setFromDate(cashBookReportBean.getFromDate());
 			balanceSheet.setToDate(cashBookReportBean.getToDate());
 			balanceSheet.setPeriod("Date");
@@ -627,6 +629,7 @@ public class CashBookController {
 						+ obj.getCurrentYearTotal() + "## previous year total::" + obj.getPreviousYearTotal()
 						+ "###fin year ::" + balanceSheet.getFinancialYear());
 			}
+			balanceSheet = null;
 			balanceSheet = new Statement();
 			balanceSheet.setFromDate(prevFromDate);
 			balanceSheet.setToDate(prevToDate);
@@ -1007,6 +1010,8 @@ public class CashBookController {
 			Date prevToDate = new Date(cashBookReportBean.getToDate().getTime() - MILLIS_IN_A_YEAR);
 			// Date prevToDate = new Date(cashBookReportBean.getFromDate().getTime() - MILLIS_IN_A_DAY);
 			// get previous year
+			balanceSheet = null;
+			balanceSheet = new Statement();
 			balanceSheet.setFromDate(cashBookReportBean.getFromDate());
 			balanceSheet.setToDate(cashBookReportBean.getToDate());
 			balanceSheet.setPeriod("Date");
@@ -1018,6 +1023,7 @@ public class CashBookController {
 						+ obj.getCurrentYearTotal() + "## previous year total::" + obj.getPreviousYearTotal()
 						+ "###fin year ::" + balanceSheet.getFinancialYear());
 			}
+			balanceSheet = null;
 			balanceSheet = new Statement();
 			balanceSheet.setFromDate(prevFromDate);
 			balanceSheet.setToDate(prevToDate);
@@ -1051,9 +1057,9 @@ public class CashBookController {
 			cashBookReportBean
 					.setAtEndPrev(balanceSheetService.getatendPrevYear(finalBalanceSheetL, cashBookReportBean));
 			titleName = getUlbName().toUpperCase() + " ";
-			cashBookReportBean.setTitleName(titleName + " Cash Flow Report");
+			cashBookReportBean.setTitleName(titleName + " Cash Flow Statement");
 			cashBookReportBean
-					.setHeader("Cash Flow Report from " + DDMMYYYYFORMAT1.format(cashBookReportBean.getFromDate())
+					.setHeader("Cash Flow Statement from " + DDMMYYYYFORMAT1.format(cashBookReportBean.getFromDate())
 							+ " to " + DDMMYYYYFORMAT1.format(cashBookReportBean.getToDate()));
 			Map<String, Object> reportParams = new HashMap<String, Object>();
 			reportParams = balanceSheetService.prepareMapForCashFlowReport(lst1, finalBalanceSheetL,
