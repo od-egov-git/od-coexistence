@@ -76,6 +76,7 @@ import org.egov.infra.validation.exception.ValidationException;
 import org.egov.infra.workflow.matrix.entity.WorkFlowMatrix;
 import org.egov.infra.workflow.service.SimpleWorkflowService;
 import org.egov.infstr.services.PersistenceService;
+import org.egov.model.bills.EgBillregister;
 import org.egov.model.voucher.VoucherDetails;
 import org.egov.model.voucher.VoucherTypeBean;
 import org.egov.model.voucher.WorkflowBean;
@@ -238,6 +239,15 @@ public class JournalVoucherActionHelper {
         	voucherHeader.setBackdateentry(voucherHeader.getBackdateentry());
             voucherHeader = voucherService.updateVoucherHeader(voucherHeader, voucherTypeBean);
             LOGGER.info("after update");
+            //added by deep for editing receipt type
+			/*
+			 * if(voucherHeader.getType().equalsIgnoreCase(FinancialConstants.
+			 * JOURNALVOUCHER_NAME_RECEIPT)) { EgBillregister egBillregister =
+			 * voucherService.updateBillForVSubType(billDetailslist, subLedgerlist,
+			 * voucherHeader, voucherTypeBean, new BigDecimal(totaldbamount)); }
+			 */
+          //added by deep for editing receipt type
+            
             voucherService.deleteGLDetailByVHId(voucherHeader.getId());
             voucherHeader.getGeneralLedger().removeAll(voucherHeader.getGeneralLedger());
             boolean CheckSaveAsDraft= true;

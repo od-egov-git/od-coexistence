@@ -1870,6 +1870,19 @@ System.out.println(":::::::::::::"+accountDetail.getGlcodeIdDetail());
 
 	
 	}
-	 
+@Transactional
+	public EgBillregister getegBillRegister(CVoucherHeader voucherHeader) {
+	EgBillregister egBillregister = null;
+	try {
+		System.out.println("::::::::::::::::"+voucherHeader.getId());
+		egBillregister = (EgBillregister) persistenceService.find(
+				"from EgBillregister br where br.egBillregistermis.voucherHeader.id=" + voucherHeader.getId());
+		
+
+	}catch(Exception e) {
+		e.printStackTrace();
+	}
+	return egBillregister;
+}
 
 }
