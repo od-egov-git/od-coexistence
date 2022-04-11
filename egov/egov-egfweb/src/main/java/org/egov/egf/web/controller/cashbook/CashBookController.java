@@ -783,7 +783,7 @@ public class CashBookController {
 					obj.setInvestmentIncomePrevYear(prevYearAmount);
 					investmentIncomePrevYear = prevYearAmount;
 					obj.setInterestIncomeReceivedPrevYear(prevYearAmount);
-					interestIncomeReceivedPrevYear = prevYearAmount;
+					investmentIncomeReceivedPrevYear = prevYearAmount;
 				}
 				obj.setDividendIncomePrevYear(null);
 				dividendIncomePrevYear = new BigDecimal(0);
@@ -904,7 +904,7 @@ public class CashBookController {
 							obj.setInvestmentsCurrYear(investmentDebitAmt);
 						} else {
 							obj.setDisposalOfInvestmentsPrevYear(investmentCreditAmt);
-							obj.setInvestmentsCurrYear(investmentDebitAmt);
+							obj.setInvestmentsPrevYear(investmentDebitAmt);
 						}
 					} catch (Exception e) {
 						e.printStackTrace();
