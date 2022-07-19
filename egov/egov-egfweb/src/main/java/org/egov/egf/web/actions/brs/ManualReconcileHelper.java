@@ -256,7 +256,7 @@ public class ManualReconcileHelper {
 			unreconMap.put("RTGS Payments",creditOthertotal);
 			unreconMap.put("Other Receipts",debitOtherTotal);
 			unreconMap.put("BRS Entry",debitTotalBrsEntry);
-			unreconMap.put("PEX Payments",creditOthertotalPex);
+			//unreconMap.put("PEX Payments",creditOthertotalPex);//comment by Abhishek on 01072022 
 			
 		/*//unReconciledDrCr="Cheque/DD/Cash Payments:"+(creditTotal != null ? creditTotal : "0" )+",RTGS Payments:"+(creditOthertotal!= null ? creditOthertotal : "0")
 		+",Cheque/DD/Cash Receipts:"+(debitTotal!= null ? debitTotal : "0") +",Other Receipts:"+( debitOtherTotal!= null ? debitOtherTotal : "0")+""+
