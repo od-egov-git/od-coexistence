@@ -4,10 +4,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -18,20 +21,37 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.egov.collection.entity.MisReceiptDetail;
+import org.egov.commons.Bankaccount;
+import org.egov.commons.CChartOfAccounts;
 import org.egov.commons.CFinancialYear;
 import org.egov.commons.CFunction;
 import org.egov.commons.Fund;
+import org.egov.commons.Vouchermis;
+import org.egov.commons.dao.FinancialYearDAO;
+import org.egov.egf.commons.EgovCommon;
+import org.egov.egf.model.BankBookEntry;
+import org.egov.egf.model.BankBookViewEntry;
 import org.egov.egf.model.IEStatementEntry;
 import org.egov.egf.model.Statement;
 import org.egov.egf.model.StatementEntry;
+import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.admin.master.service.CityService;
 import org.egov.infra.exception.ApplicationRuntimeException;
 import org.egov.infra.microservice.models.Department;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.reporting.util.ReportUtil;
+import org.egov.infra.validation.exception.ValidationException;
 import org.egov.infstr.services.PersistenceService;
 import org.egov.services.report.BalanceSheetService;
+import org.egov.egf.web.controller.cashbook.*;
+
+import org.egov.utils.Constants;
+import org.egov.utils.FinancialConstants;
+import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.transform.Transformers;
+import org.hibernate.type.BigDecimalType;
+import org.hibernate.type.StandardBasicTypes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -61,6 +81,27 @@ public class CashBookController {
 	private PersistenceService persistenceService;
 	@Autowired
 	private CityService cityService;
+	@Autowired
+	private FinancialYearDAO financialYearDAO;
+	@Autowired
+	private AppConfigValueService appConfigValuesService;
+	private Vouchermis vouchermis = new Vouchermis();
+
+	public Vouchermis getVouchermis() {
+		return vouchermis;
+	}
+
+	public void setVouchermis(Vouchermis vouchermis) {
+		this.vouchermis = vouchermis;
+	}
+
+	private List<BankBookEntry> bankBookEntries = new ArrayList<BankBookEntry>();
+	private static final String EMPTY_STRING = "";
+	private static final String PAYMENT = "Payment";
+	private static final String RECEIPT = "Receipt";
+	private static final String SURRENDERED = "Surrendered";
+	private String queryFrom = "";
+	private Fund fundId = new Fund();
 	public static final Locale LOCALE = new Locale("en", "IN");
 	public static final SimpleDateFormat DDMMYYYYFORMAT1 = new SimpleDateFormat("dd-MMM-yyyy", LOCALE);
 	private static final long MILLIS_IN_A_YEAR = (long) 1000 * 60 * 60 * 24 * 365;
@@ -72,9 +113,9 @@ public class CashBookController {
 	List<CashFlowReportDataBean> cashFlowFinalList = new ArrayList<CashFlowReportDataBean>();
 	Statement balanceSheet = new Statement();
 	@Autowired
-	BalanceSheetServiceCB balanceSheetService;
+	private BalanceSheetServiceCB balanceSheetService;
 	@Autowired
-	BalanceSheetService balancesheetServiceOld;
+	private BalanceSheetService balancesheetServiceOld;
 	private BigDecimal incomeOverExpenditureCurr = new BigDecimal(0);
 	private BigDecimal incomeOverExpenditurePrevYear = new BigDecimal(0);
 	private BigDecimal depreciationCurr = new BigDecimal(0);
@@ -99,6 +140,51 @@ public class CashBookController {
 	private BigDecimal investmentCreditAmt = new BigDecimal(0);
 	private String titleName = "";
 	private Date todayDate;
+	private Date startDate = new Date();
+	private Date endDate = new Date();
+	private String getInstrumentsByVoucherIdsQuery = "";
+	private Map<Long, List<Object[]>> voucherIdAndInstrumentMap = new HashMap<Long, List<Object[]>>();
+	private Map<Long, List<Object[]>> InstrumentHeaderIdsAndInstrumentVouchersMap = new HashMap<Long, List<Object[]>>();
+	private List<CashBookViewEntry> bankBookViewEntries = new ArrayList<CashBookViewEntry>();
+	private boolean isCreditOpeningBalance = false;
+	@Autowired
+	private EgovCommon egovCommon;
+	private final List<String> voucherNo = new ArrayList<String>();
+	private String chequeStatus = EMPTY_STRING;
+	private final SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+	private String voucherStr = "";
+	String voucherNumber = EMPTY_STRING;
+	String chequeNumber = "";
+	BigDecimal receiptTotal = BigDecimal.ZERO;
+	BigDecimal paymentTotal = BigDecimal.ZERO;
+	BigDecimal initialBalance = new BigDecimal(0);
+	List<BankBookEntry> entries = new ArrayList<BankBookEntry>();
+	private Bankaccount bankAccount;
+
+	public EgovCommon getEgovCommon() {
+		return egovCommon;
+	}
+
+	public void setEgovCommon(final EgovCommon egovCommon) {
+		this.egovCommon = egovCommon;
+	}
+
+	public Date getStartDate() {
+		return startDate;
+	}
+
+	public void setStartDate(Date startDate) {
+		this.startDate = startDate;
+	}
+
+	public Date getEndDate() {
+		return endDate;
+	}
+
+	public void setEndDate(Date endDate) {
+		this.endDate = endDate;
+	}
+
 	@Autowired
 	public MicroserviceUtils microserviceUtils;
 	@Autowired
@@ -275,98 +361,503 @@ public class CashBookController {
 	public String cashBookSearchResult(@ModelAttribute("cashBookReport") final CashBookReportBean cashBookReportBean,
 			final Model model, HttpServletRequest request) {
 		try {
+			String errMsg = null;
+			List<BankBookEntry> results = new ArrayList<BankBookEntry>();
+
 			titleName = getUlbName().toUpperCase() + " ";
-			final StringBuffer recQuery = new StringBuffer(500);
+			startDate = cashBookReportBean.getFromDate();
+			endDate = cashBookReportBean.getToDate();
+			CFinancialYear financialYear = financialYearDAO.getFinYearByDate(startDate);
+			Date endingDate = financialYear.getEndingDate();
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			String endFormat = formatter.format(endDate);
+			String endFormat1 = formatter.format(endingDate);
+			if (endFormat.compareTo(endFormat1) > 0) {
+				errMsg = "End date should be within a financial year";
 
-			List<Object[]> recqueryList = null;
-			recQuery.append("SELECT receiptdate, recvoucherno, recparticulars, paymentmode, recchequeno, recamount\n"
-					+ " FROM receipt_report_view m where ")
-					.append(getCashBooDateQuery(cashBookReportBean.getFromDate(), cashBookReportBean.getToDate()));
-			SQLQuery rec = persistenceService.getSession().createSQLQuery(recQuery.toString());
-			recqueryList = rec.list();
-			final StringBuffer payQuery = new StringBuffer(500);
-			List<Object[]> payqueryList = null;
-			payQuery.append("SELECT paydate, payvoucherno, payparticulars, payamount, paymentmode, paychequeno\n"
-					+ "FROM payment_report_view m where ")
-					.append(getpaySideCashBooDateQuery(cashBookReportBean.getFromDate(),
-							cashBookReportBean.getToDate()));
-			SQLQuery pay = persistenceService.getSession().createSQLQuery(payQuery.toString());
-			payqueryList = pay.list();
-			// populating receipt object
-			if (recqueryList != null) {
-				for (Object[] recObj : recqueryList) {
-					CashBookReportDataBean obj = new CashBookReportDataBean();
-					obj.setReceiptDate(recObj[0].toString() == null ? "" : DDMMYYYYFORMAT1.format(recObj[1]));
-					obj.setRecVoucherNo(recObj[1].toString() == null ? "" : recObj[1].toString());
-					obj.setRecParticulars(recObj[2].toString() == null ? "" : recObj[2].toString());
-					obj.setRecLF("");
-					if (recObj[3].toString().equalsIgnoreCase("cash")) {
-						obj.setRecCash(recObj[5].toString());
-						obj.setRecChequeNo("");
-					}
-					if (recObj[3].toString().equalsIgnoreCase("cheque")) {
-						obj.setRecCash("");
-						obj.setRecChequeNo(recObj[4].toString());
-					}
-					if (recObj[3].toString().equalsIgnoreCase("DD")) {
-						obj.setRecCash("");
-						obj.setRecChequeNo(recObj[4].toString());
-					}
-
-					obj.setRecAmount(recObj[5].toString() == null ? "" : recObj[5].toString());
-					obj.setPayDate("");
-					obj.setPayVoucherNo("");
-					obj.setPayParticulars("");
-					obj.setPayAmount("");
-					obj.setPayLF("");
-					obj.setPayCash("");
-					obj.setPayChequeNo("");
-
-					finalList.add(obj);
-					// receiptMap.put(recObj[0].toString(),obj);
-				}
 			}
-			// populating payment object
-			if (payqueryList != null) {
-				for (Object[] payObj : payqueryList) {
-					CashBookReportDataBean obj = new CashBookReportDataBean();
-					obj.setReceiptDate("");
-					obj.setRecVoucherNo("");
-					obj.setRecParticulars("");
-					obj.setRecAmount("");
-					obj.setRecLF("");
-					obj.setRecCash("");
-					obj.setRecChequeNo("");
-					obj.setPayDate(payObj[0].toString() == null ? "" : DDMMYYYYFORMAT1.format(payObj[0]));
-					obj.setPayVoucherNo(payObj[1].toString() == null ? "" : payObj[1].toString());
-					obj.setPayParticulars(payObj[2].toString() == null ? "" : payObj[2].toString());
-					obj.setPayAmount(payObj[3].toString() == null ? "" : payObj[3].toString());
-					obj.setPayLF("");
-					if (payObj[4].toString().equalsIgnoreCase("Cash")) {
-						obj.setPayCash(payObj[3].toString() == null ? "" : payObj[3].toString());
-						obj.setPayChequeNo("");
-					}
-					if (payObj[4].toString().equalsIgnoreCase("Cheque")) {
-						obj.setPayCash("");
-						obj.setPayChequeNo(payObj[5].toString() == null ? "" : payObj[5].toString());
-					}
-					if (payObj[4].toString().equalsIgnoreCase("DD")) {
-						obj.setPayCash("");
-						obj.setPayChequeNo(payObj[5].toString() == null ? "" : payObj[5].toString());
-					}
-					finalList.add(obj);
-				}
+			setTodayDate(new Date());
+			List<Bankaccount> bankAccountL = new ArrayList<Bankaccount>();
+			List<Object[]> objs = persistenceService.getSession().createQuery(
+					"select DISTINCT(b.chartofaccounts.glcode) as glcode,b.fund.id as fundId,f.code as fundcode "
+							+ "from Bankaccount b,Fund f where b.fund.id = f.id group by b.fund.id,b.chartofaccounts.glcode,f.code")
+					.list();
+			for (Object[] obj : objs) {
+				Fund fund = new Fund();
+				fund.setId((Integer) obj[1]);
+				fund.setCode(obj[2].toString());
+				CChartOfAccounts c = new CChartOfAccounts();
+				c.setGlcode(obj[0].toString());
+				Bankaccount b = new Bankaccount();
+				b.setChartofaccounts(c);
+				b.setFund(fund);
+				bankAccountL.add(b);
 			}
-			cashBookReportBean.setCashBookResultList(finalList);
-			cashBookReportBean.setTitleName(titleName + " Cash Book Report");
-			cashBookReportBean
-					.setHeader("Cash Book Report from " + DDMMYYYYFORMAT1.format(cashBookReportBean.getFromDate())
-							+ " to " + DDMMYYYYFORMAT1.format(cashBookReportBean.getToDate()));
-			model.addAttribute("cashBookReport", cashBookReportBean);
+			for (Bankaccount bAcc : bankAccountL) {
+				results = getResults(bAcc.getChartofaccounts().getGlcode());
+				addRowsToBankBookEntries(results, bAcc.getChartofaccounts().getGlcode(), bAcc.getFund().getCode());
+				/*
+				 * for (BankBookEntry obj : results1) { results.add(obj); }
+				 */
+			}
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
+		cashBookReportBean.setCashBookResultList(bankBookViewEntries);
+		cashBookReportBean.setTitleName(titleName + " Cash Book Report");
+		cashBookReportBean.setHeader("Cash Book Report from " + DDMMYYYYFORMAT1.format(cashBookReportBean.getFromDate())
+				+ " to " + DDMMYYYYFORMAT1.format(cashBookReportBean.getToDate()));
+
+		model.addAttribute("cashBookReport", cashBookReportBean);
+
 		return "cashBookReport";
+	}
+
+	private void addRowsToBankBookEntries(List<BankBookEntry> results, String glCodeParam, String fundCodePAram) {
+		Map<String, BankBookEntry> voucherNumberAndEntryMap = new HashMap<String, BankBookEntry>();
+		List<String> multipleChequeVoucherNumber = new ArrayList<String>();
+		List<BankBookEntry> rowsToBeRemoved = new ArrayList<BankBookEntry>();
+		Iterator<BankBookEntry> itr = results.iterator();
+		while (itr.hasNext()) {
+			// for (BankBookEntry row : results) {
+			BankBookEntry row = itr.next();
+			if (row.getType().equalsIgnoreCase(RECEIPT))
+				row.setType(RECEIPT);
+			else
+				row.setType(PAYMENT);
+			boolean shouldAddRow = true;
+			if (voucherNumberAndEntryMap.containsKey(row.getVoucherNumber())) {
+				if (SURRENDERED.equalsIgnoreCase(row.getInstrumentStatus())
+						|| FinancialConstants.INSTRUMENT_SURRENDERED_FOR_REASSIGN_STATUS
+								.equalsIgnoreCase(row.getInstrumentStatus()))
+					shouldAddRow = false;
+				else {
+					final BankBookEntry entryInMap = voucherNumberAndEntryMap.get(row.getVoucherNumber());
+					if ((SURRENDERED.equalsIgnoreCase(entryInMap.getInstrumentStatus())
+							|| FinancialConstants.INSTRUMENT_SURRENDERED_FOR_REASSIGN_STATUS
+									.equalsIgnoreCase(entryInMap.getInstrumentStatus()))
+							&& (!SURRENDERED.equalsIgnoreCase(row.getInstrumentStatus())
+									|| !FinancialConstants.INSTRUMENT_SURRENDERED_FOR_REASSIGN_STATUS
+											.equalsIgnoreCase(row.getInstrumentStatus()))) {
+						rowsToBeRemoved.add(entryInMap);
+						voucherNumberAndEntryMap.put(row.getVoucherNumber(), row);
+					} else if (row.getVoucherDate().compareTo(entryInMap.getVoucherDate()) == 0
+							&& row.getParticulars().equalsIgnoreCase(entryInMap.getParticulars())
+							&& row.getAmount().equals(entryInMap.getAmount())
+							&& !SURRENDERED.equalsIgnoreCase(entryInMap.getInstrumentStatus())) {
+						multipleChequeVoucherNumber.add(row.getVoucherNumber());
+						shouldAddRow = false;
+					} else
+						shouldAddRow = true;
+				}
+			} else
+				voucherNumberAndEntryMap.put(row.getVoucherNumber(), row);
+			if (shouldAddRow)
+				bankBookEntries.add(row);
+		}
+		if (!bankBookEntries.isEmpty()) {
+			computeTotals(glCodeParam, fundCodePAram, multipleChequeVoucherNumber, rowsToBeRemoved);
+			prepareViewObject();
+		}
+
+	}
+
+	private void getInstrumentsByVoucherIds() {
+		String mainQuery = "";
+		queryFrom = " FROM VOUCHERHEADER vh";
+		mainQuery = "SELECT vh2.id,ih2.instrumentnumber,es2.code,ih2.id as instrumentHeaderId ,ih2.instrumentdate, ih2.transactionnumber, ih2.transactiondate";
+		getInstrumentsByVoucherIdsQuery = " FROM VOUCHERHEADER vh2,egf_instrumentvoucher iv2 ,egf_instrumentheader ih2 ,egw_status es2 WHERE vh2.id = iv2.voucherheaderid AND iv2.instrumentheaderid=ih2.id"
+				+ " AND ih2.id_status = es2.id AND vh2.id in (select vh.id as vhId" + queryFrom + ")";
+		mainQuery = mainQuery + getInstrumentsByVoucherIdsQuery;
+
+		final List<Object[]> objs = persistenceService.getSession().createSQLQuery(mainQuery).list();
+
+		for (final Object[] obj : objs)
+			if (voucherIdAndInstrumentMap.containsKey(getLongValue(obj[0])))
+				voucherIdAndInstrumentMap.get(getLongValue(obj[0])).add(obj);
+			else {
+				final List<Object[]> instrumentVouchers = new ArrayList<Object[]>();
+				instrumentVouchers.add(obj);
+				voucherIdAndInstrumentMap.put(getLongValue(obj[0]), instrumentVouchers);
+			}
+	}
+
+	private void getInstrumentVouchersByInstrumentHeaderIds() {
+
+		final List<Object[]> objs = persistenceService.getSession()
+				.createSQLQuery("SELECT ih.id,vh1.id as voucherHeaderId"
+						+ " FROM VOUCHERHEADER vh1,egf_instrumentvoucher iv ,egf_instrumentheader ih,egw_status es1 WHERE vh1.id = iv.voucherheaderid AND iv.instrumentheaderid=ih.id"
+						+ " AND ih.id_status = es1.id AND ih.id in (select ih2.id as instrHeaderId "
+						+ getInstrumentsByVoucherIdsQuery + ")")
+				.list();
+
+		for (final Object[] obj : objs)
+			if (InstrumentHeaderIdsAndInstrumentVouchersMap.containsKey(getLongValue(obj[0])))
+				InstrumentHeaderIdsAndInstrumentVouchersMap.get(getLongValue(obj[0])).add(obj);
+			else {
+				final List<Object[]> instrumentVouchers = new ArrayList<Object[]>();
+				instrumentVouchers.add(obj);
+				InstrumentHeaderIdsAndInstrumentVouchersMap.put(getLongValue(obj[0]), instrumentVouchers);
+			}
+	}
+
+	private BankBookEntry getInitialAccountBalance(final String glCode, final String fundCode, final String deptCode) {
+		final Calendar calendar = Calendar.getInstance();
+		calendar.setTime(startDate);
+		calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DATE));
+		BigDecimal amount = egovCommon.getAccountBalanceforDate(calendar.getTime(), glCode, fundCode, null, null,
+				deptCode);
+		BankBookEntry initialOpeningBalance = new BankBookEntry("To Opening Balance",
+				egovCommon.getAccountBalanceforDate(calendar.getTime(), glCode, fundCode, null, null, deptCode),
+				RECEIPT, BigDecimal.ZERO, BigDecimal.ZERO);
+		return initialOpeningBalance;
+	}
+
+	private void computeTotals(final String glCode, final String fundCode,
+			final List<String> multipleChequeVoucherNumber, final List<BankBookEntry> rowsToBeRemoved) {
+
+		getInstrumentsByVoucherIds();
+		getInstrumentVouchersByInstrumentHeaderIds();
+
+		BankBookEntry initialOpeningBalance = getInitialAccountBalance(glCode, fundCode,
+				getVouchermis().getDepartmentcode());
+		entries.add(initialOpeningBalance);
+		Date date = bankBookEntries.get(0).getVoucherDate();
+		String voucherNumber = EMPTY_STRING;
+		String chequeNumber = "";
+		/*
+		 * BigDecimal receiptTotal = BigDecimal.ZERO; BigDecimal paymentTotal =
+		 * BigDecimal.ZERO; BigDecimal
+		 */initialBalance = initialOpeningBalance.getAmount();
+		if (LOGGER.isDebugEnabled())
+			LOGGER.debug("Inside computeTotals()");
+		Iterator<BankBookEntry> iter = bankBookEntries.iterator();
+
+		while (iter.hasNext()) {
+			// for (final BankBookEntry bankBookEntry : bankBookEntries) {
+			BankBookEntry bankBookEntry = iter.next();
+			if (initialBalance.longValue() < 0)
+				isCreditOpeningBalance = true;
+			if (!rowsToBeRemoved.contains(bankBookEntry)) {
+				/*
+				 * // for a voucher // there could be // multiple // surrendered // cheques //
+				 * associated // with it. remove the dupicate rows
+				 */				
+				if (bankBookEntry.voucherDate != null && date != null) {
+					if (bankBookEntry.voucherDate.compareTo(date) != 0) {
+						date = bankBookEntry.getVoucherDate();
+						final BigDecimal closingBalance = initialBalance.add(receiptTotal).subtract(paymentTotal);
+						if (closingBalance.longValue() < 0) {
+							entries.add(new BankBookEntry("Closing:By Balance c/d", closingBalance, PAYMENT,
+									BigDecimal.ZERO, BigDecimal.ZERO));
+							if (isCreditOpeningBalance)
+								entries.add(new BankBookEntry("Total", BigDecimal.ZERO, RECEIPT,
+										closingBalance.abs().add(receiptTotal),
+										initialBalance.abs().add(paymentTotal)));
+							else
+								entries.add(new BankBookEntry("Total", BigDecimal.ZERO, RECEIPT,
+										initialBalance.abs().add(receiptTotal).add(closingBalance.abs()),
+										paymentTotal));
+							entries.add(new BankBookEntry("To Opening Balance", closingBalance, RECEIPT,
+									BigDecimal.ZERO, BigDecimal.ZERO));
+						} else {
+							entries.add(new BankBookEntry("Closing:By Balance c/d", closingBalance, RECEIPT,
+									BigDecimal.ZERO, BigDecimal.ZERO));
+							if (isCreditOpeningBalance)
+								entries.add(new BankBookEntry("Total", BigDecimal.ZERO, RECEIPT, receiptTotal,
+										closingBalance.abs().add(paymentTotal).add(initialBalance.abs())));
+							else
+								entries.add(new BankBookEntry("Total", BigDecimal.ZERO, RECEIPT,
+										initialBalance.abs().add(receiptTotal),
+										closingBalance.abs().add(paymentTotal)));
+							entries.add(new BankBookEntry("To Opening Balance", closingBalance, PAYMENT,
+									BigDecimal.ZERO, BigDecimal.ZERO));
+						}
+
+						receiptTotal = BigDecimal.ZERO;
+						paymentTotal = BigDecimal.ZERO;
+						initialBalance = closingBalance;
+						isCreditOpeningBalance = false;
+					}
+				}
+				if (bankBookEntry.getVoucherNumber() != null && voucherNumber != null) {
+					if (RECEIPT.equalsIgnoreCase(bankBookEntry.getType())
+							&& !voucherNumber.equalsIgnoreCase(bankBookEntry.getVoucherNumber()))
+						receiptTotal = receiptTotal.add(bankBookEntry.getAmount());
+					else if (!voucherNumber.equalsIgnoreCase(bankBookEntry.getVoucherNumber()))
+						paymentTotal = paymentTotal.add(bankBookEntry.getAmount());
+					if (SURRENDERED.equalsIgnoreCase(bankBookEntry.getInstrumentStatus()))
+						bankBookEntry.setChequeDetail(EMPTY_STRING);
+					if (multipleChequeVoucherNumber.contains(bankBookEntry.getVoucherNumber())) {
+						bankBookEntry.setChequeDetail("MULTIPLE");// Set the cheque
+																	// details to
+																	// MULTIPLE if
+																	// the voucher
+																	// has multiple
+						// cheques assigned to it
+						final List<Object[]> chequeDetails = voucherIdAndInstrumentMap
+								.get(bankBookEntry.getVoucherId().longValue());
+						final StringBuffer listofcheque = new StringBuffer(100);
+						String chequeNos = " ";
+						String chequeComp = " ";
+
+						if (!voucherNo.contains(bankBookEntry.getVoucherNumber()) && chequeDetails != null) {
+							for (final Object[] iv : chequeDetails) {
+								chequeNumber = getStringValue(iv[1]);
+								chequeStatus = " ";
+								chequeStatus = getStringValue(iv[2]);
+								if (!(SURRENDERED.equalsIgnoreCase(chequeStatus)
+										|| FinancialConstants.INSTRUMENT_SURRENDERED_FOR_REASSIGN_STATUS
+												.equalsIgnoreCase(chequeStatus))) {
+
+									if (isInstrumentMultiVoucherMapped(getLongValue(iv[3]))) {
+										final String chqDate = sdf.format(getDateValue(iv[4]));
+										chequeComp = chequeNumber + " " + chqDate + "-MULTIPLE";
+									}
+
+									listofcheque.append(getStringValue(iv[1])).append(" ")
+											.append(getDateValue(iv[4]) != null ? sdf.format(getDateValue(iv[4])) : "");
+									// String
+									// chqDate=sdf.format(iv.getInstrumentHeaderId().getInstrumentDate());
+									if (chequeComp.contains("-MULTIPLE")) {
+										listofcheque.append(" ").append("-MULTIPLE,");
+										chequeComp = " ";
+									} else
+										listofcheque.append(" ").append(",");
+								}
+							}
+							chequeNos = listofcheque.toString();
+							if (chequeNos.length() > 1)
+								chequeNos = chequeNos.substring(0, chequeNos.length() - 1);
+
+							bankBookEntry.setChequeNumber(chequeNos);
+							voucherNumber = bankBookEntry.getVoucherNumber();
+							entries.add(bankBookEntry);
+							voucherNo.add(bankBookEntry.getVoucherNumber());
+						}
+
+					} else {
+						if (bankBookEntry.getVoucherId() != null) {
+							voucherStr = " ";
+							List<Object[]> instrumentVoucherList = new ArrayList<Object[]>();
+							instrumentVoucherList = voucherIdAndInstrumentMap
+									.get(bankBookEntry.getVoucherId().longValue());
+							if (instrumentVoucherList != null)
+								for (final Object[] instrumentVoucher : instrumentVoucherList)
+									try {
+										chequeNumber = getStringValue(instrumentVoucher[1]);
+										chequeStatus = " ";
+										chequeStatus = getStringValue(instrumentVoucher[2]);
+										if (!(SURRENDERED.equalsIgnoreCase(chequeStatus)
+												|| FinancialConstants.INSTRUMENT_SURRENDERED_FOR_REASSIGN_STATUS
+														.equalsIgnoreCase(chequeStatus)))
+											if (isInstrumentMultiVoucherMapped(getLongValue(instrumentVoucher[3]))) {
+												if (chequeNumber != null && !chequeNumber.equalsIgnoreCase("")) {
+													final String chqDate = getDateValue(instrumentVoucher[4]) != null
+															? sdf.format(getDateValue(instrumentVoucher[4]))
+															: "";
+													voucherStr = chequeNumber + " " + chqDate + "-MULTIPLE";
+												} else {
+													chequeNumber = getStringValue(instrumentVoucher[5]);
+													final String chqDate = getDateValue(instrumentVoucher[6]) != null
+															? sdf.format(getDateValue(instrumentVoucher[6]))
+															: "";
+													voucherStr = chequeNumber + " " + chqDate + "-MULTIPLE";
+												}
+											} else if (chequeNumber != null && !chequeNumber.equalsIgnoreCase("")) {
+												final String chqDate = getDateValue(instrumentVoucher[4]) != null
+														? sdf.format(getDateValue(instrumentVoucher[4]))
+														: "";
+												voucherStr = chequeNumber + " " + chqDate;
+											} else { // voucherStr=" ";
+												chequeNumber = getStringValue(instrumentVoucher[5]);
+												final String chqDate = sdf.format(getDateValue(instrumentVoucher[6]));
+												voucherStr = chequeNumber + " " + chqDate;
+												// }
+											}
+
+									} catch (final NumberFormatException ex) {
+									}
+							bankBookEntry.setChequeDetail(voucherStr);
+							entries.add(bankBookEntry);
+							voucherNo.add(bankBookEntry.getVoucherNumber());
+						}
+					}
+				}
+				voucherNumber = bankBookEntry.getVoucherNumber();
+			}
+
+		}
+		String vhNum = EMPTY_STRING;
+		for (final BankBookEntry bankBookEntry : bankBookEntries)
+			if (bankBookEntry.voucherNumber.equalsIgnoreCase(vhNum)) { // this
+																		// is to
+																		// handle
+																		// multiple
+																		// debits
+																		// or
+																		// credits
+																		// for a
+				// single voucher.
+				bankBookEntry.setVoucherDate(null);
+				bankBookEntry.setAmount(null);
+				bankBookEntry.setVoucherNumber(EMPTY_STRING);
+			} else
+				vhNum = bankBookEntry.getVoucherNumber();
+		// adding total,closing and opening balance to the last group
+		addTotalsSection(initialBalance, paymentTotal, receiptTotal, entries);
+		bankBookEntries = entries;
+		if (LOGGER.isDebugEnabled())
+			LOGGER.debug("End of computeTotals()");
+
+	}
+
+	private void prepareViewObject() {
+		for (BankBookEntry row : bankBookEntries) {
+			CashBookViewEntry bankBookViewEntry = new CashBookViewEntry();
+			if ("Total".equalsIgnoreCase(row.getParticulars())) {
+				bankBookViewEntry.setReceiptAmount(row.getReceiptAmount());
+				bankBookViewEntry.setReceiptParticulars(row.getParticulars());
+				bankBookViewEntry.setPaymentAmount(row.getReceiptAmount());
+				bankBookViewEntry.setPaymentParticulars(row.getParticulars());
+			} else if ("To Opening Balance".equalsIgnoreCase(row.getParticulars())) {
+				final BigDecimal amt = row.getAmount();
+				if (amt.longValue() < 0) {
+					bankBookViewEntry.setPaymentAmount(amt.abs());
+					bankBookViewEntry.setPaymentParticulars(row.getParticulars());
+				} else {
+					bankBookViewEntry.setReceiptAmount(amt.abs());
+					bankBookViewEntry.setReceiptParticulars(row.getParticulars());
+				}
+			} else if ("Closing:By Balance c/d".equalsIgnoreCase(row.getParticulars())) {
+				final BigDecimal amt = row.getAmount();
+				if (amt.longValue() < 0) {
+					bankBookViewEntry.setReceiptAmount(amt.abs());
+					bankBookViewEntry.setReceiptParticulars(row.getParticulars());
+				} else {
+					bankBookViewEntry.setPaymentAmount(amt.abs());
+					bankBookViewEntry.setPaymentParticulars(row.getParticulars());
+				}
+
+			} else {
+				final String voucherDate = row.getVoucherDate() == null ? ""
+						: Constants.DDMMYYYYFORMAT2.format(row.getVoucherDate());
+
+				if (row.getType().equalsIgnoreCase(RECEIPT)) {
+
+					bankBookViewEntry = new CashBookViewEntry(row.getVoucherNumber(), voucherDate, row.getParticulars(),
+							row.getAmount(), row.getChequeDetail(), RECEIPT, row.getChequeNumber());
+					bankBookViewEntry.setVoucherId(row.getVoucherId().longValue());
+					String arr[] = row.getParticulars().split("-");
+					if (arr[1].toUpperCase().contains("CASH")) {
+						bankBookViewEntry.setReceiptCash(row.getAmount());
+						bankBookViewEntry.setReceiptAmount(new BigDecimal(0));
+
+					} else {
+						bankBookViewEntry.setReceiptCash(new BigDecimal(0));
+						bankBookViewEntry.setReceiptAmount(row.getAmount());
+					}
+				} else {
+					bankBookViewEntry = new CashBookViewEntry(row.getVoucherNumber(), voucherDate, row.getParticulars(),
+							row.getAmount(), row.getChequeDetail(), PAYMENT, row.getChequeNumber());
+					bankBookViewEntry.setVoucherId(row.getVoucherId().longValue());
+					String arr[] = row.getParticulars().split("-");
+					if (arr[1].toUpperCase().contains("CASH")) {
+						bankBookViewEntry.setPaymentCash(row.getAmount());
+						bankBookViewEntry.setPaymentAmount(new BigDecimal(0));
+
+					} else {
+						bankBookViewEntry.setPaymentCash(new BigDecimal(0));
+						bankBookViewEntry.setPaymentAmount(row.getAmount());
+					}
+				}
+			}
+			bankBookViewEntries.add(bankBookViewEntry);
+		}
+	}
+
+	private List<BankBookEntry> getResults(final String glCode1) {
+		final String miscQuery = getMiscQuery();
+		String OrderBy = "";
+		final String voucherStatusToExclude = getAppConfigValueFor("EGF", "statusexcludeReport");
+		final String query1 = "SELECT distinct vh.id as voucherId,vh.voucherDate AS voucherDate, vh.voucherNumber AS voucherNumber,"
+				+ " gl.glcode||' - ('||c.name||')-'||vh.description||'-'||case when sum(gl.debitAmount)  = 0 then (case sum(gl.creditamount) when 0 then sum(gl.creditAmount)||'.00cr' when floor(sum(gl.creditamount)) then sum(gl.creditAmount)||'.00cr' else  sum(gl.creditAmount)||'cr'  end ) else (case sum(gl.debitamount) when 0 then sum(gl.debitamount)||'.00dr' when floor(sum(gl.debitamount))  then sum(gl.debitamount)||'.00dr' else  sum(gl.debitamount)||'dr' 	 end ) end"
+				+ " AS particulars,case when sum(gl1.debitAmount) = 0 then sum(gl1.creditamount) else sum(gl1.debitAmount) end AS amount, case when sum(gl1.debitAmount) = 0 then 'Payment' else 'Receipt' end AS type,"
+				+ " case when (case when ch.instrumentnumber is NULL then ch.transactionnumber else ch.instrumentnumber  ||' , ' ||TO_CHAR(case when ch.instrumentdate is NULL THEN ch.transactiondate else ch.instrumentdate end,'dd/mm/yyyy') end )  is NULL then case when ch.instrumentnumber is NULL then ch.transactionnumber else ch.instrumentnumber end ||' , ' ||TO_CHAR(case when ch.instrumentdate is NULL then ch.transactiondate else ch.instrumentdate end,'dd/mm/yyyy') end"
+				+ " AS chequeDetail,gl.glcode as glCode,ch.description as instrumentStatus,vh.description as narration  ";
+		queryFrom = " FROM chartofaccounts c, generalLedger gl,generalLedger gl1"
+				+ ",vouchermis vmis, VOUCHERHEADER vh left outer join (select iv.voucherheaderid,ih.instrumentnumber,ih.instrumentdate,"
+				+ "es.description,ih.transactionnumber,ih.transactiondate from egf_instrumentheader ih,egw_status es,egf_instrumentvoucher iv where iv.instrumentheaderid=ih.id and "
+				+ "ih.id_status=es.id) ch on ch.voucherheaderid=vh.id  WHERE  c.glcode = gl.glcode AND gl.voucherHeaderId = vh.id  AND vmis.VOUCHERHEADERID=vh.id  "
+				+ "and gl.voucherheaderid  IN (SELECT voucherheaderid FROM generalledger gl WHERE glcode='" + glCode1
+				+ "') AND gl.voucherheaderid = gl1.voucherheaderid AND gl.glcode <> '" + glCode1
+				+ "' AND gl1.glcode = '" + glCode1 + "' and vh.voucherDate>='"
+				+ Constants.DDMMYYYYFORMAT1.format(startDate) + "' " + "and vh.voucherDate<='"
+				+ Constants.DDMMYYYYFORMAT1.format(endDate) + "' and vh.status not in(" + voucherStatusToExclude + ") "
+				+ miscQuery + " ";
+		OrderBy = "group by vh.id,gl.glcode,ch.instrumentnumber,ch.transactionnumber,ch.instrumentdate,ch.transactiondate,ch.description,c.name,vh.description order by voucherdate,vouchernumber";
+		System.out.println("Main query :" + query1 + queryFrom + OrderBy);
+		if (LOGGER.isDebugEnabled())
+			LOGGER.debug("Main query :" + query1 + queryFrom + OrderBy);
+
+		final Query query = persistenceService.getSession().createSQLQuery(query1 + queryFrom + OrderBy)
+				.addScalar("voucherId", new BigDecimalType()).addScalar("voucherDate").addScalar("voucherNumber")
+				.addScalar("particulars").addScalar("amount", new BigDecimalType()).addScalar("type")
+				.addScalar("chequeDetail").addScalar("glCode").addScalar("instrumentStatus")
+				.setResultTransformer(Transformers.aliasToBean(BankBookEntry.class));
+		final List<BankBookEntry> results = query.list();
+		return results;
+	}
+
+	String getMiscQuery() {
+		final StringBuffer query = new StringBuffer();
+
+		/*
+		 * if (fundId != null && fundId.getId() != null && fundId.getId() != -1) {
+		 * query.append(" and vh.fundId=").append(fundId.getId().toString()); final Fund
+		 * fnd = (Fund) persistenceService.find("from Fund where id=?", fundId.getId());
+		 * header.append(" for " + fnd.getName()); }
+		 */
+
+		if (getVouchermis() != null && getVouchermis().getDepartmentcode() != null
+				&& getVouchermis().getDepartmentcode() != null && !getVouchermis().getDepartmentcode().equals("-1")) {
+			query.append(" and vmis.DEPARTMENTCODE='").append(getVouchermis().getDepartmentcode() + "'");
+			Department department = microserviceUtils.getDepartmentByCode(getVouchermis().getDepartmentcode());
+			header.append(" in " + department.getName() + " ");
+		}
+		if (getVouchermis() != null && getVouchermis().getFunctionary() != null
+				&& getVouchermis().getFunctionary().getId() != null && getVouchermis().getFunctionary().getId() != -1)
+			query.append(" and vmis.FUNCTIONARYID=").append(getVouchermis().getFunctionary().getId().toString());
+		if (getVouchermis() != null && getVouchermis().getFundsource() != null
+				&& getVouchermis().getFundsource().getId() != null && getVouchermis().getFundsource().getId() != -1)
+			query.append(" and vmis.FUNDSOURCEID =").append(getVouchermis().getFundsource().getId().toString());
+		if (getVouchermis() != null && getVouchermis().getSchemeid() != null
+				&& getVouchermis().getSchemeid().getId() != null && getVouchermis().getSchemeid().getId() != -1)
+			query.append(" and vmis.SCHEMEID =").append(getVouchermis().getSchemeid().getId().toString());
+		if (getVouchermis() != null && getVouchermis().getSubschemeid() != null
+				&& getVouchermis().getSubschemeid().getId() != null && getVouchermis().getSubschemeid().getId() != -1)
+			query.append(" and vmis.SUBSCHEMEID =").append(getVouchermis().getSubschemeid().getId().toString());
+		if (getVouchermis() != null && getVouchermis().getDivisionid() != null
+				&& getVouchermis().getDivisionid().getId() != null && getVouchermis().getDivisionid().getId() != -1)
+			query.append(" and vmis.DIVISIONID =").append(getVouchermis().getDivisionid().getId().toString());
+		/*
+		 * if (function != null && function.getId() != null && function.getId() != -1) {
+		 * query.append(" and vmis.FUNCTIONID=" ).append(function.getId().toString());
+		 * final CFunction func = (CFunction)
+		 * persistenceService.find("from CFunction where id=?", function.getId());
+		 * header.append(" in " + func.getName() + " "); }
+		 */
+		if (getVouchermis() != null && getVouchermis().getFunction() != null
+				&& getVouchermis().getFunction().getId() != null && getVouchermis().getFunction().getId() != -1) {
+			query.append(" and vmis.functionid=").append(getVouchermis().getFunction().getId());
+			final CFunction func = (CFunction) persistenceService.find("from CFunction where id=?",
+					getVouchermis().getFunction().getId());
+			header.append(" in " + func.getName() + " ");
+		}
+
+		return query.toString();
 	}
 
 	private String getpaySideCashBooDateQuery(Date fromDate, Date toDate) {
@@ -812,7 +1303,7 @@ public class CashBookController {
 		fixedAssetCreditAmt = balanceSheetService.getFixedAssetCreditAmount("410", fromDate, toDate);
 		investmentDebitAmt = balanceSheetService.getInvestmentDEbitAmount("420", fromDate, toDate);
 		investmentCreditAmt = balanceSheetService.getInvestmentCreditAmount("420", fromDate, toDate);
-		
+
 		List<StatementEntry> ieStatementEntry = new ArrayList<StatementEntry>();
 		CashFlowReportDataBean obj = new CashFlowReportDataBean();
 		ieStatementEntry = resultEntries;
@@ -959,16 +1450,16 @@ public class CashBookController {
 				if (ieStatementEntry.get(i).getGlCode().equalsIgnoreCase("450")) {
 					if (yearType.equalsIgnoreCase("current")) {
 						obj.setAtBeginingPeriodCurrYear(prevYearAmount);
-						//obj.setAtEndPeriodCurrYear(thisYearAmount);
+						// obj.setAtEndPeriodCurrYear(thisYearAmount);
 					}
 					if (yearType.equalsIgnoreCase("prev")) {
 						obj.setAtBeginingPeriodPrevYear(prevYearAmount);
-						//obj.setAtEndPeriodPrevYear(thisYearAmount);
+						// obj.setAtEndPeriodPrevYear(thisYearAmount);
 					}
 				}
 			}
-		
-		lst1.add(obj);
+
+			lst1.add(obj);
 		}
 		return lst1;
 	}
@@ -1008,7 +1499,8 @@ public class CashBookController {
 			// for balance sheet
 			Date prevFromDate = new Date(cashBookReportBean.getFromDate().getTime() - MILLIS_IN_A_YEAR);
 			Date prevToDate = new Date(cashBookReportBean.getToDate().getTime() - MILLIS_IN_A_YEAR);
-			// Date prevToDate = new Date(cashBookReportBean.getFromDate().getTime() - MILLIS_IN_A_DAY);
+			// Date prevToDate = new Date(cashBookReportBean.getFromDate().getTime() -
+			// MILLIS_IN_A_DAY);
 			// get previous year
 			balanceSheet = null;
 			balanceSheet = new Statement();
@@ -1082,5 +1574,70 @@ public class CashBookController {
 
 	private String getUlbName() {
 		return ReportUtil.getCityName() + " " + (cityService.getCityGrade() == null ? "" : cityService.getCityGrade());
+	}
+
+	private String getAppConfigValueFor(final String module, final String key) {
+		try {
+			return appConfigValuesService.getConfigValuesByModuleAndKey(module, key).get(0).getValue();
+		} catch (final Exception e) {
+			throw new ValidationException(EMPTY_STRING, "The key '" + key + "' is not defined in appconfig");
+		}
+	}
+
+	private Long getLongValue(final Object object) {
+		return object != null ? new Long(object.toString()) : 0;
+	}
+
+	private String getStringValue(final Object object) {
+		return object != null ? object.toString() : "";
+	}
+
+	private boolean isInstrumentMultiVoucherMapped(final Long instrumentHeaderId) {
+		final List<Object[]> instrumentVoucherList = InstrumentHeaderIdsAndInstrumentVouchersMap
+				.get(instrumentHeaderId);
+		boolean rep = false;
+		if (instrumentVoucherList != null && instrumentVoucherList.size() != 0) {
+
+			final Object[] obj = instrumentVoucherList.get(0);
+			final Long voucherId = getLongValue(obj[1]);
+			for (final Object[] instrumentVoucher : instrumentVoucherList)
+				if (voucherId != getLongValue(instrumentVoucher[1])) {
+					rep = true;
+					break;
+				}
+		}
+		return rep;
+	}
+
+	private Date getDateValue(final Object object) {
+		return object != null ? (Date) object : null;
+	}
+
+	private void addTotalsSection(BigDecimal initialBalance, BigDecimal paymentTotal, BigDecimal receiptTotal,
+			List<BankBookEntry> entries) {
+		BigDecimal closingBalance = initialBalance.add(receiptTotal).subtract(paymentTotal);
+		entries.add(
+				new BankBookEntry("Closing:By Balance c/d", closingBalance, PAYMENT, BigDecimal.ZERO, BigDecimal.ZERO));
+		// Obtain the total accordingly. Similar to how it is done in
+		// computeTotals().
+		if (initialBalance.longValue() < 0)
+			isCreditOpeningBalance = true;
+		if (closingBalance.longValue() < 0) {
+			if (isCreditOpeningBalance)
+				entries.add(new BankBookEntry("Total", BigDecimal.ZERO, RECEIPT, closingBalance.abs().add(receiptTotal),
+						initialBalance.abs().add(paymentTotal)));
+			else
+				entries.add(new BankBookEntry("Total", BigDecimal.ZERO, RECEIPT,
+						initialBalance.abs().add(receiptTotal).add(closingBalance.abs()), paymentTotal));
+		} else if (isCreditOpeningBalance)
+			entries.add(new BankBookEntry("Total", BigDecimal.ZERO, RECEIPT, receiptTotal,
+					closingBalance.abs().add(paymentTotal).add(initialBalance.abs())));
+		else
+			entries.add(new BankBookEntry("Total", BigDecimal.ZERO, RECEIPT, initialBalance.abs().add(receiptTotal),
+					closingBalance.abs().add(paymentTotal)));
+		isCreditOpeningBalance = false;
+		receiptTotal = BigDecimal.ZERO;
+		paymentTotal = BigDecimal.ZERO;
+		initialBalance = closingBalance;
 	}
 }

@@ -1012,8 +1012,7 @@ public class EgovCommon {
 
     private void validateParameterData(final Date asondate, final String glcode,
             final String fundcode, final Integer accountdetailType, final Integer accountdetailkey) {
-
-        if (null == asondate)
+    	if (null == asondate)
             throw new ValidationException(Arrays.asList(new ValidationError(
                     "asondate", "asondate supplied is null")));
 
@@ -1101,6 +1100,7 @@ public class EgovCommon {
         if (null != accountdetailkey)
             opBalncQuery.append(" and accountdetailkey=").append(
                     accountdetailkey);
+        System.out.println("#### opBalncQuery::"+opBalncQuery);
         final List<Object> tsummarylist = getPersistenceService().findAllBy(opBalncQuery.toString(), glcode);
         opBalAsonDate = BigDecimal.valueOf((Integer) tsummarylist.get(0));
 
@@ -1214,7 +1214,7 @@ public class EgovCommon {
                     Constants.DDMMYYYYFORMAT1.format(asondate)).append("') and vh.voucherDate <'").append(
                             Constants.DDMMYYYYFORMAT1.format(asondate)).append("'and vh.status not in (").append(statusExclude)
                             .append(")");
-
+System.out.println("### glCodeBalQry ::"+glCodeBalQry);
             final List<Object> list = getPersistenceService().findAllBy(glCodeBalQry.toString(), glcode);
             glCodeBalance = BigDecimal.valueOf((Integer) list.get(0));
         } else {

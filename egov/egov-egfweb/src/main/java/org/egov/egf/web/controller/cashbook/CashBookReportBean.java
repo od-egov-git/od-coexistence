@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.egov.egf.model.BankBookViewEntry;
+
 public class CashBookReportBean {
 	private Date fromDate;
 	public Date getFromDate() {
@@ -119,9 +121,10 @@ public class CashBookReportBean {
 	public void setAbcPrevYear(BigDecimal abcPrevYear) {
 		this.abcPrevYear = abcPrevYear;
 	}
-	private List<CashBookReportDataBean> cashBookResultList = new ArrayList<CashBookReportDataBean>();
+	private List<CashBookViewEntry> cashBookResultList = new ArrayList<CashBookViewEntry>();
 	private List<CashFlowReportDataBean> cashFlowResultList = new ArrayList<CashFlowReportDataBean>();
 	private List<CashFlowReportDataBean> finalBalanceSheetL = new ArrayList<CashFlowReportDataBean>();
+	
 	public List<CashFlowReportDataBean> getFinalBalanceSheetL() {
 		return finalBalanceSheetL;
 	}
@@ -134,10 +137,12 @@ public class CashBookReportBean {
 	public void setCashFlowResultList(List<CashFlowReportDataBean> cashFlowResultList) {
 		this.cashFlowResultList = cashFlowResultList;
 	}
-	public List<CashBookReportDataBean> getCashBookResultList() {
+	
+	
+	public List<CashBookViewEntry> getCashBookResultList() {
 		return cashBookResultList;
 	}
-	public void setCashBookResultList(List<CashBookReportDataBean> cashBookResultList) {
+	public void setCashBookResultList(List<CashBookViewEntry> cashBookResultList) {
 		this.cashBookResultList = cashBookResultList;
 	}
 	public String getHeader() {
