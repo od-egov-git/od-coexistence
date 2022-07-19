@@ -1790,6 +1790,99 @@ System.out.println(":::::::::::::"+accountDetail.getGlcodeIdDetail());
 		 System.out.println(vmis.toString());
 		 return vmis;
 	 }
-	 
+
+	public Map<String, Object> getVoucherInfoForView(Long voucherId) {
+
+
+		if (LOGGER.isDebugEnabled())
+			LOGGER.debug("VoucherService | getVoucherDetails | Start");
+		final Map<String, Object> voucherMap = new HashMap<>();
+		final CVoucherHeader voucherHeader = (CVoucherHeader) persistenceService.find("from CVoucherHeader where id=?",
+				voucherId);
+		voucherMap.put(Constants.VOUCHERHEADER, voucherHeader);
+		final List<CGeneralLedger> glList = voucherHibDAO.getGLInfo(voucherHeader.getId());
+		if (LOGGER.isDebugEnabled())
+			LOGGER.debug("total number of general ledger entry " + glList.size());
+		final List<VoucherDetails> billDetailslist = new ArrayList<>();
+		final List<VoucherDetails> subLedgerlist = new ArrayList<>();
+		VoucherDetails voucherDetail;
+		VoucherDetails subLedgerDetail;
+		BigDecimal crAmount;
+		BigDecimal drAmount;
+		try {
+			for (final CGeneralLedger generalLedger : glList) {
+				voucherDetail = new VoucherDetails();
+				if (null != generalLedger.getFunctionId()) {
+					voucherDetail.setFunctionIdDetail(Long.valueOf(generalLedger.getFunctionId().toString()));
+					voucherDetail.setFunctionDetail(functionDAO.getFunctionById(Long.valueOf(generalLedger.getFunctionId().toString())).getCode()+"`-`"+functionDAO
+							.getFunctionById(Long.valueOf(generalLedger.getFunctionId().toString())).getName());
+				}
+				voucherDetail.setGlcodeIdDetail(generalLedger.getGlcodeId().getId());
+				voucherDetail.setGlcodeDetail(generalLedger.getGlcodeId().getGlcode());
+
+				voucherDetail.setAccounthead(coaDAO.findById(generalLedger.getGlcodeId().getId(), false).getName());
+				drAmount = BigDecimal.valueOf(generalLedger.getDebitAmount());
+				crAmount = BigDecimal.valueOf(generalLedger.getCreditAmount());
+				voucherDetail.setDebitAmountDetail(drAmount.setScale(2, BigDecimal.ROUND_HALF_UP));
+				voucherDetail.setCreditAmountDetail(crAmount.setScale(2, BigDecimal.ROUND_HALF_UP));
+				billDetailslist.add(voucherDetail);
+
+				final List<CGeneralLedgerDetail> gledgerDetailList = voucherHibDAO
+						.getGeneralledgerdetail(generalLedger.getId());
+
+				for (final CGeneralLedgerDetail gledgerDetail : gledgerDetailList) {
+					if (chartOfAccountDetailService.getByGlcodeIdAndDetailTypeId(generalLedger.getGlcodeId().getId(),
+							gledgerDetail.getDetailTypeId().getId().intValue()) != null) {
+						subLedgerDetail = new VoucherDetails();
+						subLedgerDetail.setAmount(gledgerDetail.getAmount().setScale(2));
+						subLedgerDetail.setGlcode(coaDAO.findById(generalLedger.getGlcodeId().getId(), false));
+						subLedgerDetail.setSubledgerCode(generalLedger.getGlcodeId().getGlcode());
+						final Accountdetailtype accountdetailtype = voucherHibDAO
+								.getAccountDetailById(gledgerDetail.getDetailTypeId().getId());
+						subLedgerDetail.setDetailType(accountdetailtype);
+						subLedgerDetail.setDetailTypeName(accountdetailtype.getName());
+						final EntityType entity = voucherHibDAO.getEntityInfo(gledgerDetail.getDetailKeyId(),
+								accountdetailtype.getId());
+						subLedgerDetail.setDetailCode(entity.getCode());
+						subLedgerDetail.setDetailKeyId(gledgerDetail.getDetailKeyId());
+						subLedgerDetail.setDetailKey(entity.getName());
+						subLedgerDetail.setFunctionDetail(
+								generalLedger.getFunctionId() != null ? generalLedger.getFunctionId().toString() : "0");
+						subLedgerlist.add(subLedgerDetail);
+					}
+				}
+
+			}
+		} catch (final HibernateException e) {
+			LOGGER.error("Exception occured in VoucherSerive |getVoucherInfo " + e);
+		} catch (final Exception e) {
+			LOGGER.error("Exception occured in VoucherSerive |getVoucherInfo " + e);
+		}
+
+		voucherMap.put(Constants.GLDEATILLIST, billDetailslist);
+		/**
+		 * create empty sub ledger row
+		 */
+		if (subLedgerlist.isEmpty())
+			subLedgerlist.add(new VoucherDetails());
+		voucherMap.put("subLedgerDetail", subLedgerlist);
+		return voucherMap;
+
+	
+	}
+@Transactional
+	public EgBillregister getegBillRegister(CVoucherHeader voucherHeader) {
+	EgBillregister egBillregister = null;
+	try {
+		System.out.println("::::::::::::::::"+voucherHeader.getId());
+		egBillregister = (EgBillregister) persistenceService.find(
+				"from EgBillregister br where br.egBillregistermis.voucherHeader.id=" + voucherHeader.getId());
+		
+
+	}catch(Exception e) {
+		e.printStackTrace();
+	}
+	return egBillregister;
+}
 
 }

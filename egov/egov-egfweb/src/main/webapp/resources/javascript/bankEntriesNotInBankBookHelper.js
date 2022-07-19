@@ -249,7 +249,20 @@ function loadBank(obj) {
 	}
 
 }
+function loadBankNew() {
+		var newBank=document.getElementById("bank").value;
+		var fundId = "1";
+		// bootbox.alert("heelo"+x);
+		if (newBank == null || newBank == "-1") {
+		populatebank({
+			fundId : fundId
+		});
+		}else{
+			
+		}
+		
 
+}
 function validate() {
 	var flag = true;
 	for (var i = 0; i < bankEntriesNotInBankBookTableIndex; i++) {

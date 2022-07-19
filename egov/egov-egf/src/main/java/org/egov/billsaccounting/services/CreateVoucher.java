@@ -2328,7 +2328,7 @@ public class CreateVoucher {
 					&& null != subdetailDetailMap.get(VoucherConstant.CREDITAMOUNT)
 					&& new BigDecimal(subdetailDetailMap.get(VoucherConstant.CREDITAMOUNT).toString())
 							.compareTo(BigDecimal.ZERO) != 0) {
-				
+
 			}
 			// validate the glcode is a subledger code or not.
 
@@ -3642,21 +3642,21 @@ public class CreateVoucher {
 	}
 
 	@Transactional
-	public void createPreApprovedVoucherAfterRejection(HashMap<String, Object> headerDetails, List<HashMap<String, Object>> accountdetails,
-			List<HashMap<String, Object>> subledgerDetails, CVoucherHeader voucherHeader) throws ApplicationRuntimeException, ValidationException {
-		
-		  final AppConfig appConfig =
-		  appConfigService.getAppConfigByKeyName("PREAPPROVEDVOUCHERSTATUS"); if (null
-		  != appConfig && null != appConfig.getConfValues()) for (final AppConfigValues
-		  appConfigVal : appConfig.getConfValues())
-			  headerDetails.put(VoucherConstant.STATUS,
-		  Integer.valueOf(appConfigVal.getValue())); else throw new
-		  ApplicationRuntimeException(
-		  "Appconfig value for PREAPPROVEDVOUCHERSTATUS is not defined in the system");
-		  //CVoucherHeader vh;
-		 
+	public void createPreApprovedVoucherAfterRejection(HashMap<String, Object> headerDetails,
+			List<HashMap<String, Object>> accountdetails, List<HashMap<String, Object>> subledgerDetails,
+			CVoucherHeader voucherHeader) throws ApplicationRuntimeException, ValidationException {
+
+		final AppConfig appConfig = appConfigService.getAppConfigByKeyName("PREAPPROVEDVOUCHERSTATUS");
+		if (null != appConfig && null != appConfig.getConfValues())
+			for (final AppConfigValues appConfigVal : appConfig.getConfValues())
+				headerDetails.put(VoucherConstant.STATUS, Integer.valueOf(appConfigVal.getValue()));
+		else
+			throw new ApplicationRuntimeException(
+					"Appconfig value for PREAPPROVEDVOUCHERSTATUS is not defined in the system");
+		// CVoucherHeader vh;
+
 		try {
-			createVoucherAfterRejection(headerDetails,accountdetails, subledgerDetails,voucherHeader);
+			createVoucherAfterRejection(headerDetails, accountdetails, subledgerDetails, voucherHeader);
 			/*
 			 * if (vh.getModuleId() != null) startWorkflow(vh);
 			 */
@@ -3671,12 +3671,13 @@ public class CreateVoucher {
 			LOGGER.error(ERR, e);
 			throw new ApplicationRuntimeException(e.getMessage());
 		}
-		
+
 	}
 
 	@Transactional
-	private void createVoucherAfterRejection(HashMap<String, Object> headerDetails, List<HashMap<String, Object>> accountdetails,
-			List<HashMap<String, Object>> subledgerDetails, CVoucherHeader voucherHeader) throws ApplicationRuntimeException {
+	private void createVoucherAfterRejection(HashMap<String, Object> headerDetails,
+			List<HashMap<String, Object>> accountdetails, List<HashMap<String, Object>> subledgerDetails,
+			CVoucherHeader voucherHeader) throws ApplicationRuntimeException {
 
 		try {
 			if (headerDetails.containsKey(VoucherConstant.SERVICE_NAME)
@@ -3697,7 +3698,8 @@ public class CreateVoucher {
 		}
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("End | insertIntoVoucherHeader");
-		final List<Transaxtion> transactions = createTransactionAfterRejection(headerDetails,accountdetails, subledgerDetails,voucherHeader);
+		final List<Transaxtion> transactions = createTransactionAfterRejection(headerDetails, accountdetails,
+				subledgerDetails, voucherHeader);
 		// persistenceService.getSession().flush();
 		// engine = ChartOfAccounts.getInstance();
 		// setChartOfAccounts();
@@ -3720,8 +3722,9 @@ public class CreateVoucher {
 
 	}
 
-	private List<Transaxtion> createTransactionAfterRejection(HashMap<String, Object> headerDetails, List<HashMap<String, Object>> accountdetails,
-			List<HashMap<String, Object>> subledgerDetails, CVoucherHeader voucherHeader) {
+	private List<Transaxtion> createTransactionAfterRejection(HashMap<String, Object> headerDetails,
+			List<HashMap<String, Object>> accountdetails, List<HashMap<String, Object>> subledgerDetails,
+			CVoucherHeader voucherHeader) {
 
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("Start | createTransaction ");
@@ -3747,7 +3750,7 @@ public class CreateVoucher {
 						LOGGER.debug("functionId>>>>>>>> " + functionId);
 				}
 				final CChartOfAccounts chartOfAcc = chartOfAccountsDAO.getCChartOfAccountsByGlCode(glcode);
-				
+
 				final Transaxtion transaction = new Transaxtion();
 				transaction.setGlCode(chartOfAcc.getGlcode());
 				transaction.setGlName(chartOfAcc.getName());
@@ -3826,7 +3829,7 @@ public class CreateVoucher {
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("END | createTransaction ");
 		return transaxtionList;
-	
+
 	}
 
 }

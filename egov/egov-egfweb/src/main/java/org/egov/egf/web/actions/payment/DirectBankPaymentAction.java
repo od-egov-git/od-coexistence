@@ -769,7 +769,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
 		final String bankGlcode = paymentheader.getBankaccount().getChartofaccounts().getGlcode();
 		LOGGER.info("bankGlcode  ::" + bankGlcode);
 		VoucherDetails bankdetail = null;
-		final Map<String, Object> vhInfoMap = voucherService.getVoucherInfo(voucherHeader.getId());
+		final Map<String, Object> vhInfoMap = voucherService.getVoucherInfoForView(voucherHeader.getId());
 
 		// voucherHeader =
 		// (CVoucherHeader)vhInfoMap.get(Constants.VOUCHERHEADER);

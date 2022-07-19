@@ -94,7 +94,7 @@ public class BalanceSheetServiceCB extends ReportServiceCB {
 	private static final BigDecimal NEGATIVE = new BigDecimal(-1);
 	public static final Locale LOCALE = new Locale("en", "IN");
 	public static final SimpleDateFormat DDMMYYYYFORMAT1 = new SimpleDateFormat("dd-MMM-yyyy", LOCALE);
-	private static final long MILLIS_IN_A_DAY = (long) 1000*60*60*24;
+	private static final long MILLIS_IN_A_DAY = (long) 1000 * 60 * 60 * 24;
 	private String removeEntrysWithZeroAmount = "";
 	private BigDecimal adjustedIncomeCurrYear = new BigDecimal(0);
 	private BigDecimal adjustedIncomePrevYear = new BigDecimal(0);
@@ -280,8 +280,8 @@ public class BalanceSheetServiceCB extends ReportServiceCB {
 			formattedToDate = getFormattedDate(cal.getTime());
 		} else
 			formattedToDate = getFormattedDate(getPreviousYearFor(toDate));
-		
-		formattedToDate = getFormattedDate(new Date(fromDate.getTime()-MILLIS_IN_A_DAY));
+
+		formattedToDate = getFormattedDate(new Date(fromDate.getTime() - MILLIS_IN_A_DAY));
 		StringBuffer qry = new StringBuffer(256);
 		qry = qry.append(
 				"		select sum(g.creditamount)-sum(g.debitamount),v.fundid  from voucherheader v,generalledger g, ");
@@ -306,6 +306,7 @@ public class BalanceSheetServiceCB extends ReportServiceCB {
 				balanceSheet.get(index).setPreviousYearTotal(prevYrTotal.add(divideAndRound(sum, divisor)));
 			}
 	}
+
 	public void populateBalanceSheet(final Statement balanceSheet) {
 
 		try {
@@ -536,14 +537,14 @@ public class BalanceSheetServiceCB extends ReportServiceCB {
 			formattedToDate = cal.getTime();
 		} else
 			formattedToDate = getPreviousYearFor(toDate);
-		
-		
-		/*final List<StatementResultObject> results = getTransactionAmount(filterQuery, formattedToDate,
-				getPreviousYearFor(fromDate), coaType, reportSubType);
-		*/
-		final List<StatementResultObject> results = getTransactionAmount(filterQuery, new Date(fromDate.getTime()-MILLIS_IN_A_DAY),
-				getPreviousYearFor(fromDate), coaType, reportSubType);
-		
+
+		/*
+		 * final List<StatementResultObject> results = getTransactionAmount(filterQuery,
+		 * formattedToDate, getPreviousYearFor(fromDate), coaType, reportSubType);
+		 */
+		final List<StatementResultObject> results = getTransactionAmount(filterQuery,
+				new Date(fromDate.getTime() - MILLIS_IN_A_DAY), getPreviousYearFor(fromDate), coaType, reportSubType);
+
 		for (final StatementResultObject row : results)
 			if (balanceSheet.containsBalanceSheetEntry(row.getGlCode())) {
 				for (int index = 0; index < balanceSheet.size(); index++)
@@ -598,8 +599,10 @@ public class BalanceSheetServiceCB extends ReportServiceCB {
 					currobj.getStockInhandPrevYear().subtract(currobj.getStockInhandCurrYear()));
 			finalObj.setPrepaidExpenseCurrYear(
 					currobj.getPrepaidExpensePrevYear().subtract(currobj.getPrepaidExpenseCurrYear()));
+
 			finalObj.setOtherCurrentAssetsCurrYear(
 					currobj.getOtherCurrentAssetsPrevYear().subtract(currobj.getOtherCurrentAssetsCurrYear()));
+
 			finalObj.setDepositsReceivedCurrYear(
 					currobj.getDepositsReceivedCurrYear().subtract(currobj.getDepositsReceivedPrevYear()));
 			finalObj.setDepositWorksCurrYear(
@@ -610,13 +613,14 @@ public class BalanceSheetServiceCB extends ReportServiceCB {
 					currobj.getIncreaseInProvisionCurrYear().subtract(currobj.getIncreaseInProvisionPrevYear()));
 			finalObj.setSpecialFundsGrantsCurrYear(
 					currobj.getSpecialFundsGrantsPrevYear().subtract(currobj.getSpecialFundsGrantsCurrYear()));
-			finalObj.setCwipCurrYear(currobj.getCwipCurrYear());
+			//finalObj.setCwipCurrYear(currobj.getCwipCurrYear());
+			finalObj.setCwipCurrYear(new BigDecimal(0));
 			finalObj.setInvestmentsCurrYear(currobj.getInvestmentsCurrYear());
 			finalObj.setDisposalOfAssetsCurrYear(currobj.getDisposalOfAssetsCurrYear());
 			finalObj.setDisposalOfInvestmentsCurrYear(currobj.getDisposalOfInvestmentsCurrYear());
 			finalObj.setAtBeginingPeriodCurrYear(currobj.getAtBeginingPeriodCurrYear());
-			//finalObj.setAtEndPeriodCurrYear(currobj.getAtBeginingPeriodCurrYear().add(cashBookReportBean.getAbcCurrentYear()));;
-			//finalObj.setAtEndPeriodCurrYear(currobj.getAtEndPeriodCurrYear());
+			// finalObj.setAtEndPeriodCurrYear(currobj.getAtBeginingPeriodCurrYear().add(cashBookReportBean.getAbcCurrentYear()));;
+			// finalObj.setAtEndPeriodCurrYear(currobj.getAtEndPeriodCurrYear());
 		}
 		if (prevobj != null) {
 			finalObj.setSundryDebtorsPrevYear(
@@ -637,13 +641,14 @@ public class BalanceSheetServiceCB extends ReportServiceCB {
 					prevobj.getIncreaseInProvisionCurrYear().subtract(prevobj.getIncreaseInProvisionPrevYear()));
 			finalObj.setSpecialFundsGrantsPrevYear(
 					prevobj.getSpecialFundsGrantsPrevYear().subtract(prevobj.getSpecialFundsGrantsCurrYear()));
-			finalObj.setCwipPrevYear(prevobj.getCwipPrevYear());
+			//finalObj.setCwipPrevYear(prevobj.getCwipPrevYear());
+			finalObj.setCwipPrevYear(new BigDecimal(0));
 			finalObj.setInvestmentsPrevYear(prevobj.getInvestmentsPrevYear());
 			finalObj.setDisposalOfAssetsPrevYear(prevobj.getDisposalOfAssetsPrevYear());
 			finalObj.setDisposalOfInvestmentsPrevYear(prevobj.getDisposalOfInvestmentsPrevYear());
 			finalObj.setAtBeginingPeriodPrevYear(prevobj.getAtBeginingPeriodPrevYear());
-			//finalObj.setAtEndPeriodPrevYear(prevobj.getAtBeginingPeriodPrevYear().add(cashBookReportBean.getAbcPrevYear()));
-			//finalObj.setAtEndPeriodPrevYear(prevobj.getAtEndPeriodPrevYear());
+			// finalObj.setAtEndPeriodPrevYear(prevobj.getAtBeginingPeriodPrevYear().add(cashBookReportBean.getAbcPrevYear()));
+			// finalObj.setAtEndPeriodPrevYear(prevobj.getAtEndPeriodPrevYear());
 		}
 		finalBalanceSheetL.add(finalObj);
 		return finalBalanceSheetL;
@@ -770,18 +775,18 @@ public class BalanceSheetServiceCB extends ReportServiceCB {
 				obj.setDisposalOfAssetsCurrYear(disposalOfAssetsCurrYear);
 				obj.setCwipCurrYear(cwipCurrYear);
 				obj.setInvestmentsCurrYear(investmentsCurrYear);
-				if(lstObj.getAtBeginingPeriodCurrYear() == null) {
+				if (lstObj.getAtBeginingPeriodCurrYear() == null) {
 					atBeginingPeriodCurrYear = new BigDecimal(0);
-				}else {
-					atBeginingPeriodCurrYear  = lstObj.getAtBeginingPeriodCurrYear();
+				} else {
+					atBeginingPeriodCurrYear = lstObj.getAtBeginingPeriodCurrYear();
 				}
-				if(lstObj.getAtEndPeriodCurrYear() == null) {
+				if (lstObj.getAtEndPeriodCurrYear() == null) {
 					atEndPeriodCurrYear = new BigDecimal(0);
 				} /*
 					 * else { atEndPeriodCurrYear = lstObj.getAtEndPeriodCurrYear(); }
 					 */
 				obj.setAtBeginingPeriodCurrYear(atBeginingPeriodCurrYear);
-				//obj.setAtEndPeriodCurrYear(atEndPeriodCurrYear);
+				// obj.setAtEndPeriodCurrYear(atEndPeriodCurrYear);
 			}
 			if (yearType.equalsIgnoreCase("prev")) {
 				if (lstObj.getCwipPrevYear() == null) {
@@ -809,19 +814,19 @@ public class BalanceSheetServiceCB extends ReportServiceCB {
 				obj.setDisposalOfInvestmentsPrevYear(disposalOfInvestmentsPrevYear);
 				obj.setCwipPrevYear(cwipPrevYear);
 				obj.setInvestmentsPrevYear(investmentsPrevYear);
-				if(lstObj.getAtBeginingPeriodPrevYear() == null) {
+				if (lstObj.getAtBeginingPeriodPrevYear() == null) {
 					atBeginingPeriodPrevYear = new BigDecimal(0);
-				}else {
+				} else {
 					atBeginingPeriodPrevYear = lstObj.getAtBeginingPeriodPrevYear();
 				}
-				if(lstObj.getAtEndPeriodPrevYear() == null) {
+				if (lstObj.getAtEndPeriodPrevYear() == null) {
 					atEndPeriodPrevYear = new BigDecimal(0);
 				} /*
 					 * else { atEndPeriodPrevYear = lstObj.getAtEndPeriodPrevYear(); }
 					 */
 				obj.setAtBeginingPeriodPrevYear(atBeginingPeriodPrevYear);
-				//obj.setAtEndPeriodPrevYear(atEndPeriodPrevYear);
-				//obj.setAtEndPeriodPrevYear(atBeginingPeriodCurrYear);
+				// obj.setAtEndPeriodPrevYear(atEndPeriodPrevYear);
+				// obj.setAtEndPeriodPrevYear(atBeginingPeriodCurrYear);
 			}
 			obj.setSundryDebtorsCurrYear(sundryDebtorsCurrYear);
 			obj.setSundryDebtorsPrevYear(sundryDebtorsPrevYear);
@@ -1285,17 +1290,17 @@ public class BalanceSheetServiceCB extends ReportServiceCB {
 		try {
 			if (cashBookReportBean.getaCurrentYear() == null) {
 				aCurrYear = new BigDecimal(0);
-			}else {
+			} else {
 				aCurrYear = cashBookReportBean.getaCurrentYear();
 			}
 			if (cashBookReportBean.getbCurrentYear() == null) {
 				bCurrYear = new BigDecimal(0);
-			}else {
+			} else {
 				bCurrYear = cashBookReportBean.getbCurrentYear();
 			}
 			if (cashBookReportBean.getcCurrentYear() == null) {
 				cCurrYear = new BigDecimal(0);
-			}else {
+			} else {
 				cCurrYear = cashBookReportBean.getcCurrentYear();
 			}
 			abcCurrent = aCurrYear.add(bCurrYear).add(cCurrYear);
@@ -1335,10 +1340,10 @@ public class BalanceSheetServiceCB extends ReportServiceCB {
 			CashBookReportBean cashBookReportBean) {
 		BigDecimal atEndCurr = new BigDecimal(0);
 		try {
-			for(CashFlowReportDataBean obj : finalBalanceSheetL) {
+			for (CashFlowReportDataBean obj : finalBalanceSheetL) {
 				atEndCurr = obj.getAtBeginingPeriodCurrYear().add(cashBookReportBean.getAbcCurrentYear());
 			}
-		}catch(Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return atEndCurr;
@@ -1348,10 +1353,10 @@ public class BalanceSheetServiceCB extends ReportServiceCB {
 			CashBookReportBean cashBookReportBean) {
 		BigDecimal atEndPrev = new BigDecimal(0);
 		try {
-			for(CashFlowReportDataBean obj : finalBalanceSheetL) {
+			for (CashFlowReportDataBean obj : finalBalanceSheetL) {
 				atEndPrev = obj.getAtBeginingPeriodPrevYear().add(cashBookReportBean.getAbcPrevYear());
 			}
-		}catch(Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return atEndPrev;

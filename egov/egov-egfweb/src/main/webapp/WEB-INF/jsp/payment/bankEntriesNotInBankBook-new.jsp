@@ -297,7 +297,7 @@
 </script>
 
 </head>
-<body onload="load();">
+<body onload="load();loadBankNew();">
 	<s:form action="bankEntriesNotInBankBook" theme="simple"
 		name="bankEntriesNotInBankBookform" id="bankEntriesNotInBankBookform">
 		<s:push value="model">
