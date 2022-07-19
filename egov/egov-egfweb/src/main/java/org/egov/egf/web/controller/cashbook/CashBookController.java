@@ -378,16 +378,27 @@ public class CashBookController {
 			}
 			setTodayDate(new Date());
 			List<Bankaccount> bankAccountL = new ArrayList<Bankaccount>();
+			/*
+			 * List<Object[]> objs = persistenceService.getSession().createQuery(
+			 * "select DISTINCT(b.chartofaccounts.glcode) as glcode,b.fund.id as fundId,f.code as fundcode "
+			 * +
+			 * "from Bankaccount b,Fund f where b.fund.id = f.id group by b.fund.id,b.chartofaccounts.glcode,f.code"
+			 * ) .list();
+			 */
 			List<Object[]> objs = persistenceService.getSession().createQuery(
-					"select DISTINCT(b.chartofaccounts.glcode) as glcode,b.fund.id as fundId,f.code as fundcode "
-							+ "from Bankaccount b,Fund f where b.fund.id = f.id group by b.fund.id,b.chartofaccounts.glcode,f.code")
+					"select DISTINCT concat(concat(bank.id,'-'),bankBranch.id) as bankbranchid,concat(concat(bank.name,' '),bankBranch.branchname) as bankbranchname, "
+					+" c.glcode as glcode ,bankaccount.fund.id as fundId, f.code as code"
+                            + " FROM Bank bank,Bankbranch bankBranch,Bankaccount bankaccount,CChartOfAccounts c ,Fund f  "
+                            + " where  bank.isactive=true  and bankBranch.isactive=true and bank.id = bankBranch.bank.id and bankBranch.id = bankaccount.bankbranch.id "
+                            +" and bankaccount.chartofaccounts.id = c.id and bankaccount.fund.id  = f.id"
+                            + " and bankaccount.isactive=true ")
 					.list();
 			for (Object[] obj : objs) {
 				Fund fund = new Fund();
-				fund.setId((Integer) obj[1]);
-				fund.setCode(obj[2].toString());
+				fund.setId(Integer.parseInt(obj[3].toString()));
+				fund.setCode(obj[4].toString());
 				CChartOfAccounts c = new CChartOfAccounts();
-				c.setGlcode(obj[0].toString());
+				c.setGlcode(obj[2].toString());
 				Bankaccount b = new Bankaccount();
 				b.setChartofaccounts(c);
 				b.setFund(fund);
