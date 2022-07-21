@@ -149,15 +149,16 @@ public class CashBookController {
 	private boolean isCreditOpeningBalance = false;
 	@Autowired
 	private EgovCommon egovCommon;
-	private final List<String> voucherNo = new ArrayList<String>();
+
 	private String chequeStatus = EMPTY_STRING;
 	private final SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 	private String voucherStr = "";
 	String voucherNumber = EMPTY_STRING;
 	String chequeNumber = "";
-	BigDecimal receiptTotal = BigDecimal.ZERO;
-	BigDecimal paymentTotal = BigDecimal.ZERO;
-	BigDecimal initialBalance = new BigDecimal(0);
+	/*
+	 * BigDecimal receiptTotal = BigDecimal.ZERO; BigDecimal paymentTotal =
+	 * BigDecimal.ZERO; BigDecimal initialBalance = new BigDecimal(0);
+	 */
 	List<BankBookEntry> entries = new ArrayList<BankBookEntry>();
 	private Bankaccount bankAccount;
 
@@ -362,7 +363,6 @@ public class CashBookController {
 			final Model model, HttpServletRequest request) {
 		try {
 			String errMsg = null;
-			List<BankBookEntry> results = new ArrayList<BankBookEntry>();
 
 			titleName = getUlbName().toUpperCase() + " ";
 			startDate = cashBookReportBean.getFromDate();
@@ -387,11 +387,11 @@ public class CashBookController {
 			 */
 			List<Object[]> objs = persistenceService.getSession().createQuery(
 					"select DISTINCT concat(concat(bank.id,'-'),bankBranch.id) as bankbranchid,concat(concat(bank.name,' '),bankBranch.branchname) as bankbranchname, "
-					+" c.glcode as glcode ,bankaccount.fund.id as fundId, f.code as code"
-                            + " FROM Bank bank,Bankbranch bankBranch,Bankaccount bankaccount,CChartOfAccounts c ,Fund f  "
-                            + " where  bank.isactive=true  and bankBranch.isactive=true and bank.id = bankBranch.bank.id and bankBranch.id = bankaccount.bankbranch.id "
-                            +" and bankaccount.chartofaccounts.id = c.id and bankaccount.fund.id  = f.id"
-                            + " and bankaccount.isactive=true ")
+							+ " c.glcode as glcode ,bankaccount.fund.id as fundId, f.code as code"
+							+ " FROM Bank bank,Bankbranch bankBranch,Bankaccount bankaccount,CChartOfAccounts c ,Fund f  "
+							+ " where  bank.isactive=true  and bankBranch.isactive=true and bank.id = bankBranch.bank.id and bankBranch.id = bankaccount.bankbranch.id "
+							+ " and bankaccount.chartofaccounts.id = c.id and bankaccount.fund.id  = f.id"
+							+ " and bankaccount.isactive=true ")
 					.list();
 			for (Object[] obj : objs) {
 				Fund fund = new Fund();
@@ -405,12 +405,12 @@ public class CashBookController {
 				bankAccountL.add(b);
 			}
 			for (Bankaccount bAcc : bankAccountL) {
+				List<BankBookEntry> results = new ArrayList<BankBookEntry>();
 				results = getResults(bAcc.getChartofaccounts().getGlcode());
 				addRowsToBankBookEntries(results, bAcc.getChartofaccounts().getGlcode(), bAcc.getFund().getCode());
-				/*
-				 * for (BankBookEntry obj : results1) { results.add(obj); }
-				 */
+
 			}
+			prepareViewObject();
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -430,6 +430,7 @@ public class CashBookController {
 		Map<String, BankBookEntry> voucherNumberAndEntryMap = new HashMap<String, BankBookEntry>();
 		List<String> multipleChequeVoucherNumber = new ArrayList<String>();
 		List<BankBookEntry> rowsToBeRemoved = new ArrayList<BankBookEntry>();
+		List<BankBookEntry> bankBookEntriesIndiuvidual = new ArrayList<BankBookEntry>();
 		Iterator<BankBookEntry> itr = results.iterator();
 		while (itr.hasNext()) {
 			// for (BankBookEntry row : results) {
@@ -466,11 +467,13 @@ public class CashBookController {
 			} else
 				voucherNumberAndEntryMap.put(row.getVoucherNumber(), row);
 			if (shouldAddRow)
-				bankBookEntries.add(row);
+				bankBookEntriesIndiuvidual.add(row);
+			bankBookEntries.add(row);
 		}
-		if (!bankBookEntries.isEmpty()) {
-			computeTotals(glCodeParam, fundCodePAram, multipleChequeVoucherNumber, rowsToBeRemoved);
-			prepareViewObject();
+		if (!bankBookEntriesIndiuvidual.isEmpty()) {
+			computeTotals(bankBookEntriesIndiuvidual, glCodeParam, fundCodePAram, multipleChequeVoucherNumber,
+					rowsToBeRemoved);
+
 		}
 
 	}
@@ -526,25 +529,25 @@ public class CashBookController {
 		return initialOpeningBalance;
 	}
 
-	private void computeTotals(final String glCode, final String fundCode,
-			final List<String> multipleChequeVoucherNumber, final List<BankBookEntry> rowsToBeRemoved) {
+	private void computeTotals(List<BankBookEntry> bankBookEntriesIndiuvidual, String glCode, String fundCode,
+			List<String> multipleChequeVoucherNumber, List<BankBookEntry> rowsToBeRemoved) {
 
 		getInstrumentsByVoucherIds();
 		getInstrumentVouchersByInstrumentHeaderIds();
-
+		List<String> voucherNo = new ArrayList<String>();
 		BankBookEntry initialOpeningBalance = getInitialAccountBalance(glCode, fundCode,
 				getVouchermis().getDepartmentcode());
 		entries.add(initialOpeningBalance);
-		Date date = bankBookEntries.get(0).getVoucherDate();
+		Date date = bankBookEntriesIndiuvidual.get(0).getVoucherDate();
 		String voucherNumber = EMPTY_STRING;
 		String chequeNumber = "";
-		/*
-		 * BigDecimal receiptTotal = BigDecimal.ZERO; BigDecimal paymentTotal =
-		 * BigDecimal.ZERO; BigDecimal
-		 */initialBalance = initialOpeningBalance.getAmount();
+
+		BigDecimal receiptTotal = BigDecimal.ZERO;
+		BigDecimal paymentTotal = BigDecimal.ZERO;
+		BigDecimal initialBalance = initialOpeningBalance.getAmount();
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("Inside computeTotals()");
-		Iterator<BankBookEntry> iter = bankBookEntries.iterator();
+		Iterator<BankBookEntry> iter = bankBookEntriesIndiuvidual.iterator();
 
 		while (iter.hasNext()) {
 			// for (final BankBookEntry bankBookEntry : bankBookEntries) {
@@ -555,11 +558,11 @@ public class CashBookController {
 				/*
 				 * // for a voucher // there could be // multiple // surrendered // cheques //
 				 * associated // with it. remove the dupicate rows
-				 */				
+				 */
 				if (bankBookEntry.voucherDate != null && date != null) {
 					if (bankBookEntry.voucherDate.compareTo(date) != 0) {
 						date = bankBookEntry.getVoucherDate();
-						final BigDecimal closingBalance = initialBalance.add(receiptTotal).subtract(paymentTotal);
+						BigDecimal closingBalance = initialBalance.add(receiptTotal).subtract(paymentTotal);
 						if (closingBalance.longValue() < 0) {
 							entries.add(new BankBookEntry("Closing:By Balance c/d", closingBalance, PAYMENT,
 									BigDecimal.ZERO, BigDecimal.ZERO));
@@ -608,14 +611,14 @@ public class CashBookController {
 																	// the voucher
 																	// has multiple
 						// cheques assigned to it
-						final List<Object[]> chequeDetails = voucherIdAndInstrumentMap
+						List<Object[]> chequeDetails = voucherIdAndInstrumentMap
 								.get(bankBookEntry.getVoucherId().longValue());
-						final StringBuffer listofcheque = new StringBuffer(100);
+						StringBuffer listofcheque = new StringBuffer(100);
 						String chequeNos = " ";
 						String chequeComp = " ";
 
 						if (!voucherNo.contains(bankBookEntry.getVoucherNumber()) && chequeDetails != null) {
-							for (final Object[] iv : chequeDetails) {
+							for (Object[] iv : chequeDetails) {
 								chequeNumber = getStringValue(iv[1]);
 								chequeStatus = " ";
 								chequeStatus = getStringValue(iv[2]);
@@ -624,7 +627,7 @@ public class CashBookController {
 												.equalsIgnoreCase(chequeStatus))) {
 
 									if (isInstrumentMultiVoucherMapped(getLongValue(iv[3]))) {
-										final String chqDate = sdf.format(getDateValue(iv[4]));
+										String chqDate = sdf.format(getDateValue(iv[4]));
 										chequeComp = chequeNumber + " " + chqDate + "-MULTIPLE";
 									}
 
@@ -656,7 +659,7 @@ public class CashBookController {
 							instrumentVoucherList = voucherIdAndInstrumentMap
 									.get(bankBookEntry.getVoucherId().longValue());
 							if (instrumentVoucherList != null)
-								for (final Object[] instrumentVoucher : instrumentVoucherList)
+								for (Object[] instrumentVoucher : instrumentVoucherList)
 									try {
 										chequeNumber = getStringValue(instrumentVoucher[1]);
 										chequeStatus = " ";
@@ -666,25 +669,25 @@ public class CashBookController {
 														.equalsIgnoreCase(chequeStatus)))
 											if (isInstrumentMultiVoucherMapped(getLongValue(instrumentVoucher[3]))) {
 												if (chequeNumber != null && !chequeNumber.equalsIgnoreCase("")) {
-													final String chqDate = getDateValue(instrumentVoucher[4]) != null
+													String chqDate = getDateValue(instrumentVoucher[4]) != null
 															? sdf.format(getDateValue(instrumentVoucher[4]))
 															: "";
 													voucherStr = chequeNumber + " " + chqDate + "-MULTIPLE";
 												} else {
 													chequeNumber = getStringValue(instrumentVoucher[5]);
-													final String chqDate = getDateValue(instrumentVoucher[6]) != null
+													String chqDate = getDateValue(instrumentVoucher[6]) != null
 															? sdf.format(getDateValue(instrumentVoucher[6]))
 															: "";
 													voucherStr = chequeNumber + " " + chqDate + "-MULTIPLE";
 												}
 											} else if (chequeNumber != null && !chequeNumber.equalsIgnoreCase("")) {
-												final String chqDate = getDateValue(instrumentVoucher[4]) != null
+												String chqDate = getDateValue(instrumentVoucher[4]) != null
 														? sdf.format(getDateValue(instrumentVoucher[4]))
 														: "";
 												voucherStr = chequeNumber + " " + chqDate;
 											} else { // voucherStr=" ";
 												chequeNumber = getStringValue(instrumentVoucher[5]);
-												final String chqDate = sdf.format(getDateValue(instrumentVoucher[6]));
+												String chqDate = sdf.format(getDateValue(instrumentVoucher[6]));
 												voucherStr = chequeNumber + " " + chqDate;
 												// }
 											}
@@ -702,7 +705,7 @@ public class CashBookController {
 
 		}
 		String vhNum = EMPTY_STRING;
-		for (final BankBookEntry bankBookEntry : bankBookEntries)
+		for (BankBookEntry bankBookEntry : bankBookEntriesIndiuvidual)
 			if (bankBookEntry.voucherNumber.equalsIgnoreCase(vhNum)) { // this
 																		// is to
 																		// handle
@@ -734,7 +737,7 @@ public class CashBookController {
 				bankBookViewEntry.setPaymentAmount(row.getReceiptAmount());
 				bankBookViewEntry.setPaymentParticulars(row.getParticulars());
 			} else if ("To Opening Balance".equalsIgnoreCase(row.getParticulars())) {
-				final BigDecimal amt = row.getAmount();
+				BigDecimal amt = row.getAmount();
 				if (amt.longValue() < 0) {
 					bankBookViewEntry.setPaymentAmount(amt.abs());
 					bankBookViewEntry.setPaymentParticulars(row.getParticulars());
@@ -743,7 +746,7 @@ public class CashBookController {
 					bankBookViewEntry.setReceiptParticulars(row.getParticulars());
 				}
 			} else if ("Closing:By Balance c/d".equalsIgnoreCase(row.getParticulars())) {
-				final BigDecimal amt = row.getAmount();
+				BigDecimal amt = row.getAmount();
 				if (amt.longValue() < 0) {
 					bankBookViewEntry.setReceiptAmount(amt.abs());
 					bankBookViewEntry.setReceiptParticulars(row.getParticulars());
@@ -753,7 +756,7 @@ public class CashBookController {
 				}
 
 			} else {
-				final String voucherDate = row.getVoucherDate() == null ? ""
+				String voucherDate = row.getVoucherDate() == null ? ""
 						: Constants.DDMMYYYYFORMAT2.format(row.getVoucherDate());
 
 				if (row.getType().equalsIgnoreCase(RECEIPT)) {

@@ -229,8 +229,10 @@
 	        buttons: [
 		        {
 	        	extend: 'pdfHtml5',
-                orientation: 'landscape',
-                pageSize: 'LEGAL'
+	        	orientation : 'landscape',
+	            pageSize : 'A3', // You can also use "A1","A2" or "A0", most of the time "A3" works the best.
+	            text : '<i class="fa fa-file-pdf-o"> PDF</i>',
+	            titleAttr : 'PDF'
 		        }
 	        ]
 	    } );
