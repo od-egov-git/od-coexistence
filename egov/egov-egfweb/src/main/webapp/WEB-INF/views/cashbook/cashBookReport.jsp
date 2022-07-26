@@ -41,7 +41,7 @@
 		<div class="panel panel-primary" data-collapsed="0">
 
 			<div style="padding: 0 15px;">
-				<c:if
+				<%-- <c:if
 					test="${cashBookReport.titleName != null &&  !cashBookReport.titleName.isEmpty()}">
 					<table width="100%" border="1" cellspacing="0" cellpadding="0">
 						<tr>
@@ -58,9 +58,20 @@
 								style="font-size: 15px;"> ${cashBookReport.header}</strong></th>
 						</tr>
 					</table>
-				</c:if>
+				</c:if> --%>
 				<table class="table table-bordered" id="searchResult">
+				<c:if
+						test="${cashBookReport.cashBookResultList != null &&  !cashBookReport.cashBookResultList.isEmpty()}">
+					
 					<thead>
+						<tr>
+							<th class="bluebgheadtd" width="100%" colspan="14"><strong
+								style="font-size: 15px;"> ${cashBookReport.titleName}</strong></th>
+						</tr>
+						<tr>
+							<th class="bluebgheadtd" width="100%" colspan="14"><strong
+								style="font-size: 15px;"> ${cashBookReport.header}</strong></th>
+						</tr>
 						<tr>
 							<th colspan="7">Receipt Side</th>
 							<th colspan="7">Payment Side</th>
@@ -83,8 +94,6 @@
 						</tr>
 					</thead>
 					`
-					<c:if
-						test="${cashBookReport.cashBookResultList != null &&  !cashBookReport.cashBookResultList.isEmpty()}">
 						<tbody>
 							<c:forEach items="${cashBookReport.cashBookResultList}"
 								var="result" varStatus="status">
@@ -180,10 +189,7 @@
 						
 						<tbody>
 					</c:if>
-					<c:if
-						test="${cashBookReport.cashBookResultList == null ||  cashBookReport.cashBookResultList.isEmpty()}">
-					No records found
-					</c:if>
+					
 				</table>
 			</div>
 			<br> <br>
@@ -232,7 +238,7 @@
 	        	orientation : 'landscape',
 	            pageSize : 'A3', // You can also use "A1","A2" or "A0", most of the time "A3" works the best.
 	            text : '<i class="fa fa-file-pdf-o"> PDF</i>',
-	            titleAttr : 'PDF'
+	            titleAttr : 'Cash Book Report'
 		        }
 	        ]
 	    } );

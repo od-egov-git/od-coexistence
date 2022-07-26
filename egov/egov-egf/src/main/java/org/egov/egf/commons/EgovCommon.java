@@ -973,7 +973,29 @@ public class EgovCommon {
             LOGGER.debug("EgovCommon | getAccountBalanceforDate | Start");
         return opBalAsonDate.add(glBalAsonDate);
     }
+    public BigDecimal getAccountBalanceforDateCashBook(final Date asondate, List<Bankaccount> bankAccountL, final String fundcode,
+            final Integer accountdetailType,
+            final Integer accountdetailkey, final String deptCode)
+                    throws ValidationException {
+    	BigDecimal opBalAsonDate = new BigDecimal(0);
+    	BigDecimal glBalAsonDate = new BigDecimal(0);
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("EgovCommon | getAccountBalanceforDate | Start");
+        //validateParameterData(asondate, glcode, fundcode, accountdetailType, accountdetailkey);
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("validation of data is sucessfull");
+        for(Bankaccount bank : bankAccountL) {
+        	opBalAsonDate = opBalAsonDate.add(getOpeningBalAsonDate(asondate, bank.getChartofaccounts().getGlcode(), fundcode, accountdetailType, accountdetailkey,
+            		deptCode));
+            glBalAsonDate = glBalAsonDate.add(getGlcodeBalBeforeDate(asondate, bank.getChartofaccounts().getGlcode(), fundcode, accountdetailType, accountdetailkey,
+            		deptCode));
+        }
+        
 
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("EgovCommon | getAccountBalanceforDate | Start");
+        return opBalAsonDate.add(glBalAsonDate);
+    }
     /**
      * @author manoranjan
      * @description - Get the account code balance for any glcode and the subledger balance,If the accountdetail details are
@@ -1009,7 +1031,26 @@ public class EgovCommon {
                     + glBalAsonDate);
         return opBalAsonDate.add(glBalAsonDate);
     }
+    public BigDecimal getAccountBalanceTillDateCashBook(final Date asondate, final String glcode, final String fundcode,
+            final Integer accountdetailType,
+            final Integer accountdetailkey, final String deptCode)
+                    throws ValidationException {
 
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("EgovCommon | getAccountBalanceTillDate | Start");
+        validateParameterData(asondate, glcode, fundcode, accountdetailType, accountdetailkey);
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("validation of data is sucessfull");
+        final BigDecimal opBalAsonDate = getOpeningBalAsonDate(asondate, glcode, fundcode, accountdetailType, accountdetailkey,
+        		deptCode);
+        final BigDecimal glBalAsonDate = getGlcodeBalTillDate(asondate, glcode, fundcode, accountdetailType, accountdetailkey,
+        		deptCode);
+
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("EgovCommon | getAccountBalanceTillDate | Opening Balance :" + opBalAsonDate + " Txn Balance  :"
+                    + glBalAsonDate);
+        return opBalAsonDate.add(glBalAsonDate);
+    }
     private void validateParameterData(final Date asondate, final String glcode,
             final String fundcode, final Integer accountdetailType, final Integer accountdetailkey) {
     	if (null == asondate)
@@ -1100,7 +1141,6 @@ public class EgovCommon {
         if (null != accountdetailkey)
             opBalncQuery.append(" and accountdetailkey=").append(
                     accountdetailkey);
-        System.out.println("#### opBalncQuery::"+opBalncQuery);
         final List<Object> tsummarylist = getPersistenceService().findAllBy(opBalncQuery.toString(), glcode);
         opBalAsonDate = BigDecimal.valueOf((Integer) tsummarylist.get(0));
 
@@ -1214,7 +1254,6 @@ public class EgovCommon {
                     Constants.DDMMYYYYFORMAT1.format(asondate)).append("') and vh.voucherDate <'").append(
                             Constants.DDMMYYYYFORMAT1.format(asondate)).append("'and vh.status not in (").append(statusExclude)
                             .append(")");
-System.out.println("### glCodeBalQry ::"+glCodeBalQry);
             final List<Object> list = getPersistenceService().findAllBy(glCodeBalQry.toString(), glcode);
             glCodeBalance = BigDecimal.valueOf((Integer) list.get(0));
         } else {
