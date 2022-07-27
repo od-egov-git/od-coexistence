@@ -59,10 +59,10 @@
 						</tr>
 					</table>
 				</c:if> --%>
-				<table class="table table-bordered" id="searchResult">
+				
 				<c:if
 						test="${cashBookReport.cashBookResultList != null &&  !cashBookReport.cashBookResultList.isEmpty()}">
-					
+					<table class="table table-bordered" id="searchResult">
 					<thead>
 						<tr>
 							<th class="bluebgheadtd" width="100%" colspan="14"><strong
@@ -188,9 +188,10 @@
 							</c:forEach>
 						
 						<tbody>
-					</c:if>
+					
 					
 				</table>
+				</c:if>
 			</div>
 			<br> <br>
 		</div>
@@ -238,7 +239,7 @@
 	        	orientation : 'landscape',
 	            pageSize : 'A3', // You can also use "A1","A2" or "A0", most of the time "A3" works the best.
 	            text : '<i class="fa fa-file-pdf-o"> PDF</i>',
-	            titleAttr : 'Cash Book Report'
+	            title : 'Cash Book Report'
 		        }
 	        ]
 	    } );

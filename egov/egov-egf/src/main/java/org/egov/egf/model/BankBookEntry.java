@@ -72,10 +72,20 @@ public class BankBookEntry {
     private String instrumentStatus;
     private BigDecimal voucherId;
     private List<InstrumentVoucher> instrumentVouchers;
-
+    private String narration;
     public BankBookEntry() {
     };
 
+    public BankBookEntry(final String particulars, final BigDecimal amount, final String type,
+            final BigDecimal receiptAmount, final BigDecimal paymentAmount, final String narration) {
+        super();
+        this.particulars = particulars;
+        this.amount = amount;
+        this.type = type;
+        this.receiptAmount = receiptAmount;
+        this.paymentAmount = paymentAmount;
+        this.narration= narration;
+    }
     public BankBookEntry(final String particulars, final BigDecimal amount, final String type,
             final BigDecimal receiptAmount, final BigDecimal paymentAmount) {
         super();
@@ -84,8 +94,8 @@ public class BankBookEntry {
         this.type = type;
         this.receiptAmount = receiptAmount;
         this.paymentAmount = paymentAmount;
+        
     }
-
     public String getVoucherNumber() {
         return voucherNumber;
     }
@@ -206,4 +216,13 @@ public class BankBookEntry {
     public List<InstrumentVoucher> getInstrumentVouchers() {
         return instrumentVouchers;
     }
+
+	public String getNarration() {
+		return narration;
+	}
+
+	public void setNarration(String narration) {
+		this.narration = narration;
+	}
+    
 }
