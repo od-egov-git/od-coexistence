@@ -851,30 +851,36 @@ public class CashBookController {
 							if (row.getGlCode() != null && row.getGlCode().substring(0, 3).equals("450")) {// &&
 
 								if (row.getParticulars().substring(row.getParticulars().length() - 2).equals("dr")) {
-									bankBookViewEntry.setReceiptAmount(row.getAmount());
+									String arr[] = row.getParticulars().split("-");
+									if (arr[1].toUpperCase().contains("CASH")) {
+										bankBookViewEntry.setReceiptCash(row.getAmount());
+										bankBookViewEntry.setReceiptAmount(null);
+									} else {
+										bankBookViewEntry.setReceiptCash(null);
+										bankBookViewEntry.setReceiptAmount(row.getAmount());
+									}
+
 								} else {
+									bankBookViewEntry.setReceiptCash(null);
 									bankBookViewEntry.setReceiptAmount(null);
 								}
 							}
 						} else {
 							if (row.getGlCode() != null && row.getGlCode().substring(0, 3).equals("450")) {
-								bankBookViewEntry.setReceiptAmount(row.getAmount());
-							} else {
 								if (row.getParticulars().split("-") != null) {
 									String arr[] = row.getParticulars().split("-");
-
 									if (arr[1].toUpperCase().contains("CASH")) {
 										bankBookViewEntry.setReceiptCash(row.getAmount());
-										//bankBookViewEntry.setReceiptAmount(new BigDecimal(0));
 										bankBookViewEntry.setReceiptAmount(null);
-
 									} else {
-										bankBookViewEntry.setReceiptCash(new BigDecimal(0));
-										//bankBookViewEntry.setReceiptAmount(row.getAmount());
-										bankBookViewEntry.setReceiptAmount(null);
+										bankBookViewEntry.setReceiptCash(null);
+										bankBookViewEntry.setReceiptAmount(row.getAmount());
 									}
-								}
 
+								}
+							} else {
+								bankBookViewEntry.setReceiptCash(null);
+								bankBookViewEntry.setReceiptAmount(null);
 							}
 
 						}
@@ -892,57 +898,40 @@ public class CashBookController {
 								row.getParticulars(), row.getAmount(), row.getChequeDetail(), PAYMENT,
 								row.getChequeNumber());
 						bankBookViewEntry.setVoucherId(row.getVoucherId().longValue());
-
-						/*
-						 * if (null != row.getVoucherNumber() && row.getVoucherNumber().contains("CSL"))
-						 * { if (row.getGlCode().contains("450") && row.getParticulars() .substring(0,
-						 * row.getParticulars().length() - 2).equals("cr")) {
-						 * bankBookViewEntry.setPaymentAmount(row.getAmount()); } else {
-						 * bankBookViewEntry.setPaymentAmount(null); } } if
-						 * (row.getParticulars().split("-") != null) { String arr[] =
-						 * row.getParticulars().split("-");
-						 * 
-						 * if (arr[1].toUpperCase().contains("CASH")) {
-						 * bankBookViewEntry.setPaymentCash(row.getAmount());
-						 * bankBookViewEntry.setPaymentAmount(new BigDecimal(0));
-						 * 
-						 * } else { bankBookViewEntry.setPaymentCash(new BigDecimal(0));
-						 * bankBookViewEntry.setPaymentAmount(row.getAmount()); } // } }
-						 * 
-						 * if (!row.getVoucherNumber().contains("CSL") && row.getGlCode() != null &&
-						 * row.getGlCode().substring(0, 3).equals("450")) // &&
-						 * bankBookViewEntry.setPaymentAmount(row.getAmount()); else
-						 * bankBookViewEntry.setPaymentAmount(null);
-						 */
-
 						if (row.getVoucherNumber() != null && row.getVoucherNumber().contains("CSL")) {
 							if (row.getGlCode() != null && row.getGlCode().substring(0, 3).equals("450")) {// &&
 
 								if (row.getParticulars().substring(row.getParticulars().length() - 2).equals("cr")) {
-									bankBookViewEntry.setPaymentAmount(row.getAmount());
+									String arr[] = row.getParticulars().split("-");
+									if (arr[1].toUpperCase().contains("CASH")) {
+										bankBookViewEntry.setPaymentAmount(null);
+										bankBookViewEntry.setPaymentCash(row.getAmount());
+									}else {
+										bankBookViewEntry.setPaymentAmount(row.getAmount());
+										bankBookViewEntry.setPaymentCash(null);
+									}
 								} else {
-									bankBookViewEntry.setPaymentAmount(null);
+										bankBookViewEntry.setPaymentAmount(null);
+										bankBookViewEntry.setPaymentCash(null);
 								}
+							}else {
+								bankBookViewEntry.setPaymentAmount(null);
+								bankBookViewEntry.setPaymentCash(null);
 							}
 						} else {
 							if (row.getGlCode() != null && row.getGlCode().substring(0, 3).equals("450")) {
-								bankBookViewEntry.setPaymentAmount(row.getAmount());
-							} else {
-								if (row.getParticulars().split("-") != null) {
-									String arr[] = row.getParticulars().split("-");
+								String arr[] = row.getParticulars().split("-");
 
-									if (arr[1].toUpperCase().contains("CASH")) {
-										bankBookViewEntry.setPaymentCash(row.getAmount());
-										//bankBookViewEntry.setPaymentAmount(new BigDecimal(0));
-										bankBookViewEntry.setPaymentAmount(null);
-
-									} else {
-										bankBookViewEntry.setPaymentCash(new BigDecimal(0));
-										//bankBookViewEntry.setPaymentAmount(row.getAmount());
-										bankBookViewEntry.setPaymentAmount(null);
-									}
+								if (arr[1].toUpperCase().contains("CASH")) {
+									bankBookViewEntry.setPaymentCash(row.getAmount());
+									bankBookViewEntry.setPaymentAmount(null);
+								}else {
+									bankBookViewEntry.setPaymentCash(null);
+									bankBookViewEntry.setPaymentAmount(row.getAmount());
 								}
-
+							} else {
+								bankBookViewEntry.setPaymentCash(null);
+								bankBookViewEntry.setPaymentAmount(null);
 							}
 
 						}
@@ -1018,7 +1007,16 @@ public class CashBookController {
 
 		populateParticulars(results);
 		populateContraEntries(results);
+		populateRegularEntries(results);
 		return results;
+	}
+
+	private void populateRegularEntries(List<BankBookEntry> results) {
+		for (BankBookEntry ent : results) {
+			if (!ent.getGlCode().contains("CSL")) {
+				ent.setType(ent.getType().equalsIgnoreCase(RECEIPT) ? PAYMENT : RECEIPT);
+			}
+		}
 	}
 
 	private void populateContraEntries(List<BankBookEntry> results) {
@@ -1028,11 +1026,6 @@ public class CashBookController {
 		while (itr1.hasNext()) {
 			BankBookEntry b1 = itr1.next();
 			if (b1.getVoucherNumber().contains("CSL")) {
-
-				/*
-				 * if (b1.getType() != null && b1.getType().equalsIgnoreCase(RECEIPT)) {
-				 * b1.setType(PAYMENT); } else { b1.setType(RECEIPT); }
-				 */
 				BankBookEntry b = new BankBookEntry(b1.getVoucherNumber(), b1.getVoucherDate(), b1.getParticulars(),
 						b1.getAmount(), b1.getType(), b1.getChequeDetail(), b1.getGlCode(), b1.getInstrumentStatus(),
 						b1.getVoucherId(), b1.getNarration());
@@ -1040,7 +1033,6 @@ public class CashBookController {
 
 			}
 		}
-		System.out.println("##contraElements ::" + contraElements.size());
 		for (BankBookEntry ent : contraElements) {
 			if (ent.getType().equals(RECEIPT))
 				ent.setType(PAYMENT);
