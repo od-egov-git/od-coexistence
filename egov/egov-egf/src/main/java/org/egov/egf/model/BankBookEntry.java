@@ -75,7 +75,23 @@ public class BankBookEntry {
     private String narration;
     public BankBookEntry() {
     };
+    
+    public BankBookEntry(String voucherNumber, Date voucherDate, String particulars, BigDecimal amount, String type,
+			String chequeDetail, String glCode, String instrumentStatus, BigDecimal voucherId, String narration) {
+		super();
+		this.voucherNumber = voucherNumber;
+		this.voucherDate = voucherDate;
+		this.particulars = particulars;
+		this.amount = amount;
+		this.type = type;
+		this.chequeDetail = chequeDetail;
+		this.glCode = glCode;
+		this.instrumentStatus = instrumentStatus;
+		this.voucherId = voucherId;
+		this.narration = narration;
+	}
 
+	
     public BankBookEntry(final String particulars, final BigDecimal amount, final String type,
             final BigDecimal receiptAmount, final BigDecimal paymentAmount, final String narration) {
         super();
