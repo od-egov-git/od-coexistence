@@ -512,7 +512,6 @@ public class CashBookController {
 				bankBookEntries.add(row);
 			}
 		}
-		System.out.println("### bankbookEntries size::" + bankBookEntries.size());
 		if (!bankBookEntriesIndiuvidual.isEmpty()) {
 			computeTotals(bankBookEntriesIndiuvidual, bankAccountL, "", multipleChequeVoucherNumber, rowsToBeRemoved);
 		}
@@ -819,7 +818,7 @@ public class CashBookController {
 				if ("Total".equalsIgnoreCase(row.getParticulars())) {
 					bankBookViewEntry.setReceiptAmount(row.getReceiptAmount());
 					bankBookViewEntry.setReceiptParticulars(row.getParticulars());
-					//bankBookViewEntry.setReceiptCash(row.get);
+					// bankBookViewEntry.setReceiptCash(row.get);
 					bankBookViewEntry.setPaymentAmount(row.getReceiptAmount());
 					bankBookViewEntry.setPaymentParticulars(row.getParticulars());
 				} else if ("To Opening Balance".equalsIgnoreCase(row.getParticulars())) {
@@ -851,41 +850,33 @@ public class CashBookController {
 								row.getParticulars(), row.getAmount(), row.getChequeDetail(), RECEIPT,
 								row.getChequeNumber());
 						bankBookViewEntry.setVoucherId(row.getVoucherId().longValue());
-						if (row.getVoucherNumber() != null && row.getVoucherNumber().contains("CSL")) {
-							if (row.getGlCode() != null && row.getGlCode().substring(0, 3).equals("450")) {// &&
-
+						if (row.getGlCode() != null && row.getGlCode().substring(0, 3).equals("450")) {// &&
+							if (null != row.getParticulars() && row.getParticulars().length() > 2) {
 								if (row.getParticulars().substring(row.getParticulars().length() - 2).equals("dr")) {
 									String arr[] = row.getParticulars().split("-");
-									if (arr[1].toUpperCase().contains("CASH")) {
-										bankBookViewEntry.setReceiptCash(row.getAmount());
-										bankBookViewEntry.setReceiptAmount(null);
+									if (arr.length > 1) {
+										if (arr[1].toUpperCase().contains("CASH")) {
+											bankBookViewEntry.setReceiptCash(row.getAmount());
+											bankBookViewEntry.setReceiptAmount(null);
+										} else {
+											bankBookViewEntry.setReceiptCash(null);
+											bankBookViewEntry.setReceiptAmount(row.getAmount());
+										}
 									} else {
 										bankBookViewEntry.setReceiptCash(null);
-										bankBookViewEntry.setReceiptAmount(row.getAmount());
+										bankBookViewEntry.setReceiptAmount(null);
 									}
-
 								} else {
 									bankBookViewEntry.setReceiptCash(null);
 									bankBookViewEntry.setReceiptAmount(null);
-								}
-							}
-						} else {
-							if (row.getGlCode() != null && row.getGlCode().substring(0, 3).equals("450")) {
-								if (row.getParticulars().split("-") != null) {
-									String arr[] = row.getParticulars().split("-");
-									if (arr[1].toUpperCase().contains("CASH")) {
-										bankBookViewEntry.setReceiptCash(row.getAmount());
-										bankBookViewEntry.setReceiptAmount(null);
-									} else {
-										bankBookViewEntry.setReceiptCash(null);
-										bankBookViewEntry.setReceiptAmount(row.getAmount());
-									}
-
 								}
 							} else {
 								bankBookViewEntry.setReceiptCash(null);
 								bankBookViewEntry.setReceiptAmount(null);
 							}
+						} else {
+							bankBookViewEntry.setReceiptCash(null);
+							bankBookViewEntry.setReceiptAmount(null);
 
 						}
 
@@ -903,16 +894,21 @@ public class CashBookController {
 								row.getParticulars(), row.getAmount(), row.getChequeDetail(), PAYMENT,
 								row.getChequeNumber());
 						bankBookViewEntry.setVoucherId(row.getVoucherId().longValue());
-						if (row.getVoucherNumber() != null && row.getVoucherNumber().contains("CSL")) {
-							if (row.getGlCode() != null && row.getGlCode().substring(0, 3).equals("450")) {// &&
 
+						if (row.getGlCode() != null && row.getGlCode().substring(0, 3).equals("450")) {// &&
+							if (null != row.getParticulars() && row.getParticulars().length() > 2) {
 								if (row.getParticulars().substring(row.getParticulars().length() - 2).equals("cr")) {
 									String arr[] = row.getParticulars().split("-");
-									if (arr[1].toUpperCase().contains("CASH")) {
-										bankBookViewEntry.setPaymentAmount(null);
-										bankBookViewEntry.setPaymentCash(row.getAmount());
+									if (arr.length > 1) {
+										if (arr[1].toUpperCase().contains("CASH")) {
+											bankBookViewEntry.setPaymentAmount(null);
+											bankBookViewEntry.setPaymentCash(row.getAmount());
+										} else {
+											bankBookViewEntry.setPaymentAmount(row.getAmount());
+											bankBookViewEntry.setPaymentCash(null);
+										}
 									} else {
-										bankBookViewEntry.setPaymentAmount(row.getAmount());
+										bankBookViewEntry.setPaymentAmount(null);
 										bankBookViewEntry.setPaymentCash(null);
 									}
 								} else {
@@ -924,22 +920,10 @@ public class CashBookController {
 								bankBookViewEntry.setPaymentCash(null);
 							}
 						} else {
-							if (row.getGlCode() != null && row.getGlCode().substring(0, 3).equals("450")) {
-								String arr[] = row.getParticulars().split("-");
-
-								if (arr[1].toUpperCase().contains("CASH")) {
-									bankBookViewEntry.setPaymentCash(row.getAmount());
-									bankBookViewEntry.setPaymentAmount(null);
-								} else {
-									bankBookViewEntry.setPaymentCash(null);
-									bankBookViewEntry.setPaymentAmount(row.getAmount());
-								}
-							} else {
-								bankBookViewEntry.setPaymentCash(null);
-								bankBookViewEntry.setPaymentAmount(null);
-							}
-
+							bankBookViewEntry.setPaymentAmount(null);
+							bankBookViewEntry.setPaymentCash(null);
 						}
+
 						// make voucher number and date blank for existing entries
 						if (paymentmap.containsKey(row.getVoucherId().longValue())) {
 							bankBookViewEntry.setPaymentVoucherDate(null);
@@ -971,22 +955,7 @@ public class CashBookController {
 				+ "case when sum(gl1.debitAmount) = 0 then 'Receipt' else 'Payment' end AS type,"
 				+ " case when (case when ch.instrumentnumber is NULL then ch.transactionnumber else ch.instrumentnumber  ||' , ' ||TO_CHAR(case when ch.instrumentdate is NULL THEN ch.transactiondate else ch.instrumentdate end,'dd/mm/yyyy') end )  is NULL then case when ch.instrumentnumber is NULL then ch.transactionnumber else ch.instrumentnumber end ||' , ' ||TO_CHAR(case when ch.instrumentdate is NULL then ch.transactiondate else ch.instrumentdate end,'dd/mm/yyyy') end"
 				+ " AS chequeDetail,gl.glcode as glCode,ch.description as instrumentStatus,vh.description as narration  ";
-		/*
-		 * queryFrom = " FROM chartofaccounts c, generalLedger gl,generalLedger gl1" +
-		 * ",vouchermis vmis, VOUCHERHEADER vh left outer join (select iv.voucherheaderid,ih.instrumentnumber,ih.instrumentdate,"
-		 * +
-		 * "es.description,ih.transactionnumber,ih.transactiondate from egf_instrumentheader ih,egw_status es,egf_instrumentvoucher iv where iv.instrumentheaderid=ih.id and "
-		 * +
-		 * "ih.id_status=es.id) ch on ch.voucherheaderid=vh.id  WHERE  c.glcode = gl.glcode AND gl.voucherHeaderId = vh.id  AND vmis.VOUCHERHEADERID=vh.id  "
-		 * +
-		 * "and gl.voucherheaderid  IN (SELECT voucherheaderid FROM generalledger gl WHERE glcode='"
-		 * + glCode1 +
-		 * "') AND gl.voucherheaderid = gl1.voucherheaderid AND gl.glcode <> '" +
-		 * glCode1 + "' AND gl1.glcode = '" + glCode1 + "' and vh.voucherDate>='" +
-		 * Constants.DDMMYYYYFORMAT1.format(startDate) + "' " + "and vh.voucherDate<='"
-		 * + Constants.DDMMYYYYFORMAT1.format(endDate) + "' and vh.status not in(" +
-		 * voucherStatusToExclude + ") " + miscQuery + " ";
-		 */
+		
 		queryFrom = " FROM chartofaccounts c, generalLedger gl,generalLedger gl1"
 				+ ",vouchermis vmis, VOUCHERHEADER vh left outer join (select iv.voucherheaderid,ih.instrumentnumber,ih.instrumentdate,"
 				+ "es.description,ih.transactionnumber,ih.transactiondate from egf_instrumentheader ih,egw_status es,egf_instrumentvoucher iv where iv.instrumentheaderid=ih.id and "
@@ -1000,7 +969,7 @@ public class CashBookController {
 				+ miscQuery + " ";
 
 		OrderBy = "group by vh.id,gl.glcode,ch.instrumentnumber,ch.transactionnumber,ch.instrumentdate,ch.transactiondate,ch.description,c.name,vh.description order by voucherdate,vouchernumber";
-		System.out.println("Main query :" + query1 + queryFrom + OrderBy);
+
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("Main query :" + query1 + queryFrom + OrderBy);
 
@@ -1012,14 +981,80 @@ public class CashBookController {
 		List<BankBookEntry> results = query.list();
 
 		// populateParticulars(results);
-		populateContraEntries(results);
-		populateRegularEntries(results);
-		return results;
+		 populateContraEntries(results);
+		
+		// populateRegularEntries(results, contraElements);
+
+		return populateNarrationEntries(results);
 	}
 
-	private void populateRegularEntries(List<BankBookEntry> results) {
+	private List<BankBookEntry> populateNarrationEntries(List<BankBookEntry> results) {
+		List<BankBookEntry> updatedNarrResultList = new ArrayList<BankBookEntry>();
+		Map<String,String> narrMap = new HashMap<String,String>();
+		BankBookEntry s=null;
+		int i=0;
+		for(BankBookEntry entry:results)
+		{
+			if(entry.getNarration() !=null && !entry.getNarration().isEmpty())
+			{
+				if(i==0)//for 1st time
+				{
+					narrMap.put(entry.getVoucherNumber(), entry.getNarration());
+					updatedNarrResultList.add(entry);
+					s=entry;
+					i=1;
+				}
+				else
+				{
+					if(narrMap.containsKey(entry.getVoucherNumber()))
+					{
+						updatedNarrResultList.add(entry);
+						s=entry;
+					}
+					else
+					{
+						//s.setParticulars(narrMap.get(s.getVoucherNumber()));
+						s = new BankBookEntry(s.getVoucherNumber(), s.getVoucherDate(), s.getNarration(),
+								s.getAmount(), s.getType(), s.getChequeDetail(), s.getGlCode(), s.getInstrumentStatus(),
+								s.getVoucherId(), s.getNarration());
+						narrMap.put(entry.getVoucherNumber(), entry.getNarration());
+						updatedNarrResultList.add(s);
+						updatedNarrResultList.add(entry);
+					}
+				}
+				
+			}
+			else
+			{
+				updatedNarrResultList.add(entry);
+			}
+		}
+		return updatedNarrResultList;
+	}
+	/*private void populateNarrationEntries(List<BankBookEntry> results) {
+		Map<Long, BankBookEntry> narrationMap = new HashMap<Long, BankBookEntry>();
+		List<BankBookEntry> narrationElements = new ArrayList<BankBookEntry>();
 		for (BankBookEntry ent : results) {
-			if (!ent.getGlCode().contains("CSL")) {
+			if (null != ent.getNarration() && !ent.getNarration().isEmpty()) {
+				narrationMap.put(ent.getVoucherId().longValue(), ent);
+			}
+		}
+		for (Map.Entry<Long, BankBookEntry> m : narrationMap.entrySet()) {
+			BankBookEntry b = new BankBookEntry(m.getValue().getVoucherNumber(), m.getValue().getVoucherDate(), m.getValue().getNarration(),
+					m.getValue().getAmount(), m.getValue().getType(), m.getValue().getChequeDetail(), m.getValue().getGlCode(), m.getValue().getInstrumentStatus(),
+					m.getValue().getVoucherId(), m.getValue().getNarration());
+			narrationElements.add(b);
+			//m.getValue().setParticulars(m.getValue().getNarration());
+			//narrationElements.add(m.getValue());
+		}
+		results.addAll(narrationElements);
+		results.sort((o1, o2) -> o1.getVoucherDate().compareTo(o2.getVoucherDate()));
+
+	}*/
+
+	private void populateRegularEntries(List<BankBookEntry> results, List<BankBookEntry> contraElements) {
+		for (BankBookEntry ent : results) {
+			if (!contraElements.contains(ent)) {
 				ent.setType(ent.getType().equalsIgnoreCase(RECEIPT) ? PAYMENT : RECEIPT);
 			}
 		}
@@ -1033,21 +1068,7 @@ public class CashBookController {
 
 		while (itr1.hasNext()) {
 			BankBookEntry b1 = itr1.next();
-			/*
-			 * if (b1.getVoucherNumber().contains("CSL")) { BankBookEntry b = new
-			 * BankBookEntry(b1.getVoucherNumber(), b1.getVoucherDate(),
-			 * b1.getParticulars(), b1.getAmount(), b1.getType(), b1.getChequeDetail(),
-			 * b1.getGlCode(), b1.getInstrumentStatus(), b1.getVoucherId(),
-			 * b1.getNarration()); contraElements.add(b);
-			 * 
-			 * }
-			 */
-			/*
-			 * String[] arr = b1.getParticulars().split("-");
-			 * if(arr[1].toUpperCase().contains("CASH")) {
-			 * contraVoucherNumList.put(b1.getVoucherId().longValue(),b1.getVoucherNumber())
-			 * ; }
-			 */
+
 			if (b1.getParticulars().substring(0, 4).contains("450")
 					&& b1.getParticulars().substring(b1.getParticulars().length() - 2).contains("dr")) {
 				contraVoucherNumList.put(b1.getVoucherId().longValue(), b1.getVoucherNumber());
@@ -1059,16 +1080,16 @@ public class CashBookController {
 					&& b1.getParticulars().substring(0, 4).contains("450")
 					&& b1.getParticulars().substring(b1.getParticulars().length() - 2).contains("cr")) {
 				confirmedcontraVoucherNumList.put(b1.getVoucherId().longValue(), b1.getVoucherNumber());
-				
+
 			}
 		}
-		for(BankBookEntry b1 : results) {
-			if (confirmedcontraVoucherNumList.containsKey(b1.getVoucherId().longValue())){
+		for (BankBookEntry b1 : results) {
+			if (confirmedcontraVoucherNumList.containsKey(b1.getVoucherId().longValue())) {
 				BankBookEntry b = new BankBookEntry(b1.getVoucherNumber(), b1.getVoucherDate(), b1.getParticulars(),
 						b1.getAmount(), b1.getType(), b1.getChequeDetail(), b1.getGlCode(), b1.getInstrumentStatus(),
 						b1.getVoucherId(), b1.getNarration());
 				contraElements.add(b);
-				
+
 			}
 		}
 
@@ -1081,7 +1102,6 @@ public class CashBookController {
 		}
 		results.addAll(contraElements);
 		results.sort((o1, o2) -> o1.getVoucherDate().compareTo(o2.getVoucherDate()));
-
 	}
 
 	private void populateParticulars(List<BankBookEntry> results) {
