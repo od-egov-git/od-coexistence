@@ -409,18 +409,32 @@ public class CashBookController {
 			}
 
 			/*
-			 * List<String> objs = persistenceService.getSession()
+			 * List<String> objs1 = persistenceService.getSession()
 			 * .createQuery("select distinct(g.glcode) from CGeneralLedger g where g.voucherHeaderId in "
 			 * + " (select vh.id from CVoucherHeader vh where vh.voucherDate>='" +
 			 * Constants.DDMMYYYYFORMAT1.format(startDate) + "' " + "and vh.voucherDate<='"
 			 * + Constants.DDMMYYYYFORMAT1.format(endDate) + "'" +
 			 * " and vh.status not in(4,5))") .list();
 			 * 
-			 * for (String obj : objs) { CChartOfAccounts c = new CChartOfAccounts();
+			 * for (String obj : objs1) { CChartOfAccounts c = new CChartOfAccounts();
 			 * c.setGlcode(obj.toString()); Bankaccount b = new Bankaccount();
 			 * b.setChartofaccounts(c); bankAccountL.add(b); }
 			 */
-
+			String query1 = "select\n" + "	distinct(glcode) as glCode " + "from\n" + "	generalledger g\n" + "where\n"
+					+ "	g.voucherheaderid in (\n" + "	select\n" + "		distinct(g.voucherheaderid)\n" + "	from\n"
+					+ "		generalledger g,\n" + "		voucherheader v\n" + "	where\n" + "		g.glcode in ("
+					+ "		select" + "			distinct(c.glcode) as glcode" + "		from" + "			Bank bank,"
+					+ "			Bankbranch bankBranch," + "			Bankaccount bankaccount,"
+					+ "			ChartOfAccounts c ," + "			Fund f" + "		where"
+					+ "			bank.isactive = true" + "			and bankBranch.isactive = true"
+					+ "			and bank.id = bankBranch.bankid"
+					+ "			and bankBranch.id = bankaccount.branchid" + "			and bankaccount.glcodeid = c.id"
+					+ "			and bankaccount.fundid = f.id" + "			and bankaccount.isactive = true)"
+					+ "		and g.voucherheaderid = v.id" + "		and v.voucherdate >= '"
+					+ Constants.DDMMYYYYFORMAT1.format(startDate) + "'" + "		and v.voucherdate <= '"
+					+ Constants.DDMMYYYYFORMAT1.format(endDate) + "'" + "		and v.status not in(4, 5))";
+			Query query = persistenceService.getSession().createSQLQuery(query1).addScalar("glCode");
+			List<String> glCodeList = query.list();
 			bankBookEntries = new ArrayList<BankBookEntry>();
 			bankBookViewEntries = new ArrayList<CashBookViewEntry>();
 			entries = new ArrayList<BankBookEntry>();
@@ -432,12 +446,22 @@ public class CashBookController {
 //			  addRowsToBankBookEntries(results, bAcc.getChartofaccounts().getGlcode(), "");
 //			  
 //			  }
+
+			for (String l : glCodeList) {
+				CChartOfAccounts c = new CChartOfAccounts();
+				c.setGlcode(l.toString());
+				Bankaccount b = new Bankaccount();
+				b.setChartofaccounts(c);
+				bankAccountL.add(b);
+				// glcodes = glcodes.append(Long.toString(l.longValue())).append("','");
+			}
 			Iterator<Bankaccount> itr = bankAccountL.iterator();
 			while (itr.hasNext()) {
 				Bankaccount bAcc = itr.next();
 				glcodes = glcodes.append(bAcc.getChartofaccounts().getGlcode()).append("','");
 
 			}
+
 			System.out.println("#####glcodes" + glcodes);
 			List<BankBookEntry> results = new ArrayList<BankBookEntry>();
 			results = getResults(glcodes.toString());
@@ -947,19 +971,19 @@ public class CashBookController {
 		String OrderBy = "";
 		String voucherStatusToExclude = getAppConfigValueFor("EGF", "statusexcludeReport");
 		String query1 = "SELECT distinct vh.id as voucherId,vh.voucherDate AS voucherDate, vh.voucherNumber AS voucherNumber,"
-				+ " gl.glcode||' - '||c.name||'-'||case when sum(gl.debitAmount)  = 0 then (case sum(gl.creditamount) when 0 "
-				+ "then sum(gl.creditAmount)||'.00cr' when floor(sum(gl.creditamount)) then sum(gl.creditAmount)||'.00cr' else  "
-				+ "sum(gl.creditAmount)||'cr'  end ) else (case sum(gl.debitamount) when 0 then sum(gl.debitamount)||'.00dr' "
-				+ "when floor(sum(gl.debitamount))  then sum(gl.debitamount)||'.00dr' else  sum(gl.debitamount)||'dr' end ) end"
-				+ " AS particulars,case when sum(gl.debitAmount) = 0 then sum(gl.creditamount) else sum(gl.debitAmount) end AS amount, "
-				+ "case when sum(gl1.debitAmount) = 0 then 'Receipt' else 'Payment' end AS type,"
+				+ " gl.glcode||' - '||c.name||'-'||case when gl1.debitAmount  = 0 then (case gl1.creditamount when 0 "
+				+ "then gl1.creditAmount||'.00cr' when floor(gl1.creditamount) then gl1.creditAmount ||'.00cr' else  "
+				+ "gl1.creditAmount||'cr'  end ) else (case gl1.debitamount when 0 then gl1.debitamount||'.00dr' "
+				+ "when floor(gl1.debitamount)  then gl1.debitamount||'.00dr' else  gl1.debitamount||'dr' end ) end"
+				+ " AS particulars,case when gl1.debitAmount = 0 then gl1.creditamount else gl1.debitAmount end AS amount, "
+				+ "case when gl1.debitAmount = 0 then 'Receipt' else 'Payment' end AS type,"
 				+ " case when (case when ch.instrumentnumber is NULL then ch.transactionnumber else ch.instrumentnumber  ||' , ' ||TO_CHAR(case when ch.instrumentdate is NULL THEN ch.transactiondate else ch.instrumentdate end,'dd/mm/yyyy') end )  is NULL then case when ch.instrumentnumber is NULL then ch.transactionnumber else ch.instrumentnumber end ||' , ' ||TO_CHAR(case when ch.instrumentdate is NULL then ch.transactiondate else ch.instrumentdate end,'dd/mm/yyyy') end"
 				+ " AS chequeDetail,gl.glcode as glCode,ch.description as instrumentStatus,vh.description as narration  ";
-		
+
 		queryFrom = " FROM chartofaccounts c, generalLedger gl,generalLedger gl1"
 				+ ",vouchermis vmis, VOUCHERHEADER vh left outer join (select iv.voucherheaderid,ih.instrumentnumber,ih.instrumentdate,"
 				+ "es.description,ih.transactionnumber,ih.transactiondate from egf_instrumentheader ih,egw_status es,egf_instrumentvoucher iv where iv.instrumentheaderid=ih.id and "
-				+ "ih.id_status=es.id) ch on ch.voucherheaderid=vh.id  WHERE  c.glcode = gl.glcode AND gl.voucherHeaderId = vh.id  AND vmis.VOUCHERHEADERID=vh.id  "
+				+ "ih.id_status=es.id) ch on ch.voucherheaderid=vh.id  WHERE  c.glcode = gl.glcode AND gl.voucherHeaderId = vh.id  AND vmis.VOUCHERHEADERID=vh.id  AND gl.glcode = gl1.glcode "
 				+ "and gl.voucherheaderid  IN (SELECT voucherheaderid FROM generalledger gl WHERE glcode in('" + glCodes
 				+ "')" + ") AND gl.voucherheaderid = gl1.voucherheaderid "
 				// + "AND gl.glcode not in ('"+glCodes+"') "
@@ -968,8 +992,8 @@ public class CashBookController {
 				+ Constants.DDMMYYYYFORMAT1.format(endDate) + "' and vh.status not in(" + voucherStatusToExclude + ") "
 				+ miscQuery + " ";
 
-		OrderBy = "group by vh.id,gl.glcode,ch.instrumentnumber,ch.transactionnumber,ch.instrumentdate,ch.transactiondate,ch.description,c.name,vh.description order by voucherdate,vouchernumber";
-
+		OrderBy = "group by vh.id,gl.glcode,ch.instrumentnumber,ch.transactionnumber,ch.instrumentdate,ch.transactiondate,ch.description,c.name,vh.description,gl.debitAmount,gl.creditamount,gl1.debitAmount,gl1.creditamount order by voucherdate,vouchernumber";
+		System.out.println("### main query ::" + query1 + queryFrom + OrderBy);
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("Main query :" + query1 + queryFrom + OrderBy);
 
@@ -981,76 +1005,102 @@ public class CashBookController {
 		List<BankBookEntry> results = query.list();
 
 		// populateParticulars(results);
-		 populateContraEntries(results);
-		
+		populateEntries(results);
+		populatePaymentTypes(results);
+		populateContraEntries(results);
+
 		// populateRegularEntries(results, contraElements);
 
 		return populateNarrationEntries(results);
 	}
 
+	private void populatePaymentTypes(List<BankBookEntry> results) {
+		String type = null;
+		Map<Long,String> typeMap = new HashMap<Long,String>();
+		for(BankBookEntry obj: results) {
+			if(obj.getGlCode().contains("450")) {
+				typeMap.put(obj.getVoucherId().longValue(), obj.getType());
+			}
+		}
+		for(BankBookEntry obj: results) {
+			if(typeMap.containsKey(obj.getVoucherId().longValue())) {
+				obj.setType(typeMap.get(obj.getVoucherId().longValue()));
+			}
+		}
+	}
+
+	private void populateEntries(List<BankBookEntry> results) {
+		Map voucherNumberEntryMap = new HashMap<Long,BankBookEntry>();
+		List<BankBookEntry> finalResultList = new ArrayList<BankBookEntry>();
+		
+	for(BankBookEntry obj : results) {
+		if(obj.getGlCode().contains("450")) {
+			
+			voucherNumberEntryMap.put(obj.getVoucherId().longValue(), obj);
+		}
+	}
+	for(BankBookEntry obj : results) {
+		if(voucherNumberEntryMap.containsKey(obj.getVoucherId().longValue())) {
+			finalResultList.add(obj);
+		}
+	}
+	results = finalResultList;
+	}
+
 	private List<BankBookEntry> populateNarrationEntries(List<BankBookEntry> results) {
 		List<BankBookEntry> updatedNarrResultList = new ArrayList<BankBookEntry>();
-		Map<String,String> narrMap = new HashMap<String,String>();
-		BankBookEntry s=null;
-		int i=0;
-		for(BankBookEntry entry:results)
-		{
-			if(entry.getNarration() !=null && !entry.getNarration().isEmpty())
-			{
-				if(i==0)//for 1st time
+		Map<String, String> narrMap = new HashMap<String, String>();
+		BankBookEntry s = null;
+		int i = 0;
+		for (BankBookEntry entry : results) {
+			if (entry.getNarration() != null && !entry.getNarration().isEmpty()) {
+				if (i == 0)// for 1st time
 				{
 					narrMap.put(entry.getVoucherNumber(), entry.getNarration());
 					updatedNarrResultList.add(entry);
-					s=entry;
-					i=1;
-				}
-				else
-				{
-					if(narrMap.containsKey(entry.getVoucherNumber()))
-					{
+					s = entry;
+					i = 1;
+				} else {
+					if (narrMap.containsKey(entry.getVoucherNumber())) {
 						updatedNarrResultList.add(entry);
-						s=entry;
-					}
-					else
-					{
-						//s.setParticulars(narrMap.get(s.getVoucherNumber()));
-						s = new BankBookEntry(s.getVoucherNumber(), s.getVoucherDate(), s.getNarration(),
-								s.getAmount(), s.getType(), s.getChequeDetail(), s.getGlCode(), s.getInstrumentStatus(),
+						s = entry;
+					} else {
+						// s.setParticulars(narrMap.get(s.getVoucherNumber()));
+						s = new BankBookEntry(s.getVoucherNumber(), s.getVoucherDate(), s.getNarration(), s.getAmount(),
+								s.getType(), s.getChequeDetail(), s.getGlCode(), s.getInstrumentStatus(),
 								s.getVoucherId(), s.getNarration());
 						narrMap.put(entry.getVoucherNumber(), entry.getNarration());
 						updatedNarrResultList.add(s);
 						updatedNarrResultList.add(entry);
 					}
 				}
-				
-			}
-			else
-			{
+
+			} else {
 				updatedNarrResultList.add(entry);
 			}
 		}
 		return updatedNarrResultList;
 	}
-	/*private void populateNarrationEntries(List<BankBookEntry> results) {
-		Map<Long, BankBookEntry> narrationMap = new HashMap<Long, BankBookEntry>();
-		List<BankBookEntry> narrationElements = new ArrayList<BankBookEntry>();
-		for (BankBookEntry ent : results) {
-			if (null != ent.getNarration() && !ent.getNarration().isEmpty()) {
-				narrationMap.put(ent.getVoucherId().longValue(), ent);
-			}
-		}
-		for (Map.Entry<Long, BankBookEntry> m : narrationMap.entrySet()) {
-			BankBookEntry b = new BankBookEntry(m.getValue().getVoucherNumber(), m.getValue().getVoucherDate(), m.getValue().getNarration(),
-					m.getValue().getAmount(), m.getValue().getType(), m.getValue().getChequeDetail(), m.getValue().getGlCode(), m.getValue().getInstrumentStatus(),
-					m.getValue().getVoucherId(), m.getValue().getNarration());
-			narrationElements.add(b);
-			//m.getValue().setParticulars(m.getValue().getNarration());
-			//narrationElements.add(m.getValue());
-		}
-		results.addAll(narrationElements);
-		results.sort((o1, o2) -> o1.getVoucherDate().compareTo(o2.getVoucherDate()));
-
-	}*/
+	/*
+	 * private void populateNarrationEntries(List<BankBookEntry> results) {
+	 * Map<Long, BankBookEntry> narrationMap = new HashMap<Long, BankBookEntry>();
+	 * List<BankBookEntry> narrationElements = new ArrayList<BankBookEntry>(); for
+	 * (BankBookEntry ent : results) { if (null != ent.getNarration() &&
+	 * !ent.getNarration().isEmpty()) {
+	 * narrationMap.put(ent.getVoucherId().longValue(), ent); } } for
+	 * (Map.Entry<Long, BankBookEntry> m : narrationMap.entrySet()) { BankBookEntry
+	 * b = new BankBookEntry(m.getValue().getVoucherNumber(),
+	 * m.getValue().getVoucherDate(), m.getValue().getNarration(),
+	 * m.getValue().getAmount(), m.getValue().getType(),
+	 * m.getValue().getChequeDetail(), m.getValue().getGlCode(),
+	 * m.getValue().getInstrumentStatus(), m.getValue().getVoucherId(),
+	 * m.getValue().getNarration()); narrationElements.add(b);
+	 * //m.getValue().setParticulars(m.getValue().getNarration());
+	 * //narrationElements.add(m.getValue()); } results.addAll(narrationElements);
+	 * results.sort((o1, o2) -> o1.getVoucherDate().compareTo(o2.getVoucherDate()));
+	 * 
+	 * }
+	 */
 
 	private void populateRegularEntries(List<BankBookEntry> results, List<BankBookEntry> contraElements) {
 		for (BankBookEntry ent : results) {
