@@ -473,7 +473,7 @@ public class CashBookController {
 		}
 
 		cashBookReportBean.setCashBookResultList(bankBookViewEntries);
-		cashBookReportBean.setTitleName(titleName + " Cash Book Report");
+		cashBookReportBean.setTitleName(titleName);
 		cashBookReportBean.setHeader("Cash Book Report from " + DDMMYYYYFORMAT1.format(cashBookReportBean.getFromDate())
 				+ " to " + DDMMYYYYFORMAT1.format(cashBookReportBean.getToDate()));
 
@@ -836,6 +836,10 @@ public class CashBookController {
 	private void prepareViewObject() {
 		Map<Long, BankBookEntry> receiptmap = new HashMap<Long, BankBookEntry>();
 		Map<Long, BankBookEntry> paymentmap = new HashMap<Long, BankBookEntry>();
+		Map voucherNumberEntryMap = new HashMap<Long,BankBookEntry>();
+		List<BankBookEntry> finalResultList = new ArrayList<BankBookEntry>();
+		
+	
 		for (BankBookEntry row : bankBookEntries) {
 			if (null != row.getParticulars() && !row.getParticulars().isEmpty()) {
 				CashBookViewEntry bankBookViewEntry = new CashBookViewEntry();
@@ -870,6 +874,7 @@ public class CashBookController {
 
 					if (row.getType().equalsIgnoreCase(RECEIPT)) {
 						// bankBookViewEntry.setType(RECEIPT);
+						if(globalvoucherNumberEntryMap.containsKey(row.getVoucherId().longValue())) {
 						bankBookViewEntry = new CashBookViewEntry(row.getVoucherNumber(), voucherDate,
 								row.getParticulars(), row.getAmount(), row.getChequeDetail(), RECEIPT,
 								row.getChequeNumber());
@@ -911,9 +916,9 @@ public class CashBookController {
 						} else {
 							receiptmap.put(row.getVoucherId().longValue(), row);
 						}
-
+					}
 					} else {
-						// bankBookViewEntry.setType(PAYMENT);
+						if(globalvoucherNumberEntryMap.containsKey(row.getVoucherId().longValue())) {
 						bankBookViewEntry = new CashBookViewEntry(row.getVoucherNumber(), voucherDate,
 								row.getParticulars(), row.getAmount(), row.getChequeDetail(), PAYMENT,
 								row.getChequeNumber());
@@ -955,13 +960,14 @@ public class CashBookController {
 						} else {
 							paymentmap.put(row.getVoucherId().longValue(), row);
 						}
-
+					}
 					}
 
 				}
-
+				if((bankBookViewEntry.getPaymentParticulars()!= null && !bankBookViewEntry.getPaymentParticulars().isEmpty()) || 
+						(bankBookViewEntry.getReceiptParticulars() != null && !bankBookViewEntry.getReceiptParticulars().isEmpty())) {
 				bankBookViewEntries.add(bankBookViewEntry);
-
+				}
 			}
 		}
 	}
@@ -1005,8 +1011,8 @@ public class CashBookController {
 		List<BankBookEntry> results = query.list();
 
 		// populateParticulars(results);
-		populateEntries(results);
-		populatePaymentTypes(results);
+		List<BankBookEntry> finalEntries = populateEntries(results);
+		populatePaymentTypes(finalEntries);
 		populateContraEntries(results);
 
 		// populateRegularEntries(results, contraElements);
@@ -1019,7 +1025,12 @@ public class CashBookController {
 		Map<Long,String> typeMap = new HashMap<Long,String>();
 		for(BankBookEntry obj: results) {
 			if(obj.getGlCode().contains("450")) {
-				typeMap.put(obj.getVoucherId().longValue(), obj.getType());
+				if(obj.getParticulars().substring(obj.getParticulars().length()-2).contains("dr")) {
+					typeMap.put(obj.getVoucherId().longValue(),RECEIPT);
+				}else {
+					typeMap.put(obj.getVoucherId().longValue(), PAYMENT);
+				}
+				
 			}
 		}
 		for(BankBookEntry obj: results) {
@@ -1028,23 +1039,26 @@ public class CashBookController {
 			}
 		}
 	}
-
-	private void populateEntries(List<BankBookEntry> results) {
-		Map voucherNumberEntryMap = new HashMap<Long,BankBookEntry>();
+	Map globalvoucherNumberEntryMap = new HashMap<Long,BankBookEntry>();
+	private List<BankBookEntry> populateEntries(List<BankBookEntry> results) {
+		//Map voucherNumberEntryMap = new HashMap<Long,BankBookEntry>();
 		List<BankBookEntry> finalResultList = new ArrayList<BankBookEntry>();
 		
 	for(BankBookEntry obj : results) {
 		if(obj.getGlCode().contains("450")) {
 			
-			voucherNumberEntryMap.put(obj.getVoucherId().longValue(), obj);
+			globalvoucherNumberEntryMap.put(obj.getVoucherId().longValue(), obj);
 		}
 	}
 	for(BankBookEntry obj : results) {
-		if(voucherNumberEntryMap.containsKey(obj.getVoucherId().longValue())) {
+		if(globalvoucherNumberEntryMap.containsKey(obj.getVoucherId().longValue())) {
 			finalResultList.add(obj);
 		}
 	}
-	results = finalResultList;
+	for(BankBookEntry obj : finalResultList) {
+		System.out.println("##::"+obj.getVoucherNumber()+"## gl :"+obj.getGlCode());
+	}
+	return finalResultList;
 	}
 
 	private List<BankBookEntry> populateNarrationEntries(List<BankBookEntry> results) {
@@ -1318,7 +1332,7 @@ public class CashBookController {
 				}
 			}
 			titleName = getUlbName().toUpperCase() + " ";
-			cashBookReportBean.setTitleName(titleName + " Cash Book Report");
+			cashBookReportBean.setTitleName(titleName);
 			cashBookReportBean
 					.setHeader("Cash Book Report from " + DDMMYYYYFORMAT1.format(cashBookReportBean.getFromDate())
 							+ " to " + DDMMYYYYFORMAT1.format(cashBookReportBean.getToDate()));
