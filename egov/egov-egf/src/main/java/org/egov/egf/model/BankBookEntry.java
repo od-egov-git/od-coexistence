@@ -60,6 +60,7 @@ public class BankBookEntry {
     public Date voucherDate;
     public String particulars;
     public  BigDecimal amount;
+    public  BigDecimal cash;
     private BigDecimal creditAmount;
     private BigDecimal debitAmount;
     public String chequeNumber;
@@ -102,6 +103,17 @@ public class BankBookEntry {
         this.paymentAmount = paymentAmount;
         this.narration= narration;
     }
+    public BankBookEntry(final String particulars,final BigDecimal cash, final BigDecimal amount, final String type,
+            final BigDecimal receiptAmount, final BigDecimal paymentAmount, final String narration) {
+        super();
+        this.particulars = particulars;
+        this.cash = cash;
+        this.amount = amount;
+        this.type = type;
+        this.receiptAmount = receiptAmount;
+        this.paymentAmount = paymentAmount;
+        this.narration= narration;
+    }
     public BankBookEntry(final String particulars, final BigDecimal amount, final String type,
             final BigDecimal receiptAmount, final BigDecimal paymentAmount) {
         super();
@@ -120,7 +132,15 @@ public class BankBookEntry {
         this.voucherNumber = voucherNumber;
     }
 
-    public Date getVoucherDate() {
+    public BigDecimal getCash() {
+		return cash;
+	}
+
+	public void setCash(BigDecimal cash) {
+		this.cash = cash;
+	}
+
+	public Date getVoucherDate() {
         return voucherDate;
     }
 

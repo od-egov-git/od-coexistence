@@ -1141,6 +1141,7 @@ public class EgovCommon {
         if (null != accountdetailkey)
             opBalncQuery.append(" and accountdetailkey=").append(
                     accountdetailkey);
+        System.out.println("###opBalncQuery::"+opBalncQuery.toString());
         final List<Object> tsummarylist = getPersistenceService().findAllBy(opBalncQuery.toString(), glcode);
         opBalAsonDate = BigDecimal.valueOf((Integer) tsummarylist.get(0));
 
@@ -1274,7 +1275,7 @@ public class EgovCommon {
                 glCodeDbtBalQry.append(" and gld.detailKeyId =").append(
                         accountdetailkey);
             glCodeDbtBalQry.append(" and gl.debitAmount >0");
-
+System.out.println("###glCodeDbtBalQry ::"+glCodeDbtBalQry.toString());
             final List<Object> listDbt = getPersistenceService().findAllBy(glCodeDbtBalQry.toString(), glcode);
             glCodeDbtBalance = (BigDecimal) listDbt.get(0) == null ? BigDecimal.ZERO
                     : (BigDecimal) listDbt.get(0);
