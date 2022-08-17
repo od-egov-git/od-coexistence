@@ -41,30 +41,12 @@
 		<div class="panel panel-primary" data-collapsed="0">
 
 			<div style="padding: 0 15px;">
-				<%-- <c:if
-					test="${cashBookReport.titleName != null &&  !cashBookReport.titleName.isEmpty()}">
-					<table width="100%" border="1" cellspacing="0" cellpadding="0">
-						<tr>
-							<th class="bluebgheadtd" width="100%" colspan="5"><strong
-								style="font-size: 15px;"> ${cashBookReport.titleName}</strong></th>
-						</tr>
-					</table>
-				</c:if>
-				<c:if
-					test="${cashBookReport.header != null &&  !cashBookReport.header.isEmpty()}">
-					<table width="100%" border="1" cellspacing="0" cellpadding="0">
-						<tr>
-							<th class="bluebgheadtd" width="100%" colspan="5"><strong
-								style="font-size: 15px;"> ${cashBookReport.header}</strong></th>
-						</tr>
-					</table>
-				</c:if> --%>
-
 				<c:if
 					test="${cashBookReport.cashBookResultList != null &&  !cashBookReport.cashBookResultList.isEmpty()}">
-					<input type="hidden" id="header1" value="${cashBookReport.titleName}">
+					<input type="hidden" id="header1"
+						value="${cashBookReport.titleName}">
 					<input type="hidden" id="header2" value="${cashBookReport.header}">
-					<table class="table table-bordered" id="searchResult">
+					<table class="table table-striped table-bordered" id="searchResult">
 						<thead>
 							<tr>
 								<th class="bluebgheadtd" width="100%" colspan="14"><strong
@@ -112,7 +94,7 @@
 										</c:otherwise>
 										</c:choose></td>
 									<td></td>
-									<td>
+									<td class="myClass">
 										<div align="right">
 											<c:choose>
 												<c:when test="${result.receiptParticulars == 'Total'}">
@@ -126,14 +108,14 @@
 											</c:choose>
 										</div>
 									</td>
-									<td><c:choose>
+									<td class="myClass"><c:choose>
 											<c:when test="${result.receiptChequeDetail == 'MULTIPLE'}">
 										${result.receiptChequeDetail}&nbsp;
 						</c:when>
 											<c:otherwise>
 										${result.receiptChequeDetail}&nbsp;</c:otherwise>
 										</c:choose></td>
-									<td>
+									<td class="myClass">
 										<div align="right">
 											<c:choose>
 												<c:when test="${result.receiptParticulars == 'Total'}">
@@ -158,7 +140,7 @@
 						</c:otherwise>
 										</c:choose></td>
 									<td></td>
-									<td>
+									<td class="myClass">
 										<div align="right">
 											<c:choose>
 												<c:when test="${result.paymentParticulars == 'Total'}">
@@ -172,14 +154,14 @@
 											</c:choose>
 										</div>
 									</td>
-									<td><c:choose>
+									<td class="myClass"><c:choose>
 											<c:when test="${result.paymentChequeDetail == 'MULTIPLE'}">
 										${result.paymentChequeDetail}&nbsp;
 						</c:when>
 											<c:otherwise>
 										${result.paymentChequeDetail}&nbsp;</c:otherwise>
 										</c:choose></td>
-									<td>
+									<td class="myClass">
 										<div align="right">
 											<c:choose>
 												<c:when test="${result.paymentParticulars == 'Total'}">
@@ -257,6 +239,11 @@
 				text : '<i class="fa fa-file-pdf-o"> PDF</i>',
 				title : function() {
 					return $('#header1').val() + '\n' + $('#header2').val()
+				},
+				customize: function (doc) {
+					var objLayout = {};
+					objLayout['vLineColor'] = function(i) { return '#aaa'; };
+					doc.content[1].layout = objLayout;
 				}
 			} ]
 		});

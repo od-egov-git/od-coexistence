@@ -948,11 +948,15 @@ public class CashBookController {
 
 			for (TrialBalanceBean obj : al) {
 				if (obj.getAccCode().startsWith("4501")) {
+					LOGGER.debug("### cash obj.getOpeningBalance() ::"+obj.getAccCode()+" :: "+obj.getOpeningBalance());
+					System.out.println("### cash obj.getOpeningBalance() ::"+obj.getOpeningBalance());
 					cashval = cashval.add(obj.getOpeningBalance());
 				}
 			}
 			for (TrialBalanceBean obj : al) {
 				if (obj.getAccCode().startsWith("4502")) {
+					LOGGER.debug("### bank obj.getOpeningBalance() ::"+obj.getAccCode()+" :: "+obj.getOpeningBalance());
+					System.out.println("### bank obj.getOpeningBalance() ::"+obj.getOpeningBalance());
 					bankVal = bankVal.add(obj.getOpeningBalance());
 				}
 			}
