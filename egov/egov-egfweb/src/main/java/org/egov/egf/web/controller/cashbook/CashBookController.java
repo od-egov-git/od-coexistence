@@ -451,8 +451,6 @@ public class CashBookController {
 				glcodes = glcodes.append(bAcc.getChartofaccounts().getGlcode()).append("','");
 
 			}
-
-			System.out.println("#####glcodes" + glcodes);
 			List<BankBookEntry> results = new ArrayList<BankBookEntry>();
 			results = getResults(glcodes.toString());
 			addRowsToBankBookEntries(results, bankAccountL, "");
@@ -843,6 +841,8 @@ public class CashBookController {
 		cal.add(Calendar.DATE, -1);
 		tillDateOPBQry.setDate("fromDateMinus1", cal.getTime());
 		final List<TrialBalanceBean> tillDateOPBList = tillDateOPBQry.list();
+		if (LOGGER.isInfoEnabled())
+			LOGGER.info("tillDateOPBList query ---->" + tillDateOPBQry);
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("get till date balance for all account codes reulted in " + tillDateOPBList.size());
 		if (LOGGER.isDebugEnabled())
@@ -864,7 +864,7 @@ public class CashBookController {
 		
 		final List<TrialBalanceBean> currentDebitCreditList = currentDebitCreditQry.list();
 		if (LOGGER.isInfoEnabled())
-			LOGGER.info("closing balance query ---->" + currentDebitCreditQry);
+			LOGGER.info("currentDebitCreditQry query ---->" + currentDebitCreditQry);
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("get current debit and credit sum for all account codes resulted in   "
 					+ currentDebitCreditList.size());
@@ -945,21 +945,18 @@ public class CashBookController {
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("Exiting getTBReport" + totalOpeningBalance + "    " + totalClosingBalance);
 	
-
-			for (TrialBalanceBean obj : al) {
-				if (obj.getAccCode().startsWith("4501")) {
-					LOGGER.debug("### cash obj.getOpeningBalance() ::"+obj.getAccCode()+" :: "+obj.getOpeningBalance());
-					System.out.println("### cash obj.getOpeningBalance() ::"+obj.getOpeningBalance());
-					cashval = cashval.add(obj.getOpeningBalance());
-				}
+		for (Map.Entry<String, TrialBalanceBean> entry : tbMap.entrySet()) {
+			if(entry.getKey().startsWith("4501")) {
+				LOGGER.debug("### cash obj.getOpeningBalance() ::"+entry.getKey()+" :: "+entry.getValue().getOpeningBalance());
+				cashval = cashval.add(entry.getValue().getOpeningBalance());
+			}else if(entry.getKey().startsWith("4502")) {
+				LOGGER.debug("### bank obj.getOpeningBalance() ::"+entry.getKey()+" :: "+entry.getValue().getOpeningBalance());
+				
+				bankVal = bankVal.add(entry.getValue().getOpeningBalance());
 			}
-			for (TrialBalanceBean obj : al) {
-				if (obj.getAccCode().startsWith("4502")) {
-					LOGGER.debug("### bank obj.getOpeningBalance() ::"+obj.getAccCode()+" :: "+obj.getOpeningBalance());
-					System.out.println("### bank obj.getOpeningBalance() ::"+obj.getOpeningBalance());
-					bankVal = bankVal.add(obj.getOpeningBalance());
-				}
-			}
+			
+		}
+			
 
 	}
 
