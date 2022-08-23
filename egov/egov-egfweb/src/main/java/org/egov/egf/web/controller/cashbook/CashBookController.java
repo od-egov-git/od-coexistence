@@ -947,16 +947,17 @@ public class CashBookController {
 	
 		for (Map.Entry<String, TrialBalanceBean> entry : tbMap.entrySet()) {
 			if(entry.getKey().startsWith("4501")) {
-				LOGGER.debug("### cash obj.getOpeningBalance() ::"+entry.getKey()+" :: "+entry.getValue().getOpeningBalance());
+				LOGGER.debug("### cash obj.getOpeningBalance() ::"+entry.getKey()+" :: "+entry.getValue().getOpeningBalance()+"::"+entry.getValue().getClosingBalance());
 				cashval = cashval.add(entry.getValue().getOpeningBalance());
 			}else if(entry.getKey().startsWith("4502")) {
-				LOGGER.debug("### bank obj.getOpeningBalance() ::"+entry.getKey()+" :: "+entry.getValue().getOpeningBalance());
+				LOGGER.debug("### bank obj.getOpeningBalance() ::"+entry.getKey()+" :: "+entry.getValue().getOpeningBalance()+"::"+entry.getValue().getClosingBalance());
 				
 				bankVal = bankVal.add(entry.getValue().getOpeningBalance());
 			}
 			
 		}
-			
+		LOGGER.debug("## cash Opening ::"+cashval);
+		LOGGER.debug("## bank Opening ::"+bankVal);	
 
 	}
 
