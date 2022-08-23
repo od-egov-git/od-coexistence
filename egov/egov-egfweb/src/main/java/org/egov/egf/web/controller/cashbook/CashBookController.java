@@ -743,8 +743,8 @@ public class CashBookController {
 			}
 			
 		}
-		closingCashBalance = initialCashBalance.add(receiptCashTotal).subtract(paymentCashTotal);
-		closingBankBalance = initialBankBalance.add(receiptBankTotal).subtract(paymentBankTotal);
+		//closingCashBalance = initialCashBalance.add(receiptCashTotal).subtract(paymentCashTotal);
+		//closingBankBalance = initialBankBalance.add(receiptBankTotal).subtract(paymentBankTotal);
 		isCreditOpeningBalance = false;
 
 		String vhNum = EMPTY_STRING;
@@ -949,15 +949,19 @@ public class CashBookController {
 			if(entry.getKey().startsWith("4501")) {
 				LOGGER.debug("### cash obj.getOpeningBalance() ::"+entry.getKey()+" :: "+entry.getValue().getOpeningBalance()+"::"+entry.getValue().getClosingBalance());
 				cashval = cashval.add(entry.getValue().getOpeningBalance());
+				closingCashBalance = closingCashBalance.add(entry.getValue().getClosingBalance());
 			}else if(entry.getKey().startsWith("4502")) {
 				LOGGER.debug("### bank obj.getOpeningBalance() ::"+entry.getKey()+" :: "+entry.getValue().getOpeningBalance()+"::"+entry.getValue().getClosingBalance());
 				
 				bankVal = bankVal.add(entry.getValue().getOpeningBalance());
+				closingBankBalance = closingBankBalance.add(entry.getValue().getClosingBalance());
 			}
 			
 		}
 		LOGGER.debug("## cash Opening ::"+cashval);
 		LOGGER.debug("## bank Opening ::"+bankVal);	
+		LOGGER.debug("## cash closing ::"+closingCashBalance);
+		LOGGER.debug("## bank closing ::"+closingBankBalance);	
 
 	}
 
