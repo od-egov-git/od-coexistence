@@ -381,6 +381,10 @@ public class CashBookController {
 	public String cashBookSearchResult(@ModelAttribute("cashBookReport") final CashBookReportBean cashBookReportBean,
 			final Model model, HttpServletRequest request) {
 		try {
+			cashval = new BigDecimal(0);
+			bankVal = new BigDecimal(0);
+			closingCashBalance  = new BigDecimal(0);
+			closingBankBalance  = new BigDecimal(0);
 			String errMsg = null;
 
 			titleName = getUlbName().toUpperCase() + " ";
@@ -797,7 +801,7 @@ public class CashBookController {
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("get Opening balance for all account codes");
 		// get Opening balance for all account codes
-		final String openingBalanceStr = "SELECT coa.glcode AS accCode ,coa.name  AS accName, SUM(ts.openingcreditbalance) as creditOPB,"
+		String openingBalanceStr = "SELECT coa.glcode AS accCode ,coa.name  AS accName, SUM(ts.openingcreditbalance) as creditOPB,"
 				+ "sum(ts.openingdebitbalance) as debitOPB"
 				+ " FROM transactionsummary ts,chartofaccounts coa,financialyear fy "
 				+ " WHERE ts.glcodeid=coa.id  AND ts.financialyearid=fy.id "
@@ -805,14 +809,15 @@ public class CashBookController {
 				+ " GROUP BY ts.glcodeid,coa.glcode,coa.name ORDER BY coa.glcode ASC";
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("Query Str" + openingBalanceStr);
-		final Query openingBalanceQry = persistenceService.getSession().createSQLQuery(openingBalanceStr)
+		Query openingBalanceQry = persistenceService.getSession().createSQLQuery(openingBalanceStr)
 				.addScalar("accCode").addScalar("accName").addScalar("creditOPB", BigDecimalType.INSTANCE)
 				.addScalar("debitOPB", BigDecimalType.INSTANCE)
 				.setResultTransformer(Transformers.aliasToBean(TrialBalanceBean.class));
 
 		openingBalanceQry.setParameter("fromDate", startDate);
 		openingBalanceQry.setParameter("toDate", endDate);
-		final List<TrialBalanceBean> openingBalanceList = openingBalanceQry.list();
+		List<TrialBalanceBean> openingBalanceList = new ArrayList<TrialBalanceBean>();
+		openingBalanceList = openingBalanceQry.list();
 		if (LOGGER.isInfoEnabled())
 			LOGGER.info("Opening balance query ---->" + openingBalanceQry);
 
@@ -822,13 +827,13 @@ public class CashBookController {
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("get till date balance for all account codes");
 		// get till date balance for all account codes
-		final String tillDateOPBStr = "SELECT coa.glcode AS accCode ,coa.name  AS accName, SUM(gl.creditAmount) as tillDateCreditOPB,sum(gl.debitAmount) as tillDateDebitOPB"
+		String tillDateOPBStr = "SELECT coa.glcode AS accCode ,coa.name  AS accName, SUM(gl.creditAmount) as tillDateCreditOPB,sum(gl.debitAmount) as tillDateDebitOPB"
 				+ " FROM generalledger  gl,chartofaccounts coa,financialyear fy,Voucherheader vh " 
 				+ " WHERE gl.glcodeid=coa.id and vh.id=gl.voucherheaderid " 
 				+ " AND vh.voucherdate>=fy.startingdate AND vh.voucherdate<=:fromDateMinus1 "
 				+ " AND fy.startingdate<=:fromDate AND fy.endingdate>=:toDate" + " AND vh.status not in ("
 				+ defaultStatusExclude + ")" + " GROUP BY gl.glcodeid,coa.glcode,coa.name ORDER BY coa.glcode ASC";
-		final Query tillDateOPBQry = persistenceService.getSession().createSQLQuery(tillDateOPBStr).addScalar("accCode")
+		Query tillDateOPBQry = persistenceService.getSession().createSQLQuery(tillDateOPBStr).addScalar("accCode")
 				.addScalar("accName").addScalar("tillDateCreditOPB", BigDecimalType.INSTANCE)
 				.addScalar("tillDateDebitOPB", BigDecimalType.INSTANCE)
 				.setResultTransformer(Transformers.aliasToBean(TrialBalanceBean.class));
@@ -840,7 +845,8 @@ public class CashBookController {
 		cal.setTime(startDate);
 		cal.add(Calendar.DATE, -1);
 		tillDateOPBQry.setDate("fromDateMinus1", cal.getTime());
-		final List<TrialBalanceBean> tillDateOPBList = tillDateOPBQry.list();
+		List<TrialBalanceBean> tillDateOPBList = new ArrayList<TrialBalanceBean>();
+		tillDateOPBList = tillDateOPBQry.list();
 		if (LOGGER.isInfoEnabled())
 			LOGGER.info("tillDateOPBList query ---->" + tillDateOPBQry);
 		if (LOGGER.isDebugEnabled())
@@ -848,13 +854,13 @@ public class CashBookController {
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("get current debit and credit sum for all account codes  ");
 		// get current debit and credit sum for all account codes
-		final String currentDebitCreditStr = "SELECT coa.glcode AS accCode ,coa.name  AS accName, SUM(gl.creditAmount) as creditAmount,sum(gl.debitAmount) as debitAmount"
+		String currentDebitCreditStr = "SELECT coa.glcode AS accCode ,coa.name  AS accName, SUM(gl.creditAmount) as creditAmount,sum(gl.debitAmount) as debitAmount"
 				+ " FROM generalledger gl,chartofaccounts coa,financialyear fy,Voucherheader vh " 
 				+ " WHERE gl.glcodeid=coa.id and vh.id= gl.voucherheaderid "
 				+ " AND vh.voucherdate>=:fromDate AND vh.voucherdate<=:toDate "
 				+ " AND fy.startingdate<=:fromDate AND fy.endingdate>=:toDate" + " AND vh.status not in ("
 				+ defaultStatusExclude + ") " + " GROUP BY gl.glcodeid,coa.glcode,coa.name ORDER BY coa.glcode ASC";
-		final Query currentDebitCreditQry = persistenceService.getSession().createSQLQuery(currentDebitCreditStr)
+		Query currentDebitCreditQry = persistenceService.getSession().createSQLQuery(currentDebitCreditStr)
 				.addScalar("accCode").addScalar("accName").addScalar("creditAmount", BigDecimalType.INSTANCE)
 				.addScalar("debitAmount", BigDecimalType.INSTANCE)
 				.setResultTransformer(Transformers.aliasToBean(TrialBalanceBean.class));
@@ -862,13 +868,14 @@ public class CashBookController {
 		currentDebitCreditQry.setParameter("fromDate", startDate);
 		currentDebitCreditQry.setParameter("toDate", endDate);
 		
-		final List<TrialBalanceBean> currentDebitCreditList = currentDebitCreditQry.list();
+		List<TrialBalanceBean> currentDebitCreditList = new ArrayList<TrialBalanceBean>();
+		currentDebitCreditList = currentDebitCreditQry.list();
 		if (LOGGER.isInfoEnabled())
 			LOGGER.info("currentDebitCreditQry query ---->" + currentDebitCreditQry);
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("get current debit and credit sum for all account codes resulted in   "
 					+ currentDebitCreditList.size());
-		final Map<String, TrialBalanceBean> tbMap = new LinkedHashMap<String, TrialBalanceBean>();
+		Map<String, TrialBalanceBean> tbMap = new LinkedHashMap<String, TrialBalanceBean>();
 		totalClosingBalance = BigDecimal.ZERO;
 		totalOpeningBalance = BigDecimal.ZERO;
 
@@ -1152,8 +1159,10 @@ public class CashBookController {
 
 		OrderBy = "group by vh.id,gl.glcode,ch.instrumentnumber,ch.transactionnumber,ch.instrumentdate,ch.transactiondate,ch.description,c.name,vh.description,gl.debitAmount,gl.creditamount,gl1.debitAmount,gl1.creditamount order by voucherdate,vouchernumber";
 		//System.out.println("### main query ::" + query1 + queryFrom + OrderBy);
-		if (LOGGER.isDebugEnabled())
-			LOGGER.debug("Main query :" + query1 + queryFrom + OrderBy);
+		/*
+		 * if (LOGGER.isDebugEnabled()) LOGGER.debug("Main query :" + query1 + queryFrom
+		 * + OrderBy);
+		 */
 
 		Query query = persistenceService.getSession().createSQLQuery(query1 + queryFrom + OrderBy)
 				.addScalar("voucherId", new BigDecimalType()).addScalar("voucherDate").addScalar("voucherNumber")
