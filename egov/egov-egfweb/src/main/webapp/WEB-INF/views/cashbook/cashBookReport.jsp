@@ -57,8 +57,8 @@
 									style="font-size: 15px;"> ${cashBookReport.header}</strong></th>
 							</tr>
 							<tr>
-								<th colspan="7">Receipt Side</th>
-								<th colspan="7">Payment Side</th>
+								<th colspan="7" align="center">Receipt Side</th>
+								<th colspan="7" align="center">Payment Side</th>
 							</tr>
 							<tr>
 								<th>Date</th>
@@ -67,14 +67,14 @@
 								<th>L.F</th>
 								<th>Cash</th>
 								<th>Chq No.</th>
-								<th>Amt</th>
+								<th>Bank</th>
 								<th>Date</th>
 								<th>Voucher No.</th>
 								<th>Particulars</th>
 								<th>L.F</th>
 								<th>Cash</th>
 								<th>Chq No.</th>
-								<th>Amt</th>
+								<th>Bank</th>
 							</tr>
 						</thead>
 						`
