@@ -1242,6 +1242,7 @@ public class CashBookController {
 		Map<String, String> narrMap = new HashMap<String, String>();
 		BankBookEntry s = null;
 		int i = 0;
+		String narr = "";
 		for (BankBookEntry entry : results) {
 			if (entry.getNarration() != null && !entry.getNarration().isEmpty()) {
 				// narrMap.put(entry.getVoucherNumber(), entry.getNarration());
@@ -1253,17 +1254,21 @@ public class CashBookController {
 					s = entry;
 					i = 1;
 				} else {
+					narr = entry.getNarration();
 					if (narrMap.containsKey(entry.getVoucherNumber())) {
 						updatedNarrResultList.add(entry);
 						s = entry;
 					} else { //
 						//s.setParticulars(narrMap.get(s.getVoucherNumber()));
+						
+						if(!entry.getParticulars().equals(narr)) {
 						s = new BankBookEntry(s.getVoucherNumber(), s.getVoucherDate(), s.getNarration(), s.getAmount(),
 								s.getType(), s.getChequeDetail(), s.getGlCode(), s.getInstrumentStatus(),
 								s.getVoucherId(), s.getNarration());
+							updatedNarrResultList.add(s);
+						}
 						narrMap.put(entry.getVoucherNumber(), entry.getNarration());
-						updatedNarrResultList.add(s);
-						// if(!entry.getParticulars().equals(entry.getNarration()))
+						
 						updatedNarrResultList.add(entry);
 					}
 				}
