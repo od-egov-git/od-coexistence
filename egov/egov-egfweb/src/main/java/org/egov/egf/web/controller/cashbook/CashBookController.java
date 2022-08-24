@@ -992,14 +992,7 @@ public class CashBookController {
 		for (BankBookEntry row : bankBookEntries) {
 			if (null != row.getParticulars() && !row.getParticulars().isEmpty()) {
 				CashBookViewEntry bankBookViewEntry = new CashBookViewEntry();
-				/*
-				 * if ("Total".equalsIgnoreCase(row.getParticulars())) {
-				 * bankBookViewEntry.setReceiptAmount(row.getReceiptAmount());
-				 * bankBookViewEntry.setReceiptParticulars(row.getParticulars()); //
-				 * bankBookViewEntry.setReceiptCash(row.get);
-				 * bankBookViewEntry.setPaymentAmount(row.getReceiptAmount());
-				 * bankBookViewEntry.setPaymentParticulars(row.getParticulars()); } else
-				 */if ("To Opening Balance".equalsIgnoreCase(row.getParticulars())) {
+				if ("To Opening Balance".equalsIgnoreCase(row.getParticulars())) {
 					BigDecimal amt = row.getAmount();
 					BigDecimal cash = row.getCash();
 					if (amt.longValue() < 0) {
@@ -1142,6 +1135,7 @@ public class CashBookController {
 				}
 			}
 		}
+		System.out.println("### bankBookViewEntries size ::"+bankBookViewEntries.size());
 	}
 
 	private List<BankBookEntry> getResults(String glCodes) {
@@ -1231,9 +1225,7 @@ public class CashBookController {
 				finalResultList.add(obj);
 			}
 		}
-		for (BankBookEntry obj : finalResultList) {
-			System.out.println("##::" + obj.getVoucherNumber() + "## gl :" + obj.getGlCode());
-		}
+		
 		return finalResultList;
 	}
 
@@ -1256,8 +1248,10 @@ public class CashBookController {
 				} else {
 					narr = entry.getNarration();
 					if (narrMap.containsKey(entry.getVoucherNumber())) {
-						updatedNarrResultList.add(entry);
-						s = entry;
+						if(!entry.getParticulars().equals(entry.getNarration())) {
+							updatedNarrResultList.add(entry);
+							s = entry;
+						}
 					} else { //
 						//s.setParticulars(narrMap.get(s.getVoucherNumber()));
 						
@@ -1278,23 +1272,6 @@ public class CashBookController {
 			}
 
 		}
-		/*
-		 * for (
-		 * 
-		 * BankBookEntry entry : results) { if
-		 * (!narrMap.containsKey(entry.getVoucherNumber())) {
-		 * updatedNarrResultList.add(entry); s = entry; i = 1; } else { for
-		 * (BankBookEntry entry2 : results) { if
-		 * (entry2.equals(entry.getVoucherNumber())) {
-		 * updatedNarrResultList.add(entry2); } else { s = new
-		 * BankBookEntry(entry2.getVoucherNumber(), entry2.getVoucherDate(),
-		 * entry2.getNarration(), entry2.getAmount(), entry2.getType(),
-		 * entry2.getChequeDetail(), entry2.getGlCode(), entry2.getInstrumentStatus(),
-		 * entry2.getVoucherId(), entry2.getNarration()); updatedNarrResultList.add(s);
-		 * } } }
-		 * 
-		 * }
-		 */
 		return updatedNarrResultList;
 	}
 
