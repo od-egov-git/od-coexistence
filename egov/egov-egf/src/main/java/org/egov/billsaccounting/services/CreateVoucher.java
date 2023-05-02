@@ -1902,6 +1902,8 @@ public class CreateVoucher {
 			throws ApplicationRuntimeException, Exception {
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("START | createVoucherHeader");
+		
+		LOGGER.info("START | createVoucherHeader");
 		// Connection con = null;
 		Query query = null;
 		final CVoucherHeader cVoucherHeader = new CVoucherHeader();
@@ -1954,9 +1956,14 @@ public class CreateVoucher {
 
 			if (LOGGER.isDebugEnabled())
 				LOGGER.debug("Voucher Type is :" + voucherType);
+			
+			LOGGER.info("Voucher Type is :" + voucherType);
+			
 			if (LOGGER.isDebugEnabled())
 				LOGGER.debug("vNumGenMode is  :" + vNumGenMode);
-
+			
+			LOGGER.info("vNumGenMode is  :" + vNumGenMode);
+			
 			if (headerdetails.get(VoucherConstant.VOUCHERNUMBER) != null)
 				cVoucherHeader.setVoucherNumber(headerdetails.get(VoucherConstant.VOUCHERNUMBER).toString());
 			if (null != headerdetails.get(VoucherConstant.MODULEID))
@@ -2047,6 +2054,8 @@ public class CreateVoucher {
 		}
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("END | createVoucherHeader");
+		
+		LOGGER.info("END | createVoucherHeader");
 		return cVoucherHeader;
 	}
 

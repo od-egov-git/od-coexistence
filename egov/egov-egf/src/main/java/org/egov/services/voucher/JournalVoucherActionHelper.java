@@ -299,6 +299,7 @@ public class JournalVoucherActionHelper {
             voucherHeader = transitionWorkFlow(voucherHeader, workflowBean);
             voucherService.applyAuditing(voucherHeader.getState());
             voucherService.persist(voucherHeader);
+            LOGGER.info("Journal Voucher Modify Action | After persist");
         } catch (final ValidationException e) {
 
             final List<ValidationError> errors = new ArrayList<ValidationError>();
