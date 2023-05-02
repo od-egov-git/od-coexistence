@@ -192,6 +192,9 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
         List<Position> positionsForUser = null;
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("JournalVoucherModifyAction | loadvouchers | Start ");
+        
+        LOGGER.info("JournalVoucherModifyAction | loadvouchers | Start ");
+        
         if (voucherHeader != null && voucherHeader.getId() != null)
        voucherHeaderId = voucherHeader.getId().toString();
         else
@@ -207,11 +210,15 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
         voucherHeader.setDocumentMode(CommonConstants.DOCUMENT_ADD_VIEW_MODE);
         System.out.println("::::BackdateEntry::"+voucherHeader.getBackdateentry());
         fileno=voucherHeader.getFileno();
+        
+        LOGGER.info("file number: "+ fileno);
        // voucherHeader.setBackdateentry(voucherHeader.getBackdateentry());
         try {
             if (voucherHeader != null && voucherHeader.getState() != null)
                 if (voucherHeader.getState().getValue().contains("Rejected")) {
+                	LOGGER.info("** Inside rejected **");
                     positionsForUser = eisService.getPositionsForUser(ApplicationThreadLocals.getUserId(), new Date());
+                    LOGGER.info("positionsForUser "+positionsForUser);
                 }
                 else if (voucherHeader.getState().getValue().contains("Closed")) {
                     if (LOGGER.isDebugEnabled())
@@ -253,6 +260,8 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
         getBillInfo();
         loadSchemeSubscheme();
         loadFundSource();
+        
+        LOGGER.info("End of modify voucher");
         // loadApproverUser("default");
         if (null != parameters.get("showMode") && parameters.get("showMode")[0].equalsIgnoreCase("view")) {
             return "view";
@@ -275,10 +284,13 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
     {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("journalVoucherModifyAction | sendForApproval | Start");
+        LOGGER.info("journalVoucherModifyAction | sendForApproval | Start");
         if (voucherHeader.getId() == null)
             voucherHeader = (CVoucherHeader) voucherService.findById(Long.parseLong(parameters.get("voucherId")[0]), false);
         populateWorkflowBean();
         voucherHeader = preApprovedActionHelper.sendForApproval(voucherHeader, workflowBean);
+        
+        LOGGER.info("journalVoucherModifyAction | sendForApproval | voucherHeader "+ voucherHeader);
         if (FinancialConstants.BUTTONFORWARD.equalsIgnoreCase(workflowBean.getWorkFlowAction()))
             addActionMessage(getText("pjv.voucher.approved",
                     new String[] {this.getEmployeeName(voucherHeader.getState()
@@ -409,7 +421,7 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
     @SuppressWarnings("deprecation")
     @Action(value = "/voucher/journalVoucherModify-update")
     public String update() {
-            LOGGER.info("JournalVoucherModifyAction | updateVoucher | Start");
+        LOGGER.info("JournalVoucherModifyAction | updateVoucher | Start");
         target = "";
         loadSchemeSubscheme();
 
