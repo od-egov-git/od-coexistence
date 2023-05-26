@@ -2379,8 +2379,18 @@ function updateRateDetailJV()
 							amount=parseFloat((rate*rateDeb)/100);
 							if((document.getElementById('billDetailslist['+i+'].accounthead').value).includes("GST"))
 							{
-								document.getElementById('billDetailslist['+i+'].debitAmountDetail').value=amount;
-								deb=deb+amount;
+								if((document.getElementById('billDetailslist['+i+'].accounthead').value).includes("GST Payable"))
+								{
+									document.getElementById('billDetailslist['+i+'].creditAmountDetail').value=amount;
+									cred=cred+amount;
+									
+								}
+								else
+								{
+									document.getElementById('billDetailslist['+i+'].debitAmountDetail').value=amount;
+									deb=deb+amount;
+								}
+								
 							}
 							else
 								{
