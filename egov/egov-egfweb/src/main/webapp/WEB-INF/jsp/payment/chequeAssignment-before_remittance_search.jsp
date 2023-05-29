@@ -55,7 +55,7 @@
 	href="/services/EGF/resources/css/ccMenu.css?rnd=${app_release_no}" />
 <title><s:text name="chq.assignment.heading.search" /></title>
 </head>
-<body>
+<body onload="onload()">
 	<s:form action="chequeAssignment" theme="simple"
 		name="chequeAssignment" id="chequeAssignment">
 		<jsp:include page="../budget/budgetHeader.jsp">
@@ -147,6 +147,11 @@
 		<s:hidden name="bankbranch" id="bankbranch" />
 	</s:form>
 	<script>
+		function onload() {
+			loadBank("1");
+		}
+		
+	
 		function submitForm() {
 
 			document.chequeAssignment.action = "/services/EGF/payment/chequeAssignment-searchChequesOfRemittance.action";
@@ -154,17 +159,19 @@
 		}
 		var date = '<s:date name="currentDate" format="dd/MM/yyyy"/>';
 		function loadBank(obj) {
+			/*
 			if (document.getElementById("recoveryId").value == "") {
 				var revocery = 0;
 			}else{
 				var revocery = document.getElementById("recoveryId").value;
 			}
+			*/
 			var vTypeOfAccount = '<s:property value="%{typeOfAccount}"/>';
 			
-			if (obj.options[obj.selectedIndex].value != -1)
+			if (obj != -1)
 				populatebank_branch({
-					fundId : obj.options[obj.selectedIndex].value
-							+ '&asOnDate=' + date + '&recoveryId=' + revocery
+					fundId : "1"  //obj.options[obj.selectedIndex].value
+							+ '&asOnDate=' + date  // + '&recoveryId=' + revocery
 				});
 		}
 		function loadBankAccount(obj) {
