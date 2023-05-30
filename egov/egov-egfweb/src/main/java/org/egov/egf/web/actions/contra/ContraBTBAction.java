@@ -132,7 +132,7 @@ public class ContraBTBAction extends BaseVoucherAction {
 	private SimpleDateFormat sqlformat = new SimpleDateFormat("dd-MMM-yyyy");
 	private static final String EXCEPTION_WHILE_SAVING_DATA = "Exception while saving Data";
 	private static final String MDC_CHEQUE = "cheque";
-	
+	private static final String MDC_ONLINE = "online";
 	private static final String MDC_OTHER = "RTGS/NEFT";
 	private static final String MDC_PEX ="pex";
 	private static final String REVERSE = "reverse";
@@ -216,6 +216,7 @@ public class ContraBTBAction extends BaseVoucherAction {
 		//ModeOfCollectionMap.put(MDC_PEX,MDC_PEX);//comment by Abhishek on 10042021
 		//ModeOfCollectionMap.put(MDC_OTHER, MDC_OTHER);//comment by Abhishek on 08042021 
 		ModeOfCollectionMap.put(MDC_CHEQUE, MDC_CHEQUE);
+		ModeOfCollectionMap.put(MDC_ONLINE, MDC_ONLINE);
 		final List<CChartOfAccounts> glCodeList = persistenceService.findAllBy(
 				"from CChartOfAccounts coa where coa.purposeId=8 and coa.classification=4 and coa.isActiveForPosting=true order by coa.glcode ");
 		addDropdownData("interFundList", glCodeList);
