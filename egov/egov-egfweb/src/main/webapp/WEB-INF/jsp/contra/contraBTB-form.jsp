@@ -188,8 +188,7 @@
 	<td class="bluebox"><s:text name="contra.modeOfCollection" /> <span
 		class="bluebox"><span class="mandatory1">*</span></span></td>
 	<td class="bluebox"><s:radio name="contraBean.modeOfCollection"
-			id="modeOfCollection" list="#{'cheque':'Cheque'}"
-			 value="cheque" checked="checked"/></td>
+			id="modeOfCollection" list="%{modeOfCollectionMap}" /></td>
 	<td class="bluebox"></td>
 	<td class="bluebox"></td>
 </tr>
@@ -197,8 +196,8 @@
 <tr id="chequeGrid">
 	<td class="greybox"></td>
 	<td class="greybox"><span id="mdcNumber"><s:text
-				name="contra.chequeNumber" /></span> <span class="greybox"><span
-			class="mandatory1">*</span></span></td>
+				name="contra.chequeNumber" /></span> <%--  span class="greybox"><span
+			class="mandatory1">*</span >></span --%></td>
 	<td class="greybox"><s:textfield name="contraBean.chequeNumber"
 			id="chequeNum" value="%{contraBean.chequeNumber}" onblur="validateChequeNumber(this)" onchange="validateReassignSurrenderChequeNumber(this)"/>
 				<span>
