@@ -47,6 +47,7 @@
  */
 package org.egov.eis.service;
 
+import org.apache.log4j.Logger;
 import org.egov.eis.repository.DesignationRepository;
 import org.egov.infra.admin.master.entity.Role;
 import org.egov.pims.commons.Designation;
@@ -63,7 +64,9 @@ import static java.util.Collections.emptyList;
 @Service
 @Transactional(readOnly = true)
 public class DesignationService {
-
+	
+	private static final Logger LOGGER = Logger.getLogger(DesignationService.class);
+	
     @Autowired
     private DesignationRepository designationRepository;
 
@@ -115,6 +118,7 @@ public class DesignationService {
     }
 
     public List<Designation> getDesignationsByNames(List<String> names) {
+    	LOGGER.info("Inside getDesignationsByNames, names= " + names);
         return names.isEmpty() ? emptyList() : designationRepository.getDesignationsByNames(names);
     }
 

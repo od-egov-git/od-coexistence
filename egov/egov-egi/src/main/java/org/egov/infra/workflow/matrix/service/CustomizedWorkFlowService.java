@@ -48,6 +48,7 @@
 
 package org.egov.infra.workflow.matrix.service;
 
+import org.apache.log4j.Logger;
 import org.egov.infra.workflow.entity.StateAware;
 import org.egov.infra.workflow.matrix.entity.WorkFlowMatrix;
 import org.egov.infra.workflow.service.WorkflowService;
@@ -66,7 +67,9 @@ import java.util.List;
 @Service
 @Transactional(readOnly = true)
 public class CustomizedWorkFlowService {
-
+	
+	private static final Logger LOGGER = Logger.getLogger(CustomizedWorkFlowService.class);
+	
     @Autowired
     @Qualifier("workflowService")
     private WorkflowService<? extends StateAware> workflowService;
@@ -97,9 +100,15 @@ public class CustomizedWorkFlowService {
     public List<String> getNextDesignations(String type, String department, BigDecimal businessRule,
                                             String additionalRule, String currentState,
                                             String pendingAction, Date date, String designation) {
-
-        return getDesignationNames(workflowService.getWfMatrix(type, department, businessRule, additionalRule, currentState,
+    	LOGGER.info("type = "+type);
+    	LOGGER.info("department = "+department);
+    	
+    	List<String> result = getDesignationNames(workflowService.getWfMatrix(type, department, businessRule, additionalRule, currentState,
                 pendingAction, date, designation));
+    	
+    	LOGGER.info("Inside getNextDesignations, result = "+result);
+
+        return result;
     }
 
     public List<String> getNextValidActions(String type, String departmentName, BigDecimal businessRule,
@@ -156,6 +165,9 @@ public class CustomizedWorkFlowService {
     }
 
     private List<String> getDesignationNames(WorkFlowMatrix wfMatrix) {
+    	
+    	LOGGER.info("wfmatrix from getWfMatrix = "+wfMatrix);
+    	
         List<String> designationNames = new ArrayList<>();
         if (wfMatrix != null && wfMatrix.getNextDesignation() != null) {
             List<String> tempDesignationName = Arrays.asList(wfMatrix.getNextDesignation().split(","));
@@ -163,6 +175,8 @@ public class CustomizedWorkFlowService {
                 if (desgName != null && !"".equals(desgName.trim()))
                     designationNames.add(desgName.toUpperCase());
         }
+        LOGGER.info("Inside getDesignationNames, designationNames = "+designationNames);
+        
         return designationNames;
     }
 
