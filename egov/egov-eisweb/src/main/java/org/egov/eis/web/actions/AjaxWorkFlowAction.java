@@ -55,6 +55,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.apache.struts2.ServletActionContext;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.ParentPackage;
@@ -82,6 +83,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class AjaxWorkFlowAction extends BaseFormAction {
 
     private static final long serialVersionUID = -4816498948951535977L;
+    private static final Logger LOGGER = Logger.getLogger(AjaxWorkFlowAction.class);
     private static final String WF_DESIGNATIONS = "designations";
     private static final String WF_APPROVERS = "approvers";
     private transient List<Designation> designationList;
@@ -126,7 +128,9 @@ public class AjaxWorkFlowAction extends BaseFormAction {
 		else
 			designationList = designationService.getDesignationsByNames(customizedWorkFlowService.getNextDesignations(
 					type, departmentRule, amountRule, additionalRule, currentState, pendingAction, new Date()));
-         
+		
+		
+        LOGGER.info("Inside getDesignationsByObjectType, DesignationList =  "+ designationList); 
             //designationList = microserviceUtils.getDesignations();
         return WF_DESIGNATIONS;
     }
