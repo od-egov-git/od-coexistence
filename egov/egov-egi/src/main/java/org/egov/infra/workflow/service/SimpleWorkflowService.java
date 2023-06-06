@@ -48,6 +48,7 @@
 
 package org.egov.infra.workflow.service;
 
+import org.apache.log4j.Logger;
 import org.egov.infra.exception.ApplicationRuntimeException;
 import org.egov.infra.script.entity.Script;
 import org.egov.infra.script.service.ScriptService;
@@ -81,6 +82,8 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
  * </pre>
  **/
 public class SimpleWorkflowService<T extends StateAware> implements WorkflowService<T> {
+	
+	private static final Logger LOGGER = Logger.getLogger(SimpleWorkflowService.class);
 
     private static final String WF_ACTION_ARG = "action";
     private static final String WF_ITEM_ARG = "wfItem";
@@ -173,8 +176,20 @@ public class SimpleWorkflowService<T extends StateAware> implements WorkflowServ
     @Override
     public WorkFlowMatrix getWfMatrix(String type, String department, BigDecimal amountRule,
                                       String additionalRule, String currentState, String pendingActions, Date date) {
+    	LOGGER.info("Inside getWfMatrix implementation :");
+    	LOGGER.info("Department :"+department);
+    	LOGGER.info("type :"+type);
+    	LOGGER.info("businessRule :"+amountRule);
+    	LOGGER.info("additionalRule :"+additionalRule);
+    	LOGGER.info("currentState :"+currentState);
+    	LOGGER.info("pendingAction :"+pendingActions);
+    	LOGGER.info("date :"+date);
+    	
         Criteria wfMatrixCriteria = createWfMatrixAdditionalCriteria(type, department, amountRule,
                 additionalRule, currentState, pendingActions, null);
+        
+        LOGGER.info("Inside getWfMatrix implementation, wfMatrixCriteria = "+ wfMatrixCriteria);
+        
         Criterion fromDateCriteria = Restrictions.le("fromDate", date == null ? new Date() : date);
         Criterion toDateCriteria = Restrictions.ge("toDate", date == null ? new Date() : date);
         Criterion dateCriteria = Restrictions.conjunction().add(fromDateCriteria).add(toDateCriteria);
@@ -201,12 +216,14 @@ public class SimpleWorkflowService<T extends StateAware> implements WorkflowServ
                                                 String currentState, String pendingActions,
                                                 String designation, Criteria wfMatrixCriteria) {
         List<WorkFlowMatrix> workflowMatrix = wfMatrixCriteria.list();
+        LOGGER.info("Inside getWorkflowMatrixObj , workflowMatrix :" + workflowMatrix);
         if (workflowMatrix.isEmpty()) {
             Criteria defaultCriteria = commonWorkFlowMatrixCriteria(type, additionalRule, currentState, pendingActions);
             defaultCriteria.add(Restrictions.eq(DEPARTMENT, ANY));
             if (isNotBlank(designation))
                 defaultCriteria.add(Restrictions.ilike(CURRENT_DESIGNATION, designation));
             List<WorkFlowMatrix> defaultMatrix = defaultCriteria.list();
+            LOGGER.info("Inside getWorkflowMatrixObj , defaultMatrix :" + defaultMatrix);
             return defaultMatrix.isEmpty() ? null : defaultMatrix.get(0);
         } else {
             for (WorkFlowMatrix matrix : workflowMatrix)
@@ -219,8 +236,12 @@ public class SimpleWorkflowService<T extends StateAware> implements WorkflowServ
     private Criteria createWfMatrixAdditionalCriteria(String type, String department,
                                                       BigDecimal amountRule, String additionalRule, String currentState,
                                                       String pendingActions, String designation) {
+    	
+    	
         Criteria wfMatrixCriteria = commonWorkFlowMatrixCriteria(type, additionalRule, currentState,
                 pendingActions);
+        
+        LOGGER.info("wfMatrixCriteria = "+wfMatrixCriteria);
         if (isNotBlank(department))
             wfMatrixCriteria.add(Restrictions.eq(DEPARTMENT, department));
 
