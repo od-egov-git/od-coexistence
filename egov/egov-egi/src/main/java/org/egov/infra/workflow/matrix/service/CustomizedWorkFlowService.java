@@ -93,6 +93,15 @@ public class CustomizedWorkFlowService {
 
     public List<String> getNextDesignations(String type, String department, BigDecimal businessRule,
                                             String additionalRule, String currentState, String pendingAction, Date date) {
+    	
+    	LOGGER.info("Inside getNextDesignations:");
+    	LOGGER.info("Department :"+department);
+    	LOGGER.info("type :"+type);
+    	LOGGER.info("businessRule :"+businessRule);
+    	LOGGER.info("additionalRule :"+additionalRule);
+    	LOGGER.info("currentState :"+currentState);
+    	LOGGER.info("pendingAction :"+pendingAction);
+    	LOGGER.info("date :"+date);
         return getDesignationNames(workflowService
                 .getWfMatrix(type, department, businessRule, additionalRule, currentState, pendingAction, date));
     }
