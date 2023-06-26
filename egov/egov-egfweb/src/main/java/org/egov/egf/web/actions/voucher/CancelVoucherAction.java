@@ -185,7 +185,6 @@ public class CancelVoucherAction extends BaseFormAction {
 	@Action(value = "/voucher/cancelVoucher-beforeSearch")
 	public String beforeSearch() {
 		voucherHeader.reset();
-		System.out.println("In before Search");
 		setFromDate(null);
 		setToDate(null);
 		return SEARCH;
@@ -203,7 +202,6 @@ public class CancelVoucherAction extends BaseFormAction {
 		for (org.egov.infra.microservice.models.Department department : departments) {
 			depMap.put(department.getCode(), department.getName());
 		}
-		System.out.println(depMap);
 		if (voucherSearchList != null && !voucherSearchList.isEmpty())
 			for (CVoucherHeader voucher : voucherSearchList) {
 				if (voucher.getVouchermis()!=null && voucher.getVouchermis().getDepartmentcode() != null)
@@ -391,8 +389,7 @@ public class CancelVoucherAction extends BaseFormAction {
 		} else if (voucherHeader.getType().equalsIgnoreCase(FinancialConstants.STANDARD_VOUCHER_TYPE_CONTRA)) {
 			contraVoucherQry = "from CVoucherHeader vh where vh.status =" + FinancialConstants.CREATEDVOUCHERSTATUS
 					+ " and ( vh.isConfirmed != 1 or vh.isConfirmed is null) ";
-			persistenceService.findAllBy(contraVoucherQry + filterQry);
-			voucherList.addAll(persistenceService.findAllBy(contraVoucherQry + filterQry));// Redundant Calling of the same service 
+			voucherList.addAll(persistenceService.findAllBy(contraVoucherQry + filterQry)) 
 		}
 		else if(voucherHeader.getType().equalsIgnoreCase(FinancialConstants.STANDARD_VOUCHER_TYPE_RECEIPT)) {
 			receiptVoucherQry = "from CVoucherHeader vh where vh.status =" + FinancialConstants.CREATEDVOUCHERSTATUS
