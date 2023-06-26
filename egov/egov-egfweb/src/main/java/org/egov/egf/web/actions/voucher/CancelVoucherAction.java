@@ -389,7 +389,7 @@ public class CancelVoucherAction extends BaseFormAction {
 		} else if (voucherHeader.getType().equalsIgnoreCase(FinancialConstants.STANDARD_VOUCHER_TYPE_CONTRA)) {
 			contraVoucherQry = "from CVoucherHeader vh where vh.status =" + FinancialConstants.CREATEDVOUCHERSTATUS
 					+ " and ( vh.isConfirmed != 1 or vh.isConfirmed is null) ";
-			voucherList.addAll(persistenceService.findAllBy(contraVoucherQry + filterQry)) 
+			voucherList.addAll(persistenceService.findAllBy(contraVoucherQry + filterQry)); 
 		}
 		else if(voucherHeader.getType().equalsIgnoreCase(FinancialConstants.STANDARD_VOUCHER_TYPE_RECEIPT)) {
 			receiptVoucherQry = "from CVoucherHeader vh where vh.status =" + FinancialConstants.CREATEDVOUCHERSTATUS
