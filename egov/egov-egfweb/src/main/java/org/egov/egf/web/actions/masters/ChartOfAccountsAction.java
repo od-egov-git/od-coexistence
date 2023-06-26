@@ -561,8 +561,11 @@ public class ChartOfAccountsAction extends BaseFormAction {
             model.setParentId(parentId);
             model.setType(parent.getType());
         }
+        
+        if (coaParent != null) {
+        	model.setSchedule(coaParent.getSchedule());
+        }
         setPurposeOnCoa();
-        model.setSchedule(coaParent.getSchedule());
         model.setIsActiveForPosting(activeForPosting);
         model.setBudgetCheckReq(budgetCheckRequired);
         model.setFunctionReqd(functionRequired);
