@@ -206,6 +206,7 @@ public class CancelVoucherAction extends BaseFormAction {
 			for (CVoucherHeader voucher : voucherSearchList) {
 				if (voucher.getVouchermis()!=null && voucher.getVouchermis().getDepartmentcode() != null)
 					voucher.setDepartmentName(depMap.get(voucher.getVouchermis().getDepartmentcode()));
+				
 			}
 		return SEARCH;
 	}
@@ -226,6 +227,7 @@ public class CancelVoucherAction extends BaseFormAction {
 	private List<CVoucherHeader> getVouchersForCancellation() {
 		String voucheerWithNoPayment, allPayment, noChequePaymentQry;
 		String contraVoucherQry;
+		String receiptVoucherQry;
 		String filterQry = "";
 		if(!voucherNumber.isEmpty()&&voucherNumber!=null ) {
 		    CVoucherHeader vocuHeaders = (CVoucherHeader) persistenceService.find(" from CVoucherHeader vh where vh.voucherNumber = ? and vh.status = 0", voucherNumber);
@@ -388,8 +390,12 @@ public class CancelVoucherAction extends BaseFormAction {
 		} else if (voucherHeader.getType().equalsIgnoreCase(FinancialConstants.STANDARD_VOUCHER_TYPE_CONTRA)) {
 			contraVoucherQry = "from CVoucherHeader vh where vh.status =" + FinancialConstants.CREATEDVOUCHERSTATUS
 					+ " and ( vh.isConfirmed != 1 or vh.isConfirmed is null) ";
-			persistenceService.findAllBy(contraVoucherQry + filterQry);
-			voucherList.addAll(persistenceService.findAllBy(contraVoucherQry + filterQry));
+			voucherList.addAll(persistenceService.findAllBy(contraVoucherQry + filterQry)); 
+		}
+		else if(voucherHeader.getType().equalsIgnoreCase(FinancialConstants.STANDARD_VOUCHER_TYPE_RECEIPT)) {
+			receiptVoucherQry = "from CVoucherHeader vh where vh.status =" + FinancialConstants.CREATEDVOUCHERSTATUS
+					+ " and ( vh.isConfirmed != 1 or vh.isConfirmed is null) ";
+			voucherList.addAll(persistenceService.findAllBy(receiptVoucherQry + filterQry));
 		}
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("......No of voucher found in search for is cancellation ..." + voucherList.size());
