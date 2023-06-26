@@ -545,6 +545,10 @@ public class ChartOfAccountsAction extends BaseFormAction {
         }
         final CChartOfAccounts coa = chartOfAccountsService.find("from CChartOfAccounts where glcode=?",
                 generatedGlcode.concat(newGlcode));
+        
+        final CChartOfAccounts coaParent = chartOfAccountsService.find("from CChartOfAccounts where glcode=?",
+                generatedGlcode.substring(0, 3));
+        
         if (coa != null) {
             addActionMessage(getText("chartOfAccount.glcode.already.exists"));
             return NEW;
@@ -558,6 +562,7 @@ public class ChartOfAccountsAction extends BaseFormAction {
             model.setType(parent.getType());
         }
         setPurposeOnCoa();
+        model.setSchedule(coaParent.getSchedule());
         model.setIsActiveForPosting(activeForPosting);
         model.setBudgetCheckReq(budgetCheckRequired);
         model.setFunctionReqd(functionRequired);
