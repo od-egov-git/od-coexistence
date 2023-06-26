@@ -226,7 +226,8 @@ public class CancelVoucherAction extends BaseFormAction {
 	@SuppressWarnings("unchecked")
 	private List<CVoucherHeader> getVouchersForCancellation() {
 		String voucheerWithNoPayment, allPayment, noChequePaymentQry;
-		String contraVoucherQry, receiptVoucherQry;
+		String contraVoucherQry;
+		String receiptVoucherQry;
 		String filterQry = "";
 		if(!voucherNumber.isEmpty()&&voucherNumber!=null ) {
 		    CVoucherHeader vocuHeaders = (CVoucherHeader) persistenceService.find(" from CVoucherHeader vh where vh.voucherNumber = ? and vh.status = 0", voucherNumber);
