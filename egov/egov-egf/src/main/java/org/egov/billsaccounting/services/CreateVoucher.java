@@ -1422,6 +1422,8 @@ public class CreateVoucher {
 	public CVoucherHeader createVoucher(final HashMap<String, Object> headerdetails,
 			final List<HashMap<String, Object>> accountcodedetails,
 			final List<HashMap<String, Object>> subledgerdetails) throws ApplicationRuntimeException {
+		
+		LOGGER.info("start | createVoucher API");
 		CVoucherHeader vh = null;
 		Vouchermis mis;
 
@@ -1449,6 +1451,7 @@ public class CreateVoucher {
 
 			if (LOGGER.isDebugEnabled())
 				LOGGER.debug("start | insertIntoVoucherHeader");
+			LOGGER.info("start | insertIntoVoucherHeader");
 			final String vdt = formatter.format(vh.getVoucherDate());
 			String fiscalPeriod = null;
 			try {
@@ -1496,7 +1499,7 @@ public class CreateVoucher {
 
 			if (LOGGER.isDebugEnabled())
 				LOGGER.debug("End | insertIntoVoucherHeader");
-
+			LOGGER.info("End | insertIntoVoucherHeader");
 			// insertIntoRecordStatus(vh);
 			final List<Transaxtion> transactions = createTransaction(headerdetails, accountcodedetails,
 					subledgerdetails, vh);
@@ -1525,6 +1528,7 @@ public class CreateVoucher {
 		}
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("End | createVoucher API");
+		LOGGER.info("End | createVoucher API");
 		return vh;
 
 	}
