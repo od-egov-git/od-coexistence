@@ -705,6 +705,7 @@ public class MicroserviceUtils {
             StringBuilder url = new StringBuilder(appConfigManager.getEgovUserSerHost()).append(tokenGenUrl);
             LOGGER.info("call:" + url);
             Object response = restTemplate.postForObject(url.toString(), request, Object.class);
+            LOGGER.info("response in generateAdminToken = "+response.toString());
             if (response != null)
                 return String.valueOf(((HashMap) response).get("access_token"));
         } catch (RestClientException e) {
@@ -727,6 +728,7 @@ public class MicroserviceUtils {
         String url = appConfigManager.getEgovUserSerHost() + userSrcUrl;
         LOGGER.info("call:" + url);
         UserSearchResponse response = restT.postForObject(url, request, UserSearchResponse.class);
+        LOGGER.info("response in getUserInfo = "+response.toString());
         return response;
     }
 

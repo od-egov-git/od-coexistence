@@ -146,6 +146,8 @@ public class VoucherController extends BaseBillController{
 	@ResponseBody
 	public VoucherResponse create(@RequestBody VoucherSearchRequest voucherSearchRequest) {
 		try {
+
+    		LOGGER.info("Inside /rest/voucher/_search ");
 			VoucherResponse response = voucherService.findVouchers(voucherSearchRequest);
 			response.setResponseInfo(MicroserviceUtils.getResponseInfo(voucherSearchRequest.getRequestInfo(),
 					HttpStatus.SC_OK, null));
@@ -183,6 +185,8 @@ public class VoucherController extends BaseBillController{
 	@PostMapping(value = "/rest/voucher/_create")
 	@ResponseBody
 	public VoucherResponse create(@RequestBody VoucherRequest voucherRequest) {
+		
+		LOGGER.info("Inside /rest/voucher/_create ");
 
 		VoucherResponse response = new VoucherResponse();
 		final HashMap<String, Object> headerDetails = new HashMap<String, Object>();
@@ -284,17 +288,20 @@ public class VoucherController extends BaseBillController{
 
 	}
 	
-	@PostMapping(value = "/rest/voucher/_searchbyserviceandreference",produces="application/json")
+		@PostMapping(value = "/rest/voucher/_searchbyserviceandreference",produces="application/json")
         @ResponseBody
         public VoucherResponse searchVoucherByServiceCodeAndReferenceDoc(@RequestParam(name="servicecode",required=false)  String serviceCode, @RequestParam("referencedocument")  String referenceDocument) {
                 try {
+                		LOGGER.info("Inside searchVoucherByServiceCodeAndReferenceDoc method.");
                         referenceDocument = URLDecoder.decode(referenceDocument, "UTF-8");
-                        List<CVoucherHeader> cVoucherHeaders = voucherService.getVoucherByServiceNameAndReferenceDocument(serviceCode, referenceDocument);
+                        List<CVoucherHeader> cVoucherHeaders = voucherService.getVoucherByServiceNameAndReferenceDocument(serviceCode, referenceDocument); 
                         VoucherResponse res = new VoucherResponse();
                         if(cVoucherHeaders == null){
+                        	LOGGER.info("vouchers not found inside searchVoucherByServiceCodeAndReferenceDoc");
                             res.setResponseInfo(MicroserviceUtils.getResponseInfo(null,
                                     HttpStatus.SC_NOT_FOUND, null));
                         }else{
+                        	LOGGER.info("cVoucherHeaders inside searchVoucherByServiceCodeAndReferenceDoc = "+cVoucherHeaders.toString());
                             res.setVouchers(cVoucherHeaders.stream().map(cv -> new Voucher(cv)).collect(Collectors.toList()));
                         }
                         return res;

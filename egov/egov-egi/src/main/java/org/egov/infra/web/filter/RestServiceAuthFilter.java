@@ -92,6 +92,7 @@ public class RestServiceAuthFilter implements Filter {
             LOGGER.info("Clear Token request recieved " + httpRequest.getServletPath());
             httpRequest.getRequestDispatcher(httpRequest.getServletPath()+StringUtils.defaultString(httpRequest.getPathInfo())).forward(req, res);
         }else if(httpRequest.getRequestURI().contains("/rest/voucher/")){
+        	LOGGER.info("inside /rest/voucher/");
             try {
                 // TODO : Need to identify the external and internal to enable/disable authentication.
                 RestRequestWrapper request = new RestRequestWrapper(httpRequest);
@@ -101,10 +102,13 @@ public class RestServiceAuthFilter implements Filter {
                 session.setAttribute(MS_TENANTID_KEY, tenantId);
                 session.setAttribute(MS_USER_TOKEN, user_token);
                 CurrentUser user = new CurrentUser(this.getUserDetails(request));
+                LOGGER.info("user inside doFilter = "+ user.toString());
                 Authentication auth = this.prepareAuthenticationObj(request, user);
+                LOGGER.info("auth inside doFilter = "+auth.toString());
                 SecurityContextHolder.getContext().setAuthentication(auth);
                 chain.doFilter(request, res);
             } catch (Exception e) {
+            	LOGGER.error(e.getMessage(), e);
                 httpResponse.setContentType(MediaType.APPLICATION_JSON_VALUE);
                 httpResponse.setStatus(HttpStatus.SC_UNAUTHORIZED);
                 httpResponse.getWriter().write(getErrorResponse(e.getMessage()));
@@ -156,7 +160,9 @@ public class RestServiceAuthFilter implements Filter {
     	
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user, " ",
                 user.getAuthorities());
+        LOGGER.info("auth inside prepareAuthenticationObj = "+ auth.toString());
         WebAuthenticationDetails details = new WebAuthenticationDetails(request);
+        LOGGER.info("details inside prepareAuthenticationObj = "+ details.toString());
         auth.setDetails(details);
         return auth;
     }
