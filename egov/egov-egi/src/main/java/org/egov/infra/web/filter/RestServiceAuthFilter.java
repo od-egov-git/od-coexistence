@@ -193,7 +193,7 @@ public class RestServiceAuthFilter implements Filter {
         user.setUsername(userinfo.getUserName());
         user.setActive(userinfo.getActive());
         user.setAccountLocked(userinfo.getAccountLocked());
-        user.setGender(Gender.valueOf(userinfo.getGender().toUpperCase()));
+        //user.setGender(Gender.valueOf(userinfo.getGender().toUpperCase()));
         user.setPassword(" ");
         user.setName(userinfo.getName());
         user.setPwdExpiryDate(userinfo.getPwdExpiryDate());
@@ -207,7 +207,6 @@ public class RestServiceAuthFilter implements Filter {
             role.setName(roleReq.getName());
             roles.add(role);
         });
-
         return user;
 
     }
