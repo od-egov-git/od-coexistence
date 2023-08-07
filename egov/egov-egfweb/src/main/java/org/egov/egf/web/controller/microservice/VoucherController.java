@@ -314,7 +314,8 @@ public class VoucherController extends BaseBillController{
 	@PostMapping(value = "/rest/voucher/_misreceipt")
 	@ResponseBody
 	public MisReceiptsDetailsResponse  createMiscReceiptDetails(@RequestBody MisReceiptsDetailsRequest misReceiptsDetailsRequest ){
-		System.out.println("1....nEW");
+		//System.out.println("1....nEW");
+		LOGGER.info("Inside /rest/voucher/_misreceipt");
 		ModelMap model =null;
 		MisReceiptsDetailsResponse res = new MisReceiptsDetailsResponse();
 		res.setSuccess(false);
