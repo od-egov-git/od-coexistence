@@ -267,6 +267,9 @@ public class MicroserviceUtils {
 
     @Value("${si.microservice.granttype}")
     private String siGrantType;
+    
+    @Value("${si.microservice.tenantid}")
+    private String siTenantId;
 
     @Value("${egov.services.billing.service.taxperiods.search}")
     private String taxperiodsSearchUrl;
@@ -698,7 +701,8 @@ public class MicroserviceUtils {
         map.add("scope", this.siScope);
         map.add("password", this.siPassword);
         map.add("grant_type", this.siGrantType);
-        map.add("tenantId", tenantId);
+        map.add("tenantId", this.siTenantId);
+        //map.add("tenantId", tenantId);
         map.add("userType", this.siUserType);
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, header);
         try {
