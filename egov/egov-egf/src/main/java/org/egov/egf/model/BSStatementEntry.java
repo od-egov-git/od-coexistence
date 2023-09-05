@@ -13,6 +13,7 @@ public class BSStatementEntry {
 	private BigDecimal prevDebitamount;
     private BigDecimal prevCreditamount;
     private boolean displayBold = false;
+    private Character type;
     
     public BSStatementEntry() {
     }
@@ -32,7 +33,7 @@ public class BSStatementEntry {
 
 
 	public BSStatementEntry(String glCode, String accountName,BigDecimal debitamount, BigDecimal creditamount, BigDecimal prevDebitamount,
-			BigDecimal prevCreditamount, boolean displayBold) {
+			BigDecimal prevCreditamount, boolean displayBold, Character type) {
 		super();
 		this.glCode = glCode;
 		this.accountName = accountName;
@@ -41,6 +42,7 @@ public class BSStatementEntry {
 		this.prevDebitamount = prevDebitamount;
 		this.prevCreditamount = prevCreditamount;
 		this.displayBold = displayBold;
+		this.type = type;
 	}
 
 	public String getGlCode() {
@@ -97,6 +99,14 @@ public class BSStatementEntry {
 
 	public void setPrevCreditamount(BigDecimal prevCreditamount) {
 		this.prevCreditamount = prevCreditamount;
+	}
+
+	public Character getType() {
+		return type;
+	}
+
+	public void setType(Character type) {
+		this.type = type;
 	}
     
 

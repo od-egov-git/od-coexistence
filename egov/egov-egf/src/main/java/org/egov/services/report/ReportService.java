@@ -262,6 +262,7 @@ public abstract class ReportService {
             if (type.getBS(index).getGlCode() != null && row.getGlCode().equals(type.getBS(index).getGlCode())) {
             	type.getBS(index).setCreditamount(creditAmt);
             	type.getBS(index).setDebitamount(debitAmt);
+            	type.getBS(index).setType(row.getType());
           
             }
         }
@@ -277,6 +278,7 @@ public abstract class ReportService {
             if (type.getBS(index).getGlCode() != null && row.getGlCode().equals(type.getBS(index).getGlCode())) {
             	type.getBS(index).setPrevCreditamount(creditAmt);
             	type.getBS(index).setPrevDebitamount(debitAmt);
+            	type.getBS(index).setType(row.getType());
           
             }
         }
@@ -287,8 +289,11 @@ public abstract class ReportService {
         for (int index = 0; index < type.sizeIE(); index++) {
             final BigDecimal amount = divideAndRound(row.getAmount(), divisor);
 
-            if (type.getIE(index).getGlCode() != null && row.getGlCode().equals(type.getIE(index).getGlCode()))
+            if (type.getIE(index).getGlCode() != null && row.getGlCode().equals(type.getIE(index).getGlCode())) {
                 type.getIE(index).getNetAmount().put(getFundNameForId(fundList, Integer.valueOf(row.getFundId())), amount);
+                type.getIE(index).setType(row.getType());
+            }
+            
         }
     }
 
@@ -326,6 +331,22 @@ public abstract class ReportService {
                                 + "where s.id=coa.scheduleid and coa.classification=2 and s.reporttype = '"
                                 + scheduleReportType
                                 + "' order by coa.majorcode").addScalar(
+                                        "glCode").addScalar("scheduleNumber").addScalar(
+                                                "scheduleName").addScalar("type").setResultTransformer(
+                                                        Transformers.aliasToBean(StatementResultObject.class));
+        return query.list();
+    }
+    
+    protected List<StatementResultObject> getAllGlCodesForTypes(final String scheduleReportType, String type) {
+        final Query query = persistenceService.getSession()
+                .createSQLQuery(
+                        "select distinct coa.majorcode as glCode,s.schedule as scheduleNumber,"
+                                + "s.schedulename as scheduleName,coa.type as type from chartofaccounts coa, schedulemapping s "
+                                + "where s.id=coa.scheduleid and coa.classification=2 and s.reporttype = '"
+                                + scheduleReportType
+                                + "' and coa.type = '"
+                                + type
+                                +"' order by coa.majorcode").addScalar(
                                         "glCode").addScalar("scheduleNumber").addScalar(
                                                 "scheduleName").addScalar("type").setResultTransformer(
                                                         Transformers.aliasToBean(StatementResultObject.class));
