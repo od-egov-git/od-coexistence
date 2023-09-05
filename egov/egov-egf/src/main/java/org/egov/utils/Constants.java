@@ -105,8 +105,8 @@ public class Constants {
     public static final String BUDGET_GROUP = "budgetGroup";
     public static final String BUDGET = "budget";
     public static final String STATE = "state";
-    public static final String TOTAL_ASSETS = "Total ASSETS";
-    public static final String TOTAL_LIABILITIES = "Total LIABILITIES";
+    public static final String TOTAL_ASSETS = "Total Assets";
+    public static final String TOTAL_LIABILITIES = "Total Liabilities";
     public static final String TOTAL = "Total";
     public static final String LIABILITIES = "LIABILITIES";
     public static final String ASSETS = "ASSETS";
@@ -148,8 +148,8 @@ public class Constants {
     public static final String CHEQUE_NO_GENERATION_APPCONFIG_KEY = "Cheque_no_generation_auto";
     public static final String INCOME = "INCOME";
     public static final String EXPENDITURE = "EXPENDITURE";
-    public static final String TOTAL_INCOME = "Total INCOME";
-    public static final String TOTAL_EXPENDITURE = "Total EXPENDITURE";
+    public static final String TOTAL_INCOME = "Total Income";
+    public static final String TOTAL_EXPENDITURE = "Total Expenditure";
     public static final String ADVANCE_PAYMENT = "Advance Payment";
     public static final String MODULEID = "module id";
     public static final String CONSUMEORRELEASE = "consume or release";

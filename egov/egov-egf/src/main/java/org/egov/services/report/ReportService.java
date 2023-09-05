@@ -48,11 +48,25 @@
 package org.egov.services.report;
 
 
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.apache.log4j.Logger;
 import org.egov.commons.CFinancialYear;
 import org.egov.commons.CVoucherHeader;
 import org.egov.commons.Fund;
 import org.egov.commons.dao.FinancialYearHibernateDAO;
+import org.egov.egf.model.BSStatementEntry;
 import org.egov.egf.model.IEStatementEntry;
 import org.egov.egf.model.Statement;
 import org.egov.egf.model.StatementEntry;
@@ -70,19 +84,6 @@ import org.hibernate.transform.Transformers;
 import org.hibernate.type.BigDecimalType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-
-import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 public abstract class ReportService {
    
@@ -249,6 +250,37 @@ public abstract class ReportService {
                                 .getFundId())), amount);
         }
     }
+    
+    void addFundAmountBS(final List<Fund> fundList, final Statement type, final BigDecimal divisor,
+            final StatementResultObject row) {
+        for (int index = 0; index < type.sizeBS(); index++) {
+            //fundwise not given
+        	final BigDecimal creditAmt = row.getCreditamount();
+        	final BigDecimal debitAmt = row.getDebitamount();
+        	
+
+            if (type.getBS(index).getGlCode() != null && row.getGlCode().equals(type.getBS(index).getGlCode())) {
+            	type.getBS(index).setCreditamount(creditAmt);
+            	type.getBS(index).setDebitamount(debitAmt);
+          
+            }
+        }
+    }
+    
+    void addFundAmountBSPre(final List<Fund> fundList, final Statement type, final BigDecimal divisor,
+            final StatementResultObject row) {
+        for (int index = 0; index < type.sizeBS(); index++) {
+        	final BigDecimal creditAmt = row.getCreditamount();
+        	final BigDecimal debitAmt = row.getDebitamount();
+        	
+
+            if (type.getBS(index).getGlCode() != null && row.getGlCode().equals(type.getBS(index).getGlCode())) {
+            	type.getBS(index).setPrevCreditamount(creditAmt);
+            	type.getBS(index).setPrevDebitamount(debitAmt);
+          
+            }
+        }
+    }
 
     void addFundAmountIE(final List<Fund> fundList, final Statement type, final BigDecimal divisor,
             final StatementResultObject row) {
@@ -269,6 +301,18 @@ public abstract class ReportService {
                 resultList.add(balanceSheetQueryObject);
         return resultList;
     }
+    
+	List<StatementResultObject> getRowWithGlCodeBS(final List<StatementResultObject> results, final String glCode) {
+
+		final List<StatementResultObject> resultList = new ArrayList<StatementResultObject>();
+		for (final StatementResultObject balanceSheetQueryObject : results)
+			if (glCode.equalsIgnoreCase(balanceSheetQueryObject.getGlCode())
+					&& (balanceSheetQueryObject.getCreditamount().compareTo(BigDecimal.ZERO) != 0
+							|| balanceSheetQueryObject.getDebitamount().compareTo(BigDecimal.ZERO) != 0)) {
+				resultList.add(balanceSheetQueryObject);
+			}
+		return resultList;
+	}
 
     protected abstract void addRowsToStatement(Statement balanceSheet,
             Statement assets, Statement liabilities);
@@ -319,6 +363,41 @@ public abstract class ReportService {
                                         Transformers.aliasToBean(StatementResultObject.class));
         return query.list();
     }
+    
+    
+    public List<StatementResultObject> getTransactionAmountBS(final String filterQuery,
+            final Date toDate, final Date fromDate, final String coaType, final String subReportType) {
+    	String    voucherStatusToExclude = getAppConfigValueFor("EGF",
+                "statusexcludeReport");
+        
+        final Query query = persistenceService.getSession()
+                .createSQLQuery(
+                        "select c.majorcode as glCode, c.type as type,sum(debitamount) as debitamount, sum(creditamount) as creditamount"
+                                + " from generalledger g,chartofaccounts c,voucherheader v ,vouchermis mis where v.id=mis.voucherheaderid and "
+                                + "v.id=g.voucherheaderid and c.type in("
+                                + coaType 
+                                + ") and c.id=g.glcodeid and v.status not in("
+                                + voucherStatusToExclude
+                                + ")  AND v.voucherdate <= '"
+                                + getFormattedDate(toDate)
+                                + "' and v.voucherdate >='"
+                                + getFormattedDate(fromDate)
+                                + "' and c.parentid "
+                                //+ minorCodeLength
+                                + " in "
+                                + "(select coa2.id from chartofaccounts coa2, schedulemapping s where s.id=coa2.scheduleid and "
+                                + "coa2.classification=2 and s.reporttype = '"
+                                + subReportType
+                                + "') "
+                                + filterQuery
+                                + " group by c.majorcode,v.fundid,c.type order by c.majorcode")
+                                .addScalar("glCode").addScalar("type")
+                                .addScalar("debitamount",BigDecimalType.INSTANCE)
+                                .addScalar("creditamount",BigDecimalType.INSTANCE).setResultTransformer(
+                                        Transformers.aliasToBean(StatementResultObject.class));
+        return query.list();
+    }
+    
 
     protected Map<String, String> getSubSchedule(final String subReportType) {
         final Map<String, String> scheduleNumberToName = new HashMap<String, String>();
@@ -469,5 +548,66 @@ public abstract class ReportService {
             balanceSheetEntry.setCurrentYearTotal(currentYearTotal);
         }
     }
+    
+    protected void computeCurrentYearTotalsBS(final Statement statement, final String type1,
+            final String type2) {
+    	BigDecimal currentYearTotalCredit = BigDecimal.ZERO;
+    	BigDecimal currentYearTotalDebit = BigDecimal.ZERO;
+        for (final BSStatementEntry balanceSheetEntry : statement.getBsEntries()) {
+        	
+            if (type1.equals(balanceSheetEntry.getAccountName())
+                    || type2.equals(balanceSheetEntry.getAccountName())
+                    || balanceSheetEntry.isDisplayBold())
+                continue;
+            currentYearTotalCredit = balanceSheetEntry.getCreditamount() !=null ? balanceSheetEntry.getCreditamount().add(currentYearTotalCredit):BigDecimal.ZERO;
+            currentYearTotalDebit = balanceSheetEntry.getDebitamount() !=null ? balanceSheetEntry.getDebitamount().add(currentYearTotalDebit):BigDecimal.ZERO;
+            
+        }
+    }
+    
+	// returns glcodes and name of given classification
+	protected List<StatementResultObject> getGlcodesForRPStatement(int classification) {
+
+		final Query query = persistenceService.getSession()
+				.createSQLQuery("select c.glcode, c.name from chartofaccounts c where c.classification = "
+						+ classification + " order by c.glcode asc")
+				.addScalar("glcode").addScalar("name")
+				.setResultTransformer(Transformers.aliasToBean(StatementResultObject.class));
+
+		return query.list();
+	}
+
+	List<StatementResultObject> getTransactionAmountForRPStatement(final String filterQuery, final Date toDate,
+			final Date fromDate) {
+
+		String voucherStatusToExclude = getAppConfigValueFor("EGF", "statusexcludeReport");
+
+		final Query query = persistenceService.getSession().createSQLQuery(
+				"select c.majorcode as glCode,v.fundid as fundId,c.type as type,sum(debitamount)-sum(creditamount) as amount"
+						+ " from generalledger g,chartofaccounts c,voucherheader v ,vouchermis mis where v.id=mis.voucherheaderid and "
+						+ "v.id=g.voucherheaderid " + ") and c.id=g.glcodeid and v.status not in("
+						+ voucherStatusToExclude + ")  AND v.voucherdate <= '" + getFormattedDate(toDate)
+						+ "' and v.voucherdate >='" + getFormattedDate(fromDate) + "' and c.parentid " + " in "
+						+ "(select coa2.id from chartofaccounts coa2, schedulemapping s where s.id=coa2.scheduleid and "
+						+ "coa2.classification=2) " + filterQuery
+						+ " group by c.majorcode,v.fundid,c.type order by c.majorcode")
+				.addScalar("glCode").addScalar("fundId", BigDecimalType.INSTANCE).addScalar("type")
+				.addScalar("amount", BigDecimalType.INSTANCE)
+				.setResultTransformer(Transformers.aliasToBean(StatementResultObject.class));
+		return query.list();
+	}
+
+	List<StatementResultObject> getRowWithGlCodeForRPAccount(final List<StatementResultObject> results, 
+			final String glCode) {
+		
+		final List<StatementResultObject> resultList = new ArrayList<StatementResultObject>();
+		
+		for (final StatementResultObject obj : results)
+			if (glCode.equalsIgnoreCase(obj.getGlCode())
+					&& obj.getAmount().compareTo(BigDecimal.ZERO) != 0)
+				resultList.add(obj);
+		return resultList;
+	}
+
 
 }
