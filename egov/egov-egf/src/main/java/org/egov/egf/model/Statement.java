@@ -75,6 +75,7 @@ public class Statement {
     private Fund fund;
     private List<Fund> fundList = new ArrayList<Fund>();
     private List<IEStatementEntry> ieEntries = new ArrayList<IEStatementEntry>();
+    private List<BSStatementEntry> bsEntries = new ArrayList<BSStatementEntry>();
     private List<StatementEntry> entries = new ArrayList<StatementEntry>();
     private boolean restData=false;
 
@@ -183,6 +184,10 @@ public class Statement {
     public void addIE(final IEStatementEntry entry) {
         ieEntries.add(entry);
     }
+    
+    public void addBS(final BSStatementEntry entry) {
+        bsEntries.add(entry);
+    }
 
     public List<StatementEntry> getEntries() {
         return entries;
@@ -194,6 +199,10 @@ public class Statement {
 
     public int sizeIE() {
         return ieEntries.size();
+    }
+    
+    public int sizeBS() {
+        return bsEntries.size();
     }
 
     public StatementEntry get(final int index) {
@@ -207,9 +216,17 @@ public class Statement {
     public void addAllIE(final Statement balanceSheet) {
         ieEntries.addAll(balanceSheet.getIeEntries());
     }
+    
+    public void addAllBS(final Statement balanceSheet) {
+        bsEntries.addAll(balanceSheet.getBsEntries());
+    }
 
     public IEStatementEntry getIE(final int index) {
         return ieEntries.get(index);
+    }
+    
+    public BSStatementEntry getBS(final int index) {
+        return bsEntries.get(index);
     }
 
     public BigDecimal getDivisor() {
@@ -255,6 +272,16 @@ public class Statement {
                 return true;
         return false;
     }
+    
+    public boolean containsBSStatementEntry(final String glCode) {
+        if (glCode == null)
+            return false;
+        for (final BSStatementEntry balanceSheetEntry : getBsEntries())
+            if (balanceSheetEntry.getGlCode() != null && glCode.equals(balanceSheetEntry.getGlCode()))
+                return true;
+        return false;
+    }
+
 
     public boolean containsMajorCodeEntry(final String majorcode) {
         if (majorcode == null)
@@ -291,6 +318,14 @@ public class Statement {
 
 	public void setRestData(boolean restData) {
 		this.restData = restData;
+	}
+
+	public List<BSStatementEntry> getBsEntries() {
+		return bsEntries;
+	}
+
+	public void setBsEntries(List<BSStatementEntry> bsEntries) {
+		this.bsEntries = bsEntries;
 	}
 
 }

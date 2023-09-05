@@ -53,6 +53,8 @@ import java.util.Date;
 public class StatementResultObject {
     private static final BigDecimal NEGATIVE = new BigDecimal(-1);
     BigDecimal amount;
+	BigDecimal debitamount;
+    BigDecimal creditamount;
     Integer fundId;
     String fundCode;
     String glCode = "";
@@ -191,4 +193,28 @@ public class StatementResultObject {
 	public void setLastmodifieddate(Date lastmodifieddate) {
 		this.lastmodifieddate = lastmodifieddate;
 	}
+    public BigDecimal getDebitamount() {
+		return debitamount;
+	}
+
+	public void setDebitamount(BigDecimal debitamount) {
+		this.debitamount = debitamount;
+	}
+
+	public BigDecimal getCreditamount() {
+		return creditamount;
+	}
+
+	public void setCreditamount(BigDecimal creditamount) {
+		this.creditamount = creditamount;
+	}
+	
+    public void negateCreditAmount() {
+        creditamount = creditamount.multiply(NEGATIVE);
+    }
+    
+    public void negateDebitAmount() {
+        debitamount = debitamount.multiply(NEGATIVE);
+    }
+	
 }

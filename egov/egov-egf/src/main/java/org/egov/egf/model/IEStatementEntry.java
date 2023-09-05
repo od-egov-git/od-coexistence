@@ -66,6 +66,7 @@ public class IEStatementEntry {
     private String departmentcode;
     private AuditDetails auditDetails;
     private boolean displayBold = false;
+    private Character type;
 
     public IEStatementEntry() {
 
@@ -180,5 +181,13 @@ public class IEStatementEntry {
 
 	public void setAuditDetails(AuditDetails auditDetails) {
 		this.auditDetails = auditDetails;
+	}
+
+	public Character getType() {
+		return type;
+	}
+
+	public void setType(Character type) {
+		this.type = type;
 	}
 }
