@@ -501,10 +501,13 @@ public abstract class ReportService {
                 .hasNext();) {
             final Fund next = fund.next();
             for (final IEStatementEntry balanceSheetEntry : statement.getIeEntries())
-                if (balanceSheetEntry.getNetAmount().containsKey(
-                        next.getName()) || balanceSheetEntry.getPreviousYearAmount().containsKey(
-                                next.getName()))
-                    fundToBeRemoved.put(next.getName(), Boolean.FALSE);
+            	{
+            	if(balanceSheetEntry.getNetAmount()!=null)
+	                if (balanceSheetEntry.getNetAmount().containsKey(
+	                        next.getName()) || balanceSheetEntry.getPreviousYearAmount().containsKey(
+	                                next.getName()))
+	                    fundToBeRemoved.put(next.getName(), Boolean.FALSE);
+            	}
             if (fundToBeRemoved.get(next.getName()).booleanValue())
                 fund.remove();
         }
