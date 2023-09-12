@@ -80,6 +80,17 @@ public class IEStatementEntry {
         this.netAmount = netAmount;
         this.displayBold = displayBold;
     }
+    
+    public IEStatementEntry(final String accountCode, final String accountName, final Map<String, BigDecimal> netAmount,
+            final Map<String, BigDecimal> previousYearAmount, final boolean displayBold, Character type) {
+        glCode = accountCode;
+        this.accountName = accountName;
+        this.previousYearAmount = previousYearAmount;
+        this.netAmount = netAmount;
+        this.displayBold = displayBold;
+        this.type = type;
+    }
+    
 
     public IEStatementEntry(final String accountCode, final String accountName, final String scheduleNo, final boolean displayBold) {
         glCode = accountCode;
