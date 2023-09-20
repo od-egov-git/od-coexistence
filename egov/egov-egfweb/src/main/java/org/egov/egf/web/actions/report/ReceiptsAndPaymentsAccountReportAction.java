@@ -1,5 +1,6 @@
 package org.egov.egf.web.actions.report;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -15,15 +16,20 @@ import org.egov.commons.Functionary;
 import org.egov.commons.Fund;
 import org.egov.egf.model.Statement;
 import org.egov.infra.admin.master.entity.Boundary;
+import org.egov.infra.config.persistence.datasource.routing.annotation.ReadOnly;
 import org.egov.infra.microservice.models.Department;
+import org.egov.infra.reporting.util.ReportUtil;
 import org.egov.infra.web.struts.actions.BaseFormAction;
 import org.egov.infstr.services.PersistenceService;
 import org.egov.infstr.utils.EgovMasterDataCaching;
 import org.egov.services.report.ReceiptsAndPaymentsService;
 import org.egov.utils.Constants;
+import org.egov.utils.ReportHelper;
 import org.hibernate.FlushMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+
+import net.sf.jasperreports.engine.JasperPrint;
 
 @ParentPackage("egov")
 @Results({ @Result(name = "report", location = "receiptsAndPaymentsAccountReport-report.jsp"),
@@ -48,6 +54,9 @@ public class ReceiptsAndPaymentsAccountReportAction extends BaseFormAction {
 
 	@Autowired
 	private ReceiptsAndPaymentsService ReceiptsAndPaymentsService;
+	
+	InputStream inputStream;
+	ReportHelper reportHelper;
 
 	Statement receiptsAndPaymentsAccountStatement = new Statement();
 	private Date todayDate;
@@ -111,6 +120,18 @@ public class ReceiptsAndPaymentsAccountReportAction extends BaseFormAction {
 		}
 		return "result";
 	}
+	
+//    @ReadOnly
+//    @Action(value = "/report/receiptsAndPaymentsAccountReport-generateReceiptAndPaymentPdf")
+//    public String generateReceiptAndPaymentPdf() throws Exception {
+//        populateDataSource();
+//        final String heading = ReportUtil.getCityName() +" "+(cityService.getCityGrade()==null ? "" :cityService.getCityGrade()) + "\\n" + statementheading.toString();
+//        final String subtitle = "Report Run Date-" + FORMATDDMMYYYY.format(getTodayDate());
+//        final JasperPrint jasper = reportHelper.generateIncomeExpenditureReportJasperPrint(incomeExpenditureStatement, heading,
+//                getPreviousYearToDate(), getCurrentYearToDate(), subtitle, true);
+//        inputStream = reportHelper.exportPdf(inputStream, jasper);
+//        return INCOME_EXPENSE_PDF;
+//    }
 
 	private void populateDataSource() {
 
