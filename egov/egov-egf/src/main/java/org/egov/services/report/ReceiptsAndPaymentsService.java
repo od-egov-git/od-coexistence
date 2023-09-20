@@ -49,7 +49,12 @@ public class ReceiptsAndPaymentsService extends ReportService {
 	private static final String E = "E";
 	private static final String IE = "IE";
 	private static final String BS = "BS";
-
+	
+	BigDecimal totalReceipts = BigDecimal.ZERO;
+	BigDecimal totalPayments = BigDecimal.ZERO;
+	BigDecimal prevTotalReceipts = BigDecimal.ZERO;
+	BigDecimal prevTotalPayments = BigDecimal.ZERO;
+	
 	int CoaClassification = 1;
 
 	@Override
@@ -62,17 +67,21 @@ public class ReceiptsAndPaymentsService extends ReportService {
 		IEStatementEntry expenseEntry = new IEStatementEntry();
 		IEStatementEntry totalCashOpeningEntry = new IEStatementEntry();
 		IEStatementEntry totalBankOpeningEntry = new IEStatementEntry();
-
+		IEStatementEntry totalOpeningEntry = new IEStatementEntry();
+		
 		totalCashOpeningEntry = getTotalOpening(statement, fromDate, toDate);
 		totalBankOpeningEntry = getTotalBankOpening(statement, fromDate, toDate);
+		totalOpeningEntry = getTotalOpeningFinal(statement,totalCashOpeningEntry, totalBankOpeningEntry);
+		
 		statement.addIE(new IEStatementEntry("", "Opening Balances", null, null, true, 'O'));
 		statement.addIE(totalCashOpeningEntry);
 		statement.addIE(totalBankOpeningEntry);
+		statement.addIE(totalOpeningEntry);
 		statement.addIE(new IEStatementEntry("", "", null, null, true, 'O'));
 
 		if (assets.sizeIE() > 0) {
 			statement.addIE(new IEStatementEntry(null, Constants.EXPENDITURE, "", true));
-			expenseEntry = getTotalExpenseFundwise(assets);
+			expenseEntry = getTotalExpenseFundwise(statement, assets);
 			statement.addAllIE(assets);
 			statement.addIE(expenseEntry);
 			statement.addIE(new IEStatementEntry(null, "", "", false));
@@ -80,7 +89,8 @@ public class ReceiptsAndPaymentsService extends ReportService {
 
 		if (liabilities.sizeIE() > 0) {
 			statement.addIE(new IEStatementEntry(null, Constants.INCOME, "", true));
-			incomeEntry = getTotalIncomeFundwise(liabilities);
+			incomeEntry = getTotalIncomeFundwise(statement,liabilities);
+			statement.addIE(new IEStatementEntry("", "", null, null, true, 'E'));
 			statement.addIE(new IEStatementEntry("", "", null, null, true, 'E'));
 			statement.addIE(new IEStatementEntry("", "", null, null, true, 'E'));
 			statement.addIE(new IEStatementEntry("", "", null, null, true, 'E'));
@@ -90,6 +100,33 @@ public class ReceiptsAndPaymentsService extends ReportService {
 			statement.addIE(new IEStatementEntry(null, "", "", false));
 		}
 
+	}
+
+	private IEStatementEntry getTotalOpeningFinal(Statement statement, IEStatementEntry totalCashOpeningEntry,
+			IEStatementEntry totalBankOpeningEntry) {
+		
+		int fundid = 1;
+		final IEStatementEntry resultEntry = new IEStatementEntry();
+		BigDecimal totalOp = BigDecimal.ZERO;
+		BigDecimal prevTotalOp = BigDecimal.ZERO;
+		
+		totalOp = totalCashOpeningEntry.getNetAmount().get(getFundNameForId(statement.getFunds(), fundid))
+				.add(totalBankOpeningEntry.getNetAmount().get(getFundNameForId(statement.getFunds(), fundid)));
+		
+		prevTotalOp = totalCashOpeningEntry.getPreviousYearAmount().get(getFundNameForId(statement.getFunds(), fundid))
+				.add(totalBankOpeningEntry.getPreviousYearAmount().get(getFundNameForId(statement.getFunds(), fundid)));
+		totalReceipts = BigDecimal.ZERO;
+		prevTotalReceipts = BigDecimal.ZERO;
+	
+		totalReceipts = totalReceipts.add(totalOp != null ? totalOp:BigDecimal.ZERO);
+		prevTotalReceipts= prevTotalReceipts.add(prevTotalOp != null ? prevTotalOp:BigDecimal.ZERO);
+		
+		resultEntry.getNetAmount().put(getFundNameForId(statement.getFunds(), fundid), totalOp);
+		resultEntry.getPreviousYearAmount().put(getFundNameForId(statement.getFunds(), fundid), prevTotalOp);
+		resultEntry.setGlCode("");
+		resultEntry.setType('O');
+		resultEntry.setAccountName("Total Opening Balance");		
+		return resultEntry;
 	}
 
 	private IEStatementEntry getTotalOpening(Statement statement, Date fromDate, Date toDate) {
@@ -295,7 +332,10 @@ public class ReceiptsAndPaymentsService extends ReportService {
 
 		totalEntry = getTotalBS(statement);
 		statement.addBS(totalEntry);
-
+		statement.addBS(new BSStatementEntry(null, "", null, null, null, null, true, Character.MIN_VALUE));
+		statement.addBS(new BSStatementEntry(null, "Total of Receipts", totalReceipts, prevTotalReceipts, null, null, true, 'C'));
+		statement.addBS(new BSStatementEntry(null, "Total of Payments", totalPayments, prevTotalPayments, null, null, true, 'C'));
+		
 		closingCashBalEntry = getClosingCashBalance(statement, fromDate, toDate);
 		closingBankBalEntry = getClosingBankBalance(statement, fromDate, toDate);
 		statement.addBS(new BSStatementEntry("", "", null, null, null,null, true, 'C'));
@@ -363,7 +403,7 @@ public class ReceiptsAndPaymentsService extends ReportService {
 		BigDecimal totalPrevCashClosing = totalPrevCashOpeningBalance
 				.add(totalPrevDebitCash.subtract(totalPrevCreditCash));
 
-		BSStatementEntry entry = new BSStatementEntry("","",totalCashClosing,null,totalPrevCashClosing,null,true,'C');
+		BSStatementEntry entry = new BSStatementEntry("","a. Cash Balances",totalCashClosing,null,totalPrevCashClosing,null,true,'C');
 
 		return entry;
 
@@ -426,7 +466,7 @@ public class ReceiptsAndPaymentsService extends ReportService {
 		BigDecimal totalPrevBankClosing = totalPrevBankOpeningBalance
 				.add(totalPrevDebitBank.subtract(totalPrevCreditBank));
 
-		BSStatementEntry entry = new BSStatementEntry("","",totalBankClosing,null,totalPrevBankClosing,null,true,'C');
+		BSStatementEntry entry = new BSStatementEntry("","b. Bank Balances",totalBankClosing,null,totalPrevBankClosing,null,true,'C');
 		
 		return entry;
 	}
@@ -515,7 +555,12 @@ public class ReceiptsAndPaymentsService extends ReportService {
 			}
 
 		}
-
+		totalReceipts = totalReceipts.add(totalNOReceipts != null ? totalNOReceipts:BigDecimal.ZERO);
+		prevTotalReceipts = prevTotalReceipts.add(totalNOPrevReceipts != null ? totalNOPrevReceipts:BigDecimal.ZERO);
+		
+		totalPayments = totalPayments.add(totalNOPayments != null ? totalNOPayments:BigDecimal.ZERO);
+		prevTotalPayments = prevTotalPayments.add(totalNOPrevPayments != null ? totalNOPrevPayments:BigDecimal.ZERO);
+		
 		return new BSStatementEntry("", "Sub Total", totalNOPayments, totalNOReceipts, totalNOPrevPayments,
 				totalNOPrevReceipts, true, 'T');
 	}
@@ -658,14 +703,13 @@ public class ReceiptsAndPaymentsService extends ReportService {
 		} else
 			prevFormattedToDate = getPreviousYearFor(toDate);
 
-		final List<StatementResultObject> allGlCodesWithoutFilter = getAllGlCodesFor(scheduleReportType);
+		final List<StatementResultObject> allGlCodesWithoutFilter = getAllGlCodesForBS(scheduleReportType);
 		final List<StatementResultObject> allGlCodes = filterBSCodes(allGlCodesWithoutFilter);
 
-		final List<StatementResultObject> results = getTransactionAmountBS(filterQuery, toDate, fromDate, "'L','A'",
-				BS);
+		final List<StatementResultObject> results = getTransactionAmtBSNew(filterQuery, toDate, fromDate, "'L','A'");
 
-		final List<StatementResultObject> prevResults = getTransactionAmountBS(filterQuery, prevFormattedToDate,
-				getPreviousYearFor(fromDate), "'L','A'", BS);
+		final List<StatementResultObject> prevResults = getTransactionAmtBSNew(filterQuery, prevFormattedToDate,
+				getPreviousYearFor(fromDate), "'L','A'");
 
 		for (final StatementResultObject queryObject : allGlCodes) {
 			if (queryObject.getGlCode() == null)
@@ -678,9 +722,6 @@ public class ReceiptsAndPaymentsService extends ReportService {
 							queryObject.getGlCode());
 
 					for (final StatementResultObject pre : prerows) {
-
-						if (pre.isLiability())
-							pre.negateCreditAmount();
 
 						if (liabilities.containsBSStatementEntry(pre.getGlCode())
 								|| assets.containsBSStatementEntry(pre.getGlCode())) {
@@ -716,8 +757,6 @@ public class ReceiptsAndPaymentsService extends ReportService {
 				}
 			} else
 				for (final StatementResultObject row : rows) {
-					if (row.isLiability())
-						row.negateCreditAmount();
 					if (liabilities.containsBSStatementEntry(row.getGlCode())
 							|| assets.containsBSStatementEntry(row.getGlCode())) {
 						if (row.isLiability())
@@ -738,8 +777,6 @@ public class ReceiptsAndPaymentsService extends ReportService {
 							final List<StatementResultObject> preRow = getRowWithGlCodeBS(prevResults,
 									queryObject.getGlCode());
 							for (final StatementResultObject pre : preRow) {
-								if (pre.isLiability())
-									pre.negateCreditAmount();
 								if (pre.getGlCode() != null && pre.getGlCode().equals(pre.getGlCode())) {
 									balanceSheetEntry.setPrevCreditamount(
 											pre.getCreditamount() == null ? BigDecimal.ZERO : pre.getCreditamount());
@@ -839,7 +876,7 @@ public class ReceiptsAndPaymentsService extends ReportService {
 	/*
 	 * Calculate total Income of current year and previous year
 	 */
-	private IEStatementEntry getTotalIncomeFundwise(final Statement income_expense) {
+	private IEStatementEntry getTotalIncomeFundwise(final Statement statement,final Statement income_expense) {
 		final Map<String, BigDecimal> fundNetTotals = new HashMap<String, BigDecimal>();
 		final Map<String, BigDecimal> fundPreTotals = new HashMap<String, BigDecimal>();
 		BigDecimal netAmount = BigDecimal.ZERO;
@@ -859,15 +896,24 @@ public class ReceiptsAndPaymentsService extends ReportService {
 				fundPreTotals.put(prerow.getKey(), preAmount.add(zeroOrValue(fundPreTotals.get(prerow.getKey()))));
 			}
 		}
-		// return new IEStatementEntry("A", Constants.TOTAL_INCOME, fundNetTotals,
-		// fundPreTotals, true);
+		
+		totalPayments = BigDecimal.ZERO;
+		prevTotalPayments = BigDecimal.ZERO;
+		
+		totalPayments = totalPayments.add(fundNetTotals.get(getFundNameForId(statement.getFunds(), 1)) != null
+				? fundNetTotals.get(getFundNameForId(statement.getFunds(), 1))
+				: BigDecimal.ZERO);
+		prevTotalPayments = prevTotalPayments.add(fundPreTotals.get(getFundNameForId(statement.getFunds(), 1)) != null
+				? fundPreTotals.get(getFundNameForId(statement.getFunds(), 1))
+						: BigDecimal.ZERO);
+		
 		return new IEStatementEntry(" ", "Sub Total", fundNetTotals, fundPreTotals, true, 'E');
 	}
 
 	/*
 	 * Calculate total Expenditure of current year and previous year
 	 */
-	private IEStatementEntry getTotalExpenseFundwise(final Statement income_expense) {
+	private IEStatementEntry getTotalExpenseFundwise(final Statement statement,final Statement income_expense) {
 
 		final Map<String, BigDecimal> fundNetTotals = new HashMap<String, BigDecimal>();
 		final Map<String, BigDecimal> fundPreTotals = new HashMap<String, BigDecimal>();
@@ -888,8 +934,14 @@ public class ReceiptsAndPaymentsService extends ReportService {
 				fundPreTotals.put(prerow.getKey(), preAmount.add(zeroOrValue(fundPreTotals.get(prerow.getKey()))));
 			}
 		}
-		// return new IEStatementEntry("B", Constants.TOTAL_EXPENDITURE, fundNetTotals,
-		// fundPreTotals, true);
+
+		totalReceipts = totalReceipts.add(fundNetTotals.get(getFundNameForId(statement.getFunds(), 1)) != null
+				? fundNetTotals.get(getFundNameForId(statement.getFunds(), 1))
+				: BigDecimal.ZERO);
+		prevTotalReceipts = prevTotalReceipts.add(fundPreTotals.get(getFundNameForId(statement.getFunds(), 1)) != null
+				? fundPreTotals.get(getFundNameForId(statement.getFunds(), 1))
+						: BigDecimal.ZERO);
+
 		return new IEStatementEntry(" ", "Sub Total", fundNetTotals, fundPreTotals, true, 'I');
 	}
 
@@ -1082,7 +1134,7 @@ public class ReceiptsAndPaymentsService extends ReportService {
 				"341", "350", "360", "410", "412", "420", "430", "431", "440", "460", "470"));
 
 		for (StatementResultObject glcode : allGlCodes) {
-			if (desiredGlCodes.contains(glcode.getGlCode())) {
+			if (desiredGlCodes.contains(glcode.getGlCode().substring(0, 3))) {
 				results.add(glcode);
 			}
 		}
