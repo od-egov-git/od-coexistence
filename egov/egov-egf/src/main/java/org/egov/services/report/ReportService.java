@@ -338,12 +338,12 @@ public abstract class ReportService {
     }
     
     
-    protected List<StatementResultObject> getAllGlCodesForBS(
+    protected List<StatementResultObject> getAllGlCodesForRP(
             final String scheduleReportType) {
         final Query query = persistenceService.getSession()
                 .createSQLQuery(
                         "select distinct coa.glcode as glCode,s.schedule as scheduleNumber,"
-                                + "s.schedulename as scheduleName,coa.type as type from chartofaccounts coa, schedulemapping s "
+                                + "coa.name as scheduleName,coa.type as type from chartofaccounts coa, schedulemapping s "
                                 + "where s.id=coa.scheduleid and coa.classification=4 and s.reporttype = '"
                                 + scheduleReportType
                                 + "' order by coa.glcode").addScalar(
@@ -352,6 +352,8 @@ public abstract class ReportService {
                                                         Transformers.aliasToBean(StatementResultObject.class));
         return query.list();
     }
+    
+    
     
     protected List<StatementResultObject> getAllGlCodesForTypes(final String scheduleReportType, String type) {
         final Query query = persistenceService.getSession()
@@ -437,10 +439,10 @@ public abstract class ReportService {
     
     
     
-    public List<StatementResultObject> getTransactionAmtBSNew(final String filterQuery,
+    public List<StatementResultObject> getTransactionAmtNew(final String filterQuery,
             final Date toDate, final Date fromDate, final String coaType) {
     	
-    	String    voucherStatusToExclude = getAppConfigValueFor("EGF",
+    	String voucherStatusToExclude = getAppConfigValueFor("EGF",
                 "statusexcludeReport");
         
         final Query query = persistenceService.getSession()
@@ -470,6 +472,42 @@ public abstract class ReportService {
         return query.list();
     }
 
+    
+    public List<StatementResultObject> getTransactionAmtNewIE(final String filterQuery,
+            final Date toDate, final Date fromDate, final String coaType) {
+    	
+    	String voucherStatusToExclude = getAppConfigValueFor("EGF",
+                "statusexcludeReport");
+        
+        final Query query = persistenceService.getSession()
+                .createSQLQuery(
+                        "select distinct on(glcode) g.glcode as glCode, sum(g.debitamount)-sum(g.creditamount) as amount, "
+                        + "c.type as type"
+                		+" from generalledger g, chartofaccounts c, voucherheader v"
+                		+" where v.id=g.voucherheaderid and g.effectivedate >= '"
+                		+getFormattedDate(fromDate)
+                		+"' and g.glcodeid = c.id and g.effectivedate <= '"
+                		+getFormattedDate(toDate)
+                		+"' and c.type in ("
+                		+ coaType
+                		+ ") and v.status not in ("
+                		+ voucherStatusToExclude
+                		+ ") and g.voucherheaderid in (select voucherheaderid from generalledger "
+                		+"where effectivedate >= '"
+                		+ getFormattedDate(fromDate)
+                		+"' and effectivedate <= '"
+                		+getFormattedDate(toDate)
+                		+"' and substring(glcode,0,4)='450')"
+                		+ filterQuery
+                		+" group by g.glcode, c.type")
+                                .addScalar("glCode").addScalar("amount",BigDecimalType.INSTANCE)
+                                .addScalar("type").setResultTransformer(
+                                        Transformers.aliasToBean(StatementResultObject.class));
+        return query.list();
+    }
+    
+    
+    
     protected Map<String, String> getSubSchedule(final String subReportType) {
         final Map<String, String> scheduleNumberToName = new HashMap<String, String>();
         final List<Object[]> rows = persistenceService.getSession()
@@ -520,7 +558,7 @@ public abstract class ReportService {
         return statement.getFinancialYear().getEndingDate();
         
     }
-
+ 
     void addFundAmount(final StatementEntry entry, final Map<String, BigDecimal> fundTotals) {
         for (final Entry<String, BigDecimal> row : entry.getFundWiseAmount()
                 .entrySet()) {

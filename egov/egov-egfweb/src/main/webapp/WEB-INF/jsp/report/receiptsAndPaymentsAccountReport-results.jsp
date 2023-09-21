@@ -564,6 +564,93 @@
 
 								</tr>
 								</s:elseif>
+								
+								<s:elseif test="%{type == 'R'}">
+								<tr>
+									<td class="blueborderfortd">
+										<div align="center">
+											<s:if test='%{glCode != ""}'>
+												<s:if test='%{displayBold == true}'>
+
+													<strong><s:property value="glCode" /></strong>
+
+												</s:if>
+												<s:else>
+													<s:property value="glCode" />
+												</s:else>
+											</s:if>
+											&nbsp;
+										</div>
+									</td>
+									<td class="blueborderfortd">
+										<div align="left">
+											<s:text name="Total of Receipts" />
+											&nbsp;
+										</div>
+									</td>
+									<td class="blueborderfortd">
+										<div align="right">
+
+											<s:if test='%{displayBold == true}'>
+												<strong><s:property value="creditamount" />&nbsp;</strong>
+											</s:if>
+											<s:else>
+												<s:property value="creditamount" />&nbsp;</s:else>
+										</div>
+									</td>								
+									<td class="blueborderfortd">
+										<div align="right">
+											<s:if test='%{displayBold == true}'>
+												<strong><s:property value="prevCreditamount" />&nbsp;</strong>
+											</s:if>
+											<s:else>
+												<s:property value="prevCreditamount" />&nbsp;</s:else>
+										</div>
+									</td>
+									<%-- <td></td>--%>
+									<td class="blueborderfortd">
+										<div align="center">
+											<s:if test='%{glCode != ""}'>
+												<s:if test='%{displayBold == true}'>
+
+													<strong><s:property value="glCode" /></strong>
+
+												</s:if>
+												<s:else>
+													<s:property value="glCode" />
+												</s:else>
+											</s:if>
+											&nbsp;
+										</div>
+									</td>
+									<td class="blueborderfortd">
+										<div align="left">
+											<s:text name="Total of Payments" />
+											&nbsp;
+										</div>
+									</td>	
+									<td class="blueborderfortd">
+										<div align="right">
+
+											<s:if test='%{displayBold == true}'>
+												<strong><s:property value="debitamount" />&nbsp;</strong>
+											</s:if>
+											<s:else>
+												<s:property value="debitamount" />&nbsp;</s:else>
+										</div>
+									</td>
+									<td class="blueborderfortd">
+										<div align="right">
+											<s:if test='%{displayBold == true}'>
+												<strong><s:property value="prevDebitamount" />&nbsp;</strong>
+											</s:if>
+											<s:else>
+												<s:property value="prevDebitamount" />&nbsp;</s:else>
+										</div>
+									</td>																		
+
+								</tr>
+								</s:elseif>
 								<s:elseif test="%{type == 'C'}">
 								<tr>
 									<td class="blueborderfortd">
