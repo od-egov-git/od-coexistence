@@ -481,7 +481,7 @@ public abstract class ReportService {
         
         final Query query = persistenceService.getSession()
                 .createSQLQuery(
-                        "select distinct on(glcode) g.glcode as glCode, sum(g.debitamount)-sum(g.creditamount) as amount, "
+                        "select distinct on(glcode) g.glcode as glCode, v.fundid as fundId ,sum(g.debitamount)-sum(g.creditamount) as amount, "
                         + "c.type as type"
                 		+" from generalledger g, chartofaccounts c, voucherheader v"
                 		+" where v.id=g.voucherheaderid and g.effectivedate >= '"
@@ -499,8 +499,8 @@ public abstract class ReportService {
                 		+getFormattedDate(toDate)
                 		+"' and substring(glcode,0,4)='450')"
                 		+ filterQuery
-                		+" group by g.glcode, c.type")
-                                .addScalar("glCode").addScalar("amount",BigDecimalType.INSTANCE)
+                		+" group by g.glcode, c.type, v.fundid")
+                                .addScalar("glCode").addScalar("fundId",BigDecimalType.INSTANCE).addScalar("amount",BigDecimalType.INSTANCE)
                                 .addScalar("type").setResultTransformer(
                                         Transformers.aliasToBean(StatementResultObject.class));
         return query.list();
