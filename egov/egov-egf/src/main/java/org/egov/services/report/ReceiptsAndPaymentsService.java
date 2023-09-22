@@ -959,7 +959,7 @@ public class ReceiptsAndPaymentsService extends ReportService {
 		List<StatementResultObject> results = new ArrayList<>();
 
 		ArrayList<String> desiredGlCodes = new ArrayList<String>(Arrays.asList("110", "120", "130", "140", "150", "160",
-				"170", "171", "180", "210", "220", "230", "240", "250", "260"));
+				"170", "171", "180", "185","190","191","192","210", "220", "230", "240", "250", "260","270","271","272","285","290","291","292"));
 
 		for (StatementResultObject glcode : allGlCodes) {
 			if (desiredGlCodes.contains(glcode.getGlCode().substring(0, 3))) {
@@ -974,7 +974,7 @@ public class ReceiptsAndPaymentsService extends ReportService {
 		List<StatementResultObject> results = new ArrayList<>();
 
 		ArrayList<String> desiredGlCodes = new ArrayList<String>(Arrays.asList("310", "312", "320", "330", "331", "340",
-				"341", "350", "360", "410", "412", "420", "430", "431", "440", "460", "470"));
+				"341", "350", "360", "410","411", "412", "420", "430", "431", "432","440", "460", "470","471"));
 
 		for (StatementResultObject glcode : allGlCodes) {
 			if (desiredGlCodes.contains(glcode.getGlCode().substring(0, 3))) {
