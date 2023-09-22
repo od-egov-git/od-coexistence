@@ -53,9 +53,9 @@ function disableAsOnDate(){
 	}
 }
 
-//function validateMandatoryFields(){
+function validateMandatoryFields(){
 
-	/*if(document.getElementById('period').value=="Select")
+	if(document.getElementById('period').value=="Select")
 	{
 		bootbox.alert('<s:text name="msg.please.select.period"/>');
 		return false;
@@ -66,26 +66,26 @@ function disableAsOnDate(){
 			bootbox.alert('<s:text name="msg.please.select.financial.year"/>');
 			return false;
 		}
-	}*/
+	}
 	
-	/*if(document.getElementById('period').value=="Date" && document.getElementById('asOndate').value==""){
-		bootbox.alert('<s:text name="msg.please.enter.as.onDate"/>');
+	//if(document.getElementById('period').value=="Date" && document.getElementById('asOndate').value==""){
+		//bootbox.alert('<s:text name="msg.please.enter.as.onDate"/>');
+		//return false;
+	//}
+	if( document.getElementById('period').value=="Date" && document.getElementById('fromDate').value==""){
+		bootbox.alert('<s:text name="msg.please.select.from.date"/>');
 		return false;
-	}*/
-//	if( document.getElementById('period').value=="Date" && document.getElementById('fromDate').value==""){
-//		bootbox.alert('<s:text name="msg.please.select.from.date"/>');
-//		return false;
-//	}
-//	if( document.getElementById('period').value=="Date" && document.getElementById('toDate').value==""){
-//		bootbox.alert('<s:text name="msg.please.select.toDate"/>');
-//		return false;
-//	}
-//	return true;
-//}/ 
+	}
+	if( document.getElementById('period').value=="Date" && document.getElementById('toDate').value==""){
+		bootbox.alert('<s:text name="msg.please.select.toDate"/>');
+		return false;
+	}
+	return true;
+} 
 
 ///report/receiptsAndPaymentsAccountReport-ajaxPrintReceiptsAndPaymentsAccountReport
 function getData(){
-	//if(validateMandatoryFields()){
+	if(validateMandatoryFields()){
 		doLoadingMask();
 		//var url = '/services/EGF/report/incomeExpenditureReport-ajaxPrintIncomeExpenditureReport.action?showDropDown=false&model.period='+document.getElementById('period').value+'&model.currency='+document.getElementById('currency').value+'&model.financialYear.id='+document.getElementById('financialYear').value+'&model.department.code='+document.getElementById('department').value+'&model.function.id='+document.getElementById('function').value+'&model.asOndate='+document.getElementById('asOndate').value+'&model.fund.id='+document.getElementById('fund').value;
 		var url = '/services/EGF/report/receiptsAndPaymentsAccountReport-ajaxPrintReceiptsAndPaymentsAccountReport.action?showDropDown=false&model.period='+document.getElementById('period').value+'&model.financialYear.id='+document.getElementById('financialYear').value+'&model.fromDate='+document.getElementById('fromDate').value+'&model.toDate='+document.getElementById('toDate').value+'&model.fund.id='+document.getElementById('fund').value;;
@@ -94,9 +94,9 @@ function getData(){
 		//document.receiptsAndPaymentsAccountReport.action='/services/EGF/report/receiptsAndPaymentsAccountReport-ajaxPrintReceiptsAndPaymentsAccountReport.action';
 		//document.receiptsAndPaymentsAccountReport.submit();
 		return true;
-    //}
+    }
     
-	//return false;
+	return false;
 }
 
 </script>
@@ -114,7 +114,7 @@ function getData(){
 						class="mandatory1">*</span></td>
 					<td width="22%" class="bluebox"><s:select name="period"
 							id="period"
-							list="#{'Select':'---Choose---','Date':'Date','Yearly':'Yearly','Half Yearly':'Half Yearly'}"
+							list="#{'Select':'---Choose---','Date':'Date','Yearly':'Yearly'}"
 							onclick="disableAsOnDate()" value="%{model.period}" /></td>
 					<td class="bluebox" width="12%"><s:text
 							name="report.financialYear" />:<span class="mandatory1">*</span></td>
