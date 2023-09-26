@@ -88,7 +88,7 @@ function getData(){
 	if(validateMandatoryFields()){
 		doLoadingMask();
 		//var url = '/services/EGF/report/incomeExpenditureReport-ajaxPrintIncomeExpenditureReport.action?showDropDown=false&model.period='+document.getElementById('period').value+'&model.currency='+document.getElementById('currency').value+'&model.financialYear.id='+document.getElementById('financialYear').value+'&model.department.code='+document.getElementById('department').value+'&model.function.id='+document.getElementById('function').value+'&model.asOndate='+document.getElementById('asOndate').value+'&model.fund.id='+document.getElementById('fund').value;
-		var url = '/services/EGF/report/receiptsAndPaymentsAccountReport-ajaxPrintReceiptsAndPaymentsAccountReport.action?showDropDown=false&model.period='+document.getElementById('period').value+'&model.financialYear.id='+document.getElementById('financialYear').value+'&model.fromDate='+document.getElementById('fromDate').value+'&model.toDate='+document.getElementById('toDate').value+'&model.fund.id='+document.getElementById('fund').value;;
+		var url = '/services/EGF/report/receiptsAndPaymentsAccountReport-ajaxPrintReceiptsAndPaymentsAccountReport.action?showDropDown=false&model.period='+document.getElementById('period').value+'&model.financialYear.id='+document.getElementById('financialYear').value+'&model.fromDate='+document.getElementById('fromDate').value+'&model.toDate='+document.getElementById('toDate').value+'&model.fund.id='+document.getElementById('fund').value;
 		YAHOO.util.Connect.asyncRequest('POST', url, callback, null);
 		
 		//document.receiptsAndPaymentsAccountReport.action='/services/EGF/report/receiptsAndPaymentsAccountReport-ajaxPrintReceiptsAndPaymentsAccountReport.action';

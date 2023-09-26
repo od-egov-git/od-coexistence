@@ -99,6 +99,73 @@ public class ReceiptsAndPaymentsService extends ReportService {
 		}
 
 	}
+	
+	protected void addRowsToStatementBS(Statement statement, Statement assets, Statement liabilities) {
+
+		Date fromDate = getFromDate(statement);
+		Date toDate = getToDate(statement);
+		
+		Date closingFromDate;
+		Date closingToDate;
+		
+		if ("Yearly".equalsIgnoreCase(statement.getPeriod())) {
+			final Calendar cal1 = Calendar.getInstance();
+			cal1.setTime(fromDate);
+			cal1.add(Calendar.YEAR, 1);
+			closingFromDate = cal1.getTime();
+			
+			final Calendar cal2 = Calendar.getInstance();
+			cal2.setTime(toDate);
+			cal2.add(Calendar.YEAR, 1);
+			closingToDate = cal2.getTime();
+			
+		} else {
+			final Calendar cal1 = Calendar.getInstance();
+			cal1.setTime(fromDate);
+			cal1.add(Calendar.DATE, 1);
+			closingFromDate = cal1.getTime();
+			
+			final Calendar cal2 = Calendar.getInstance();
+			cal2.setTime(toDate);
+			cal2.add(Calendar.DATE, 1);
+			closingToDate = cal2.getTime();
+		}
+
+		if (liabilities.sizeBS() > 0) {
+			statement.addBS(new BSStatementEntry(null, Constants.LIABILITIES, null, null, null, null, true,
+					Character.MIN_VALUE));
+			statement.addAllBS(liabilities);
+			statement.addBS(new BSStatementEntry(null, "", null, null, null, null, true, Character.MIN_VALUE));
+
+		}
+		if (assets.sizeBS() > 0) {
+			statement.addBS(
+					new BSStatementEntry(null, Constants.ASSETS, null, null, null, null, true, Character.MIN_VALUE));
+			statement.addAllBS(assets);
+			statement.addBS(new BSStatementEntry(null, "", null, null, null, null, true, Character.MIN_VALUE));
+
+		}
+		
+		BSStatementEntry totalEntry = new BSStatementEntry();
+		totalEntry = getTotalBS(statement);
+		statement.addBS(totalEntry);
+		statement.addBS(new BSStatementEntry("", "", totalPayments, totalReceipts, prevTotalPayments, prevTotalReceipts,true, 'R'));
+		
+		BSStatementEntry totalCashOpeningEntry = new BSStatementEntry();
+		BSStatementEntry totalBankOpeningEntry = new BSStatementEntry();
+		BSStatementEntry totalOpeningEntry = new BSStatementEntry();
+		
+		totalCashOpeningEntry = getTotalCashOpeningForClosing(statement, closingFromDate, closingToDate);
+		totalBankOpeningEntry = getTotalBankOpeningForClosing(statement, closingFromDate, closingToDate);
+		totalOpeningEntry = getTotalClosingFinal(totalCashOpeningEntry, totalBankOpeningEntry);
+
+		statement.addBS(new BSStatementEntry("", "", null, null, null,null, true, 'C'));
+		statement.addBS(new BSStatementEntry("", "Closing Balances", null, null, null,null, true, 'C'));
+		statement.addBS(totalCashOpeningEntry);
+		statement.addBS(totalBankOpeningEntry);
+		statement.addBS(totalOpeningEntry);
+
+	}
 
 	private IEStatementEntry getTotalOpeningFinal(Statement statement, IEStatementEntry totalCashOpeningEntry,
 			IEStatementEntry totalBankOpeningEntry) {
@@ -273,8 +340,58 @@ public class ReceiptsAndPaymentsService extends ReportService {
 			}
 		}
 		
-		resultEntry.setDebitamount(totalCashOpeningBalance);
-		resultEntry.setPrevDebitamount(totalPrevCashOpeningBalance);
+		final List<OpeningAndClosingBalanceEntry> tillDateResults = getTillDateOpeningBalanceForRP(statement, fromDate, toDate);
+		final List<OpeningAndClosingBalanceEntry> tillDatePrevResults = getTillDateOpeningBalanceForRP(statement,
+				getPreviousYearFor(fromDate), prevFormattedToDate);
+		
+		BigDecimal tillDateCashOpeningBalance = BigDecimal.ZERO;
+		BigDecimal tillDatePrevCashOpeningBalance = BigDecimal.ZERO;
+
+		if (!tillDateResults.isEmpty()) {
+			for (OpeningAndClosingBalanceEntry entry : tillDateResults) {
+
+				String cashGlCode = entry.getGlcode().substring(0, 4);
+
+				if (cashGlCode != null) {
+					int shortGlcode = Integer.parseInt(cashGlCode);
+
+					if (shortGlcode == 4501) {
+						tillDateCashOpeningBalance = tillDateCashOpeningBalance
+								.add(entry.getOpeningDebitBalance().subtract(entry.getOpeningCreditBalance()));
+
+					}
+
+				}
+
+			}
+		}
+
+		if (!tillDatePrevResults.isEmpty()) {
+			for (OpeningAndClosingBalanceEntry entry : tillDatePrevResults) {
+
+				String cashGlCode = entry.getGlcode().substring(0, 4);
+
+				if (cashGlCode != null) {
+					int shortGlcode = Integer.parseInt(cashGlCode);
+
+					if (shortGlcode == 4501) {
+						tillDatePrevCashOpeningBalance = tillDatePrevCashOpeningBalance
+								.add(entry.getOpeningDebitBalance().subtract(entry.getOpeningCreditBalance()));
+					}
+
+				}
+			}
+		}
+		
+		BigDecimal finalCashOpeningBalance = BigDecimal.ZERO;
+		BigDecimal finalPrevCashOpeningBalance = BigDecimal.ZERO;
+		
+		
+		finalCashOpeningBalance = tillDateCashOpeningBalance.add(totalCashOpeningBalance);
+		finalPrevCashOpeningBalance = tillDatePrevCashOpeningBalance.add(totalPrevCashOpeningBalance);
+		
+		resultEntry.setDebitamount(finalCashOpeningBalance);
+		resultEntry.setPrevDebitamount(finalPrevCashOpeningBalance);
 		resultEntry.setGlCode("");
 		resultEntry.setType('C');
 		resultEntry.setAccountName("a. Cash Balances");
@@ -367,8 +484,6 @@ public class ReceiptsAndPaymentsService extends ReportService {
 		final List<OpeningAndClosingBalanceEntry> prevResults = getOpeningBalanceForRP(statement,
 				getPreviousYearFor(fromDate), prevFormattedToDate);
 
-		final BSStatementEntry resultEntry = new BSStatementEntry();
-
 		BigDecimal totalPrevBankOpeningBalance = BigDecimal.ZERO;
 		BigDecimal totalBankOpeningBalance = BigDecimal.ZERO;
 
@@ -406,8 +521,61 @@ public class ReceiptsAndPaymentsService extends ReportService {
 
 			}
 		}
-		resultEntry.setDebitamount(totalBankOpeningBalance);
-		resultEntry.setPrevDebitamount(totalPrevBankOpeningBalance);
+		
+		final List<OpeningAndClosingBalanceEntry> tillDateBankResults = getOpeningBalanceForRP(statement, fromDate, toDate);
+		final List<OpeningAndClosingBalanceEntry> prevTillDateBankResults = getOpeningBalanceForRP(statement,
+				getPreviousYearFor(fromDate), prevFormattedToDate);
+
+		final BSStatementEntry resultEntry = new BSStatementEntry();
+
+		BigDecimal tillDatePrevBankOpeningBalance = BigDecimal.ZERO;
+		BigDecimal tillDateBankOpeningBalance = BigDecimal.ZERO;
+
+		if (!prevTillDateBankResults.isEmpty()) {
+			for (OpeningAndClosingBalanceEntry entry : prevTillDateBankResults) {
+
+				String cashGlCode = entry.getGlcode().substring(0, 4);
+
+				if (cashGlCode != null) {
+					int shortGlcode = Integer.parseInt(cashGlCode);
+
+					if (shortGlcode == 4502) {
+						tillDatePrevBankOpeningBalance = tillDatePrevBankOpeningBalance
+								.add(entry.getOpeningDebitBalance().subtract(entry.getOpeningCreditBalance()));
+					}
+				}
+
+			}
+		}
+
+		if (!tillDateBankResults.isEmpty()) {
+			for (OpeningAndClosingBalanceEntry entry : tillDateBankResults) {
+
+				String cashGlCode = entry.getGlcode().substring(0, 4);
+
+				if (cashGlCode != null) {
+					int shortGlcode = Integer.parseInt(cashGlCode);
+
+					if (shortGlcode == 4502) {
+						tillDateBankOpeningBalance = tillDateBankOpeningBalance
+								.add(entry.getOpeningDebitBalance().subtract(entry.getOpeningCreditBalance()));
+					}
+
+				}
+
+			}
+		}
+		
+		BigDecimal finalPrevBankOpeningBalance = BigDecimal.ZERO;
+		BigDecimal finalBankOpeningBalance = BigDecimal.ZERO;
+		
+		
+		finalBankOpeningBalance = tillDateBankOpeningBalance.add(totalBankOpeningBalance);
+		finalPrevBankOpeningBalance = tillDatePrevBankOpeningBalance.add(totalPrevBankOpeningBalance);
+
+		
+		resultEntry.setDebitamount(finalBankOpeningBalance);
+		resultEntry.setPrevDebitamount(finalPrevBankOpeningBalance);
 		resultEntry.setGlCode("");
 		resultEntry.setType('C');
 		resultEntry.setAccountName("b. Bank Balances");
@@ -419,6 +587,9 @@ public class ReceiptsAndPaymentsService extends ReportService {
 
 	private List<OpeningAndClosingBalanceEntry> getOpeningBalanceForRP(Statement statement, Date fromDate,
 			Date toDate) {
+		
+		String voucherStatusToExclude = getAppConfigValueFor("EGF",
+                "statusexcludeReport");
 
 		final String openingBalanceStr = "SELECT coa.glcode AS glcode ,coa.name  AS accName, SUM(ts.openingcreditbalance) as openingCreditBalance,"
 				+ "sum(ts.openingdebitbalance) as openingDebitBalance"
@@ -437,61 +608,38 @@ public class ReceiptsAndPaymentsService extends ReportService {
 
 		return openingBalanceQry.list();
 	}
-
-	protected void addRowsToStatementBS(Statement statement, Statement assets, Statement liabilities) {
-
-		Date fromDate = getFromDate(statement);
-		Date toDate = getToDate(statement);
+	
+	
+	private List<OpeningAndClosingBalanceEntry> getTillDateOpeningBalanceForRP(Statement statement, Date fromDate,
+			Date toDate) {
 		
-		Date closingFromDate;
-		Date closingToDate;
+		String voucherStatusToExclude = getAppConfigValueFor("EGF",
+                "statusexcludeReport");
 		
-		final Calendar cal1 = Calendar.getInstance();
-		cal1.setTime(fromDate);
-		cal1.add(Calendar.YEAR, 1);
-		closingFromDate = cal1.getTime();
+		final String tillDateopeningBalanceStr="SELECT coa.glcode AS glcode ,coa.name  AS accName, SUM(gl.creditAmount) as openingCreditBalance,sum(gl.debitAmount) as openingDebitBalance"
+				+ " FROM generalledger  gl,chartofaccounts coa,financialyear fy,Voucherheader vh "
+				+ " WHERE gl.glcodeid=coa.id and vh.id=gl.voucherheaderid "
+				+ " AND vh.voucherdate>=fy.startingdate AND vh.voucherdate<= :fromDateMinus1"
+				+ " AND fy.startingdate<=:fromDate AND fy.endingdate>=:toDate" + " AND vh.status not in ("
+				+ voucherStatusToExclude + ")" + " GROUP BY gl.glcodeid,coa.glcode,coa.name ORDER BY coa.glcode ASC";
+
+		final Query tillDateopeningBalanceQry = persistenceService.getSession().createSQLQuery(tillDateopeningBalanceStr)
+				.addScalar("glcode").addScalar("accName").addScalar("openingCreditBalance", BigDecimalType.INSTANCE)
+				.addScalar("openingDebitBalance", BigDecimalType.INSTANCE)
+				.setResultTransformer(Transformers.aliasToBean(OpeningAndClosingBalanceEntry.class));
+
+		tillDateopeningBalanceQry.setDate("fromDate", fromDate);
+		tillDateopeningBalanceQry.setDate("toDate", toDate);
 		
-		final Calendar cal2 = Calendar.getInstance();
-		cal2.setTime(toDate);
-		cal2.add(Calendar.YEAR, 1);
-		closingToDate = cal2.getTime();
 
+		final Calendar cal = Calendar.getInstance();
+		cal.setTime(fromDate);
+		cal.add(Calendar.DATE, -1);
+		tillDateopeningBalanceQry.setDate("fromDateMinus1", cal.getTime());
 
-		if (liabilities.sizeBS() > 0) {
-			statement.addBS(new BSStatementEntry(null, Constants.LIABILITIES, null, null, null, null, true,
-					Character.MIN_VALUE));
-			statement.addAllBS(liabilities);
-			statement.addBS(new BSStatementEntry(null, "", null, null, null, null, true, Character.MIN_VALUE));
-
-		}
-		if (assets.sizeBS() > 0) {
-			statement.addBS(
-					new BSStatementEntry(null, Constants.ASSETS, null, null, null, null, true, Character.MIN_VALUE));
-			statement.addAllBS(assets);
-			statement.addBS(new BSStatementEntry(null, "", null, null, null, null, true, Character.MIN_VALUE));
-
-		}
-		
-		BSStatementEntry totalEntry = new BSStatementEntry();
-		totalEntry = getTotalBS(statement);
-		statement.addBS(totalEntry);
-		statement.addBS(new BSStatementEntry("", "", totalPayments, totalReceipts, prevTotalPayments, prevTotalReceipts,true, 'R'));
-		
-		BSStatementEntry totalCashOpeningEntry = new BSStatementEntry();
-		BSStatementEntry totalBankOpeningEntry = new BSStatementEntry();
-		BSStatementEntry totalOpeningEntry = new BSStatementEntry();
-		
-		totalCashOpeningEntry = getTotalCashOpeningForClosing(statement, closingFromDate, closingToDate);
-		totalBankOpeningEntry = getTotalBankOpeningForClosing(statement, closingFromDate, closingToDate);
-		totalOpeningEntry = getTotalClosingFinal(totalCashOpeningEntry, totalBankOpeningEntry);
-
-		statement.addBS(new BSStatementEntry("", "", null, null, null,null, true, 'C'));
-		statement.addBS(new BSStatementEntry("", "Closing Balances", null, null, null,null, true, 'C'));
-		statement.addBS(totalCashOpeningEntry);
-		statement.addBS(totalBankOpeningEntry);
-		statement.addBS(totalOpeningEntry);
-
+		return tillDateopeningBalanceQry.list();
 	}
+	
 
 	private BSStatementEntry getTotalBS(Statement statement) {
 
