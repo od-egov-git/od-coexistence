@@ -280,23 +280,21 @@
 						<table border="0" cellspacing="0" cellpadding="0"
 							class="tablebottom" width="100%">
 							<tr>
-								<th class="bluebgheadtd"><s:text name="report.accountCode" /></th>
-								<th class="bluebgheadtd"><s:text
-										name="Perticulars" /></th>
-								<th class="bluebgheadtd" width="15%" align="center"
+								<th class="bluebgheadtd" width="15%"><s:text name="report.accountCode" /></th>
+								<th class="bluebgheadtd" width="20%"><s:text name="Perticulars" /></th>
+								<th class="bluebgheadtd" width="7.5%" align="center"
 									colspan="1"><s:text name="Current Period" />( Rs)</th>
 											
-								<th class="bluebgheadtd" width="15%" align="center"
+								<th class="bluebgheadtd" width="7.5%" align="center"
 									colspan="1"><s:text name="Previous Year" />( Rs)</th>
 									
 								<%-- <th width="1%" align="center"></th> --%>
 									
-								<th class="bluebgheadtd"><s:text name="report.accountCode" /></th>
-								<th class="bluebgheadtd"><s:text
-										name="Perticulars" /></th>
-								<th class="bluebgheadtd" width="15%" align="center"
+								<th class="bluebgheadtd" width="15%"><s:text name="report.accountCode" /></th>
+								<th class="bluebgheadtd" width="20%"><s:text name="Perticulars" /></th>
+								<th class="bluebgheadtd" width="7.5%" align="center"
 									colspan="1"><s:text name="Current Period" />( Rs)</th>
-								<th class="bluebgheadtd" width="15%" align="center"
+								<th class="bluebgheadtd" width="7.5%" align="center"
 									colspan="1"><s:text name="Previous Year" />( Rs)</th>									
 
 							</tr>
@@ -418,19 +416,19 @@
 										<div align="right">
 
 											<s:if test='%{displayBold == true}'>
-												<strong><s:property value="debitamount" />&nbsp;</strong>
+												<strong><s:property value="creditamount" />&nbsp;</strong>
 											</s:if>
 											<s:else>
-												<s:property value="debitamount" />&nbsp;</s:else>
+												<s:property value="creditamount" />&nbsp;</s:else>
 										</div>
 									</td>								
 									<td class="blueborderfortd">
 										<div align="right">
 											<s:if test='%{displayBold == true}'>
-												<strong><s:property value="prevDebitamount" />&nbsp;</strong>
+												<strong><s:property value="prevCreditamount" />&nbsp;</strong>
 											</s:if>
 											<s:else>
-												<s:property value="prevDebitamount" />&nbsp;</s:else>
+												<s:property value="prevCreditamount" />&nbsp;</s:else>
 										</div>
 									</td>
 									<%--<td></td> --%>
@@ -459,19 +457,19 @@
 										<div align="right">
 
 											<s:if test='%{displayBold == true}'>
-												<strong><s:property value="creditamount" />&nbsp;</strong>
+												<strong><s:property value="debitamount" />&nbsp;</strong>
 											</s:if>
 											<s:else>
-												<s:property value="creditamount" />&nbsp;</s:else>
+												<s:property value="debitamount" />&nbsp;</s:else>
 										</div>
 									</td>
 									<td class="blueborderfortd">
 										<div align="right">
 											<s:if test='%{displayBold == true}'>
-												<strong><s:property value="prevCreditamount" />&nbsp;</strong>
+												<strong><s:property value="prevDebitamount" />&nbsp;</strong>
 											</s:if>
 											<s:else>
-												<s:property value="prevCreditamount" />&nbsp;</s:else>
+												<s:property value="prevDebitamount" />&nbsp;</s:else>
 										</div>
 									</td>																		
 
