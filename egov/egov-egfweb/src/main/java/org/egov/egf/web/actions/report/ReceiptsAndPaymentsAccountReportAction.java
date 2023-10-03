@@ -1,9 +1,11 @@
 package org.egov.egf.web.actions.report;
 
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.ParentPackage;
@@ -16,6 +18,7 @@ import org.egov.commons.Functionary;
 import org.egov.commons.Fund;
 import org.egov.egf.model.Statement;
 import org.egov.infra.admin.master.entity.Boundary;
+import org.egov.infra.admin.master.service.CityService;
 import org.egov.infra.config.persistence.datasource.routing.annotation.ReadOnly;
 import org.egov.infra.microservice.models.Department;
 import org.egov.infra.reporting.util.ReportUtil;
@@ -43,6 +46,9 @@ import net.sf.jasperreports.engine.JasperPrint;
 public class ReceiptsAndPaymentsAccountReportAction extends BaseFormAction {
 
 	private static final long serialVersionUID = 1L;
+	
+    private static final String Receipts_Payments_PDF = "PDF";
+    private static final String Receipts_Payments_XLS = "XLS";
 
 	@Autowired
 	@Qualifier("persistenceService")
@@ -56,7 +62,25 @@ public class ReceiptsAndPaymentsAccountReportAction extends BaseFormAction {
 	private ReceiptsAndPaymentsService ReceiptsAndPaymentsService;
 	
 	InputStream inputStream;
+
 	ReportHelper reportHelper;
+	
+	public InputStream getInputStream() {
+		return inputStream;
+	}
+	
+	public void setInputStream(InputStream inputStream) {
+		this.inputStream = inputStream;
+	}
+
+	public void setReportHelper(ReportHelper reportHelper) {
+		this.reportHelper = reportHelper;
+	}
+
+	@Autowired
+    private CityService cityService;
+    
+    private static SimpleDateFormat FORMATDDMMYYYY = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
 
 	Statement receiptsAndPaymentsAccountStatement = new Statement();
 	private Date todayDate;
@@ -121,17 +145,25 @@ public class ReceiptsAndPaymentsAccountReportAction extends BaseFormAction {
 		return "result";
 	}
 	
-//    @ReadOnly
-//    @Action(value = "/report/receiptsAndPaymentsAccountReport-generateReceiptAndPaymentPdf")
-//    public String generateReceiptAndPaymentPdf() throws Exception {
-//        populateDataSource();
-//        final String heading = ReportUtil.getCityName() +" "+(cityService.getCityGrade()==null ? "" :cityService.getCityGrade()) + "\\n" + statementheading.toString();
-//        final String subtitle = "Report Run Date-" + FORMATDDMMYYYY.format(getTodayDate());
-//        final JasperPrint jasper = reportHelper.generateIncomeExpenditureReportJasperPrint(incomeExpenditureStatement, heading,
-//                getPreviousYearToDate(), getCurrentYearToDate(), subtitle, true);
-//        inputStream = reportHelper.exportPdf(inputStream, jasper);
-//        return INCOME_EXPENSE_PDF;
-//    }
+    @ReadOnly
+    @Action(value = "/report/receiptsAndPaymentsAccountReport-generateIncomeExpenditureXls")
+    public String generateReceiptsAndPaymentsAccountXls() throws Exception {
+        populateDataSource();
+        final String heading = ReportUtil.getCityName() +" "+(cityService.getCityGrade()==null ? "" :cityService.getCityGrade()) + "\\n" + statementheading.toString();
+        final JasperPrint jasper = reportHelper.generateReceiptsAndPaymentsAccountsJasperPrint(receiptsAndPaymentsAccountStatement, heading);
+        inputStream = reportHelper.exportXls(inputStream, jasper);
+        return Receipts_Payments_XLS;
+    }
+	
+    @ReadOnly
+    @Action(value = "/report/receiptsAndPaymentsAccountReport-generateReceiptAndPaymentPdf")
+    public String generateReceiptsAndPaymentsAccountPdf() throws Exception {
+        populateDataSource();
+        final String heading = ReportUtil.getCityName() +" "+(cityService.getCityGrade()==null ? "" :cityService.getCityGrade()) + "\\n" + statementheading.toString();
+        final JasperPrint jasper = reportHelper.generateReceiptsAndPaymentsAccountsJasperPrint(receiptsAndPaymentsAccountStatement, heading);        
+        inputStream = reportHelper.exportPdf(inputStream, jasper);
+        return Receipts_Payments_PDF;
+    }
 
 	private void populateDataSource() {
 

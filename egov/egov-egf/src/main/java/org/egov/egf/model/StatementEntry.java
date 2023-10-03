@@ -61,8 +61,19 @@ public class StatementEntry {
     private BigDecimal currentYearTotal = BigDecimal.ZERO;
     private Map<String, BigDecimal> fundWiseAmount = new HashMap<String, BigDecimal>();
     private boolean displayBold = false;
+    private Character type;
 
-    public boolean isDisplayBold() {
+    public StatementEntry(String glCode, String accountName, BigDecimal previousYearTotal, BigDecimal currentYearTotal,
+			Character type) {
+		super();
+		this.glCode = glCode;
+		this.accountName = accountName;
+		this.previousYearTotal = previousYearTotal;
+		this.currentYearTotal = currentYearTotal;
+		this.type = type;
+	}
+
+	public boolean isDisplayBold() {
         return displayBold;
     }
 
@@ -154,5 +165,13 @@ public class StatementEntry {
     public void setFundCode(final String fundCode) {
         this.fundCode = fundCode;
     }
+
+	public Character getType() {
+		return type;
+	}
+
+	public void setType(Character type) {
+		this.type = type;
+	}
 
 }
