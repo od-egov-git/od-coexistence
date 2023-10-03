@@ -404,6 +404,46 @@ public class ReportHelper {
         return DynamicJasperHelper.generateJasperPrint(dr,
                 new ClassicLayoutManager(), ds);
     }
+    
+    public JasperPrint generateReceiptsAndPaymentsAccountsJasperPrint(
+            final Statement rpStatement, final String heading)
+                    throws Exception {
+    	
+        final Style detailAmountStyle = getDetailAmountStyle();
+        final Style columnStyle = getColumnStyle();
+        FastReportBuilder drb = new FastReportBuilder();
+        LOGGER.info("Generating Receipts and Payments Account pdf/excel ");
+
+        drb = drb
+                .addColumn("Account Code", "glCode",
+                        String.class.getName(), 55, columnStyle)
+                .addColumn("Perticulars", "accountName", String.class.getName(), 100,
+                                columnStyle);
+
+        drb.setTitle(heading)
+        .setPrintBackgroundOnOddRows(true).setWhenNoData("No data", null)
+        .setDefaultStyles(getTitleStyle(), getAmountSubTitleStyle(), getHeaderStyle(), getDetailStyle())
+        .setOddRowBackgroundStyle(getOddRowStyle())
+        .setDetailHeight(20)
+        .setHeaderHeight(35)
+        .setUseFullPageWidth(true)
+        .setTitleHeight(40);
+
+        drb.setPageSizeAndOrientation(new Page(612, 792, false));
+        
+        drb.addColumn("Current Year" + "(Rs)",
+                "currentYearTotal", BigDecimal.class.getName(),
+                70, false, "0.00", detailAmountStyle);
+        drb.addColumn("Previous Year" + "(Rs)",
+                "previousYearTotal", BigDecimal.class
+                .getName(), 70, false, "0.00", detailAmountStyle);
+
+        final DynamicReport dr = drb.build();
+        final JRDataSource ds = new JRBeanCollectionDataSource(rpStatement.getEntries());
+        return DynamicJasperHelper.generateJasperPrint(dr,
+                new ClassicLayoutManager(), ds);
+    }
+
 
     public JasperPrint generateReceiptPaymentReportJasperPrint(final Statement receiptPaymentObj, final String heading,
             final String subtitle,
