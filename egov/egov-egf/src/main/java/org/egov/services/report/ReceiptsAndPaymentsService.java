@@ -13,12 +13,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import org.egov.commons.CVoucherHeader;
 import org.egov.commons.Fund;
 import org.egov.egf.model.BSStatementEntry;
 import org.egov.egf.model.IEStatementEntry;
 import org.egov.egf.model.OpeningAndClosingBalanceEntry;
+import org.egov.egf.model.RPAccountEntry;
 import org.egov.egf.model.Statement;
 import org.egov.egf.model.StatementEntry;
 import org.egov.egf.model.StatementResultObject;
@@ -499,7 +501,7 @@ public class ReceiptsAndPaymentsService extends ReportService {
 				if (cashGlCode != null) {
 					int shortGlcode = Integer.parseInt(cashGlCode);
 
-					if (shortGlcode == 4501) {
+					if (shortGlcode == 4502) {
 						tillDateBankOpeningBalance = tillDateBankOpeningBalance
 								.add(entry.getOpeningDebitBalance().subtract(entry.getOpeningCreditBalance()));
 
@@ -518,7 +520,7 @@ public class ReceiptsAndPaymentsService extends ReportService {
 				if (cashGlCode != null) {
 					int shortGlcode = Integer.parseInt(cashGlCode);
 
-					if (shortGlcode == 4501) {
+					if (shortGlcode == 4502) {
 						tillDatePrevBankOpeningBalance = tillDatePrevBankOpeningBalance
 								.add(entry.getOpeningDebitBalance().subtract(entry.getOpeningCreditBalance()));
 					}
@@ -798,7 +800,125 @@ public class ReceiptsAndPaymentsService extends ReportService {
 
 		removeEntrysWithZeroAmount(receiptsAndPaymentsAccountStatement);
 
-		getColsolidatedStatement(receiptsAndPaymentsAccountStatement);
+		getColsolidatedStatement2(receiptsAndPaymentsAccountStatement);
+
+	}
+
+	public void getColsolidatedStatement2(Statement receiptsAndPaymentsAccountStatement) {
+
+		int fundId = 1;
+		List<IEStatementEntry> ieEntries = receiptsAndPaymentsAccountStatement.getIeEntries();
+
+		List<IEStatementEntry> incomeEntries = ieEntries.stream().filter(entry -> entry.getType() != null)
+				.filter(entry -> entry.getType() == 'I').collect(Collectors.toList());
+
+		List<IEStatementEntry> expenseEntries = ieEntries.stream().filter(entry -> entry.getType() != null)
+				.filter(entry -> entry.getGlCode() != null && !entry.getGlCode().equals(""))
+				.filter(entry -> entry.getAccountName() != null && !entry.getAccountName().equals(""))
+				.filter(entry -> entry.getType() == 'E').collect(Collectors.toList());
+
+		if (incomeEntries.size() > expenseEntries.size()) {
+			int diff = incomeEntries.size() - expenseEntries.size();
+
+			for (int i = 0; i < diff; i++) {
+				expenseEntries.add(new IEStatementEntry());
+			}
+		} else if (incomeEntries.size() < expenseEntries.size()) {
+			int diff = expenseEntries.size() - incomeEntries.size();
+
+			for (int i = 0; i < diff; i++) {
+				incomeEntries.add(new IEStatementEntry());
+			}
+		} else {
+
+		}
+
+		List<RPAccountEntry> resultList = new ArrayList<RPAccountEntry>();
+
+		for (int i = 0; i < ieEntries.size(); i++) {
+			if (ieEntries.get(i).getType() != null && ieEntries.get(i).getType() == 'O') {
+				resultList.add(new RPAccountEntry("", ieEntries.get(i).getAccountName(),
+						ieEntries.get(i).getNetAmount() != null
+								? ieEntries.get(i).getNetAmount()
+										.get(getFundNameForId(receiptsAndPaymentsAccountStatement.getFunds(), fundId))
+								: null,
+						ieEntries.get(i).getPreviousYearAmount() != null
+								? ieEntries.get(i).getPreviousYearAmount()
+										.get(getFundNameForId(receiptsAndPaymentsAccountStatement.getFunds(), fundId))
+								: null,
+						"", "", null, null, 'X'));
+			}
+		}
+
+		for (int i = 0; i < incomeEntries.size(); i++) {
+
+			resultList.add(new RPAccountEntry(incomeEntries.get(i).getGlCode(), incomeEntries.get(i).getAccountName(),
+					incomeEntries.get(i).getNetAmount() != null
+							? incomeEntries.get(i).getNetAmount()
+									.get(getFundNameForId(receiptsAndPaymentsAccountStatement.getFunds(), fundId))
+							: BigDecimal.ZERO,
+					incomeEntries.get(i).getPreviousYearAmount() != null
+							? incomeEntries.get(i).getPreviousYearAmount()
+									.get(getFundNameForId(receiptsAndPaymentsAccountStatement.getFunds(), fundId))
+							: BigDecimal.ZERO,
+
+					expenseEntries.get(i).getGlCode(), expenseEntries.get(i).getAccountName(),
+
+					expenseEntries.get(i).getNetAmount() != null
+							? expenseEntries.get(i).getNetAmount()
+									.get(getFundNameForId(receiptsAndPaymentsAccountStatement.getFunds(), fundId))
+							: BigDecimal.ZERO,
+					expenseEntries.get(i).getPreviousYearAmount() != null
+							? expenseEntries.get(i).getPreviousYearAmount()
+									.get(getFundNameForId(receiptsAndPaymentsAccountStatement.getFunds(), fundId))
+							: BigDecimal.ZERO,
+					'X'));
+		}
+
+		List<BSStatementEntry> bsEntries = receiptsAndPaymentsAccountStatement.getBsEntries();
+
+		List<BSStatementEntry> assetLiabilitiesEntries = bsEntries.stream()
+				.filter(entry -> entry.getType() == 'A' || entry.getType() == 'L').collect(Collectors.toList());
+
+		for (int i = 0; i < assetLiabilitiesEntries.size(); i++) {
+			resultList.add(new RPAccountEntry(assetLiabilitiesEntries.get(i).getGlCode(),
+					assetLiabilitiesEntries.get(i).getAccountName(), assetLiabilitiesEntries.get(i).getCreditamount(),
+					assetLiabilitiesEntries.get(i).getPrevCreditamount(), assetLiabilitiesEntries.get(i).getGlCode(),
+					assetLiabilitiesEntries.get(i).getAccountName(), assetLiabilitiesEntries.get(i).getDebitamount(),
+					assetLiabilitiesEntries.get(i).getPrevDebitamount(), 'Y'));
+		}
+
+		List<BSStatementEntry> totalsEntries = bsEntries.stream().filter(entry -> entry.getType() == 'T')
+				.collect(Collectors.toList());
+		resultList.add(new RPAccountEntry(totalsEntries.get(0).getGlCode(), totalsEntries.get(0).getAccountName(),
+				totalsEntries.get(0).getCreditamount(), totalsEntries.get(0).getPrevCreditamount(),
+				totalsEntries.get(0).getGlCode(), totalsEntries.get(0).getAccountName(),
+				totalsEntries.get(0).getDebitamount(), totalsEntries.get(0).getPrevDebitamount(), 'Y'));
+
+		List<BSStatementEntry> grandTotalsEntries = bsEntries.stream().filter(entry -> entry.getType() == 'R')
+				.collect(Collectors.toList());
+		resultList.add(new RPAccountEntry(grandTotalsEntries.get(0).getGlCode(),
+				"Total of Receipts", grandTotalsEntries.get(0).getCreditamount(),
+				grandTotalsEntries.get(0).getPrevCreditamount(), grandTotalsEntries.get(0).getGlCode(),
+				"Total of Payments", grandTotalsEntries.get(0).getDebitamount(),
+				grandTotalsEntries.get(0).getPrevDebitamount(), 'Y'));
+
+		List<BSStatementEntry> closingEntries = bsEntries.stream().filter(entry -> entry.getType() == 'C')
+				.collect(Collectors.toList());
+
+		for (int i = 0; i < closingEntries.size(); i++) {
+			resultList.add(new RPAccountEntry(null,
+					(closingEntries.get(i).getAccountName().equalsIgnoreCase("Closing Balances")
+							|| closingEntries.get(i).getAccountName().equalsIgnoreCase("a. Cash Balances")
+							|| closingEntries.get(i).getAccountName().equalsIgnoreCase("b. Bank Balances")
+							|| closingEntries.get(i).getAccountName().equalsIgnoreCase("Total Closing Balance")) ? ""
+									: closingEntries.get(i).getAccountName(),
+					closingEntries.get(i).getCreditamount(), closingEntries.get(i).getPrevCreditamount(),
+					null, closingEntries.get(i).getAccountName(),
+					closingEntries.get(i).getDebitamount(), closingEntries.get(i).getPrevDebitamount(), 'Y'));
+		}
+
+		receiptsAndPaymentsAccountStatement.setRpEntries(resultList);
 
 	}
 
