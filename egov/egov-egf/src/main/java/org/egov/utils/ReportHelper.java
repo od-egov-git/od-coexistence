@@ -101,6 +101,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ReportHelper {
     private static final int MB = 1024 * 1024;
@@ -298,7 +299,6 @@ public class ReportHelper {
         // dr.getOptions().set
         dr.getOptions().setIgnorePagination(true);
         // if(LOGGER.isInfoEnabled()) LOGGER.info(dr.getColumnsGroups());
-
         // String generateJRXML = DynamicJasperHelper.generateJRXML(dr, new ClassicLayoutManager(), myMap,"UTF-8");
         // if(LOGGER.isInfoEnabled()) LOGGER.info(generateJRXML);
         return DynamicJasperHelper.generateJasperPrint(dr, new ClassicLayoutManager(), ds, myMap);
@@ -326,7 +326,7 @@ public class ReportHelper {
                 "totalConcurrenceGivenTillDate", BigDecimal.class.getName(), 22, detailAmountStyle);
 
         // Added Blank Space for painting subtitle left and right aligned
-        drb.setTitle(heading).setPrintBackgroundOnOddRows(false).setWhenNoData("No data", null)
+        drb.setPrintBackgroundOnOddRows(false).setWhenNoData("No data", null)
         .setDefaultStyles(getBudgetTitleStyle(), getDepartmentwiseSubTitleStyle(), getHeaderStyle(), getDetailStyle())
         .setOddRowBackgroundStyle(getOddRowStyle()).setDetailHeight(10)
         .setHeaderHeight(35).setUseFullPageWidth(true)
@@ -408,42 +408,108 @@ public class ReportHelper {
     public JasperPrint generateReceiptsAndPaymentsAccountsJasperPrint(
             final Statement rpStatement, final String heading)
                     throws Exception {
-    	
-        final Style detailAmountStyle = getDetailAmountStyle();
+    	final Style detailAmountStyle = getDetailAmountStyle();
         final Style columnStyle = getColumnStyle();
         FastReportBuilder drb = new FastReportBuilder();
-        LOGGER.info("Generating Receipts and Payments Account pdf/excel ");
-
+        if (LOGGER.isInfoEnabled())
+            LOGGER.info("Generating Income Expenditure pdf/excel ");
+        // drb.addsubre
         drb = drb
-                .addColumn("Account Code", "glCode",
-                        String.class.getName(), 55, columnStyle)
-                .addColumn("Perticulars", "accountName", String.class.getName(), 100,
+                .addColumn("Account Code", "glcode1",
+                        String.class.getName(), 55, columnStyle).addColumn(
+                                "Head of Account", "accName1", String.class.getName(), 100,
                                 columnStyle);
-
+        
         drb.setTitle(heading)
-        .setPrintBackgroundOnOddRows(true).setWhenNoData("No data", null)
-        .setDefaultStyles(getTitleStyle(), getAmountSubTitleStyle(), getHeaderStyle(), getDetailStyle())
-        .setOddRowBackgroundStyle(getOddRowStyle())
-        .setDetailHeight(20)
-        .setHeaderHeight(35)
-        .setUseFullPageWidth(true)
-        .setTitleHeight(40);
+                .setPrintBackgroundOnOddRows(true).setWhenNoData("No data", null)
+                .setDefaultStyles(getTitleStyle(), getAmountSubTitleStyle(), getHeaderStyle(), getDetailStyle())
+                .setOddRowBackgroundStyle(getOddRowStyle()).setDetailHeight(20)
+                .setHeaderHeight(35).setUseFullPageWidth(true)
+                .setSubtitleHeight(30).setTitleHeight(40);
 
         drb.setPageSizeAndOrientation(new Page(612, 792, false));
-        
-        drb.addColumn("Current Year" + "(Rs)",
-                "currentYearTotal", BigDecimal.class.getName(),
+        drb.addColumn("Current Year (Rs)",
+                "currentAmt1", BigDecimal.class.getName(),
                 70, false, "0.00", detailAmountStyle);
-        drb.addColumn("Previous Year" + "(Rs)",
-                "previousYearTotal", BigDecimal.class
+        drb.addColumn("Previous Year (Rs)",
+                "previousAmt1", BigDecimal.class
                 .getName(), 70, false, "0.00", detailAmountStyle);
-
+        
+        drb
+        .addColumn("Account Code", "glcode2",
+                String.class.getName(), 55, columnStyle).addColumn(
+                        "Head of Account", "accName2", String.class.getName(), 100,
+                        columnStyle);
+        
+        drb.addColumn("Current Year (Rs)",
+                "currentAmt2", BigDecimal.class.getName(),
+                70, false, "0.00", detailAmountStyle);
+        drb.addColumn("Previous Year (Rs)",
+                "previousAmt2", BigDecimal.class
+                .getName(), 70, false, "0.00", detailAmountStyle);  
+        
+        drb.addConcatenatedReport(createSubreportRP(rpStatement, drb));
+                
         final DynamicReport dr = drb.build();
-        final JRDataSource ds = new JRBeanCollectionDataSource(rpStatement.getEntries());
-        return DynamicJasperHelper.generateJasperPrint(dr,
-                new ClassicLayoutManager(), ds);
+        final JRDataSource ds = new JRBeanCollectionDataSource(rpStatement.getRpEntries().stream()
+        		.filter(entry -> entry.getType() != null)
+        		.filter(entry -> entry.getType() == 'X')
+				.collect(Collectors.toList()));
+        
+        final JRDataSource ds1 = new JRBeanCollectionDataSource(rpStatement.getRpEntries().stream()
+        		.filter(entry -> entry.getType() != null)
+        		.filter(entry -> entry.getType() == 'Y')
+				.collect(Collectors.toList()));
+        
+      final Map myMap = new HashMap();
+      myMap.put("subreportds", ds1);
+//        return DynamicJasperHelper.generateJasperPrint(dr,
+//                new ClassicLayoutManager(), ds);
+      
+      return DynamicJasperHelper.generateJasperPrint(dr, new ClassicLayoutManager(), ds, myMap);
+        
     }
+    
+	private Subreport createSubreportRP(final Statement statement,
+			final FastReportBuilder mainrep) throws Exception {
 
+		final Style detailAmountStyle = getDetailAmountStyle();
+		final Style columnStyle = getColumnStyle();
+		FastReportBuilder drb = new FastReportBuilder();
+
+		drb = drb.addColumn("Account Code", "glcode1", String.class.getName(), 55, columnStyle)
+				.addColumn("Head of Account", "accName1", String.class.getName(), 100, columnStyle);
+
+		drb.setPrintBackgroundOnOddRows(true).setWhenNoData("No data", null)
+				.setDefaultStyles(getTitleStyle(), getAmountSubTitleStyle(), getHeaderStyle(), getDetailStyle())
+				.setOddRowBackgroundStyle(getOddRowStyle()).setDetailHeight(20).setHeaderHeight(35)
+				.setUseFullPageWidth(true).setSubtitleHeight(30).setTitleHeight(40);
+
+		drb.setPageSizeAndOrientation(new Page(612, 792, false));
+		drb.addColumn("Current Year (Rs)", "currentAmt1", BigDecimal.class.getName(), 70, false, "0.00",
+				detailAmountStyle);
+		drb.addColumn("Previous Year (Rs)", "previousAmt1", BigDecimal.class.getName(), 70, false, "0.00",
+				detailAmountStyle);
+
+		drb.addColumn("Account Code", "glcode2", String.class.getName(), 55, columnStyle).addColumn("Head of Account",
+				"accName2", String.class.getName(), 100, columnStyle);
+
+		drb.addColumn("Current Year (Rs)", "currentAmt2", BigDecimal.class.getName(), 70, false, "0.00",
+				detailAmountStyle);
+		drb.addColumn("Previous Year (Rs)", "previousAmt2", BigDecimal.class.getName(), 70, false, "0.00",
+				detailAmountStyle);
+
+		final DJDataSource djds = new DJDataSource("subreportds", DJConstants.DATA_SOURCE_ORIGIN_PARAMETER,
+				DJConstants.DATA_SOURCE_TYPE_JRDATASOURCE);
+
+		final Subreport subRep = new Subreport();
+		subRep.setLayoutManager(new ClassicLayoutManager());
+		subRep.setDynamicReport(drb.build());
+		subRep.setDatasource(djds);
+		subRep.setUseParentReportParameters(true);
+
+		return subRep;
+	}
 
     public JasperPrint generateReceiptPaymentReportJasperPrint(final Statement receiptPaymentObj, final String heading,
             final String subtitle,

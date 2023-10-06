@@ -77,6 +77,7 @@ public class Statement {
     private List<IEStatementEntry> ieEntries = new ArrayList<IEStatementEntry>();
     private List<BSStatementEntry> bsEntries = new ArrayList<BSStatementEntry>();
     private List<StatementEntry> entries = new ArrayList<StatementEntry>();
+    private List<RPAccountEntry> rpEntries = new ArrayList<RPAccountEntry>();
     private boolean restData=false;
 
     public void setEntries(final List<StatementEntry> entries) {
@@ -326,6 +327,14 @@ public class Statement {
 
 	public void setBsEntries(List<BSStatementEntry> bsEntries) {
 		this.bsEntries = bsEntries;
+	}
+
+	public List<RPAccountEntry> getRpEntries() {
+		return rpEntries;
+	}
+
+	public void setRpEntries(List<RPAccountEntry> rpEntries) {
+		this.rpEntries = rpEntries;
 	}
 
 }
