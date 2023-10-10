@@ -81,15 +81,13 @@ public class ReceiptsAndPaymentsService extends ReportService {
 		statement.addIE(new IEStatementEntry("", "", null, null, true, 'O'));
 
 		if (assets.sizeIE() > 0) {
-			statement.addIE(new IEStatementEntry(null, Constants.EXPENDITURE, "", true));
 			expenseEntry = getTotalExpenseFundwise(statement, assets);
 			statement.addAllIE(assets);
 			statement.addIE(expenseEntry);
-			statement.addIE(new IEStatementEntry(null, "", "", false));
+			statement.addIE(new IEStatementEntry("", "", null, null, true, 'E'));
 		}
 
 		if (liabilities.sizeIE() > 0) {
-			statement.addIE(new IEStatementEntry(null, Constants.INCOME, "", true));
 			incomeEntry = getTotalIncomeFundwise(statement, liabilities);
 			statement.addIE(new IEStatementEntry("", "", null, null, true, 'E'));
 			statement.addIE(new IEStatementEntry("", "", null, null, true, 'E'));
@@ -98,7 +96,7 @@ public class ReceiptsAndPaymentsService extends ReportService {
 			statement.addIE(new IEStatementEntry("", "", null, null, true, 'E'));
 			statement.addAllIE(liabilities);
 			statement.addIE(incomeEntry);
-			statement.addIE(new IEStatementEntry(null, "", "", false));
+			statement.addIE(new IEStatementEntry("", "", null, null, true, 'E'));
 		}
 
 	}
@@ -109,17 +107,13 @@ public class ReceiptsAndPaymentsService extends ReportService {
 		Date toDate = getToDate(statement);
 
 		if (liabilities.sizeBS() > 0) {
-			statement.addBS(new BSStatementEntry(null, Constants.LIABILITIES, null, null, null, null, true,
-					Character.MIN_VALUE));
 			statement.addAllBS(liabilities);
-			statement.addBS(new BSStatementEntry(null, "", null, null, null, null, true, Character.MIN_VALUE));
+			statement.addBS(new BSStatementEntry(null, "", null, null, null, null, true, 'L'));
 
 		}
 		if (assets.sizeBS() > 0) {
-			statement.addBS(
-					new BSStatementEntry(null, Constants.ASSETS, null, null, null, null, true, Character.MIN_VALUE));
 			statement.addAllBS(assets);
-			statement.addBS(new BSStatementEntry(null, "", null, null, null, null, true, Character.MIN_VALUE));
+			statement.addBS(new BSStatementEntry(null, "", null, null, null, null, true, 'A'));
 
 		}
 
@@ -773,6 +767,17 @@ public class ReceiptsAndPaymentsService extends ReportService {
 					: BigDecimal.ZERO);
 
 		}
+		
+		
+		if(statement.getIeEntries()!=null) {
+			List<IEStatementEntry> ieEntries = statement.getIeEntries().stream().filter(entry -> entry.getType()!='O').collect(Collectors.toList());
+			
+			if(ieEntries.isEmpty()) {
+				totalPayments = BigDecimal.ZERO;
+				prevTotalPayments = BigDecimal.ZERO;
+			}
+		}
+		
 		totalReceipts = totalReceipts.add(totalNOReceipts != null ? totalNOReceipts : BigDecimal.ZERO);
 		prevTotalReceipts = prevTotalReceipts.add(totalNOPrevReceipts != null ? totalNOPrevReceipts : BigDecimal.ZERO);
 
@@ -981,6 +986,7 @@ public class ReceiptsAndPaymentsService extends ReportService {
 
 		// get all net amount total
 		final List<StatementResultObject> resultsIE = getTransactionAmtNewIE(filterQuery, toDate, fromDate, "'I','E'");
+		
 		final List<StatementResultObject> preYearResultsIE = getTransactionAmtNewIE(filterQuery,
 				getPreviousYearFor(toDate), getPreviousYearFor(fromDate), "'I','E'");
 
@@ -1188,66 +1194,6 @@ public class ReceiptsAndPaymentsService extends ReportService {
 		}
 		addRowsToStatementBS(statement, assets, liabilities);
 
-	}
-
-	public void populatePreviousYearTotalsBS(final Statement balanceSheet, final String filterQuery, final Date toDate,
-			final Date fromDate, final String reportSubType, final String coaType) {
-
-		final boolean newbalanceSheet = balanceSheet.sizeBS() > 2 ? false : true;
-		final Statement assets = new Statement();
-		final Statement liabilities = new Statement();
-		Date formattedToDate;
-		final Calendar cal = Calendar.getInstance();
-
-		if ("Yearly".equalsIgnoreCase(balanceSheet.getPeriod())) {
-			cal.setTime(fromDate);
-			cal.add(Calendar.DATE, -1);
-			formattedToDate = cal.getTime();
-		} else
-			formattedToDate = getPreviousYearFor(toDate);
-
-		final List<StatementResultObject> results = getTransactionAmountBS(filterQuery, formattedToDate,
-				getPreviousYearFor(fromDate), coaType, reportSubType);
-		for (final StatementResultObject row : results)
-			if (balanceSheet.containsBSStatementEntry(row.getGlCode())) {
-				for (int index = 0; index < balanceSheet.sizeBS(); index++)
-					if (balanceSheet.getBS(index).getGlCode() != null
-							&& row.getGlCode().equals(balanceSheet.getBS(index).getGlCode())) {
-						if (row.isLiability())
-							row.negateCreditAmount();
-
-						BigDecimal prevCredit = row.getCreditamount();
-						prevCredit = prevCredit == null ? BigDecimal.ZERO : prevCredit;
-
-						BigDecimal prevDebit = row.getDebitamount();
-						prevDebit = prevDebit == null ? BigDecimal.ZERO : prevDebit;
-
-						balanceSheet.getBS(index).setPrevCreditamount(prevCredit);
-						balanceSheet.getBS(index).setPrevDebitamount(prevDebit);
-
-					}
-			} else {
-				if (row.isLiability())
-					row.negateCreditAmount();
-				final BSStatementEntry balanceSheetEntry = new BSStatementEntry();
-				if (row.getCreditamount() != null || row.getDebitamount() != null) {
-//					balanceSheetEntry.setPreviousYearTotal(divideAndRound(row.getAmount(), divisor));
-					balanceSheetEntry.setPrevCreditamount(row.getCreditamount());
-					balanceSheetEntry.setPrevDebitamount(row.getDebitamount());
-					balanceSheetEntry.setCreditamount(BigDecimal.ZERO);
-					balanceSheetEntry.setDebitamount(BigDecimal.ZERO);
-				}
-				if (row.getGlCode() != null) {
-					balanceSheetEntry.setGlCode(row.getGlCode());
-					balanceSheetEntry.setAccountName(row.getScheduleName());
-				}
-				if (row.isLiability())
-					liabilities.addBS(balanceSheetEntry);
-				else
-					assets.addBS(balanceSheetEntry);
-			}
-		if (newbalanceSheet)
-			addRowsToStatementBS(balanceSheet, assets, liabilities);
 	}
 
 	boolean contains(final List<StatementResultObject> result, final String glCode) {

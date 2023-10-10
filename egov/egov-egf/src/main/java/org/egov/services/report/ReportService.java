@@ -401,44 +401,8 @@ public abstract class ReportService {
                                 .addScalar("amount",BigDecimalType.INSTANCE).setResultTransformer(
                                         Transformers.aliasToBean(StatementResultObject.class));
         return query.list();
-    }
-    
-    
-    public List<StatementResultObject> getTransactionAmountBS(final String filterQuery,
-            final Date toDate, final Date fromDate, final String coaType, final String subReportType) {
-    	String    voucherStatusToExclude = getAppConfigValueFor("EGF",
-                "statusexcludeReport");
-        
-        final Query query = persistenceService.getSession()
-                .createSQLQuery(
-                        "select c.majorcode as glCode, c.type as type,sum(debitamount) as debitamount, sum(creditamount) as creditamount"
-                                + " from generalledger g,chartofaccounts c,voucherheader v ,vouchermis mis where v.id=mis.voucherheaderid and "
-                                + "v.id=g.voucherheaderid and c.type in("
-                                + coaType 
-                                + ") and c.id=g.glcodeid and v.status not in("
-                                + voucherStatusToExclude
-                                + ")  AND v.voucherdate <= '"
-                                + getFormattedDate(toDate)
-                                + "' and v.voucherdate >='"
-                                + getFormattedDate(fromDate)
-                                + "' and c.parentid "
-                                //+ minorCodeLength
-                                + " in "
-                                + "(select coa2.id from chartofaccounts coa2, schedulemapping s where s.id=coa2.scheduleid and "
-                                + "coa2.classification=2 and s.reporttype = '"
-                                + subReportType
-                                + "') "
-                                + filterQuery
-                                + " group by c.majorcode,v.fundid,c.type order by c.majorcode")
-                                .addScalar("glCode").addScalar("type")
-                                .addScalar("debitamount",BigDecimalType.INSTANCE)
-                                .addScalar("creditamount",BigDecimalType.INSTANCE).setResultTransformer(
-                                        Transformers.aliasToBean(StatementResultObject.class));
-        return query.list();
-    }
-    
-    
-    
+    }   
+     
     public List<StatementResultObject> getTransactionAmtNew(final String filterQuery,
             final Date toDate, final Date fromDate, final String coaType) {
     	
@@ -450,18 +414,18 @@ public abstract class ReportService {
                         "select distinct on(glcode) g.glcode as glCode, sum(g.debitamount) as debitamount, sum(g.creditamount) as creditamount, "
                         + "c.type as type"
                 		+" from generalledger g, chartofaccounts c, voucherheader v"
-                		+" where v.id=g.voucherheaderid and g.effectivedate >= '"
+                		+" where v.id=g.voucherheaderid and v.voucherdate >= '"
                 		+getFormattedDate(fromDate)
-                		+"' and g.glcodeid = c.id and g.effectivedate <= '"
+                		+"' and g.glcodeid = c.id and v.voucherdate <= '"
                 		+getFormattedDate(toDate)
                 		+"' and c.type in ("
                 		+ coaType
                 		+ ") and v.status not in ("
                 		+ voucherStatusToExclude
-                		+ ") and g.voucherheaderid in (select voucherheaderid from generalledger "
-                		+"where effectivedate >= '"
+                		+ ") and g.voucherheaderid in (select voucherheaderid from generalledger gl, voucherheader v "
+                		+"where gl.voucherheaderid = v.id and v.voucherdate >= '"
                 		+ getFormattedDate(fromDate)
-                		+"' and effectivedate <= '"
+                		+"' and v.voucherdate <= '"
                 		+getFormattedDate(toDate)
                 		+"' and substring(glcode,0,4)='450')"
                 		+ filterQuery
@@ -484,18 +448,18 @@ public abstract class ReportService {
                         "select distinct on(glcode) g.glcode as glCode, v.fundid as fundId ,sum(g.debitamount)-sum(g.creditamount) as amount, "
                         + "c.type as type"
                 		+" from generalledger g, chartofaccounts c, voucherheader v"
-                		+" where v.id=g.voucherheaderid and g.effectivedate >= '"
+                		+" where v.id=g.voucherheaderid and v.voucherdate >= '"
                 		+getFormattedDate(fromDate)
-                		+"' and g.glcodeid = c.id and g.effectivedate <= '"
+                		+"' and g.glcodeid = c.id and v.voucherdate <= '"
                 		+getFormattedDate(toDate)
                 		+"' and c.type in ("
                 		+ coaType
                 		+ ") and v.status not in ("
                 		+ voucherStatusToExclude
-                		+ ") and g.voucherheaderid in (select voucherheaderid from generalledger "
-                		+"where effectivedate >= '"
+                		+ ") and g.voucherheaderid in (select voucherheaderid from generalledger gl, voucherheader v "
+                		+"where gl.voucherheaderid = v.id and v.voucherdate >= '"
                 		+ getFormattedDate(fromDate)
-                		+"' and effectivedate <= '"
+                		+"' and v.voucherdate <= '"
                 		+getFormattedDate(toDate)
                 		+"' and substring(glcode,0,4)='450')"
                 		+ filterQuery
