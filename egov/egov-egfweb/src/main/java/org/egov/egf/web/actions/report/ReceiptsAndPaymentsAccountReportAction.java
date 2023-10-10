@@ -3,6 +3,7 @@ package org.egov.egf.web.actions.report;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -124,6 +125,27 @@ public class ReceiptsAndPaymentsAccountReportAction extends BaseFormAction {
 			receiptsAndPaymentsAccountStatement
 					.setFinancialYear((CFinancialYear) getPersistenceService().find("from CFinancialYear where id=?",
 							receiptsAndPaymentsAccountStatement.getFinancialYear().getId()));
+		} 
+		
+		if(!"Yearly".equalsIgnoreCase(receiptsAndPaymentsAccountStatement.getPeriod())) {
+			
+			SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+			
+			final Calendar cal1 = Calendar.getInstance();
+			cal1.setTime(receiptsAndPaymentsAccountStatement.getToDate());				
+			Date toDate1 = cal1.getTime();
+			String toDate = formatter.format(toDate1);
+			
+			final Calendar cal2 = Calendar.getInstance();
+			cal2.setTime(receiptsAndPaymentsAccountStatement.getFromDate());
+			Date fromDate1 = cal2.getTime();
+			String fromDate = formatter.format(fromDate1);
+			
+			heading.append(" for the period from "
+					+ fromDate
+					+" to "
+					+ toDate);
+		} else {
 			heading.append(" for the Financial Year "
 					+ receiptsAndPaymentsAccountStatement.getFinancialYear().getFinYearRange());
 		}
