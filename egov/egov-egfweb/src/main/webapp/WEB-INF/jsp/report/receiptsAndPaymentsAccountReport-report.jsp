@@ -80,6 +80,22 @@ function validateMandatoryFields(){
 		bootbox.alert('<s:text name="msg.please.select.toDate"/>');
 		return false;
 	}
+	
+	var startDate = document.getElementById('fromDate').value;
+	
+	var endDate = document.getElementById('toDate').value;
+	
+	var fromdate= startDate.split('/');
+	startDate=new Date(fromdate[2],fromdate[1]-1,fromdate[0]);
+    var todate = endDate.split('/');
+    endDate=new Date(todate[2],todate[1]-1,todate[0]);
+	
+
+	if(startDate > endDate)
+	{ 
+		bootbox.alert("<s:text name='msg.start.date.cant.be.greater.than.end.date'/>")
+		return false;
+	}
 	return true;
 } 
 
