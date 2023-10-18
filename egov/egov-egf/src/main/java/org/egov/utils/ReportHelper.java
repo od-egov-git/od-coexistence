@@ -447,6 +447,7 @@ public class ReportHelper {
         drb.addColumn("Previous Year (Rs)",
                 "previousAmt2", BigDecimal.class
                 .getName(), 70, false, "0.00", detailAmountStyle);  
+        drb.setIgnorePagination(true);
         
         drb.addConcatenatedReport(createSubreportRP(rpStatement, drb));
                 
@@ -491,13 +492,15 @@ public class ReportHelper {
 		drb.addColumn("Previous Year (Rs)", "previousAmt1", BigDecimal.class.getName(), 70, false, "0.00",
 				detailAmountStyle);
 
-		drb.addColumn("Account Code", "glcode2", String.class.getName(), 55, columnStyle).addColumn("Head of Account",
-				"accName2", String.class.getName(), 100, columnStyle);
+		drb.addColumn("Account Code", "glcode2", String.class.getName(), 55, columnStyle)
+				.addColumn("Head of Account","accName2", String.class.getName(), 100, columnStyle);
 
 		drb.addColumn("Current Year (Rs)", "currentAmt2", BigDecimal.class.getName(), 70, false, "0.00",
 				detailAmountStyle);
 		drb.addColumn("Previous Year (Rs)", "previousAmt2", BigDecimal.class.getName(), 70, false, "0.00",
 				detailAmountStyle);
+		
+		drb.setIgnorePagination(true);
 
 		final DJDataSource djds = new DJDataSource("subreportds", DJConstants.DATA_SOURCE_ORIGIN_PARAMETER,
 				DJConstants.DATA_SOURCE_TYPE_JRDATASOURCE);
