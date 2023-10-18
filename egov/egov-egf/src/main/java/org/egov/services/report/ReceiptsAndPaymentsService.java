@@ -1,6 +1,7 @@
 package org.egov.services.report;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -81,10 +82,13 @@ public class ReceiptsAndPaymentsService extends ReportService {
 		statement.addIE(new IEStatementEntry("", "", null, null, true, 'O'));
 
 		if (assets.sizeIE() > 0) {
+			statement.addIE(new IEStatementEntry("", "Operating Receipts", null, null, true, 'I'));
+			statement.addIE(new IEStatementEntry("  ", "Operating Receipts", null, null, true, 'M'));
+			statement.addIE(new IEStatementEntry("", "", null, null, true, 'I'));
 			expenseEntry = getTotalExpenseFundwise(statement, assets);
 			statement.addAllIE(assets);
 			statement.addIE(expenseEntry);
-			statement.addIE(new IEStatementEntry("", "", null, null, true, 'E'));
+			statement.addIE(new IEStatementEntry("", "", null, null, true, 'I'));
 		}
 
 		if (liabilities.sizeIE() > 0) {
@@ -93,6 +97,9 @@ public class ReceiptsAndPaymentsService extends ReportService {
 			statement.addIE(new IEStatementEntry("", "", null, null, true, 'E'));
 			statement.addIE(new IEStatementEntry("", "", null, null, true, 'E'));
 			statement.addIE(new IEStatementEntry("", "", null, null, true, 'E'));
+			statement.addIE(new IEStatementEntry("", "", null, null, true, 'E'));
+			statement.addIE(new IEStatementEntry("", "Operating Payments", null, null, true, 'E'));
+			statement.addIE(new IEStatementEntry("  ", "Operating Payments", null, null, true, 'M'));
 			statement.addIE(new IEStatementEntry("", "", null, null, true, 'E'));
 			statement.addAllIE(liabilities);
 			statement.addIE(incomeEntry);
@@ -107,6 +114,9 @@ public class ReceiptsAndPaymentsService extends ReportService {
 		Date toDate = getToDate(statement);
 
 		if (liabilities.sizeBS() > 0) {
+			
+			statement.addBS(new BSStatementEntry("", "", null, null, null, null, true, 'N'));
+			statement.addBS(new BSStatementEntry(null, "", null, null, null, null, true, 'L'));
 			statement.addAllBS(liabilities);
 			statement.addBS(new BSStatementEntry(null, "", null, null, null, null, true, 'L'));
 
@@ -116,7 +126,11 @@ public class ReceiptsAndPaymentsService extends ReportService {
 			statement.addBS(new BSStatementEntry(null, "", null, null, null, null, true, 'A'));
 
 		}
-
+		totalPayments = totalPayments.setScale(2, RoundingMode.CEILING);
+		totalReceipts = totalReceipts.setScale(2, RoundingMode.CEILING);
+		prevTotalPayments = prevTotalPayments.setScale(2, RoundingMode.CEILING);
+		prevTotalReceipts = prevTotalReceipts.setScale(2, RoundingMode.CEILING);
+		
 		BSStatementEntry totalEntry = new BSStatementEntry();
 		totalEntry = getTotalBS(statement);
 		statement.addBS(totalEntry);
@@ -149,9 +163,12 @@ public class ReceiptsAndPaymentsService extends ReportService {
 
 		totalOp = totalCashOpeningEntry.getNetAmount().get(getFundNameForId(statement.getFunds(), fundid))
 				.add(totalBankOpeningEntry.getNetAmount().get(getFundNameForId(statement.getFunds(), fundid)));
+		totalOp =totalOp.setScale(2, RoundingMode.CEILING);
 
 		prevTotalOp = totalCashOpeningEntry.getPreviousYearAmount().get(getFundNameForId(statement.getFunds(), fundid))
 				.add(totalBankOpeningEntry.getPreviousYearAmount().get(getFundNameForId(statement.getFunds(), fundid)));
+		prevTotalOp = prevTotalOp.setScale(2, RoundingMode.CEILING);
+		
 		totalReceipts = BigDecimal.ZERO;
 		prevTotalReceipts = BigDecimal.ZERO;
 
@@ -174,8 +191,10 @@ public class ReceiptsAndPaymentsService extends ReportService {
 		BigDecimal prevTotalOp = BigDecimal.ZERO;
 
 		totalOp = totalCashOpeningEntry.getDebitamount().add(totalBankOpeningEntry.getDebitamount());
+		totalOp = totalOp.setScale(2, RoundingMode.CEILING);
 
 		prevTotalOp = totalCashOpeningEntry.getPrevDebitamount().add(totalBankOpeningEntry.getPrevDebitamount());
+		prevTotalOp = prevTotalOp.setScale(2, RoundingMode.CEILING);
 
 		resultEntry.setDebitamount(totalOp);
 		resultEntry.setPrevDebitamount(prevTotalOp);
@@ -291,8 +310,11 @@ public class ReceiptsAndPaymentsService extends ReportService {
 		BigDecimal finalPrevCashOpeningBalance = BigDecimal.ZERO;
 
 		finalCashOpeningBalance = tillDateCashOpeningBalance.add(totalCashOpeningBalance);
+		finalCashOpeningBalance = finalCashOpeningBalance.setScale(2, RoundingMode.CEILING);
+		
 		finalPrevCashOpeningBalance = tillDatePrevCashOpeningBalance.add(totalPrevCashOpeningBalance);
-
+		finalPrevCashOpeningBalance = finalPrevCashOpeningBalance.setScale(2, RoundingMode.CEILING);
+		
 		resultEntry.getPreviousYearAmount().put(getFundNameForId(statement.getFunds(), fundid),
 				finalPrevCashOpeningBalance);
 		resultEntry.getNetAmount().put(getFundNameForId(statement.getFunds(), fundid), finalCashOpeningBalance);
@@ -410,8 +432,11 @@ public class ReceiptsAndPaymentsService extends ReportService {
 		BigDecimal finalPrevCashOpeningBalance = BigDecimal.ZERO;
 
 		finalCashOpeningBalance = tillDateCashOpeningBalance.add(totalCashOpeningBalance);
+		finalCashOpeningBalance = finalCashOpeningBalance.setScale(2, RoundingMode.CEILING);
+		
 		finalPrevCashOpeningBalance = tillDatePrevCashOpeningBalance.add(totalPrevCashOpeningBalance);
-
+		finalPrevCashOpeningBalance = finalPrevCashOpeningBalance.setScale(2, RoundingMode.CEILING);
+		
 		resultEntry.setDebitamount(finalCashOpeningBalance);
 		resultEntry.setPrevDebitamount(finalPrevCashOpeningBalance);
 		resultEntry.setGlCode("");
@@ -527,11 +552,14 @@ public class ReceiptsAndPaymentsService extends ReportService {
 		BigDecimal finalPrevBankOpeningBalance = BigDecimal.ZERO;
 
 		finalBankOpeningBalance = tillDateBankOpeningBalance.add(totalBankOpeningBalance);
+		finalBankOpeningBalance = finalBankOpeningBalance.setScale(2, RoundingMode.CEILING);
+		
 		finalPrevBankOpeningBalance = tillDatePrevBankOpeningBalance.add(totalPrevBankOpeningBalance);
+		finalPrevBankOpeningBalance = finalPrevBankOpeningBalance.setScale(2, RoundingMode.CEILING);
 
 		resultEntry.getPreviousYearAmount().put(getFundNameForId(statement.getFunds(), fundid),
-				finalPrevBankOpeningBalance);
-		resultEntry.getNetAmount().put(getFundNameForId(statement.getFunds(), fundid), finalBankOpeningBalance);
+				finalPrevBankOpeningBalance.setScale(2));
+		resultEntry.getNetAmount().put(getFundNameForId(statement.getFunds(), fundid), finalBankOpeningBalance.setScale(2));
 		resultEntry.setGlCode("");
 		resultEntry.setType('O');
 		resultEntry.setGlCode("");
@@ -644,7 +672,10 @@ public class ReceiptsAndPaymentsService extends ReportService {
 		BigDecimal finalBankOpeningBalance = BigDecimal.ZERO;
 
 		finalBankOpeningBalance = tillDateBankOpeningBalance.add(totalBankOpeningBalance);
+		finalBankOpeningBalance = finalBankOpeningBalance.setScale(2, RoundingMode.CEILING);
+		
 		finalPrevBankOpeningBalance = tillDatePrevBankOpeningBalance.add(totalPrevBankOpeningBalance);
+		finalPrevBankOpeningBalance = finalPrevBankOpeningBalance.setScale(2, RoundingMode.CEILING);
 
 		resultEntry.setDebitamount(finalBankOpeningBalance);
 		resultEntry.setPrevDebitamount(finalPrevBankOpeningBalance);
@@ -783,6 +814,12 @@ public class ReceiptsAndPaymentsService extends ReportService {
 
 		totalPayments = totalPayments.add(totalNOPayments != null ? totalNOPayments : BigDecimal.ZERO);
 		prevTotalPayments = prevTotalPayments.add(totalNOPrevPayments != null ? totalNOPrevPayments : BigDecimal.ZERO);
+		
+		totalNOPayments = totalNOPayments.setScale(2, RoundingMode.CEILING);
+		totalNOReceipts = totalNOReceipts.setScale(2, RoundingMode.CEILING);
+		totalNOPrevPayments = totalNOPrevPayments.setScale(2, RoundingMode.CEILING);
+		totalNOPrevReceipts = totalNOPrevReceipts.setScale(2, RoundingMode.CEILING);
+		
 
 		return new BSStatementEntry("", "Sub Total", totalNOPayments, totalNOReceipts, totalNOPrevPayments,
 				totalNOPrevReceipts, true, 'T');
@@ -815,6 +852,8 @@ public class ReceiptsAndPaymentsService extends ReportService {
 		List<IEStatementEntry> ieEntries = receiptsAndPaymentsAccountStatement.getIeEntries();
 
 		List<IEStatementEntry> incomeEntries = ieEntries.stream().filter(entry -> entry.getType() != null)
+				.filter(entry -> entry.getGlCode() != null && !entry.getGlCode().equals(""))
+				.filter(entry -> entry.getAccountName() != null && !entry.getAccountName().equals(""))
 				.filter(entry -> entry.getType() == 'I').collect(Collectors.toList());
 
 		List<IEStatementEntry> expenseEntries = ieEntries.stream().filter(entry -> entry.getType() != null)
@@ -854,6 +893,19 @@ public class ReceiptsAndPaymentsService extends ReportService {
 						"", "", null, null, 'X'));
 			}
 		}
+		
+		List<IEStatementEntry> banner1Entries = ieEntries.stream().filter(entry -> entry.getType() == 'M')
+				.collect(Collectors.toList());
+		resultList.add(new RPAccountEntry(banner1Entries.get(0).getGlCode(),
+				"Operating Receipts", null,
+				null, banner1Entries.get(0).getGlCode(),
+				"Operating Payments", null,
+				null, 'X'));
+		resultList.add(new RPAccountEntry("",
+				"", null,
+				null, "",
+				"", null,
+				null, 'X'));
 
 		for (int i = 0; i < incomeEntries.size(); i++) {
 
@@ -881,6 +933,14 @@ public class ReceiptsAndPaymentsService extends ReportService {
 		}
 
 		List<BSStatementEntry> bsEntries = receiptsAndPaymentsAccountStatement.getBsEntries();
+		
+		List<BSStatementEntry> bannerEntries = bsEntries.stream().filter(entry -> entry.getType() == 'N')
+				.collect(Collectors.toList());
+		resultList.add(new RPAccountEntry(bannerEntries.get(0).getGlCode(),
+				"Non-operating Receipts", bannerEntries.get(0).getCreditamount(),
+				bannerEntries.get(0).getPrevCreditamount(), bannerEntries.get(0).getGlCode(),
+				"Non-operating Payments", bannerEntries.get(0).getDebitamount(),
+				bannerEntries.get(0).getPrevDebitamount(), 'Y'));
 
 		List<BSStatementEntry> assetLiabilitiesEntries = bsEntries.stream()
 				.filter(entry -> entry.getType() == 'A' || entry.getType() == 'L').collect(Collectors.toList());
@@ -1122,10 +1182,14 @@ public class ReceiptsAndPaymentsService extends ReportService {
 						} else {
 							final BSStatementEntry balanceSheetEntry = new BSStatementEntry();
 							if (pre.getCreditamount() != null || pre.getDebitamount() != null) {
+								
+								BigDecimal preCred = pre.getCreditamount().setScale(2, RoundingMode.CEILING);
+								BigDecimal preDeb = pre.getDebitamount().setScale(2, RoundingMode.CEILING);
+								
 								balanceSheetEntry.setPrevCreditamount(
-										pre.getCreditamount() == null ? BigDecimal.ZERO : pre.getCreditamount());
+										pre.getCreditamount() == null ? BigDecimal.ZERO : preCred);
 								balanceSheetEntry.setPrevDebitamount(
-										pre.getDebitamount() == null ? BigDecimal.ZERO : pre.getDebitamount());
+										pre.getDebitamount() == null ? BigDecimal.ZERO : preDeb);
 							}
 
 							balanceSheetEntry.setType(pre.getType());
@@ -1157,10 +1221,14 @@ public class ReceiptsAndPaymentsService extends ReportService {
 						final BSStatementEntry balanceSheetEntry = new BSStatementEntry();
 
 						if (row.getCreditamount() != null || row.getDebitamount() != null) {
+							
+							BigDecimal rowCred = row.getCreditamount().setScale(2, RoundingMode.CEILING);
+							BigDecimal rowDeb = row.getDebitamount().setScale(2, RoundingMode.CEILING);
+							
 							balanceSheetEntry.setCreditamount(
-									row.getCreditamount() == null ? BigDecimal.ZERO : row.getCreditamount());
+									row.getCreditamount() == null ? BigDecimal.ZERO : rowCred);
 							balanceSheetEntry.setDebitamount(
-									row.getDebitamount() == null ? BigDecimal.ZERO : row.getDebitamount());
+									row.getDebitamount() == null ? BigDecimal.ZERO : rowDeb);
 						}
 
 						if (queryObject.getGlCode() != null && contains(prevResults, row.getGlCode())) {
@@ -1168,10 +1236,14 @@ public class ReceiptsAndPaymentsService extends ReportService {
 									queryObject.getGlCode());
 							for (final StatementResultObject pre : preRow) {
 								if (pre.getGlCode() != null && pre.getGlCode().equals(pre.getGlCode())) {
+									
+									BigDecimal preCred = pre.getCreditamount().setScale(2, RoundingMode.CEILING);
+									BigDecimal preDeb = pre.getDebitamount().setScale(2, RoundingMode.CEILING);
+									
 									balanceSheetEntry.setPrevCreditamount(
-											pre.getCreditamount() == null ? BigDecimal.ZERO : pre.getCreditamount());
+											pre.getCreditamount() == null ? BigDecimal.ZERO : preCred);
 									balanceSheetEntry.setPrevDebitamount(
-											pre.getDebitamount() == null ? BigDecimal.ZERO : pre.getDebitamount());
+											pre.getDebitamount() == null ? BigDecimal.ZERO : preDeb);
 
 								}
 							}
