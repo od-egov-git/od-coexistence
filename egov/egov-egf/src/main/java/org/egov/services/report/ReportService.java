@@ -49,6 +49,7 @@ package org.egov.services.report;
 
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -181,6 +182,7 @@ public abstract class ReportService {
 
     public BigDecimal divideAndRound(BigDecimal value, final BigDecimal divisor) {
         value = value.divide(divisor, 2, BigDecimal.ROUND_HALF_UP);
+        value = value.setScale(2, RoundingMode.CEILING);
         return value;
     }
 
@@ -255,8 +257,11 @@ public abstract class ReportService {
             final StatementResultObject row) {
         for (int index = 0; index < type.sizeBS(); index++) {
             //fundwise not given
-        	final BigDecimal creditAmt = row.getCreditamount();
-        	final BigDecimal debitAmt = row.getDebitamount();
+        	BigDecimal creditAmt = row.getCreditamount();
+        	creditAmt = creditAmt.setScale(2, RoundingMode.CEILING);
+        	
+        	BigDecimal debitAmt = row.getDebitamount();
+        	debitAmt = debitAmt.setScale(2, RoundingMode.CEILING);
         	
 
             if (type.getBS(index).getGlCode() != null && row.getGlCode().equals(type.getBS(index).getGlCode())) {
@@ -271,8 +276,11 @@ public abstract class ReportService {
     void addFundAmountBSPre(final List<Fund> fundList, final Statement type, final BigDecimal divisor,
             final StatementResultObject row) {
         for (int index = 0; index < type.sizeBS(); index++) {
-        	final BigDecimal creditAmt = row.getCreditamount();
-        	final BigDecimal debitAmt = row.getDebitamount();
+        	BigDecimal creditAmt = row.getCreditamount();
+        	creditAmt = creditAmt.setScale(2, RoundingMode.CEILING);
+        	
+        	BigDecimal debitAmt = row.getDebitamount();
+        	debitAmt = debitAmt.setScale(2, RoundingMode.CEILING);
         	
 
             if (type.getBS(index).getGlCode() != null && row.getGlCode().equals(type.getBS(index).getGlCode())) {
@@ -288,6 +296,7 @@ public abstract class ReportService {
             final StatementResultObject row) {
         for (int index = 0; index < type.sizeIE(); index++) {
             final BigDecimal amount = divideAndRound(row.getAmount(), divisor);
+            
 
             if (type.getIE(index).getGlCode() != null && row.getGlCode().equals(type.getIE(index).getGlCode())) {
                 type.getIE(index).getNetAmount().put(getFundNameForId(fundList, Integer.valueOf(row.getFundId())), amount);
