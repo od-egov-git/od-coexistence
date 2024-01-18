@@ -48,17 +48,60 @@
 var BANKENTRIESNOTINBANKBOOKLIST = 'bankEntriesNotInBankBookList';
 var bankEntriesNotInBankBookTableIndex = 0;
 var bankEntriesNotInBankBooksTable;
+var codeObj ;
+var allGlcodes={};
+
+function loadDropDownCodes() {
+	var	url = "/services/EGF/voucher/common-ajaxGetAllCoaCodes.action";
+	var req2 = initiateRequest();
+	req2.onreadystatechange = function() {
+		if (req2.readyState == 4 && req2.status == 200) {
+			var codes2=req2.responseText;
+			var a = codes2.split("^");
+			var codes = a[0];
+			acccodeArray=codes.split("+");
+			for(i=0;i<acccodeArray.length;i++){
+				data = acccodeArray[i].split("`~`")
+				acccodeArray[i] = data[0];
+				var key = data[0];
+				var value = data[1]
+				allGlcodes[key] = value;
+			}			
+			codeObj = new YAHOO.widget.DS_JSArray(acccodeArray);
+	  	}
+ 	};
+	req2.open("GET", url, true);
+	req2.send(null);
+}
+
+
+var funcObj;
+var funcArray;
+function loadDropDownCodesFunction() {
+	var url = "/services/EGF/voucher/common-ajaxGetAllFunctionName.action";
+	var req2 = initiateRequest();
+	req2.onreadystatechange = function() {
+	  	if (req2.readyState == 4 && req2.status == 200) {
+			var codes2=req2.responseText;
+			var a = codes2.split("^");
+			var codes = a[0];
+			funcArray=codes.split("+");
+			funcObj= new YAHOO.widget.DS_JSArray(funcArray);
+	   	}
+	};
+	req2.open("GET", url, true);
+	req2.send(null);
+}
+
+
 function updateGridBENIBB(field, index, value) {
 
-	document.getElementById(BANKENTRIESNOTINBANKBOOKLIST + '[' + index + '].'
-			+ field).value = value;
-	var obj = document.getElementById(BANKENTRIESNOTINBANKBOOKLIST + '['
-			+ index + '].' + field);
-	var beId = document.getElementById('bankEntriesNotInBankBookList[' + index
-			+ '].beId').value;
+	document.getElementById(BANKENTRIESNOTINBANKBOOKLIST + '[' + index + '].' + field).value = value;
+	var obj = document.getElementById(BANKENTRIESNOTINBANKBOOKLIST + '[' + index + '].' + field);
+	var beId = document.getElementById('bankEntriesNotInBankBookList[' + index + '].beId').value;
 	if (field != "beId" && beId != "")
 		jQuery(obj).attr("disabled", true);
-
+	console.log(obj);
 }
 function updateGridDateBENIBB(index) {
 
@@ -149,7 +192,7 @@ function createDateFormatterBENIBB(prefix, suffix) {
 	}
 }
 
-function createDropdownFormatterBENIBB(prefix) {
+function createTypeFieldFormatterBENIBB(prefix) {
 	return function(el, oRecord, oColumn, oData) {
 		var selectedValue = (lang.isValue(oData)) ? oData : oRecord
 				.getData(oColumn.field), options = (lang
@@ -159,50 +202,51 @@ function createDropdownFormatterBENIBB(prefix) {
 		if (collection.length === 0) {
 			selectEl = document.createElement("select");
 			selectEl.className = YAHOO.widget.DataTable.CLASS_DROPDOWN;
-			selectEl.name = prefix + '[' + bankEntriesNotInBankBookTableIndex
-					+ '].' + oColumn.getKey();
-			selectEl.id = prefix + '[' + bankEntriesNotInBankBookTableIndex
-					+ '].' + oColumn.getKey();
-			// selectEl.onfocus=check;
+			selectEl.name = prefix + '[' + bankEntriesNotInBankBookTableIndex + '].' + oColumn.getKey();
+			selectEl.id = prefix + '[' + bankEntriesNotInBankBookTableIndex + '].' + oColumn.getKey();
+			selectEl.style='border-style:solid;border-width:1px;';
 			selectEl = el.appendChild(selectEl);
-			var selectedIndex = {
-				value : bankEntriesNotInBankBookTableIndex
-			};
-
-			/*
-			 * YAHOO.util.Event.addListener(selectEl, "change",
-			 * onDropdownChange, selectedIndex, this);
-			 */
-
 		}
-
 		selectEl = collection[0];
-
+		
 		if (selectEl) {
 			selectEl.innerHTML = "";
 			if (options) {
 				for (var i = 0; i < options.length; i++) {
 					var option = options[i];
 					var optionEl = document.createElement("option");
-					optionEl.value = (lang.isValue(option.value)) ? option.value
-							: option;
-					optionEl.innerHTML = (lang.isValue(option.text)) ? option.text
-							: (lang.isValue(option.label)) ? option.label
-									: option;
-					optionEl = selectEl.appendChild(optionEl);
-					if (optionEl.value == selectedValue) {
+					optionEl.value = (lang.isValue(option.value)) ? option.value : option;
+					optionEl.innerHTML = (lang.isValue(option.text)) ? option.text : (lang.isValue(option.label)) ? option.label : option;
+					
+					if (optionEl.value === selectedValue) {
 						optionEl.selected = true;
 					}
+					optionEl = selectEl.appendChild(optionEl);
 				}
 			} else {
-				selectEl.innerHTML = "<option selected value=\""
-						+ selectedValue + "\">" + selectedValue + "</option>";
+				selectEl.innerHTML = "<option selected value=\"" + selectedValue + "\">" + selectedValue + "</option>";
 			}
 		} else {
 			el.innerHTML = lang.isValue(oData) ? oData : "";
 		}
+		
+		console.log(selectEl);
 	}
 }
+
+
+function createDropdownFormatterBENIBB(prefix, suffix) {
+	return function(el, oRecord, oColumn, oData) {
+	var value = (YAHOO.lang.isValue(oData)) ? oData : "";
+		el.innerHTML = "<input type='text'  id='" + prefix + "[" + bankEntriesNotInBankBookTableIndex + "]." + oColumn.getKey()
+				+ "' name='" + prefix + "[" + bankEntriesNotInBankBookTableIndex + "]." + oColumn.getKey()
+				+ "' style='width:100%;' onkeyup='autocompletecode(this,event)' "
+				+ "  autocomplete='off' class='yui-ac-input' onblur='fillNeibrAfterSplitGlcode(this);'/>";
+	
+	}
+}
+
+
 function updateBENIBBTableIndex() {
 
 	bankEntriesNotInBankBookTableIndex = bankEntriesNotInBankBookTableIndex + 1;
@@ -333,4 +377,72 @@ function disableAll() {
 	if(document.getElementById('bankaccount'))
 		document.getElementById('bankaccount').disabled = true;
 	
+}
+
+
+
+var autocompleteflag = new Array();
+function autocompletecode(obj,myEvent) {
+	var src = obj;	
+	var currRow=getRowIndex(obj);
+	var target = document.getElementById('codescontainer');	
+	var posSrc=findPos(src); 
+	
+	target.style.left=posSrc[0];	
+	target.style.top=posSrc[1]-40;
+	target.style.width=450;	
+	
+//	console.log(posSrc);
+	if(yuiflag[currRow] == undefined) {
+		var key = window.event ? window.event.keyCode : myEvent.charCode;  
+		if(key != 40 && key != 38 ) {
+			var oAutoComp = new YAHOO.widget.AutoComplete(obj, 'codescontainer', codeObj);
+			oAutoComp.queryDelay = 0;
+			oAutoComp.prehighlightClassName = "yui-ac-prehighlight";
+			oAutoComp.useShadow = true;
+			oAutoComp.maxResultsDisplayed = 15;
+			oAutoComp.useIFrame = true;
+			if(codeObj!=null){
+				codeObj.applyLocalFilter = true;
+				codeObj.queryMatchContains = true;
+			}
+			oAutoComp.minQueryLength = 0;
+			
+		}
+		autocompleteflag[currRow] = 1;
+	}	
+}
+
+
+function findPos(ob)  {
+	var obj=eval(ob);
+	var curleft = curtop = 0;
+	if (obj.offsetParent) {
+		curleft = obj.offsetLeft;
+		curtop = obj.offsetTop;
+		while (obj = obj.offsetParent)  {	
+			//bootbox.alert(obj.nodeName+"---"+obj.offsetTop+"--"+obj.offsetLeft+"-----"+curtop);
+			curleft =curleft + obj.offsetLeft;
+			curtop =curtop + obj.offsetTop; 
+			//bootbox.alert(curtop);
+		}
+	}
+	return [curleft,curtop];
+		
+}
+
+
+function getRowIndex(obj) {
+	var temp =obj.name.split('[');
+	var temp1 = temp[1].split(']');
+	return temp1[0];
+}
+
+
+function fillNeibrAfterSplitGlcode(obj) { 
+	var key = obj.value;
+	var currRow=getRowIndex(obj);
+	console.log(allGlcodes[key]);
+	document.getElementById('bankEntriesNotInBankBookList['+currRow+'].glcodeIdDetail').value=allGlcodes[key];
+	//console.log(allGlcodes);
 }
