@@ -113,95 +113,87 @@
 	var showMode = '<s:property value="showMode"/>';
 	var totaldbamt = 0, totalcramt = 0;
 	var OneFunctionCenter = <s:property value="isRestrictedtoOneFunctionCenter"/>;
-	//bootbox.alert(">>.."+OneFunctionCenter);                 
+	//console.log(">>.."+OneFunctionCenter);                 
 	var glcodeOptions = [ {
 		label : "<s:text name='lbl.choose.options'/>",
 		value : "0"
 	} ];
 	<s:iterator value="dropdownData.glcodeList">
 	glcodeOptions.push({
-		label : '<s:property value="glcode"/>'+'-'+'<s:property value="name"/>',
-		value : '<s:property value="id"/>'
+		label : "<s:property value='glcode'/>"+"-"+"<s:property value='name'/>",
+		value : "<s:property value='id'/>"
 	})
 	</s:iterator>
 	var typeOptions = [ {
 		label : "<s:text name='lbl.choose.options'/>",
 		value : "0"
 	}, {
-		label : '<s:text name="lbl.receipt"/>',
-		value : 'Receipt'
+		label : "<s:text name='lbl.receipt'/>",
+		value : "Receipt"
 	}, {
-		label :  '<s:text name="lbl.payment"/>',
-		value : 'Payment'
+		label : "<s:text name='lbl.payment'/>",
+		value : "Payment"
 	} ];
 
 	var makeBankEntriesNotInBankBookTable = function() {
 		var bankEntriesNotInBankBookColumns = [
 				{
 					key : "refNum",
-					label : '<s:text name="lbl.ref.no"/>',
-					formatter : createTextFieldFormatterBENIBB(
-							BANKENTRIESNOTINBANKBOOKLIST, ".refNum")
+					label : "<s:text name='lbl.ref.no'/>",
+					formatter : createTextFieldFormatterBENIBB(BANKENTRIESNOTINBANKBOOKLIST, ".refNum")
 				},
 				{
 					key : "beId",
 					hidden : true,
-					formatter : createHiddenFieldFormatterBENIBB(
-							BANKENTRIESNOTINBANKBOOKLIST, ".beId")
+					formatter : createHiddenFieldFormatterBENIBB(BANKENTRIESNOTINBANKBOOKLIST, ".beId")
 				},
 				{
 					key : "type",
-					label : '<s:text name="lbl.type"/>  <span class="mandatory1">*</span>',
-					formatter : createDropdownFormatterBENIBB(BANKENTRIESNOTINBANKBOOKLIST),
+					label : "<s:text name='lbl.type'/>  <span class='mandatory1'>*</span>",
+					formatter : createTypeFieldFormatterBENIBB(BANKENTRIESNOTINBANKBOOKLIST, "loaddropdown(this)"),
 					dropdownOptions : typeOptions
 				},
 				{
 					key : "date",
-					label : '<s:text name="lbl.date"/> <span class="mandatory1">*</span>',
+					label : "<s:text name='lbl.date'/> <span class='mandatory1'>*</span>",
 					width:120,
-					formatter : createDateFormatterBENIBB(
-							BANKENTRIESNOTINBANKBOOKLIST, ".date")
+					formatter : createDateFormatterBENIBB(BANKENTRIESNOTINBANKBOOKLIST, ".date")
 				},
 				{
 					key : "amount",
-					label : '<s:text name="lbl.amount"/> <span class="mandatory1">*</span>',
-					formatter : createAmountFieldFormatterBENIBB(
-							BANKENTRIESNOTINBANKBOOKLIST, ".amount")
+					label : "<s:text name='lbl.amount'/> <span class='mandatory1'>*</span>",
+					formatter : createAmountFieldFormatterBENIBB(BANKENTRIESNOTINBANKBOOKLIST, ".amount")
 				},
 				{
 					key : "remarks",
-					label : '<s:text name="lbl.remarks"/>',
-					formatter : createTextFieldFormatterBENIBB(
-							BANKENTRIESNOTINBANKBOOKLIST, ".remarks")
+					label : "<s:text name='lbl.remarks'/>",
+					formatter : createTextFieldFormatterBENIBB(BANKENTRIESNOTINBANKBOOKLIST, ".remarks")
 				},
 				{
 					key : "glcodeIdDetail",
 					hidden : true,
-					formatter : createHiddenFieldFormatterBENIBB(
-							BANKENTRIESNOTINBANKBOOKLIST, ".glcodeIdDetail")
+					formatter : createHiddenFieldFormatterBENIBB(BANKENTRIESNOTINBANKBOOKLIST, ".glcodeIdDetail")
 				},
 				{
 					key : "glcodeDetail",
-					label : '<s:text name="lbl.account.code"/> <span class="mandatory1">*</span>',
+					label : "<s:text name='lbl.account.code'/> <span class='mandatory1'>*</span>",
 					width:120,
-					formatter : createDropdownFormatterBENIBB(
-							BANKENTRIESNOTINBANKBOOKLIST, "loaddropdown(this)"),
+					formatter : createDropdownFormatterBENIBB(BANKENTRIESNOTINBANKBOOKLIST, "loaddropdown(this)"),
 					dropdownOptions : glcodeOptions
 				},
 				{
 					key : "createVoucher",
-					label : '<s:text name="lbl.create.voucher"/>',
-					formatter : createCheckBoxFormatterBENIBB(
-							BANKENTRIESNOTINBANKBOOKLIST, ".createVoucher")
+					label : "<s:text name='lbl.create.voucher'/>",
+					formatter : createCheckBoxFormatterBENIBB(BANKENTRIESNOTINBANKBOOKLIST, ".createVoucher")
 				},
 				{
 					key : 'Add',
-					label : '<s:text name="lbl.add"/>',
+					label : "<s:text name='lbl.add'/>",
 					formatter : createAddImageFormatter("${pageContext.request.contextPath}")
 				},
 				{
 					key : 'Delete',
-					label : '<s:text name="lbl.delete"/>',
+					label : "<s:text name='lbl.delete'/>",
 					formatter : createDeleteImageFormatter("${pageContext.request.contextPath}")
 				} ];
 		var bankEntriesNotInBankBookDS = new YAHOO.util.DataSource();
@@ -297,7 +289,7 @@
 </script>
 
 </head>
-<body onload="load();loadBankNew();">
+<body onload="load();loadBankNew();loadDropDownCodes();loadDropDownCodesFunction();">
 	<s:form action="bankEntriesNotInBankBook" theme="simple"
 		name="bankEntriesNotInBankBookform" id="bankEntriesNotInBankBookform">
 		<s:push value="model">
@@ -360,6 +352,7 @@
 						<td class="greybox"></td>
 					</tr>
 				</table>
+				<div id="codescontainer"></div>
 			</div>
 			<div class="buttonbottom">
 				<input type="button" value="<s:text name='lbl.search'/>" class="buttonsubmit"
@@ -586,6 +579,7 @@
 		</s:if>
 		console.log(jQuery("#bankEntriesNotInBankBookform").serialize());
 		if(validate()){
+			document.getElementById('bankEntriesNotInBankBookList[0].glcodeDetail').value = document.getElementById('bankEntriesNotInBankBookList[0].glcodeIdDetail').value;
 			doLoadingMask();
 			enableAll();
 			document.bankEntriesNotInBankBookform.action = '/services/EGF/payment/bankEntriesNotInBankBook-save.action';
