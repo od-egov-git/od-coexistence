@@ -693,8 +693,8 @@ public class BankBookReportAction extends BaseFormAction {
 		String OrderBy = "";
 		final String voucherStatusToExclude = getAppConfigValueFor("EGF", "statusexcludeReport");
 		final String query1 = "SELECT distinct vh.id as voucherId,vh.voucherDate AS voucherDate, vh.voucherNumber AS voucherNumber,"
-				+ " gl.glcode||' - ('||c.name||')-'||vh.description||'-'||case when sum(gl.debitAmount)  = 0 then (case sum(gl.creditamount) when 0 then sum(gl.creditAmount)||'.00cr' when floor(sum(gl.creditamount)) then sum(gl.creditAmount)||'.00cr' else  sum(gl.creditAmount)||'cr'  end ) else (case sum(gl.debitamount) when 0 then sum(gl.debitamount)||'.00dr' when floor(sum(gl.debitamount))  then sum(gl.debitamount)||'.00dr' else  sum(gl.debitamount)||'dr' 	 end ) end"
-				+ " AS particulars,case when sum(gl1.debitAmount) = 0 then sum(gl1.creditamount) else sum(gl1.debitAmount) end AS amount, case when sum(gl1.debitAmount) = 0 then 'Payment' else 'Receipt' end AS type,"
+				+ " gl.glcode||' - ('||c.name||')-'||vh.description||'-'||case when gl.debitAmount  = 0 then (case gl.creditamount when 0 then gl.creditAmount||'.00cr' when floor(gl.creditamount) then gl.creditAmount ||'cr' else  gl.creditAmount||'cr'  end ) else (case gl.debitamount when 0 then gl.debitamount||'.00dr' when floor(gl.debitamount)  then gl.debitamount||'.00dr' else  gl.debitamount||'dr' 	 end ) end"
+				+ " AS particulars,case when gl1.debitAmount = 0 then gl1.creditamount else gl1.debitAmount end AS amount, case when gl1.debitAmount = 0 then 'Payment' else 'Receipt' end AS type,"
 				+ " case when (case when ch.instrumentnumber is NULL then ch.transactionnumber else ch.instrumentnumber  ||' , ' ||TO_CHAR(case when ch.instrumentdate is NULL THEN ch.transactiondate else ch.instrumentdate end,'dd/mm/yyyy') end )  is NULL then case when ch.instrumentnumber is NULL then ch.transactionnumber else ch.instrumentnumber end ||' , ' ||TO_CHAR(case when ch.instrumentdate is NULL then ch.transactiondate else ch.instrumentdate end,'dd/mm/yyyy') end"
 				+ " AS chequeDetail,gl.glcode as glCode,ch.description as instrumentStatus,vh.description as narration  ";
 		queryFrom = " FROM chartofaccounts c, generalLedger gl,generalLedger gl1"
@@ -707,7 +707,7 @@ public class BankBookReportAction extends BaseFormAction {
 				+ Constants.DDMMYYYYFORMAT1.format(startDate) + "' " + "and vh.voucherDate<='"
 				+ Constants.DDMMYYYYFORMAT1.format(endDate) + "' and vh.status not in(" + voucherStatusToExclude + ") "
 				+ miscQuery + " ";
-		OrderBy = "group by vh.id,gl.glcode,ch.instrumentnumber,ch.transactionnumber,ch.instrumentdate,ch.transactiondate,ch.description,c.name,vh.description order by voucherdate,vouchernumber";
+		OrderBy = "group by vh.id,gl.glcode,gl.debitAmount,gl.creditamount,gl1.debitAmount,gl1.creditAmount,ch.instrumentnumber,ch.transactionnumber,ch.instrumentdate,ch.transactiondate,ch.description,c.name,vh.description order by voucherdate,vouchernumber";
 		System.out.println("Main query :" + query1 + queryFrom + OrderBy);
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("Main query :" + query1 + queryFrom + OrderBy);
