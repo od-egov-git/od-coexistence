@@ -330,7 +330,7 @@ public class JournalVoucherAction extends BaseVoucherAction
                 journalVoucherActionHelper.saveDocuments(voucherHeader);
                 
                 LOGGER.info(":::::1 ::: ");
-                if (!cutOffDate.isEmpty() && cutOffDate!=null )
+                if (cutOffDate!=null && !cutOffDate.isEmpty())
                 {
                     try {
                         date = sdf.parse(cutOffDate);

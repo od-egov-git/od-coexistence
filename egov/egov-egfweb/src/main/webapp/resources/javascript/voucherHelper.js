@@ -2570,7 +2570,7 @@ function removeVoucher() {
 
 function openSource(){
 	
-	
+	console.log("inside openSource ");
 	var vouchermissourcepath=document.getElementById('vouchermissourcepath').value;
 	
 	if(vouchermissourcepath=="" || vouchermissourcepath=='null')
@@ -2580,6 +2580,19 @@ function openSource(){
 		window.open(url,'Source','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700')
 	}   
 }
+
+function duplicateSource(){
+	console.log("inside duplicateSource ");
+	var vouchermissourcepath = document.getElementById('vouchermissourcepath').value;
+	
+	if(vouchermissourcepath=="" || vouchermissourcepath=='null')
+		bootbox.alert('Source is not available');
+	else{
+		var url = vouchermissourcepath+'&showMode=duplicate';
+		window.open(url,'Duplicate','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700')
+	}  
+}
+
 function checkLength(obj)
 {
 	if(obj.value.length>1024)

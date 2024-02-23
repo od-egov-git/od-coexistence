@@ -78,6 +78,7 @@ import org.apache.struts2.interceptor.validation.SkipValidation;
 import org.egov.common.contstants.CommonConstants;
 import org.egov.commons.CVoucherHeader;
 import org.egov.commons.DocumentUploads;
+import org.egov.commons.Vouchermis;
 import org.egov.commons.dao.FinancialYearDAO;
 import org.egov.eis.service.EisCommonService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
@@ -117,6 +118,7 @@ import com.exilant.GLEngine.ChartOfAccounts;
 @Results({
         @Result(name = "editVoucher", location = "journalVoucherModify-editVoucher.jsp"),
         @Result(name = "view", location = "journalVoucherModify-view.jsp"),
+        @Result(name = "duplicate", location = "journalVoucherModify-duplicateVoucher.jsp"),
         @Result(name = "message", location = "journalVoucherModify-message.jsp")
 })
 public class JournalVoucherModifyAction extends BaseVoucherAction {
@@ -230,12 +232,15 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
 				else if (parameters.get("showMode")[0].equalsIgnoreCase("view")) {
                     if (LOGGER.isDebugEnabled())
                         LOGGER.debug("Valid Owner :return true");
+                } else if (parameters.get("showMode")[0].equalsIgnoreCase("duplicate")) {
+                	LOGGER.info("Valid Owner: showmode duplicate");
+                	
                 } else
-                    throw new ApplicationRuntimeException("Invalid Aceess");
+                    throw new ApplicationRuntimeException("Invalid Access");
             setOneFunctionCenterValue();
         } catch (final ApplicationRuntimeException e) {
             final List<ValidationError> errors = new ArrayList<ValidationError>();
-            errors.add(new ValidationError("exp", "Invalid Aceess"));
+            errors.add(new ValidationError("exp", "Invalid Access"));
             throw new ValidationException(errors);
         }
         billDetailslist = (List<VoucherDetails>) vhInfoMap.get(Constants.GLDEATILLIST);
@@ -266,11 +271,34 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
         if (null != parameters.get("showMode") && parameters.get("showMode")[0].equalsIgnoreCase("view")) {
             return "view";
         }
+        
+        if (null != parameters.get("showMode") && parameters.get("showMode")[0].equalsIgnoreCase("duplicate")) {
+        	
+        	CVoucherHeader newVoucher = (CVoucherHeader) vhInfoMap.get(Constants.VOUCHERHEADER);
+               	
+        	
+        	newVoucher.setVouchermis(new Vouchermis());
+        	newVoucher.setCgvn(null);
+        	newVoucher.setCreatedBy(null);
+        	newVoucher.setCreatedDate(null);
+        	newVoucher.setVoucherDate(new Date());
+        	newVoucher.setState(null);
+            
+        	voucherHeader = (CVoucherHeader) newVoucher;
+        	
+        	
+            return "duplicate";
+        }
 
         return "editVoucher";
     }
 
-    @ValidationErrorPage(value = "editVoucher")
+//    private void prepareNewVoucher(CVoucherHeader voucherHeader, CVoucherHeader newVc) {
+//		
+//		
+//	}
+
+	@ValidationErrorPage(value = "editVoucher")
     public String saveAndPrint() throws Exception {
         try {
             saveMode = "saveprint";
