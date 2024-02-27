@@ -282,9 +282,14 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
         	newVoucher.setCreatedBy(null);
         	newVoucher.setCreatedDate(null);
         	newVoucher.setVoucherDate(new Date());
+        	newVoucher.setVoucherNumber(null);
         	newVoucher.setState(null);
             
         	voucherHeader = (CVoucherHeader) newVoucher;
+        	
+        	voucherTypeBean.setVoucherName(voucherHeader.getName());
+        	voucherTypeBean.setBillNum(null);
+        	
         	
         	
             return "duplicate";

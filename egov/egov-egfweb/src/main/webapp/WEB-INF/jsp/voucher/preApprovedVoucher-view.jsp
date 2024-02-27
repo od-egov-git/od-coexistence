@@ -147,10 +147,7 @@
 						onclick=" return openSource();">Source</a></td>
 						
 					  <td class="bluebox"><a href="#" id="duplicateLink"
-						onclick=" return duplicateSource();">Duplicate</a></td>
-						
-					<!--<button onclick="return duplicateSource();">Duplicate</button>-->
-						
+						onclick=" return duplicateSource();">Duplicate</a></td>					
 					
 
 				</tr>
