@@ -150,7 +150,8 @@ import javax.persistence.PersistenceContext;
 				+ ".jsp"),
 		@Result(name = "reverse", location = "directBankPayment-reverse.jsp"),
 		@Result(name = "vouchernew", location = "voucherdirectBankPayment-new.jsp"),
-		@Result(name = "view", location = "directBankPayment-view.jsp") })
+		@Result(name = "view", location = "directBankPayment-view.jsp"),
+		@Result(name = "duplicate", location = "directBankPayment-duplicate.jsp") })
 public class DirectBankPaymentAction extends BasePaymentAction {
 	private final static String FORWARD = "Forward";
 	private static final String FAILED_WHILE_REVERSING = "Failed while Reversing";
@@ -696,9 +697,16 @@ public class DirectBankPaymentAction extends BasePaymentAction {
 	@Action(value = "/payment/directBankPayment-beforeView")
 	public String beforeView() {
 		prepareForViewModifyReverse();
-		wfitemstate = "END"; // requird to hide the approver drop down when view
+		if(!showMode.equalsIgnoreCase("duplicate")) {
+			wfitemstate = "END"; // requird to hide the approver drop down when view
 								// is form source
-		return VIEW;
+			return VIEW;
+		} else {
+			wfitemstate = "NEW";
+			paymentheader = new Paymentheader();
+	
+			return "duplicate";
+		}
 	}
 
 	@SkipValidation
