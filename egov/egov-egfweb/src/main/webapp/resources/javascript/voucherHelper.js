@@ -345,9 +345,17 @@ function createDropdownFormatterJV(prefix){
     }
 }
 function updateAccountTableIndex(){
+	log.console("plus 1");
 	
 	billDetailTableIndex = billDetailTableIndex +1 ;
 }
+
+function updateAccountTableIndexMinus(){
+	log.console("minus 1");
+	
+	billDetailTableIndex = billDetailTableIndex - 1 ;
+}
+
 function updateSLTableIndex(){
 	
 	 slDetailTableIndex = slDetailTableIndex +1 ;
