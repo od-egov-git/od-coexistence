@@ -100,14 +100,12 @@
 				billDetailsTable.addRow({SlNo:billDetailsTable.getRecordSet().getLength()+1});
 				updateAccountTableIndex();
 			}
-			if (column.key == 'Delete') { 	
+			if (column.key == 'Delete') { 
 				if(this.getRecordSet().getLength()>1){			
 					this.deleteRow(record);
-					updateAccountTableIndexMinus();
-					allRecords=this.getRecordSet();
+					allRecords=this.getRecordSet();					
 					for(var i=0;i<allRecords.getLength();i++){
 						this.updateCell(this.getRecord(i),this.getColumn('SlNo'),""+(i+1));
-						console.log("deleted");
 					}
 					updateDebitAmountJV();updateCreditAmountJV();
 					check();
