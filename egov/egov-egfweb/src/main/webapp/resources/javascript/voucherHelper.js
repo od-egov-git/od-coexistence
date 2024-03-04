@@ -345,15 +345,8 @@ function createDropdownFormatterJV(prefix){
     }
 }
 function updateAccountTableIndex(){
-	log.console("plus 1");
 	
 	billDetailTableIndex = billDetailTableIndex +1 ;
-}
-
-function updateAccountTableIndexMinus(){
-	log.console("minus 1");
-	
-	billDetailTableIndex = billDetailTableIndex - 1 ;
 }
 
 function updateSLTableIndex(){
@@ -1128,7 +1121,6 @@ function loadSlFunction(){
 			 accountCodeId = document.getElementById('billDetailslist['+i+'].glcodeIdDetail').value;
 			 accountCode = document.getElementById('billDetailslist['+i+'].glcodeDetail').value;
 		}
-		console.log(slAccountCodes);
 		if(accGridFunc !=''  && slAccountCodes.indexOf(accountCodeId) !=-1){
 			if(functionArray.indexOf(accGridFunc) == -1){
 				functionArray.push(accGridFunc);
