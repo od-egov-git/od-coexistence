@@ -403,11 +403,16 @@ function addYUIRow_billDetailTable(obj)
 		
 		}
 function printVoucher(){
-	//alert("direct print called "+'${pageContext.request.contextPath}/voucher/preApprovedVoucher-loadvoucherview.action?vhid='+document.getElementById("directBankPayment_id").value);
-	document.forms[0].action='../report/billPaymentVoucherPrint-print.action?id=<s:property value="paymentheader.id"/>';
-	//document.forms[0].action='${pageContext.request.contextPath}/voucher/preApprovedVoucher-loadvoucherview.action?vhid='+document.getElementById("directBankPayment_id").value;
-	//document.forms[0].submit();
-	//document.forms[0].action= '/services/EGF/voucher/preApprovedVoucher-loadvoucherview.action?vhid='+ document.getElementById("directBankPayment_id").value;
+	
+	var vhId='<s:property value="voucherHeader.id"/>';
+	document.forms[0].action = "${pageContext.request.contextPath}/voucher/preApprovedVoucher-loadvoucherview.action?vhid="+vhId;
+	//alert("direct print called "+'/services/EGF/voucher/preApprovedVoucher-loadvoucherview.action?vhid==<s:property value="paymentheader.voucherheader.id"/>';
+	
+	//document.forms[0].action='../report/billPaymentVoucherPrint-print.action?id=<s:property value="paymentheader.voucherheader.id"/>';
+	//var id='<s:property value="voucherHeader.id"/>';
+	//document.forms[0].action='../report/billPaymentVoucherPrint-print.action?id='+id;
+	
+	//document.forms[0].action= '/services/EGF/voucher/preApprovedVoucher-loadvoucherview.action?vhid=<s:property value="voucherHeader.id"/>';
 	document.forms[0].submit();
 }
 function populateAccNum(branch){
@@ -507,7 +512,7 @@ onload="onLoadTask_new();loadDropDownCodesExcludingCashAndBank();loadDropDownCod
 									<td class="bluebox" width="22%"><s:text
 											name="voucher.number" /></td>
 									<td class="bluebox" width="22%"><s:textfield
-											name="voucherNumber" id="voucherNumber" /></td>
+											name="voucherNumber" id="voucherNumber" value="%{paymentheader.voucherheader.voucherNumber}"/></td>
 									<s:hidden name="id" />
 									<td class="bluebox" width="18%"><s:text
 											name="voucher.date" /><span class="mandatory1">*</span></td>
@@ -616,8 +621,8 @@ onload="onLoadTask_new();loadDropDownCodesExcludingCashAndBank();loadDropDownCod
 				<div class="buttonbottom" id="viewButton" align="center">
 					<input type="button" id="closeButton" value="Close"
                            onclick="window.close()" class="button"/>
-					<s:submit cssClass="button" id="printPreview2"
-						value="Print Preview" onclick="printVoucher()" />
+					<!--<s:submit cssClass="button" id="printPreview2"
+						value="Print Preview" onclick="printVoucher()" />-->
 
 				</div>
 				</br>
@@ -730,8 +735,10 @@ onload="onLoadTask_new();loadDropDownCodesExcludingCashAndBank();loadDropDownCod
 					<s:hidden id="paymentid" name="paymentid"
 						value="%{paymentheader.id}" />
 					<s:hidden id="firstsignatory" name="firstsignatory"
-						value="%{firstsignatory}" />	
+						value="%{firstsignatory}" />
 					<s:hidden name="actionname" id="actionName" value="%{action}" />
+
+
 					<script>
 					var totalsnotmatchingamount='<s:text name="totals.not.matching.amount"/>';
 

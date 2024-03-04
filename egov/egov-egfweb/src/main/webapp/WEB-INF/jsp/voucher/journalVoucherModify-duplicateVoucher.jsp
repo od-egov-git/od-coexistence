@@ -157,10 +157,7 @@
 			<div id="codescontainer"></div>
 			<%@ include file='../workflow/commonWorkflowMatrix.jsp'%>
 			<%@ include file='../workflow/commonWorkflowMatrix-button.jsp'%>
-			<div class="buttonbottom" id="buttondiv">
-				<input type="button" class="button" id="print" value="Print Preview"
-					action="journalVoucherPrint" method="print" onclick="printJV()" />
-			</div>
+
 			<s:hidden id="cgn" name="cgn"></s:hidden>
 			<s:hidden name="saveMode" id="saveMode" />
 			<s:hidden name="actionName" id="actionName" />
@@ -203,6 +200,7 @@
             return true;
         }
         function onSubmit() {
+        	console.log("inside submit...");
             if(checkdate()){
                 if(validateJV()) {
                 	var backlog=document.getElementById('backlogEntry');
@@ -237,6 +235,7 @@
             return true;
         }
         function validateAccDtls() {
+        	console.log("inside validate acc details...");
             var y =document.getElementById('billDetailTable').getElementsByTagName('tr');
             var x =document.getElementById('subLedgerTable').getElementsByTagName('tr');
             var totalDebitAmt= 0;
@@ -392,6 +391,7 @@
         function loadBank(fund) {
         }
         function checkdate() {
+        	console.log("inside checkdate...");
             var backlog=document.getElementById('backlogEntry').value;
             var date2=document.getElementById('voucherDate').value;
             var parts = date2.split("/");
