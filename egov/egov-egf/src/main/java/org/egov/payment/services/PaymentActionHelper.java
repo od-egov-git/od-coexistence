@@ -196,10 +196,10 @@ public class PaymentActionHelper {
 						+ commonBean.getDocumentNumber() + "'";
 				Query q1 = entityManager.createNativeQuery(queryString1.toString());
 				list2 = q1.getResultList();
-				if (list1 != null) {
+				if (list1 != null && !list1.isEmpty()) {
 					budgetAppNo = (String) list1.get(0);
 				}
-				if (list2 != null) {
+				if (list2 != null && !list2.isEmpty()) {
 					refundable = (String) list2.get(0);
 					voucherHeader.setRefundable(refundable);
 				}

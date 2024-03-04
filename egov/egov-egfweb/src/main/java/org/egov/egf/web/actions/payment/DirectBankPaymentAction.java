@@ -504,7 +504,9 @@ public class DirectBankPaymentAction extends BasePaymentAction {
 			// subLedgerlist.add(new VoucherDetails());
 			// loadApproverUser(FinancialConstants.STANDARD_VOUCHER_TYPE_PAYMENT);
 		}
-
+		
+		voucherHeader = (CVoucherHeader) paymentheader.getVoucherheader();
+		
 		return VIEW;
 	}
 
@@ -704,6 +706,8 @@ public class DirectBankPaymentAction extends BasePaymentAction {
 		} else {
 			wfitemstate = "NEW";
 			paymentheader = new Paymentheader();
+			voucherHeader.setVoucherDate(new Date());
+			
 	
 			return "duplicate";
 		}
