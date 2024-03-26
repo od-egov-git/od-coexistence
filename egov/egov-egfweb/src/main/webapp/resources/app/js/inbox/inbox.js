@@ -6,9 +6,9 @@
 $(document).ready(function () {
 //    $('#new-pass').popover({trigger: "focus", placement: "bottom"});
 
-    $(document).on("keydown", disableRefresh);
+//    $(document).on("keydown", disableRefresh);
 
-    preventBack();
+//    preventBack();
 
     $.fn.dataTable.moment('DD/MM/YYYY h:mm a');
 
@@ -85,6 +85,7 @@ $(document).ready(function () {
 //    });
 
     worklist();
+    isValidApprover();
 
     $("#official_inbox").on('click', 'tbody tr td i.inbox-history', function (e) {
         $('.history-inbox').modal('show');
@@ -615,6 +616,7 @@ function refreshnow(taskName, moduleName) {
 function inboxloadmethod() {
     clearnow();
     worklist();
+    isValidApprover();
 //    if (focussedmenu == 'worklist') {
 //        worklist();
 //    } else if (focussedmenu == 'drafts') {
@@ -622,4 +624,36 @@ function inboxloadmethod() {
 //    } else if (focussedmenu == 'notifications') {
 //        notifications();
 //    }
+}
+
+	
+function multipleSelect() {
+	var redirectUrl = contextPath + '/inbox/inbox-multiselect';
+	console.log(redirectUrl);
+	window.location = redirectUrl;
+}
+
+
+function isValidApprover() {
+	$('#select_multiple_button').hide();
+	$.ajax({
+        url: "inbox/isValidApprover",
+        dataType: "json",
+        contentType: 'application/json; charset=utf-8',
+        type: "GET",
+        cache: false,
+        crossDomain: true,
+        error: function (e) {
+        	alert("error");
+        	console.log(e);
+        },
+        success: function (data) {
+         	console.log(data);
+         	if(data) {
+				$('#select_multiple_button').show();
+			} else {
+				$('#select_multiple_button').hide();
+			}
+        }
+    });
 }
