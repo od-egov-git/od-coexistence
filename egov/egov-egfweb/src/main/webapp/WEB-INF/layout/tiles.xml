@@ -932,5 +932,9 @@
         <put-attribute name="page-title" value="title.transaction.report" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/report/transaction-report.jsp"/>
     </definition>
+    <definition name="inbox-multiselect" extends="base_layout">
+		<put-attribute name="page-title" value="title.receiptpayment.search" cascade="true"/>
+		<put-attribute name="body" value="/WEB-INF/views/inbox/inbox-multiselect.jsp"></put-attribute>
+	</definition>
 	
 </tiles-definitions>

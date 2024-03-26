@@ -10,7 +10,7 @@
 <div>
 
 		<table class="table table-bordered datatable" id="official_inbox">
-                        <thead>
+             <thead>
                         <tr>
                             <th><spring:message code="lbl.created.date"/></th>
                             <th><spring:message code="lbl.sender"/></th>
@@ -22,6 +22,17 @@
                         </tr>
                         </thead>
                     </table>
+</div>
+<div id='select_multiple_button' > 
+	<div class="buttonbottom" align="center">
+		<table style="width: 100%; text-align: center;">
+			<tr>
+				<td>
+					<input type="button" value="Select Multiple" id="select_multiple" name="select_multiple" class="buttonsubmit" onclick="multipleSelect();">
+				</td>
+			</tr>
+		</table>
+	</div>
 </div>
 <div class="modal fade history-inbox">
     <div class="modal-dialog history">
@@ -53,6 +64,9 @@
         </div>
     </div>
 </div>
+<script>
+	var contextPath = "${pageContext.request.contextPath}"
+</script>
 <script src="<cdn:url value='/resources/global/js/jquery/plugins/datatables/jquery.dataTables.min.js' context='/services/EGF'/>"></script>
 <script src="<cdn:url value='/resources/global/js/jquery/plugins/datatables/dataTables.bootstrap.js' context='/services/EGF'/>"></script>
 <script src="<cdn:url value='/resources/global/js/jquery/plugins/datatables/responsive/js/datatables.responsive.js' context='/services/EGF'/>"></script>
