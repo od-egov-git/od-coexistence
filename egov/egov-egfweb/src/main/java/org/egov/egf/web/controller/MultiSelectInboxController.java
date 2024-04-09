@@ -2,6 +2,7 @@ package org.egov.egf.web.controller;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -13,15 +14,22 @@ import org.apache.log4j.Logger;
 import org.egov.commons.CVoucherHeader;
 import org.egov.egf.dashboard.event.FinanceEventType;
 import org.egov.egf.dashboard.event.listener.FinanceDashboardService;
+import org.egov.eis.service.DesignationService;
+import org.egov.infra.admin.master.entity.AppConfigValues;
+import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
+import org.egov.infra.microservice.models.Assignment;
+import org.egov.infra.microservice.models.Department;
 import org.egov.infra.microservice.models.EmployeeInfo;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.validation.exception.ValidationError;
 import org.egov.infra.validation.exception.ValidationException;
+import org.egov.infra.workflow.matrix.service.CustomizedWorkFlowService;
 import org.egov.model.bills.EgBillregister;
 import org.egov.model.payment.Paymentheader;
 import org.egov.model.voucher.WorkflowBean;
 import org.egov.payment.services.PaymentActionHelper;
+import org.egov.pims.commons.Designation;
 import org.egov.services.bills.BillsService;
 import org.egov.services.payment.PaymentService;
 import org.egov.services.voucher.PreApprovedActionHelper;
@@ -33,6 +41,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -61,11 +70,24 @@ public class MultiSelectInboxController {
 	@Autowired
 	private PaymentActionHelper paymentActionHelper;
 	
+	@Autowired
+    private DesignationService designationService;
+	
+	@Autowired
+    private CustomizedWorkFlowService customizedWorkFlowService;
+	
+	@Autowired
+	protected AppConfigValueService appConfigValuesService;
+	
 	private static final Logger LOGGER = Logger.getLogger(MultiSelectInboxController.class);
 	
 	private static final String TASK_TYPR_VOUCHER = "Voucher";
 	private static final String ACCOUNT_DEPT = "DEPT_25";
+	private static final String WF_ACTION_APPROVE = "APPROVE";
+	
 	private static final List<String> VALID_APPROVER_DESIGNATIONS = Arrays.asList("DESIG_208", "DESIG_210", "DESIG_218", "DESIG_219");
+	private static final List<String> VALID_FORWARD_DESIGNATIONS = Arrays.asList("DESIG_207");
+
 	
 	@RequestMapping(value = "/inbox-multiselect", method = RequestMethod.GET)
 	public String multiSelectInbox() {
@@ -152,15 +174,28 @@ public class MultiSelectInboxController {
 
 	private WorkflowBean populateWorkflowBean(Map<String, Object> items) {
 		WorkflowBean workflowBean = new WorkflowBean();
-		Long positionId = populatePosition();
-		workflowBean.setApproverPositionId(positionId);
-		String approverComments = (String) items.get("remark");
+		String workFlowAction = (String) items.get("workFlowAction");
 		
+		Long positionId = null;
+		if (WF_ACTION_APPROVE.equalsIgnoreCase(workFlowAction)) {
+			positionId = populatePosition();
+			workflowBean.setCurrentState("Final Approval");
+		} else {
+			positionId = Long.valueOf((String)items.get("approverPositionId")) ;
+			workflowBean.setCurrentState("Verified");
+		}
+		if(!ObjectUtils.isEmpty(positionId)) {
+			workflowBean.setApproverPositionId(positionId);
+		}
+		
+		String approverComments = (String) items.get("remark");
 		if(!StringUtils.isEmpty(approverComments)) {
 			workflowBean.setApproverComments(approverComments);
+		} else {
+			workflowBean.setApproverComments("");
 		}
-		workflowBean.setWorkFlowAction("Approve");
-//		workflowBean.setCurrentState(currentState);
+		
+		workflowBean.setWorkFlowAction(workFlowAction);
 		return workflowBean;
 	}
 
@@ -178,16 +213,57 @@ public class MultiSelectInboxController {
 
 	@RequestMapping(value = "/isValidApprover", method = RequestMethod.GET)
 	@ResponseBody
-	public boolean isValidApprover() {
+	public String isValidApprover() {
 		Long empId = ApplicationThreadLocals.getUserId();
 		List<EmployeeInfo> employees = microserviceUtils.getEmployee(empId, null, null, null);
 		if (null != employees && employees.size() > 0) {
 			if(ACCOUNT_DEPT.equalsIgnoreCase(employees.get(0).getAssignments().get(0).getDepartment())
 					&& VALID_APPROVER_DESIGNATIONS.contains(employees.get(0).getAssignments().get(0).getDesignation())) {
-				return true;
+				return "APPROVE";
+			
+			} else if(ACCOUNT_DEPT.equalsIgnoreCase(employees.get(0).getAssignments().get(0).getDepartment())
+					&& VALID_FORWARD_DESIGNATIONS.contains(employees.get(0).getAssignments().get(0).getDesignation())) {
+				return "FORWARD";
 			}
 		}
-		return false;
+		return "";
+	}
+	
+	
+	
+	@RequestMapping(value = "/getAllDepartments", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Department> getAllDepartments() {
+		List<Department> deptartmentList = new ArrayList<>();
+		List<AppConfigValues>appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","department");
+        for(AppConfigValues value:appConfigValuesList) {
+        	deptartmentList=microserviceUtils.getDepartments(value.getValue());
+        }
+        return deptartmentList;
+	}
+	
+	
+	@RequestMapping(value = "/getDesignationsByDepartment", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Designation> getDesignationsByDepartment(@RequestParam String departmentId, @RequestParam String departmentName) {
+		List<Designation> designationList = new ArrayList<>();
+		String currentState = "Verified";
+		String type = "CVoucherHeader";
+		designationList = designationService.getDesignationsByNames( 
+				customizedWorkFlowService.getNextDesignations(type, departmentName, null, StringUtils.EMPTY, currentState, StringUtils.EMPTY, new Date()));
+        return designationList;
+	}
+	
+	
+	@RequestMapping(value = "/getApproversByDepartmentAndDesignation", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Assignment> getApproversByDepartmentAndDesignation(@RequestParam String departmentId, @RequestParam String designationId) {
+		List<Assignment> approverList = new ArrayList<>();
+		if (designationId != null && !designationId.equalsIgnoreCase("-1") && departmentId != null
+                && !departmentId.equalsIgnoreCase("-1")) {
+            approverList = microserviceUtils.getAssignments(departmentId, designationId);
+        }
+        return approverList;
 	}
 	
 }
