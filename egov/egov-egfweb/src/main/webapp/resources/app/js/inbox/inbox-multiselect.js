@@ -126,58 +126,69 @@ $("#official_inbox").on('change', 'tbody tr input[type="checkbox"]', function() 
 
    
    
-   // Handle form submission event
-   $('#Approve').on('click', function(e){
-   		validateWorkFlowApprover('Approve');
-   		var _table = $('#official_inbox').DataTable();
-   		var selectedItem = [];
-   		
-      	$("#official_inbox input[type=checkbox]:checked").each(function () {
-      		var currentRowData = _table.row($(this).parents('tr')).data();
-      		currentRowData.remark = document.getElementById("approverComments").value;
-            selectedItem.push(currentRowData);
-        });
-      	console.log(selectedItem);
-      	if(selectedItem.length == 0) {
-	      	alert("Please select atleast one row.");
-	      	return false;
-      	} else {
-      		$.ajax({
-		        url: "preApprovedVoucher-bulkUpdate",
-		        data: JSON.stringify(selectedItem),
-		        dataType: "json",
-		        contentType: 'application/json; charset=utf-8',
-		        type: "POST",
-		        cache: false,
-		        crossDomain: true,
-		        error: function (e) {
-		        	alert("error");
-		        	console.log(e);
-		        },
-		        success: function (data) {
-		         	console.log(data);
-		         	alert("Your request has been approved Sucessfully");
-		         	var redirectUrl = contextPath + '/inbox';
-					console.log(redirectUrl);
-					window.location = redirectUrl;
-		        }
-		    });
-      	}
-   });
+// Handle form submission event
+$('#Approve').on('click', function(e){
+	validateWorkFlowApprover('Approve');
+	var _table = $('#official_inbox').DataTable();
+	var selectedItem = [];
+	
+  	$("#official_inbox input[type=checkbox]:checked").each(function () {
+  		var currentRowData = _table.row($(this).parents('tr')).data();
+  		currentRowData.workFlowAction = 'Approve';
+  		currentRowData.remark = document.getElementById("approverComments").value;
+        selectedItem.push(currentRowData);
+    });
+  	console.log(selectedItem);
+  	if(selectedItem.length == 0) {
+      	alert("Please select atleast one row.");
+      	return false;
+  	} else {
+		$('#Approve').attr("disabled", true);
+  		$.ajax({
+	        url: "preApprovedVoucher-bulkUpdate",
+	        data: JSON.stringify(selectedItem),
+	        dataType: "json",
+	        contentType: 'application/json; charset=utf-8',
+	        type: "POST",
+	        cache: false,
+	        crossDomain: true,
+	        error: function (e) {
+	        	console.log(e);
+	        	$('#Approve').removeAttr("disabled");
+	        },
+	        success: function (data) {
+				$('#Approve').removeAttr("disabled");
+	         	console.log(data);
+	         	alert("Your request has been approved Sucessfully");
+	         	var redirectUrl = contextPath + '/inbox';
+				console.log(redirectUrl);
+				window.location = redirectUrl;
+	        }
+	    });
+	}
+});
    
    
 function validateWorkFlowApprover(name) {
     document.getElementById("workFlowAction").value=name;
-    var approverPosId = document.getElementById("approverPositionId");
-    var approverDesId = document.getElementById("approverDesignation");
-    if(approverPosId && approverPosId.value != -1 && approverPosId.value != "") {
-		var approver = approverPosId.options[approverPosId.selectedIndex].text; 
-		document.getElementById("approverName").value= approver.split('~')[0];
-	}   
+	if ((name=="Forward" || name=="forward")) {
+		var approverDesignation=$('#approverDesignation').val();
+		if(approverDesignation=="" || approverDesignation=="-1" || approverDesignation == undefined) {
+			alert("Please select the Approver Designation");
+			return false;
+		}
+		
+		var approverPosition = $('#approverPosition').val();
+		if(approverPosition=="" ||  approverPosition=="-1" || approverPosition == undefined) {
+			alert("Please select the Approver Department");
+			return false;
+		}
+	}
+	
     if ((name=="Reject" || name=="reject")) {
     	var approverComments = document.getElementById("approverComments").value;
     	if (approverComments == null || approverComments == "") {
-    		bootbox.alert("Please enter approver remark");
+    		alert("Please enter approver remark");
 			return false;
     	}
 	}
@@ -185,6 +196,9 @@ function validateWorkFlowApprover(name) {
 
 function isValidApprover() {
 	$('#approve_section').hide();
+	$('#approvebutton').hide();
+	$('#forwardbutton').hide();
+	$('#workflowForwardDiv').hide();
 	$.ajax({
         url: "isValidApprover",
         dataType: "json",
@@ -198,18 +212,149 @@ function isValidApprover() {
         },
         success: function (data) {
          	console.log(data);
-         	if(data) {
+         	if(data == 'APPROVE') {
 				$('#approve_section').show();
+				$('#approvebutton').show();
+			} else if(data == 'FORWARD'){
+				$('#approve_section').show();
+				$('#forwardbutton').show();	
+				$('#workflowForwardDiv').show();
+				getAllDepartments();
 			} else {
 				$('#approve_section').hide();
+				$('#approvebutton').hide();
+				$('#forwardbutton').hide();	
 			}
         }
     });
 }
 
 
-$('#Cancel').on('click', function(e){
-	var redirectUrl = contextPath + '/inbox';
-	console.log(redirectUrl);
-	window.location = redirectUrl;
+$('#ApproveCancel').on('click', function(){
+	window.location = contextPath + '/inbox';
 });
+
+$('#ForwardCancel').on('click', function(){
+	window.location = contextPath + '/inbox';
+});
+
+
+function getAllDepartments() {
+	$.ajax({
+        url: "getAllDepartments",
+        dataType: "json",
+        contentType: 'application/json; charset=utf-8',
+        type: "GET",
+        cache: false,
+        crossDomain: true,
+        error: function (e) {
+        	alert("error");
+        	console.log(e);
+        },
+        success: function (data) {
+         	console.log(data);
+         	$("#approverDepartment option").remove(); 
+         	$.each(data, function(key, department) {
+                $("#approverDepartment").append('<option value=' + department.code + '>' + department.name + '</option>');
+            });
+            getDesignationsByDepartment();
+        }
+    });
+}
+
+
+function getDesignationsByDepartment() {
+	var departmentId = document.getElementById("approverDepartment").value;
+	var departmentName = $("#approverDepartment option:selected" ).text();
+	$.ajax({
+        url: "getDesignationsByDepartment?departmentId="+departmentId+"&departmentName="+departmentName,
+        dataType: "json",
+        contentType: 'application/json; charset=utf-8',
+        type: "GET",
+        cache: false,
+        crossDomain: true,
+        error: function (e) {
+        	console.log(e);
+        },
+        success: function (data) {
+         	console.log(data);
+         	$("#approverDesignation option").remove(); 
+         	$("#approverDesignation").append('<option value="">  ----Choose---- </option>');
+         	$.each(data, function(key, designation) {
+                $("#approverDesignation").append('<option value=' + designation.code + '>' + designation.name + '</option>');
+            });
+        }
+    });
+}
+
+
+$('#approverDesignation').on('change', function(){
+	var departmentId = document.getElementById("approverDepartment").value;
+	var designationId = document.getElementById("approverDesignation").value;
+	$.ajax({
+        url: "getApproversByDepartmentAndDesignation?departmentId="+departmentId+"&designationId="+designationId,
+        dataType: "json",
+        contentType: 'application/json; charset=utf-8',
+        type: "GET",
+        cache: false,
+        crossDomain: true,
+        error: function (e) {
+        	console.log(e);
+        },
+        success: function (data) {
+         	console.log(data);
+         	$("#approverPosition option").remove(); 
+         	$("#approverPosition").append('<option value="">  ----Choose---- </option>');
+         	$.each(data, function(key, approver) {
+				$("#approverPosition").append('<option value=' + approver.empId + '>' + approver.employeeName + '</option>');
+            });
+        }
+    });
+});
+
+
+// Handle form submission event
+$('#Forward').on('click', function(e){
+	
+	var _table = $('#official_inbox').DataTable();
+	var selectedItem = [];
+   		
+  	$("#official_inbox input[type=checkbox]:checked").each(function () {
+  		var currentRowData = _table.row($(this).parents('tr')).data();
+  		currentRowData.approverPositionId = document.getElementById("approverPosition").value;
+  		currentRowData.remark = document.getElementById("approverComments").value;
+  		currentRowData.workFlowAction = 'Forward';
+        selectedItem.push(currentRowData);
+    });
+  	console.log(selectedItem);
+  	if(selectedItem.length == 0) {
+      	alert("Please select atleast one row.");
+      	return false;
+  	} else {
+		validateWorkFlowApprover('Forward');
+  		$('#Forward').attr("disabled", true);
+  		$.ajax({
+	        url: "preApprovedVoucher-bulkUpdate",
+	        data: JSON.stringify(selectedItem),
+	        dataType: "json",
+	        contentType: 'application/json; charset=utf-8',
+	        type: "POST",
+	        cache: false,
+	        crossDomain: true,
+	        error: function (e) {
+	        	console.log(e);
+	        	$('#Forward').removeAttr("disabled");
+	        },
+	        success: function (data) {
+				$('#Forward').removeAttr("disabled");
+	         	console.log(data);
+	         	alert("Your request has been forwarded Sucessfully");
+	         	var redirectUrl = contextPath + '/inbox';
+				console.log(redirectUrl);
+				window.location = redirectUrl;
+	        }
+	    });
+	}
+});
+
+

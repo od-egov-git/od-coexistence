@@ -649,7 +649,7 @@ function isValidApprover() {
         },
         success: function (data) {
          	console.log(data);
-         	if(data) {
+         	if(data == "APPROVE" || data == "FORWARD" ) {
 				$('#select_multiple_button').show();
 			} else {
 				$('#select_multiple_button').hide();
