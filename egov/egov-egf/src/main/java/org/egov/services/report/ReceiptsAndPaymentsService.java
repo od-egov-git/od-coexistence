@@ -801,7 +801,9 @@ public class ReceiptsAndPaymentsService extends ReportService {
 		
 		
 		if(statement.getIeEntries()!=null) {
-			List<IEStatementEntry> ieEntries = statement.getIeEntries().stream().filter(entry -> entry.getType()!='O').collect(Collectors.toList());
+			List<IEStatementEntry> ieEntries = statement.getIeEntries().stream()
+					.filter(entry -> entry != null && entry.getType()!='O')
+					.collect(Collectors.toList());
 			
 			if(ieEntries.isEmpty()) {
 				totalPayments = BigDecimal.ZERO;
