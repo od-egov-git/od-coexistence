@@ -799,13 +799,17 @@ public class ReceiptsAndPaymentsService extends ReportService {
 
 		}
 		
-		
-		if(statement.getIeEntries()!=null) {
-			List<IEStatementEntry> ieEntries = statement.getIeEntries().stream()
-					.filter(entry -> entry != null && entry.getType()!='O')
-					.collect(Collectors.toList());
 			
-			if(ieEntries.isEmpty()) {
+		List<IEStatementEntry> ieEntries = new ArrayList<>();
+
+		if (statement != null && statement.getIeEntries() != null) {
+			for (IEStatementEntry entry : statement.getIeEntries()) {
+				if (entry != null && entry.getType() != null && entry.getType() != 'O') {
+					ieEntries.add(entry);
+				}
+			}
+
+			if (ieEntries.isEmpty()) {
 				totalPayments = BigDecimal.ZERO;
 				prevTotalPayments = BigDecimal.ZERO;
 			}
