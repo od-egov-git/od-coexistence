@@ -900,8 +900,10 @@ public class ReceiptsAndPaymentsService extends ReportService {
 			}
 		}
 		
-		List<IEStatementEntry> banner1Entries = ieEntries.stream().filter(entry -> entry.getType() == 'M')
+		List<IEStatementEntry> banner1Entries = ieEntries.stream()
+				.filter(entry -> entry != null && entry.getType() != null && entry.getType() == 'M')
 				.collect(Collectors.toList());
+		
 		resultList.add(new RPAccountEntry(banner1Entries.get(0).getGlCode(),
 				"Operating Receipts", null,
 				null, banner1Entries.get(0).getGlCode(),
@@ -940,16 +942,22 @@ public class ReceiptsAndPaymentsService extends ReportService {
 
 		List<BSStatementEntry> bsEntries = receiptsAndPaymentsAccountStatement.getBsEntries();
 		
-		List<BSStatementEntry> bannerEntries = bsEntries.stream().filter(entry -> entry.getType() == 'N')
+		List<BSStatementEntry> bannerEntries = bsEntries.stream()
+				.filter(entry -> entry != null && entry.getType() != null && entry.getType() == 'N')
 				.collect(Collectors.toList());
 		resultList.add(new RPAccountEntry(bannerEntries.get(0).getGlCode(),
 				"Non-operating Receipts", bannerEntries.get(0).getCreditamount(),
 				bannerEntries.get(0).getPrevCreditamount(), bannerEntries.get(0).getGlCode(),
 				"Non-operating Payments", bannerEntries.get(0).getDebitamount(),
 				bannerEntries.get(0).getPrevDebitamount(), 'Y'));
-
-		List<BSStatementEntry> assetLiabilitiesEntries = bsEntries.stream()
-				.filter(entry -> entry.getType() == 'A' || entry.getType() == 'L').collect(Collectors.toList());
+		
+		List<BSStatementEntry> assetLiabilitiesEntries = new ArrayList<>();
+		if (bsEntries != null) {
+		    assetLiabilitiesEntries = bsEntries.stream()
+		            .filter(entry -> entry.getType() != null &&
+		                    (entry.getType() == 'A' || entry.getType() == 'L'))
+		            .collect(Collectors.toList());
+		}
 
 		for (int i = 0; i < assetLiabilitiesEntries.size(); i++) {
 			resultList.add(new RPAccountEntry(assetLiabilitiesEntries.get(i).getGlCode(),
@@ -959,14 +967,16 @@ public class ReceiptsAndPaymentsService extends ReportService {
 					assetLiabilitiesEntries.get(i).getPrevDebitamount(), 'Y'));
 		}
 
-		List<BSStatementEntry> totalsEntries = bsEntries.stream().filter(entry -> entry.getType() == 'T')
+		List<BSStatementEntry> totalsEntries = bsEntries.stream()
+				.filter(entry -> entry != null && entry.getType() != null && entry.getType() == 'T')
 				.collect(Collectors.toList());
 		resultList.add(new RPAccountEntry(totalsEntries.get(0).getGlCode(), totalsEntries.get(0).getAccountName(),
 				totalsEntries.get(0).getCreditamount(), totalsEntries.get(0).getPrevCreditamount(),
 				totalsEntries.get(0).getGlCode(), totalsEntries.get(0).getAccountName(),
 				totalsEntries.get(0).getDebitamount(), totalsEntries.get(0).getPrevDebitamount(), 'Y'));
 
-		List<BSStatementEntry> grandTotalsEntries = bsEntries.stream().filter(entry -> entry.getType() == 'R')
+		List<BSStatementEntry> grandTotalsEntries = bsEntries.stream()
+				.filter(entry -> entry != null && entry.getType() != null && entry.getType() == 'R')
 				.collect(Collectors.toList());
 		resultList.add(new RPAccountEntry(grandTotalsEntries.get(0).getGlCode(),
 				"Total of Receipts", grandTotalsEntries.get(0).getCreditamount(),
@@ -974,7 +984,8 @@ public class ReceiptsAndPaymentsService extends ReportService {
 				"Total of Payments", grandTotalsEntries.get(0).getDebitamount(),
 				grandTotalsEntries.get(0).getPrevDebitamount(), 'Y'));
 
-		List<BSStatementEntry> closingEntries = bsEntries.stream().filter(entry -> entry.getType() == 'C')
+		List<BSStatementEntry> closingEntries = bsEntries.stream()
+				.filter(entry -> entry != null && entry.getType() != null && entry.getType() == 'C')
 				.collect(Collectors.toList());
 
 		for (int i = 0; i < closingEntries.size(); i++) {
