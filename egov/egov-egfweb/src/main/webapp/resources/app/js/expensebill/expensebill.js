@@ -1246,75 +1246,82 @@ function validate(){
 		return false;
 	}
 	
-	if(!$netPayableAccountCodeId)
+	/*if(!$netPayableAccountCodeId)
 	{
 		//bootbox.alert($.i18n.prop('msg.please.select.one.net.payable.account.detail'));
 		bootbox.alert("Please select sub-ledger account deatil");
 		return false;
-	}
+	}*/
 	return true;
 }
 
 function clearAllDetails() {
-	var debitDetailsCount = $("#tbldebitdetails > tbody > tr:visible[id='debitdetailsrow']").length;
-	for (var i = debitDetailsCount; i >= 1; i--) {
-		if(1 == i){
-			document.getElementById('tempDebitDetails[0].debitGlcode').value = "";
-			document.getElementById('tempDebitDetails[0].glcode').value = "";
-			document.getElementById('tempDebitDetails[0].glcodeid').value = "";
-			document.getElementById('tempDebitDetails[0].detailTypeId').value = "";
-			document.getElementById('tempDebitDetails[0].detailKeyId').value = "";
-			document.getElementById('tempDebitDetails[0].debitAccountHead').value = "";
-			document.getElementById('tempDebitDetails[0].debitamount').value = "";
-		}else{
-			var objects = $('.debit-delete-row');
-			deleteRow(objects[i-1],'tbldebitdetails');
-		}
-	}
-	
-	var creditDetailsCount = $("#tblcreditdetails > tbody > tr:visible[id='creditdetailsrow']").length;
-	for (var i = creditDetailsCount; i >= 1; i--) {
-		if(1 == i){
-			document.getElementById('tempCreditDetails[0].creditGlcode').value = "";
-			document.getElementById('tempCreditDetails[0].glcode').value = "";
-			document.getElementById('tempCreditDetails[0].glcodeid').value = "";
-			document.getElementById('tempCreditDetails[0].detailTypeId').value = "";
-			document.getElementById('tempCreditDetails[0].detailKeyId').value = "";
-			document.getElementById('tempCreditDetails[0].creditAccountHead').value = "";
-			document.getElementById('tempCreditDetails[0].creditamount').value = "";
-		}else{
-			var objects = $('.credit-delete-row');
-			deleteRow(objects[i-1],'tblcreditdetails');
-		}
-	}
-	
-	
-	var subledgerCount = $('#tblSubledgerAdd  > tbody > tr:visible[id="subledgerdetailsrow"]').length;
-	for (var i = subledgerCount; i >= 1; i--) {
-		if(1 == i){
-			document.getElementById('tempCreditDetails[0].creditGlcode').value = "";
-			document.getElementById('tempSubLedger[0].subLedgerType').value = "";
-			document.getElementById('tempSubLedger[0].netPayableAccountCode').value = "";
-			document.getElementById('tempSubLedger[0].detailkeyId').value = "";
-			document.getElementById('tempSubLedger[0].subLedgerCode').value = "";
-			document.getElementById('tempSubLedger[0].payTo').value = "";
-			document.getElementById('tempSubLedger[0].expense-netPayableAmount').value = "";
-		}else{
-			var objects = $('.subledge-delete-row');
-			deleteRow(objects[i-1],'tblSubledgerAdd');
-		}
-	}
-	
-	document.getElementById('tempSubLedger[0].netPayableAccountId').value = "";
-	document.getElementById('tempSubLedger[0].netPayableAccountCodeId').value = "";
-	document.getElementById('tempSubLedger[0].netPayableDetailTypeId').value = "";
-	document.getElementById('tempSubLedger[0].netPayableDetailKeyId').value = "";
-	document.getElementById('tempSubLedger[0].netPayableAccountCode').value = "";
-	document.getElementById('tempSubLedger[0].expense-netPayableAmount').value = "";
-	
-	
-	
+    var debitDetailsCount = $("#tbldebitdetails > tbody > tr:visible[id='debitdetailsrow']").length;
+    for (var i = debitDetailsCount; i >= 1; i--) {
+        if (i === 1) {
+            // Check if elements exist before setting their values
+            if (document.getElementById('tempDebitDetails[0].debitGlcode')) {
+                document.getElementById('tempDebitDetails[0].debitGlcode').value = "";
+                document.getElementById('tempDebitDetails[0].glcode').value = "";
+                document.getElementById('tempDebitDetails[0].glcodeid').value = "";
+                document.getElementById('tempDebitDetails[0].detailTypeId').value = "";
+                document.getElementById('tempDebitDetails[0].detailKeyId').value = "";
+                document.getElementById('tempDebitDetails[0].debitAccountHead').value = "";
+                document.getElementById('tempDebitDetails[0].debitamount').value = "";
+            }
+        } else {
+            var objects = $('.debit-delete-row');
+            deleteRow(objects[i - 1], 'tbldebitdetails');
+        }
+    }
+
+    var creditDetailsCount = $("#tblcreditdetails > tbody > tr:visible[id='creditdetailsrow']").length;
+    for (var i = creditDetailsCount; i >= 1; i--) {
+        if (i === 1) {
+            if (document.getElementById('tempCreditDetails[0].creditGlcode')) {
+                document.getElementById('tempCreditDetails[0].creditGlcode').value = "";
+                document.getElementById('tempCreditDetails[0].glcode').value = "";
+                document.getElementById('tempCreditDetails[0].glcodeid').value = "";
+                document.getElementById('tempCreditDetails[0].detailTypeId').value = "";
+                document.getElementById('tempCreditDetails[0].detailKeyId').value = "";
+                document.getElementById('tempCreditDetails[0].creditAccountHead').value = "";
+                document.getElementById('tempCreditDetails[0].creditamount').value = "";
+            }
+        } else {
+            var objects = $('.credit-delete-row');
+            deleteRow(objects[i - 1], 'tblcreditdetails');
+        }
+    }
+
+    var subledgerCount = $('#tblSubledgerAdd > tbody > tr:visible[id="subledgerdetailsrow"]').length;
+    for (var i = subledgerCount; i >= 1; i--) {
+        if (i === 1) {
+            if (document.getElementById('tempSubLedger[0].creditGlcode')) {
+                document.getElementById('tempSubLedger[0].creditGlcode').value = "";
+                document.getElementById('tempSubLedger[0].subLedgerType').value = "";
+                document.getElementById('tempSubLedger[0].netPayableAccountCode').value = "";
+                document.getElementById('tempSubLedger[0].detailkeyId').value = "";
+                document.getElementById('tempSubLedger[0].subLedgerCode').value = "";
+                document.getElementById('tempSubLedger[0].payTo').value = "";
+                document.getElementById('tempSubLedger[0].expense-netPayableAmount').value = "";
+            }
+        } else {
+            var objects = $('.subledge-delete-row');
+            deleteRow(objects[i - 1], 'tblSubledgerAdd');
+        }
+    }
+
+    // Check these elements too
+    if (document.getElementById('tempSubLedger[0].netPayableAccountId')) {
+        document.getElementById('tempSubLedger[0].netPayableAccountId').value = "";
+        document.getElementById('tempSubLedger[0].netPayableAccountCodeId').value = "";
+        document.getElementById('tempSubLedger[0].netPayableDetailTypeId').value = "";
+        document.getElementById('tempSubLedger[0].netPayableDetailKeyId').value = "";
+        document.getElementById('tempSubLedger[0].netPayableAccountCode').value = "";
+        document.getElementById('tempSubLedger[0].expense-netPayableAmount').value = "";
+    }
 }
+
 
 
 function populateSubLedgerDetails(glCodeId,glCode,detailTypeId,detailKeyId,detailTypeName,detailKeyName,amount,isdebit){
@@ -1362,8 +1369,12 @@ function calculateBillAmount(){
 		billamount = parseFloat(Number(billamount) + Number($(this).find(".accountDetailsDebitAmount").html())).toFixed(2);
 		debitamount = parseFloat(Number(debitamount) + Number($(this).find(".accountDetailsDebitAmount").html())).toFixed(2);
 		creditamount = parseFloat(Number(creditamount) + Number($(this).find(".accountDetailsCreditAmount").html())).toFixed(2);
+		console.log("Debit Value: ", debitamount, " Credit Value: ", creditamount);
 	});
 	//creditamount = amountConverter(creditamount - netpayableamount);
+	console.log("Total Bill Amount: ", billamount);
+    console.log("Total Debit Amount: ", debitamount);
+    console.log("Total Credit Amount: ", creditamount);
 	$("#expenseNetPayableAmount").html(netpayableamount);
 	$("#expenseBillTotalDebitAmount").html(debitamount);
 	$("#expenseBillTotalCreditAmount").html(creditamount);
