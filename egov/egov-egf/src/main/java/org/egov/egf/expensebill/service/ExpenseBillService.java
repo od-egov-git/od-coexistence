@@ -535,7 +535,7 @@ public class ExpenseBillService {
                         .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME)
                         .withCreatedBy(user.getId())
                         .withtLastModifiedBy(user.getId());
-            } else if (FinancialConstants.BUTTONCANCEL.equalsIgnoreCase(workFlowAction) || "Approve".equalsIgnoreCase(workFlowAction)) {
+            } else if (FinancialConstants.BUTTONCANCEL.equalsIgnoreCase(workFlowAction)) {
                 stateValue = FinancialConstants.WORKFLOW_STATE_CANCELLED;
                 egBillregister.transition().end().withSenderName(user.getUsername() + "::" + user.getName())
                         .withComments(approvalComent)
@@ -551,6 +551,20 @@ public class ExpenseBillService {
         		 egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
                          "Cancelled"));
         		}
+            } else if("Approve".equalsIgnoreCase(workFlowAction)) {
+            	
+            	wfmatrix = egBillregisterRegisterWorkflowService.getWfMatrix(egBillregister.getStateType(), null,
+                        null, additionalRule, egBillregister.getCurrentState().getValue(), null);
+
+                if (stateValue.isEmpty())
+                    stateValue = wfmatrix.getNextState();
+
+                egBillregister.transition().end().withSenderName(user.getUsername() + "::" + user.getName())
+                        .withComments(approvalComent)
+                        .withStateValue(stateValue).withDateInfo(new Date())
+                        .withNextAction(wfmatrix.getNextAction())
+                        .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME);
+            	
             } else if (FinancialConstants.BUTTONVERIFY.equalsIgnoreCase(workFlowAction)) {
                 wfmatrix = egBillregisterRegisterWorkflowService.getWfMatrix(egBillregister.getStateType(), null,
                         null, additionalRule, egBillregister.getCurrentState().getValue(), null);

@@ -145,11 +145,11 @@ window.onload=function(){
            
                 <jsp:include page="expensebill-debitdetails.jsp"/>
                 <jsp:include page="expensebill-creditdetails.jsp"/>
-                 <jsp:include page="expensebill-subledgerdetails.jsp"/>
-               <jsp:include page="expensebill-netpayable.jsp"/> 
+                <jsp:include page="expensebill-netpayable.jsp"/> 
+                <jsp:include page="expensebill-accountdetails.jsp"/>              
             </div>
-            <jsp:include page="expensebill-accountdetails.jsp"/>
-            <jsp:include page="expensebill-subledgeraccountdetails.jsp"/>
+            <jsp:include page="expensebill-subledgerdetails.jsp"/>
+            <jsp:include page="expensebill-subledgeraccountdetails.jsp"/> 
             <jsp:include page="billdocument-upload.jsp"/>
         </div>
         <div class="tab-pane fade" id="checklist">
