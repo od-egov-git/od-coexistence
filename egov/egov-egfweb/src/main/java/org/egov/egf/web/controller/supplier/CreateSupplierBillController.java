@@ -327,6 +327,8 @@ public class CreateSupplierBillController extends BaseBillController {
       	  mis.setFunction(function);
        }
        
+       egBillregister.setEgBillregistermis(mis);
+       
        appConfigValuesList=null;
        setFundnamenew(fundCodeNameMap.get(getFundnew()));
        	model.addAttribute("fundnamenew", getFundnamenew());
