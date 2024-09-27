@@ -51,6 +51,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -328,23 +329,48 @@ List<String> billtype=new ArrayList<>();
             egBillregister.getEgBilldetailes().addAll(egBillregister.getNetPayableDetails());
         }
 
-        for (final EgBilldetails details : egBillregister.getEgBilldetailes()) {
-        	System.out.println(":::"+egBillregister.getEgBillregistermis().getFunction().getId());
+//        for (final EgBilldetails details : egBillregister.getEgBilldetailes()) {
+//        	System.out.println(":::"+egBillregister.getEgBillregistermis().getFunction().getId());
+//            if (details.getGlcodeid() != null) {
+//            	LOGGER.info("details.getGlcodeid() "+details.getGlcodeid());
+//                if (egBillregister.getEgBillregistermis().getFunction() != null){
+//                	LOGGER.info("egBillregister.getEgBillregistermis().getFunction() "+egBillregister.getEgBillregistermis().getFunction());
+//                    details.setFunctionid(BigDecimal.valueOf(egBillregister.getEgBillregistermis().getFunction().getId()));
+//                    details.setFunction(egBillregister.getEgBillregistermis().getFunction());
+//                }
+//                details.setEgBillregister(egBillregister);
+//                details.setLastupdatedtime(new Date());
+//                details.setChartOfAccounts(chartOfAccountsService.findById(details.getGlcodeid().longValue(), false));
+//                LOGGER.info("details egbillId "+details.getEgBillregister().getId());
+//                LOGGER.info("details functionId "+details.getFunctionid());
+//            } else {
+//            	egBillregister.getEgBilldetailes().remove(details);
+//            }
+//            LOGGER.info("details.getGlcodeid() empty");
+//        }
+        
+        Iterator<EgBilldetails> iterator = egBillregister.getEgBilldetailes().iterator();
+        while (iterator.hasNext()) {
+            EgBilldetails details = iterator.next();
+            System.out.println(":::" + egBillregister.getEgBillregistermis().getFunction().getId());
             if (details.getGlcodeid() != null) {
-            	LOGGER.info("details.getGlcodeid() "+details.getGlcodeid());
-                if (egBillregister.getEgBillregistermis().getFunction() != null){
-                	LOGGER.info("egBillregister.getEgBillregistermis().getFunction() "+egBillregister.getEgBillregistermis().getFunction());
+                LOGGER.info("details.getGlcodeid() " + details.getGlcodeid());
+                if (egBillregister.getEgBillregistermis().getFunction() != null) {
+                    LOGGER.info("egBillregister.getEgBillregistermis().getFunction() " + egBillregister.getEgBillregistermis().getFunction());
                     details.setFunctionid(BigDecimal.valueOf(egBillregister.getEgBillregistermis().getFunction().getId()));
                     details.setFunction(egBillregister.getEgBillregistermis().getFunction());
                 }
                 details.setEgBillregister(egBillregister);
                 details.setLastupdatedtime(new Date());
                 details.setChartOfAccounts(chartOfAccountsService.findById(details.getGlcodeid().longValue(), false));
-                LOGGER.info("details egbillId "+details.getEgBillregister().getId());
-                LOGGER.info("details functionId "+details.getFunctionid());
+                LOGGER.info("details egbillId " + details.getEgBillregister().getId());
+                LOGGER.info("details functionId " + details.getFunctionid());
+            } else {
+                iterator.remove(); // Remove the current element safely
             }
             LOGGER.info("details.getGlcodeid() empty");
         }
+
         if (!egBillregister.getBillPayeedetails().isEmpty())
             populateBillPayeeDetails(egBillregister);
     }
