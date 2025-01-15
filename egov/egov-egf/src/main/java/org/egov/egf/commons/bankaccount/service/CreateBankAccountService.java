@@ -49,6 +49,7 @@ package org.egov.egf.commons.bankaccount.service;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -68,6 +69,8 @@ import org.egov.commons.CChartOfAccounts;
 import org.egov.commons.service.ChartOfAccountsService;
 import org.egov.egf.commons.bankaccount.repository.BankAccountRepository;
 import org.egov.egf.commons.bankbranch.service.CreateBankBranchService;
+import org.egov.egf.contract.model.BankAccount;
+import org.egov.egf.contract.model.NewBankAccount;
 import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
@@ -130,6 +133,10 @@ public class CreateBankAccountService {
 
     public List<Bankaccount> getByBranchId(final Integer branchId) {
         return bankAccountRepository.findByBankbranch_Id(branchId);
+    }
+    
+    public List<Bankaccount> getByIsActive() {
+        return bankAccountRepository.findByIsactiveTrue();
     }
 
     @Transactional
@@ -273,4 +280,25 @@ public class CreateBankAccountService {
             LOGGER.error("Error while reloading coa cache");
         }
     }
+
+	public List<NewBankAccount> getAllActiveBankAccounts() {
+
+		List<NewBankAccount> bankAccounts = new ArrayList<>();
+
+		List<Bankaccount> bankAccounts1 = getByIsActive();
+
+		for (Bankaccount acc : bankAccounts1) {
+			NewBankAccount newAcc = new NewBankAccount();
+			newAcc.setAccount(acc.getAccountnumber());
+			newAcc.setCode(acc.getChartofaccounts().getGlcode());
+			newAcc.setBankName(acc.getBankbranch().getBank().getName());
+			newAcc.setBankBranchName(acc.getBankbranch().getBranchname());
+			bankAccounts.add(newAcc);
+		}
+
+		return bankAccounts;
+	}
+    
+    
+    
 }
