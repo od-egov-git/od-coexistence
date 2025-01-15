@@ -21,6 +21,7 @@ import org.egov.collection.entity.MisReceiptDetail;
 import org.egov.collection.service.MisReceiptDetailService;
 import org.egov.commons.Accountdetailtype;
 import org.egov.commons.Bank;
+import org.egov.commons.Bankaccount;
 import org.egov.commons.CChartOfAccountDetail;
 import org.egov.commons.CChartOfAccounts;
 import org.egov.commons.CFunction;
@@ -39,12 +40,18 @@ import org.egov.commons.utils.EntityType;
 import org.egov.egf.autonumber.ExpenseBillNumberGenerator;
 import org.egov.egf.billsubtype.service.EgBillSubTypeService;
 import org.egov.egf.commons.bank.service.CreateBankService;
+import org.egov.egf.commons.bankaccount.service.CreateBankAccountService;
 import org.egov.egf.contract.model.AccountDetailContract;
+import org.egov.egf.contract.model.BankAccount;
+import org.egov.egf.contract.model.BankAccountResponse;
 import org.egov.egf.contract.model.MigrationRequest;
 import org.egov.egf.contract.model.MigrationResponse;
 import org.egov.egf.contract.model.MisReceiptsDetailsRequest;
 import org.egov.egf.contract.model.MisReceiptsDetailsResponse;
 import org.egov.egf.contract.model.MisReceiptsPOJO;
+import org.egov.egf.contract.model.NewBankAccount;
+import org.egov.egf.contract.model.NewBankAccountRequest;
+import org.egov.egf.contract.model.NewBankAccountResponse;
 import org.egov.egf.contract.model.RefundRequest;
 import org.egov.egf.contract.model.RefundResponse;
 import org.egov.egf.contract.model.SubledgerDetailContract;
@@ -142,6 +149,28 @@ public class VoucherController extends BaseBillController{
     private EgBillSubTypeService egBillSubTypeService;
     @Autowired
     private ChartOfAccountDetailService chartOfAccountDetailService;
+    @Autowired
+    private CreateBankAccountService bankAccountService;
+    
+    @PostMapping(value = "/rest/voucher/bankacc/_search")
+	@ResponseBody
+	public NewBankAccountResponse searchBankAccount(@RequestBody NewBankAccountRequest bankAccSearchRequest) {
+		try {
+			
+    		List<NewBankAccount> bankAccounts = bankAccountService.getAllActiveBankAccounts();
+    		
+    		NewBankAccountResponse response = new NewBankAccountResponse();
+    		response.setBankaccounts(bankAccounts);		
+			response.setResponseInfo(MicroserviceUtils.getResponseInfo(bankAccSearchRequest.getRequestInfo(),
+					HttpStatus.SC_OK, null));
+			return response;
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage(), e);
+			throw new ApplicationRuntimeException(e.getMessage());
+		}
+
+	}
+    
 	@PostMapping(value = "/rest/voucher/_search")
 	@ResponseBody
 	public VoucherResponse create(@RequestBody VoucherSearchRequest voucherSearchRequest) {
@@ -973,6 +1002,8 @@ public boolean checknullBigDecimal(BigDecimal value) {
 		//refundresponse.setResponseInfo(responseInfo);
 		return refundresponse;
 	}
+	
+	
 
 
 }
