@@ -537,7 +537,18 @@ public class AjaxReceiptCreateAction extends BaseFormAction {
     @Action(value = "/receipts/ajaxReceiptCreate-ajaxTaxHeadMasterByService")
     public String ajaxTaxHeadMasterByService() {
 
-        final String serviceId = parameters.get(SERVICEID)[0];
+        String serviceId = parameters.get(SERVICEID)[0];
+        
+        if(serviceId.equals("PT.PT")) {
+        	serviceId="PT";
+        } else if(serviceId.equals("WS.WS")) {
+        	serviceId="WS";
+        } else if(serviceId.equals("MR.MR")) {
+        	serviceId="MR";
+        } else if(serviceId.equals("TL.TL")) {
+        	serviceId="TL";
+        }
+        
         List<TaxHeadMaster> taxHeadMasters = microserviceUtils.getTaxheadsByServiceCode(serviceId);
         taxHeadMastersList = new ArrayList<>();
         if (null != taxHeadMasters && !taxHeadMasters.isEmpty()) {

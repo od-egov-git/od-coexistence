@@ -1773,10 +1773,10 @@ public class MicroserviceUtils {
     public List<BusinessService> getBusinessService(String type) {
         List<BusinessService> list = null;
         List<ModuleDetail> moduleDetailsList = new ArrayList<>();
-        this.prepareModuleDetails(moduleDetailsList, "BillingService", "BusinessService", "type", type, String.class);
+        this.prepareModuleDetails(moduleDetailsList, "BillingService", "BusinessServiceMiscRec", "type", type, String.class);
         Map postForObject = mapper.convertValue(this.getMdmsData(moduleDetailsList, true, null, null), Map.class);
         if(postForObject != null){
-             list = mapper.convertValue(JsonPath.read(postForObject, "$.MdmsRes.BillingService.BusinessService"),new TypeReference<List<BusinessService>>(){});
+             list = mapper.convertValue(JsonPath.read(postForObject, "$.MdmsRes.BillingService.BusinessServiceMiscRec"),new TypeReference<List<BusinessService>>(){});
         }
         return list;
     }
