@@ -175,6 +175,65 @@
 		document.getElementById("remittanceAmount").value = totalAmtDisplay;
 	}
 	
+	// Modified toggleAll function to trigger the receipt selection handler
+	function toggleAll(source) {
+	    var checkboxes = document.querySelectorAll("input[type='checkbox'][name^='finalList']");
+	    for (var i = 0; i < checkboxes.length; i++) {
+	        checkboxes[i].checked = source.checked;
+	    }
+	    
+	    // Get all receipt numbers when "Select All" is checked
+	    if (source.checked) {
+	        var receiptNos = "";
+	        for (var i = 0; i < checkboxes.length; i++) {
+	            document.getElementById("selected_" + i).value = true;
+	            if (receiptNos == "") {
+	                receiptNos += document.getElementById("receiptNumber_" + i).value;
+	            } else {
+	                receiptNos += "','" + document.getElementById("receiptNumber_" + i).value;
+	            }
+	        }
+	        
+	        // Make the AJAX call to fetch and populate history details
+	        jQuery("#historyDetailTable tbody").empty();
+	        jQuery.ajax({
+	            url: '/services/collection/remittanceBankdetail/gldetails?receiptNo=' + receiptNos,
+	            contentType: "application/json",
+	            dataType: "json",
+	            success: function(r) {
+	                data = r;
+	                for (var i = 0; i < data.length; i++) {
+	                    jQuery("#historyDetailTable tbody").append(
+	                        '<tr>' +
+	                        '<td>' + '<input type="text" name="remittance[' + i + '].glName" readonly="true" value="' + data[i].glName + '" style="width:100%"/></td>' +
+	                        '<td >' + '<input type="text" name="remittance[' + i + '].glcode" readonly="true" value="' + data[i].glcode + '" style="width:100%"/></td>' +
+	                        '<td >' + '<input type="text" name="remittance[' + i + '].amount" readonly="true" value="' + data[i].amount + '" style="width:100%"/></td>' +
+	                        '<td align="center" >' + '<select id="remitAccountNumber" name="remittance[' + i + '].bankaccount" >' +
+	                        '<option value="-1">Select</option>' +
+	                        '<c:forEach items="${dropdownData.bankaccountNumberList}" var="accNum">' +
+	                        '<option value="${accNum}" >${accNum}</option>' +
+	                        '</c:forEach>' +
+	                        '</select>' + '</td>' +
+	                        '</tr>'
+	                    );
+	                }
+	                document.getElementById("historyDetailTable").scrollIntoView();
+	            }
+	        });
+	        
+	        // Show the history table
+	        document.getElementById("historyDetailTable").style.display = 'block';
+	    } else {
+	        // Clear and hide the history table when unchecking "Select All"
+	        jQuery("#historyDetailTable tbody").empty();
+	        document.getElementById("historyDetailTable").style.display = 'none';
+	        // Reset the selected values
+	        for (var i = 0; i < checkboxes.length; i++) {
+	            document.getElementById("selected_" + i).value = false;
+	        }
+	    }
+	}
+	
 	function handleReceiptSelectionEvent(rownum) {
 
 		dom.get("multipleserviceselectionerror").style.display = "none";
@@ -613,110 +672,169 @@
 					<div class="buttonbottom">
 						<input name="search" type="submit" class="buttonsubmit" id="search" value="Search" onclick="return searchDataToRemit()" />
 					</div>
-					
-						
-					<s:if test="%{!resultList.isEmpty()}">
-						<display:table name="resultList" id="currentRow" class="table table-bordered" uid="currentRow" pagesize="${pageSize}" style="border:1px;width:100%" cellpadding="0" cellspacing="0" export="false" requestURI="">
-							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Select" style="width:5%; text-align: center">
-								<c:set var="rowNumber" value="${currentRow_rowNum-1}" ></c:set>
-								<input type='checkbox' name='finalList[${rowNumber}].selected'  id='selected_${rowNumber}' value ="false" onClick="handleReceiptSelectionEvent(${rowNumber})" />
-								<input type="hidden" name="finalList[${rowNumber}].service"  id="service_${rowNumber}" value="${currentRow.service}" />
-								<input type="hidden" name="finalList[${rowNumber}].serviceName"  id="serviceName_${rowNumber}" value="${currentRow.serviceName}" />
-								<input type="hidden" name="finalList[${rowNumber}].receiptId"  id="receiptId_${rowNumber}" value="${currentRow.receiptId}" />
-								<input type="hidden" name="finalList[${rowNumber}].receiptNumber"  id="receiptNumber_${rowNumber}" value="${currentRow.receiptNumber}" />
-								<input type="hidden" name="finalList[${rowNumber}].fund"  id="fund_${rowNumber}" value="${currentRow.fund}" />
-								<input type="hidden" name="finalList[${rowNumber}].fundName"  id="fundName_${rowNumber}" value="${currentRow.fundName}" />
-								<input type="hidden" name="finalList[${rowNumber}].functionCode"  id="functionCode_${rowNumber}" value="${currentRow.functionCode}" />
-								<input type="hidden" name="finalList[${rowNumber}].department" id="department_${rowNumber}"  value="${currentRow.departmentName}" />
-								<input type="hidden" name="finalList[${rowNumber}].subDivision" id="subDivision_${rowNumber}"  value="${currentRow.subDivision}" />
-								<input type="hidden" name="finalList[${rowNumber}].instrumentAmount"  id="instrumentAmount_${rowNumber}" value="${currentRow.instrumentAmount}" />
-								<input type="hidden" name="finalList[${rowNumber}].instrumentType"  id="instrumentType_${rowNumber}" value="${currentRow.instrumentType}" />
-								<input type="hidden" name="finalList[${rowNumber}].receiptDate"  id="receiptDate_${rowNumber}" value="${currentRow.receiptDate}" />
-								<input type="hidden" name="finalList[${rowNumber}].createdUser"  id="createdUser_${rowNumber}" value="${currentRow.createdUser}" />
-								<input type="hidden" name="instrumentAmount" disabled="disabled" id="instrumentAmount" value="${currentRow.instrumentAmount}" />
-								<input type="hidden" name="receiptNumber" disabled="disabled" id="receiptNumber" value="${currentRow.receiptNumber}" />
-							</display:column>
-							
-							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Receipt No." style="width:10%;text-align: center" value="${currentRow.receiptNumber}" />
-							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Date" style="width:10%;text-align: center" value="${currentRow.receiptDate}" />
-							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Service Name" style="width:20%;text-align: center" value="${currentRow.serviceName}" />
-							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Fund" style="width:10%;text-align: center" value="${currentRow.fundName}" />
-							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Department" style="width:10%;text-align: center" value="${currentRow.departmentName}" />
-							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Subdivison" style="width:10%;text-align: center" value="${currentRow.subDivision}" />
-							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Collected By" style="width:15%;text-align: center" value="${currentRow.createdUser}" />
-							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Mode Of Payment" style="width:10%;text-align: center" value="${currentRow.instrumentType}" />
-							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Total Cash Collection" style="width:10%;text-align: center">
-									<div align="center">
-										<c:if test="${not empty currentRow.instrumentAmount}">
-											<c:out value="${currentRow.instrumentAmount}" />
-										</c:if>
-										&nbsp;
-									</div>
-							</display:column>
-						</display:table>
-				
-				<br />
-				<div id="loadingMask" style="display: none; overflow: hidden; text-align: center">
-					<img src="/services/collection/resources/images/bar_loader.gif" alt="" /> <span style="color: red">Please wait....</span>
-				</div>
-<div id="historyDetailTable" >
-					<table width="80%" border="0" align="center" cellpadding="0"
-						cellspacing="0" class="table table-bordered">
-						<thead>
-						<tr>
-							<th class="bluebgheadtd">GL Name</th>
-							<th class="bluebgheadtd">GL Code</th>
-							<th class="bluebgheadtd">Amount</th>
-							<th class="bluebgheadtd">Account Branch</th>
-							
-						</tr>
-						</thead>
-						
-						<tbody></tbody>
-						<c:set var="trclass" value="greybox" />
 
-						
-						<s:hidden name="targetvalue" value="%{target}" id="targetvalue" />
-					</table>
-				</div>
-				<div align="center">
-					<table>
-						<tr>					
-							<td class="bluebox" colspan="3">&nbsp;</td>
-							<td class="bluebox"><s:text name="bankremittance.remittancedate" /><span class="mandatory" /></td>
-							<td class="bluebox"><s:textfield id="remittanceDate" name="remittanceDate" data-inputmask="'mask': 'd/m/y'" placeholder="DD/MM/YYYY" /></td>
-							
-							<td class="bluebox">Narration<span class="mandatory" /></td>
-							<td class="bluebox" colspan="3"><s:textarea id="narration" name="narration" cols="100" rows="3"/></td>	
-						</tr>
-						<tr>
-							<td class="bluebox" colspan="3">&nbsp;</td>
-							<td class="bluebox">Department<span class="mandatory" /></td>
-		  					<td class="bluebox"><s:select headerKey="-1"
-							headerValue="----Choose----" name="deptIdnew" id="deptIdnew" cssClass="selectwk" list="dropdownData.departmentList" listKey="code" listValue="name"  value="%{deptIdnew}"/> 
-							</td>
-							<td class="bluebox">Function<span class="mandatory"/></td>
-							<td class="bluebox"><s:select headerKey="-1"
-							headerValue="----Choose----" name="functionNew" id="functionNew" cssClass="selectwk" list="dropdownData.functionList" listKey="code" listValue="name"  value="%{functionNew}"/> 
-							</td>
-							<%-- <td class="bluebox"><s:text name="Sub divison"/><span class="mandatory"/></td>
+
+				<s:if test="%{!resultList.isEmpty()}">
+					<display:table name="resultList" id="currentRow"
+						class="table table-bordered" uid="currentRow"
+						pagesize="${pageSize}" style="border:1px;width:100%"
+						cellpadding="0" cellspacing="0" export="false" requestURI="">
+
+						<display:column headerClass="bluebgheadtd" class="blueborderfortd"
+							title='<input type="checkbox" id="selectAll" onclick="toggleAll(this)" />'
+							style="width:5%; text-align: center" escapeXml="false">
+							<c:set var="rowNumber" value="${currentRow_rowNum-1}"></c:set>
+							<input type='checkbox' name='finalList[${rowNumber}].selected'
+								id='selected_${rowNumber}' value="false"
+								onClick="handleReceiptSelectionEvent(${rowNumber})" />
+							<input type="hidden" name="finalList[${rowNumber}].service"
+								id="service_${rowNumber}" value="${currentRow.service}" />
+							<input type="hidden" name="finalList[${rowNumber}].serviceName"
+								id="serviceName_${rowNumber}" value="${currentRow.serviceName}" />
+							<input type="hidden" name="finalList[${rowNumber}].receiptId"
+								id="receiptId_${rowNumber}" value="${currentRow.receiptId}" />
+							<input type="hidden" name="finalList[${rowNumber}].receiptNumber"
+								id="receiptNumber_${rowNumber}"
+								value="${currentRow.receiptNumber}" />
+							<input type="hidden" name="finalList[${rowNumber}].fund"
+								id="fund_${rowNumber}" value="${currentRow.fund}" />
+							<input type="hidden" name="finalList[${rowNumber}].fundName"
+								id="fundName_${rowNumber}" value="${currentRow.fundName}" />
+							<input type="hidden" name="finalList[${rowNumber}].functionCode"
+								id="functionCode_${rowNumber}"
+								value="${currentRow.functionCode}" />
+							<input type="hidden" name="finalList[${rowNumber}].department"
+								id="department_${rowNumber}"
+								value="${currentRow.departmentName}" />
+							<input type="hidden" name="finalList[${rowNumber}].subDivision"
+								id="subDivision_${rowNumber}" value="${currentRow.subDivision}" />
+							<input type="hidden"
+								name="finalList[${rowNumber}].instrumentAmount"
+								id="instrumentAmount_${rowNumber}"
+								value="${currentRow.instrumentAmount}" />
+							<input type="hidden"
+								name="finalList[${rowNumber}].instrumentType"
+								id="instrumentType_${rowNumber}"
+								value="${currentRow.instrumentType}" />
+							<input type="hidden" name="finalList[${rowNumber}].receiptDate"
+								id="receiptDate_${rowNumber}" value="${currentRow.receiptDate}" />
+							<input type="hidden" name="finalList[${rowNumber}].createdUser"
+								id="createdUser_${rowNumber}" value="${currentRow.createdUser}" />
+							<input type="hidden" name="instrumentAmount" disabled="disabled"
+								id="instrumentAmount" value="${currentRow.instrumentAmount}" />
+							<input type="hidden" name="receiptNumber" disabled="disabled"
+								id="receiptNumber" value="${currentRow.receiptNumber}" />
+						</display:column>
+
+						<display:column headerClass="bluebgheadtd" class="blueborderfortd"
+							title="Receipt No." style="width:10%;text-align: center"
+							value="${currentRow.receiptNumber}" />
+						<display:column headerClass="bluebgheadtd" class="blueborderfortd"
+							title="Date" style="width:10%;text-align: center"
+							value="${currentRow.receiptDate}" />
+						<display:column headerClass="bluebgheadtd" class="blueborderfortd"
+							title="Service Name" style="width:20%;text-align: center"
+							value="${currentRow.serviceName}" />
+						<display:column headerClass="bluebgheadtd" class="blueborderfortd"
+							title="Fund" style="width:10%;text-align: center"
+							value="${currentRow.fundName}" />
+						<display:column headerClass="bluebgheadtd" class="blueborderfortd"
+							title="Department" style="width:10%;text-align: center"
+							value="${currentRow.departmentName}" />
+						<display:column headerClass="bluebgheadtd" class="blueborderfortd"
+							title="Subdivison" style="width:10%;text-align: center"
+							value="${currentRow.subDivision}" />
+						<display:column headerClass="bluebgheadtd" class="blueborderfortd"
+							title="Collected By" style="width:15%;text-align: center"
+							value="${currentRow.createdUser}" />
+						<display:column headerClass="bluebgheadtd" class="blueborderfortd"
+							title="Mode Of Payment" style="width:10%;text-align: center"
+							value="${currentRow.instrumentType}" />
+						<display:column headerClass="bluebgheadtd" class="blueborderfortd"
+							title="Total Cash Collection"
+							style="width:10%;text-align: center">
+							<div align="center">
+								<c:if test="${not empty currentRow.instrumentAmount}">
+									<c:out value="${currentRow.instrumentAmount}" />
+								</c:if>
+								&nbsp;
+							</div>
+						</display:column>
+					</display:table>
+
+					<br />
+					<div id="loadingMask"
+						style="display: none; overflow: hidden; text-align: center">
+						<img src="/services/collection/resources/images/bar_loader.gif"
+							alt="" /> <span style="color: red">Please wait....</span>
+					</div>
+					<div id="historyDetailTable">
+						<table width="80%" border="0" align="center" cellpadding="0"
+							cellspacing="0" class="table table-bordered">
+							<thead>
+								<tr>
+									<th class="bluebgheadtd">GL Name</th>
+									<th class="bluebgheadtd">GL Code</th>
+									<th class="bluebgheadtd">Amount</th>
+									<th class="bluebgheadtd">Account Branch</th>
+
+								</tr>
+							</thead>
+
+							<tbody></tbody>
+							<c:set var="trclass" value="greybox" />
+
+
+							<s:hidden name="targetvalue" value="%{target}" id="targetvalue" />
+						</table>
+					</div>
+					<div align="center">
+						<table>
+							<tr>
+								<td class="bluebox" colspan="3">&nbsp;</td>
+								<td class="bluebox"><s:text
+										name="bankremittance.remittancedate" /><span
+									class="mandatory" /></td>
+								<td class="bluebox"><s:textfield id="remittanceDate"
+										name="remittanceDate" data-inputmask="'mask': 'd/m/y'"
+										placeholder="DD/MM/YYYY" /></td>
+
+								<td class="bluebox">Narration<span class="mandatory" /></td>
+								<td class="bluebox" colspan="3"><s:textarea id="narration"
+										name="narration" cols="100" rows="3" /></td>
+							</tr>
+							<tr>
+								<td class="bluebox" colspan="3">&nbsp;</td>
+								<td class="bluebox">Department<span class="mandatory" /></td>
+								<td class="bluebox"><s:select headerKey="-1"
+										headerValue="----Choose----" name="deptIdnew" id="deptIdnew"
+										cssClass="selectwk" list="dropdownData.departmentList"
+										listKey="code" listValue="name" value="%{deptIdnew}" /></td>
+								<td class="bluebox">Function<span class="mandatory" /></td>
+								<td class="bluebox"><s:select headerKey="-1"
+										headerValue="----Choose----" name="functionNew"
+										id="functionNew" cssClass="selectwk"
+										list="dropdownData.functionList" listKey="code"
+										listValue="name" value="%{functionNew}" /></td>
+								<%-- <td class="bluebox"><s:text name="Sub divison"/><span class="mandatory"/></td>
 						    <td class="bluebox">
 						    <div class="yui-skin-sam"><s:select headerKey="-1"
 								headerValue="----Choose----" name="subdivisonNew" id="subdivisonNew"  cssClass="selectwk" list="dropdownData.subdivisonList" listKey="subdivisonCode" listValue="subdivisonName"  value="%{subdivisonNew}"/></td> --%>
-						</tr>
-					</table>
-				</div>
-				<div  align="center">
-					<jsp:include page="common-documentsUpload.jsp" />
-				</div>
-				<div align="left" class="mandatorycoll">
-					<s:text name="common.mandatoryfields" />
-				</div>
-				<div class="buttonbottom">
-					<input name="button32" type="submit" class="buttonsubmit" id="button32" value="Remit to Bank" onclick="return validate();" />
-					&nbsp;
-					<input name="buttonClose" type="button" class="button" id="button" value="Close" onclick="window.close()" />
-				</div>
+							</tr>
+						</table>
+					</div>
+					<div align="center">
+						<jsp:include page="common-documentsUpload.jsp" />
+					</div>
+					<div align="left" class="mandatorycoll">
+						<s:text name="common.mandatoryfields" />
+					</div>
+					<div class="buttonbottom">
+						<input name="button32" type="submit" class="buttonsubmit"
+							id="button32" value="Remit to Bank" onclick="return validate();" />
+						&nbsp; <input name="buttonClose" type="button" class="button"
+							id="button" value="Close" onclick="window.close()" />
+					</div>
 				</s:if>
 				<s:if test="%{isListData}">
 					<s:if test="%{resultList.isEmpty()}">
